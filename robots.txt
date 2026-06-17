@@ -1,0 +1,101 @@
+User-agent: *
+Disallow: */feed/
+Disallow: /feed/$
+Disallow: /*?
+Disallow: /*?=
+Disallow: /search/ 
+Disallow: *?s=* 
+
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.jpeg$
+Allow: /*.gif$
+
+User-agent: Googlebot
+Disallow: */feed/
+Disallow: /feed/$
+Disallow: /*?
+Disallow: /*?=
+Disallow: /search/ 
+Disallow: *?s=* 
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.jpeg$
+Allow: /*.gif$
+
+User-agent: Googlebot-Mobile
+Disallow: */feed/
+Disallow: /feed/$
+Disallow: /*?
+Disallow: /*?=
+Disallow: /search/ 
+Disallow: *?s=* 
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.jpeg$
+Allow: /*.gif$
+
+User-Agent: bingbot
+
+Disallow: */feed/
+Disallow: /feed/$
+Disallow: /*?
+Disallow: /*?=
+Disallow: /search/ 
+Disallow: *?s=* 
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.jpeg$
+Allow: /*.gif$
+
+User-Agent: OAI SearchBot
+Disallow: */feed/
+Disallow: /feed/$
+Disallow: /*?
+Disallow: /*?=
+Disallow: /search/ 
+Disallow: *?s=* 
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.jpeg$
+Allow: /*.gif$
+
+User-Agent: GPTBot
+Disallow: */feed/
+Disallow: /feed/$
+Disallow: /*?
+Disallow: /*?=
+Disallow: /search/ 
+Disallow: *?s=* 
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.jpeg$
+Allow: /*.gif$
+
+User-Agent: ChatGPT-User
+Disallow: */feed/
+Disallow: /feed/$
+Disallow: /*?
+Disallow: /*?=
+Disallow: /search/ 
+Disallow: *?s=* 
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.jpeg$
+Allow: /*.gif$
+
+Sitemap: https://www.vendorscity.com/sitemap.xml

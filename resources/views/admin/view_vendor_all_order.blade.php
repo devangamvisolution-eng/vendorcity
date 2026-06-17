@@ -1,0 +1,792 @@
+@extends('admin.includes.Template')
+<style>
+    /* Gradient Header Background */
+    .detail-header-bg {
+        background: linear-gradient(135deg, #605bff 0%, #3f39cc 100%);
+        padding: 40px 20px 100px;
+        margin: -25px -25px 0 -25px;
+        border-radius: 0 0 30px 30px;
+    }
+
+    .main-content-wrapper {
+        margin-top: -70px;
+        /* Pull content up into the gradient */
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Timeline Styling for Service */
+    .service-timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .service-timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 5px;
+        height: 100%;
+        width: 2px;
+        background: #e2e8f0;
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 22px;
+        height: 22px;
+        background: #fff;
+        border: 4px solid #605bff;
+        border-radius: 50%;
+    }
+
+    /* Pricing Table */
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+    }
+
+    .price-row.total {
+        border-bottom: none;
+        background: #605bff;
+        color: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .label-caps {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #94a3b8;
+        letter-spacing: 1px;
+    }
+
+    .currency_dhiram {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+
+        background-color: currentColor;
+
+        -webkit-mask: url('https://vendorcity.b-cdn.net/public/site/icons/dirham.svg') no-repeat center;
+        mask: url('https://vendorcity.b-cdn.net/public/site/icons/dirham.svg') no-repeat center;
+
+        -webkit-mask-size: contain;
+        mask-size: contain;
+    }
+</style>
+@php
+    if ($order->order_status == 'P') {
+        if ($order->items[0]->service_id == 50) {
+            $statusText = 'Awaiting Confirmation';
+        } else {
+            $statusText = 'Booking Confirmed';
+        }
+        $statusColor = 'bg-success-light text-success';
+    } elseif ($order->order_status == 'PA') {
+        $statusText = 'Vendor Assigned';
+        $statusColor = 'bg-success-light text-success';
+    } elseif ($order->order_status == 'CO') {
+        $statusText = 'Booking Completed';
+        $statusColor = 'bg-success-light text-success';
+    } elseif ($order->order_status == 'CL') {
+        $statusText = 'Booking Cancelled';
+        $statusColor = 'bg-danger-light text-danger';
+    } elseif ($order->order_status == 'BK') {
+        $statusText = 'Booking Requested';
+        $statusColor = 'bg-success-light text-success';
+    } else {
+        $statusColor = 'bg-success-light text-success';
+        $statusText = 'Unknown';
+    }
+@endphp
+@section('content')
+    <div class="content container-fluid">
+        <div class="page-header mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h3 class="page-title">Booking Details</h3>
+                    <ul class="breadcrumb" style="background:none; padding:0;">
+                        <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                        <li class="breadcrumb-item active">#{{ $order->format_order_id }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        @php
+            $sub_total_new =
+                (float) $order->service_charge +
+                (float) $order->promo_discount +
+                (float) $order->additional_charge +
+                (float) $order->timing_charge +
+                (float) $order->service_fee +
+                (float) $order->cod_charge;
+        @endphp
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="badge {{ $statusColor }} mb-2"
+                                    style="font-size: 0.85rem; padding: 0.5em 1em;">
+                                    {{ $statusText }}
+                                </span>
+                                <h4 class="fw-bold mb-1">Order {{ $order->format_order_id }}</h4>
+                            </div>
+                            <div class="text-end">
+                                <p class="text-muted mb-1 small text-uppercase fw-bold">Total Amount</p>
+                                <h3 class="text-primary fw-bold"><span class="currency_dhiram"></span>
+                                    {{ number_format(round($order->order_total), 2) }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-transparent border-bottom">
+                        <h5 class="card-title mb-0"><i class="fas fa-user-circle me-2 text-primary"></i> Customer Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <p class="text-muted mb-1 small uppercase">Full Name</p>
+                                <h6 class="fw-bold">{{ $order->user_name }}</h6>
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <p class="text-muted mb-1 small">Country</p>
+                                <h6 class="fw-bold">United Arab Emirates</h6>
+                            </div>
+                            @if (isset($order->items[0]->city))
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small">Region</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->city }}</h6>
+                                </div>
+                            @endif
+                            @if (isset($order->items[0]->area))
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small">Area</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->area }}</h6>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-transparent border-bottom">
+                        <h5 class="card-title mb-0"><i class="fas fa-broom me-2 text-primary"></i> Service Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            @foreach ($order->items as $item)
+                                @php
+
+                                    if ($item->how_often_do_you_need_cleaning != '') {
+                                        $order_item_package_data = [];
+                                    } else {
+                                        $order_item_package_data = DB::table('ci_order_item_packages')
+                                            ->where('order_id', $item->order_id)
+                                            ->where('order_item_id', $item->id)
+                                            ->get()
+                                            ->toArray();
+                                    }
+                                    $order_item_addonspackage_data = DB::table('ci_order_item_addons')
+                                        ->where('order_id', $item->order_id)
+                                        ->where('order_item_id', $item->id)
+                                        ->get()
+                                        ->toArray();
+                                @endphp
+
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="text-muted mb-0 small">Service Type</p>
+                                            <span class="fw-bold">{!! Helper::subservicename(strval($item->subservice_id)) !!}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (isset($item->cleaner_id))
+                                    @php
+                                        $cleaner_Id = explode(',', $item->cleaner_id);
+                                    @endphp
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Cleaner Name</p>
+                                        <span class="fw-bold text-dark">{!! Helper::cleanername_new($cleaner_Id) !!}</span>
+                                    </div>
+                                @endif
+
+                                @if (!empty($order_item_package_data))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Services</p>
+                                        @foreach ($order_item_package_data as $package_data)
+                                            <span class="fw-bold text-dark">{!! $package_data->package_item_name !!} *
+                                                {!! $package_data->package_quantity !!}</span>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                @if (!empty($item->package_item_name))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Services</p>
+                                            <span class="fw-bold text-dark">{!! $item->package_item_name !!} *
+                                                {!! $item->package_quantity !!}</span>
+                                    </div>
+                                @endif
+
+                                @if (!empty($item->origin_add))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Origin Address</p>
+                                            <span class="fw-bold text-dark">{!! $item->origin_add !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->origin_country))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Origin Country</p>
+                                            <span class="fw-bold text-dark">{!! Helper::countryname($item->origin_country) !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->origin_state))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Origin State</p>
+                                            <span class="fw-bold text-dark">{!! $item->origin_state !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->origin_city))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Origin City</p>
+                                            <span class="fw-bold text-dark">{!! $item->origin_city !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->origin_location))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Origin Location</p>
+                                            <span class="fw-bold text-dark">{!! $item->origin_location !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->origin_zip_post))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Origin ZIP/POST Code</p>
+                                            <span class="fw-bold text-dark">{!! $item->origin_zip_post !!} </span>
+                                    </div>
+                                @endif
+
+                                @if (!empty($item->desti_add))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Destination Address</p>
+                                            <span class="fw-bold text-dark">{!! $item->desti_add !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->desti_country))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Destination Country</p>
+                                            <span class="fw-bold text-dark">{!! Helper::countryname($item->desti_country) !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->desti_state))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Destination State</p>
+                                            <span class="fw-bold text-dark">{!! $item->desti_state !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->desti_city))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Destination City</p>
+                                            <span class="fw-bold text-dark">{!! $item->desti_city !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->desti_location))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Destination Location</p>
+                                            <span class="fw-bold text-dark">{!! $item->desti_location !!} </span>
+                                    </div>
+                                @endif
+                                @if (!empty($item->desti_zip_post))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Destination ZIP/POST Code</p>
+                                            <span class="fw-bold text-dark">{!! $item->desti_zip_post !!} </span>
+                                    </div>
+                                @endif
+
+                                @if (!empty($order_item_addonspackage_data))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Addons Services</p>
+                                        @foreach ($order_item_addonspackage_data as $package_data)
+                                            <span class="fw-bold text-dark">{!! $package_data->package_item_name !!} *
+                                                {!! $package_data->package_quantity !!}</span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                @if (isset($item->how_many_cleaners_do_you_need))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">No. of Cleaners</p>
+                                        <span class="fw-bold text-dark">{{ $item->how_many_cleaners_do_you_need }}</span>
+                                    </div>
+                                @endif
+                                @if (isset($item->how_many_hours_should_they_stay))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">No. of Hours</p>
+                                        <span class="fw-bold text-dark">{{ $item->how_many_hours_should_they_stay }}</span>
+                                    </div>
+                                @endif
+                                @if (isset($item->how_often_do_you_need_cleaning))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Frequency</p>
+                                        <span class="fw-bold text-dark">{{ $item->how_often_do_you_need_cleaning }}</span>
+                                    </div>
+                                @endif
+                                @if (isset($item->which_day_of_the_week_do_you_want_the_service) &&
+                                        $item->which_day_of_the_week_do_you_want_the_service != '')
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Days of the week</p>
+                                        <span
+                                            class="fw-bold text-dark">{{ $item->which_day_of_the_week_do_you_want_the_service }}</span>
+                                    </div>
+                                @endif
+                                @if (isset($item->do_you_need_cleaning_material))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Materials Provided</p>
+                                        <span class="fw-bold text-dark">{{ $item->do_you_need_cleaning_material }}</span>
+                                    </div>
+                                @endif
+                                @if ($item->subservice_id == '47')
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Service</p>
+                                        <span class="fw-bold text-dark">{{ $item->type_of_painting }}</span>
+                                    </div>
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Size of home</p>
+                                        <span
+                                            class="fw-bold text-dark">{{ $item->selected_type_home . ' - ' . $item->selected_size_home }}</span>
+                                    </div>
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Home Furnished</p>
+                                        <span class="fw-bold text-dark">{{ $item->is_home_furnished }}</span>
+                                    </div>
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Colors</p>
+                                        <span
+                                            class="fw-bold text-dark">{{ $item->your_walls_now_color . ' to ' . $item->you_want_paint_color }}</span>
+                                    </div>
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Ceilings</p>
+                                        <span class="fw-bold text-dark">{{ $item->no_of_ceilings ?: '-' }}</span>
+                                    </div>
+                                @endif
+                                @if ($item->subservice_id == '92')
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Inspection Location</p>
+                                        <span class="fw-bold text-dark">{{ $item->verifybuy_location ?: '-' }}</span>
+                                    </div>
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Address</p>
+                                        <span class="fw-bold text-dark">{{ $item->verifybuy_address ?: '-' }}</span>
+                                    </div>
+                                    @if ($item->verifybuy_additional_details != '')
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Additional Location Details</p>
+                                            <span
+                                                class="fw-bold text-dark">{{ $item->verifybuy_additional_details ?: '-' }}</span>
+                                        </div>
+                                    @endif
+                                    @if ($item->verifybuy_where_is_car_parked != '')
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Where is Car Parked?</p>
+                                            <span
+                                                class="fw-bold text-dark">{{ $item->verifybuy_where_is_car_parked ?: '-' }}</span>
+                                        </div>
+                                    @endif
+                                    @if ($item->verifybuy_vehicle != '')
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Vehicle Details</p>
+                                            <span class="fw-bold text-dark">{!! Helper::vehiclename($item->verifybuy_vehicle) !!}</span>
+                                        </div>
+                                    @endif
+                                    @if ($item->verifybuy_model != '')
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Vehicle Model</p>
+                                            <span class="fw-bold text-dark">{{ $item->verifybuy_model ?: '-' }}</span>
+                                        </div>
+                                    @endif
+                                    @if ($item->verifybuy_category != '')
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Vehicle Category</p>
+                                            <span class="fw-bold text-dark">{{ $item->verifybuy_category ?: '-' }}</span>
+                                        </div>
+                                    @endif
+                                @endif
+                                
+                                <div class="col-md-6 col-xl-4">
+                                    <p class="text-muted mb-0 small">Booking Schedule</p>
+                                    <span class="fw-bold text-primary"> {{ $item->bookingdate }}
+                                        {{ $item->month }} {{ $item->bookingyear }}</span><br>
+                                    <small class="text-muted">{!! Helper::timeslotname($item->time_slot) !!}</small>
+                                </div>
+
+                                @if ($item->any_special_instruction != '')
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Instruction</p>
+                                            <span class="fw-bold text-dark">{{ $item->any_special_instruction ?: '-' }}</span>
+                                        </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                @php
+                    $statusFlow = [
+                        'BK' => 'Booking Requested',
+                        'P' => 'Booking Confirmed',
+                        'PA' => 'Vendor Assigned',
+                        'CO' => 'Booking Completed',
+                    ];
+
+                    $currentStatus = $order->order_status;
+                    $statusKeys = array_keys($statusFlow);
+                    $currentIndex = array_search($currentStatus, $statusKeys);
+                @endphp
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-transparent border-bottom py-3">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-stream me-2 text-primary"></i>Order Activity
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="vertical-timeline ps-3 mt-2">
+
+                            @if ($currentStatus == 'CL')
+
+                                <!-- Cancelled Special Case -->
+                                <div class="timeline-item ps-4 position-relative">
+                                    <span
+                                        class="position-absolute start-0 top-0 translate-middle badge rounded-circle bg-danger p-2"
+                                        style="margin-left:-1.5px;">
+                                        <i class="fas fa-times"></i>
+                                    </span>
+                                    <h6 class="fw-bold text-danger mb-1">Booking Cancelled</h6>
+                                    <p class="text-muted small mb-0">
+                                        Order was cancelled.
+                                    </p>
+                                </div>
+                            @else
+                                @foreach ($statusFlow as $key => $label)
+                                    @php
+                                        $index = array_search($key, $statusKeys);
+
+                                        if ($currentStatus == 'CO') {
+                                            $isCompleted = true;
+                                            $isCurrent = false;
+                                        } else {
+                                            $isCompleted = $index < $currentIndex;
+                                            $isCurrent = $index == $currentIndex;
+                                        }
+                                    @endphp
+
+                                    <div class="timeline-item pb-4 border-start ps-4 position-relative">
+
+                                        <span
+                                            class="position-absolute start-0 top-0 translate-middle badge rounded-circle p-2
+                                            {{ $isCompleted ? 'bg-success' : ($isCurrent ? 'bg-primary' : 'bg-light text-muted') }}"
+                                            style="margin-left:-1.5px;">
+
+                                            @if ($isCompleted)
+                                                <i class="fas fa-check text-white"></i>
+                                            @elseif($isCurrent)
+                                                <i class="fas fa-clock text-white"></i>
+                                            @else
+                                                <i class="fas fa-circle text-muted"></i>
+                                            @endif
+
+                                        </span>
+
+                                        <h6 class="fw-bold mb-1 {{ $isCurrent ? 'text-primary' : '' }}">
+                                            {{ $label }}
+                                        </h6>
+
+                                        <p class="text-muted small mb-0">
+                                            {{ $isCompleted ? 'Completed' : ($isCurrent ? 'Current Status' : 'Pending') }}
+                                        </p>
+
+                                    </div>
+                                @endforeach
+
+                            @endif
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 bg-light-blue">
+                    <div class="card-header bg-transparent border-bottom">
+                        <h5 class="card-title mb-0">Payment Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Payment Method</span>
+                            <div class="text-end">
+                                <div class="fw-bold">
+                                    @if ($order->paymentmode == 1)
+                                        COD
+                                    @else
+                                        Online
+                                    @endif
+                                </div>
+                                {{-- <div class="mt-1">
+                                    {!! $order->payment_status_label !!}
+                                </div> --}}
+                            </div>
+                        </div>
+                        <hr>
+                        @if (isset($order->service_charge) && $order->service_charge > 0)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Service Charge</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->service_charge, 2) }}</span>
+                            </div>
+                        @endif
+                        @if(isset($order->items[0]->package_item_name))
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Service Charge</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->items[0]->package_quantity * $order->items[0]->package_item_price, 2) }}</span>
+                            </div>
+                        @endif
+                        @if (isset($order->timing_charge) && $order->timing_charge > 0)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Timing Fee</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->timing_charge, 2) }}</span>
+                            </div>
+                        @endif
+                        @if (isset($order_item_addonspackage_data) && count($order_item_addonspackage_data) > 0)
+                            @php
+                                $addOnstotal = 0;
+                                foreach ($order_item_addonspackage_data as $addonsData) {
+                                    $addOnstotal += $addonsData->package_quantity * $addonsData->package_item_price;
+                                }
+                            @endphp
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Addons Charge</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($addOnstotal, 2) }}</span>
+                            </div>
+                        @endif
+                        @if (isset($order->cod_charge) && $order->cod_charge > 0)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">COD Charge</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->cod_charge, 2) }}</span>
+                            </div>
+                        @endif
+                        @if (isset($order->additional_charge) && $order->additional_charge > 0)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Material Charge</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->additional_charge, 2) }}</span>
+                            </div>
+                        @endif
+                        @if (isset($order->service_fee) && $order->service_fee > 0)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Service Fee</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->service_fee, 2) }}</span>
+                            </div>
+                        @endif
+
+                        {{-- @if (isset($sub_total_new) && $sub_total_new > 0)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($sub_total_new, 2) }}</span>
+                            </div>
+                        @endif --}}
+                        @if (isset($order->sub_total) && $order->sub_total > 0)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->sub_total, 2) }}</span>
+                            </div>
+                        @endif
+                        @if (isset($order->vatcharge) && $order->vatcharge > 0)
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">VAT Charge</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->vatcharge, 2) }}</span>
+                            </div>
+                        @endif
+                        @if (isset($order->promo_discount) && $order->promo_discount > 0)
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Promo Discount</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->promo_discount, 2) }}</span>
+                            </div>
+                        @endif
+                        @if (isset($order->front_wallet_amount) && $order->front_wallet_amount > 0)
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Wallet Discount</span>
+                                <span><span class="currency_dhiram"></span>
+                                    {{ number_format($order->front_wallet_amount, 2) }}</span>
+                            </div>
+                        @endif
+                        @if (isset($order->order_total) && $order->order_total > 0)
+                            <div class="d-flex justify-content-between border-top pt-3 mt-3">
+                                <h5 class="fw-bold">Total (Inc. VAT)</h5>
+                                <h5 class="fw-bold text-primary"><span class="currency_dhiram"></span>
+                                    {{ number_format(round($order->order_total), 2) }}</h5>
+                            </div>
+                        @endif
+                    </div>
+                    {{-- Fixed Buttons Section --}}
+                    <div class="card-footer bg-white border-0 p-3">
+                        @if ($order->order_status == 'BK')
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary py-2 fw-bold shadow-sm" type="button" disabled
+                                    id="spinner_button_accept" style="display: none; border-radius: 10px;">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"
+                                        aria-hidden="true"></span> Loading...
+                                </button>
+
+                                <a href="javascript:void(0)" onclick="check_order('{{ $order->order_id }}');"
+                                    class="btn btn-primary py-2 fw-bold shadow-sm" id="submit_button"
+                                    style="border-radius: 10px;">
+                                    <i class="bi bi-check-lg me-1"></i> Accept Order
+                                </a>
+
+                                <button class="btn btn-danger py-2 fw-bold" type="button" disabled
+                                    id="spinner_button_reject" style="display: none; border-radius: 10px;">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"
+                                        aria-hidden="true"></span> Loading...
+                                </button>
+
+                                <a href="javascript:void(0)" onclick="reject_order('{{ $order->order_id }}');"
+                                    class="btn btn-outline-danger py-2 fw-bold" id="reject_button"
+                                    style="border-radius: 10px; border-width: 2px;">
+                                    Reject Order
+                                </a>
+                            </div>
+                            <div id="error-message" class="text-danger small mt-2 text-center" style="display:none;">
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@stop
+
+<!-- Assign Vendor  Modal -->
+<div class="modal custom-modal fade" id="reject_order_model" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="order_vendor_form" action="{{ route('vendor.reject_order_vendor') }}" method="POST"
+                enctype="multipart/form-data">
+                @csrf
+
+
+                <input type="hidden" name="reject_order_id" id="reject_order_id" value="">
+
+                <div class="modal-body">
+
+                    <div class="modal-text text-center">
+                        <!-- <h3>Delete Expense Category</h3> -->
+                        <!-- <p>Select Vendor</p> -->
+                    </div>
+                    <div class="form-group">
+
+                        <label for="name">Reject Reason</label>
+
+                        <textarea class="form-control" id="reject_reason" name="reject_reason"></textarea>
+                        <p class="form-error-text" id="reject_reason_error" style="color: red; margin-top: 10px;">
+                        </p>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer text-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary mb-1" type="button" disabled id="spinner_button"
+                        style="display: none;">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Loading...
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="form_sub_vendor();"
+                        id="vedor_submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function check_order(order_id) {
+        //alert(order_id);
+
+        $('#spinner_button_accept').show();
+
+        $('#submit_button').hide();
+
+        var url = '{{ route('vendor.check_order_vendor') }}';
+        var redirectUrl = '{{ route('vendor-all-order') }}';
+        $.ajax({
+            url: url,
+            type: 'post',
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "order_id": order_id
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    //alert(response.message);
+                    // Optional: reload or update UI
+                    window.location.href = redirectUrl;
+                } else {
+                    $('#error-message').text(response.message).fadeIn();
+                }
+            },
+            error: function() {
+                alert('Something went wrong. Please try again.');
+            }
+        });
+
+    }
+
+    function reject_order(order_id) {
+        $('#reject_order_id').val(order_id);
+        $('#reject_order_model').modal('show');
+    }
+
+    function form_sub_vendor() {
+        var reject_reason = jQuery("#reject_reason").val();
+        if (reject_reason == '') {
+            jQuery('#reject_reason_error').html("Please Enter Reason");
+            jQuery('#reject_reason_error').show().delay(0).fadeIn('show');
+            jQuery('#reject_reason_error').show().delay(2000).fadeOut('show');
+
+            return false;
+        }
+        $('#vedor_submit').hide();
+        $('#spinner_button').show();
+        $('#order_vendor_form').submit();
+    }
+</script>
