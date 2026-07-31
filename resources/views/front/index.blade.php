@@ -1,5 +1,15 @@
 @include('front.includes.header')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css">
+    <link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}" media="print" onload="this.media='all'">
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
+    <script src="{{ asset('public/site/js/intlTelInput.min.js') }}" defer></script>
+@endpush
+
 <!-- Tabby Banner Start -->
 <div class="tabby-banner-wrapper" data-bs-toggle="modal" data-bs-target="#tabby_info_modal">
     <div class="container">
@@ -23,8 +33,8 @@
         padding: 8px 0;
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 990;
-        /* Lower than modal backdrop */
+        z-index: 90;
+        /* Lower than modal backdrop and header menus */
         position: fixed;
         top: 90px !important;
         width: 100%;
@@ -1084,7 +1094,7 @@
         left: 0;
         width: 100%;
         height: 395px;
-        background: url('{{ asset('public/site/images/Homepage/bg.png') }}') no-repeat center center;
+        background: url('{{ asset('public/site/images/Homepage/bg.webp') }}') no-repeat center center;
         background-size: cover;
         z-index: 0;
         top: 17%;
@@ -1474,7 +1484,7 @@
                                     <option>Choose City</option>
                                     @if ($city != '')
                                         @foreach ($city as $city_data)
-                                            <option value="{{ $city_data->id }}"
+                                            <option value="{{ strtolower(str_replace(' ', '-', $city_data->name)) }}"
                                                 @if ($city_data->id == session('search_city_id')) selected @endif>
                                                 {{ $city_data->name }}
                                             </option>
@@ -1880,13 +1890,13 @@
                                                                     --}}
                                                                 @if ($subservice->is_bookable == 1)
                                                                     <a
-                                                                        href="{{ route('enquiry', ['service_id' => $service_data->id, 'subservice_id' => $subservice->id]) }}">
+                                                                        href="{{ route('enquiry', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id]) }}">
                                                                     @else
                                                                         @php
                                                                             $category_id = $_GET['category'] ?? '';
                                                                         @endphp
                                                                         <a
-                                                                            href="{{ route('booknow', ['service_id' => $service_data->id, 'subservice_id' => $subservice->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}">
+                                                                            href="{{ route('booknow', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}">
                                                                 @endif
                                                         @endif
                                                         <img src="{{ asset('public/upload/subservice/' . $subservice->image) }}"
@@ -2072,7 +2082,7 @@
 <!-- CTA Banner -->
 <section class="cta-banner-about2 at-home10 mx-auto position-relative pt60-lg pb30-lg we-do-slider-desk">
     <img class="cta-about2-img big-cleaning at-home10 bdrs24 d-none d-xl-block"
-        src="{{ asset('public/site/images/Homepage/bigcleaning.png') }}"
+        src="{{ asset('public/site/images/Homepage/bigcleaning.webp') }}"
         alt="Deep cleaning services in Dubai – Vendorscity professional cleaning solutions">
     <div class="container">
         <div class="row">
@@ -2495,7 +2505,8 @@
                             <li><i class="far fa-check fa-check-custom"></i>Help us take your business forward</li>
                         </ul>
                     </div>
-                    <a href="{{ url('/become-a-vendor') }}" class="ud-btn btn-thm">Register Now</a>
+                    <a href="{{ url(session('search_city_name', 'dubai') . '/become-a-vendor') }}"
+                        class="ud-btn btn-thm">Register Now</a>
                 </div>
             </div>
             <div class="col-xl-6">
@@ -2853,12 +2864,12 @@
     }
 
     function search_city_new(val) {
-        //alert(val);
-        $('#search_city_index').val(val);
-        $('#search_banner').submit();
+        if (val && val !== 'Choose City') {
+            window.location.href = '{{ url('/') }}' + '/' + val;
+        }
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js" defer></script>
 <script>
     //  document.addEventListener('DOMContentLoaded', function () {
     //     // Select all .splide elements except #feature-slider

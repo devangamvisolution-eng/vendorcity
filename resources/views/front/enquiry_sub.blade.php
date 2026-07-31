@@ -1,4 +1,12 @@
 @include('front.includes.header')
+
+<link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}">
+<link rel="stylesheet" href="{{ asset('public/site/css/select2/css/select2.min.css') }}">
+
+@push('scripts')
+<script src="{{ asset('public/site/js/intlTelInput.min.js') }}"></script>
+<script src="{{ asset('public/site/js/select2.min.js') }}"></script>
+@endpush
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
     /* Premium Modern UI Styles - Inspired by ServiceMarket */
@@ -6,6 +14,10 @@
         background-color: #F8FAFC !important;
         color: #0F172A;
         font-family: 'Inter', sans-serif;
+    }
+
+    .form-control {
+        padding: 0;
     }
 
     .our-register {
@@ -52,7 +64,7 @@
         font-weight: 700;
         font-size: 16px;
         border: 4px solid #F8FAFC;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         transition: all 0.3s ease;
     }
 
@@ -225,7 +237,7 @@
         position: relative;
     }
 
-    .segmented-control .styledRadio:checked ~ .checkmark {
+    .segmented-control .styledRadio:checked~.checkmark {
         background-color: #0040E6;
         color: #ffffff;
         box-shadow: 0 4px 10px rgba(0, 64, 230, 0.15);
@@ -239,7 +251,8 @@
     }
 
     /* Buttons */
-    .enquiry-card-ui .btn-thm, .btn-thm {
+    .enquiry-card-ui .btn-thm,
+    .btn-thm {
         background: #0040E6;
         color: #fff !important;
         border-radius: 10px;
@@ -259,7 +272,8 @@
         overflow: hidden !important;
     }
 
-    .enquiry-card-ui .btn-thm:hover, .btn-thm:hover {
+    .enquiry-card-ui .btn-thm:hover,
+    .btn-thm:hover {
         background: #0033B8;
         transform: translateY(-1px);
         box-shadow: 0 6px 20px rgba(0, 64, 230, 0.25);
@@ -361,7 +375,8 @@
     }
 
     /* Custom Radio & Checkbox Styles (Cards) */
-    .radio-card-group, .checkbox-card-group {
+    .radio-card-group,
+    .checkbox-card-group {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
@@ -369,7 +384,8 @@
         margin-bottom: 24px;
     }
 
-    .radio-card-item, .checkbox-card-item {
+    .radio-card-item,
+    .checkbox-card-item {
         position: relative;
         background: #ffffff;
         border: 1.5px solid #0040E6;
@@ -383,18 +399,21 @@
         transition: all 0.2s ease;
     }
 
-    .radio-card-item:hover, .checkbox-card-item:hover {
+    .radio-card-item:hover,
+    .checkbox-card-item:hover {
         background-color: rgba(0, 64, 230, 0.05);
     }
 
-    .radio-card-item input[type="radio"], .checkbox-card-item input[type="checkbox"] {
+    .radio-card-item input[type="radio"],
+    .checkbox-card-item input[type="checkbox"] {
         position: absolute;
         opacity: 0;
         width: 0;
         height: 0;
     }
 
-    .radio-card-label, .checkbox-card-label {
+    .radio-card-label,
+    .checkbox-card-label {
         font-size: 15px;
         font-weight: 500;
         color: #0040E6;
@@ -403,14 +422,18 @@
         transition: color 0.2s ease;
     }
 
-    .radio-card-item.active, .checkbox-card-item.active,
-    .radio-card-item:has(input:checked), .checkbox-card-item:has(input:checked) {
+    .radio-card-item.active,
+    .checkbox-card-item.active,
+    .radio-card-item:has(input:checked),
+    .checkbox-card-item:has(input:checked) {
         background-color: #0040E6 !important;
         border-color: #0040E6 !important;
     }
 
-    .radio-card-item.active .radio-card-label, .checkbox-card-item.active .checkbox-card-label,
-    .radio-card-item:has(input:checked) .radio-card-label, .checkbox-card-item:has(input:checked) .checkbox-card-label {
+    .radio-card-item.active .radio-card-label,
+    .checkbox-card-item.active .checkbox-card-label,
+    .radio-card-item:has(input:checked) .radio-card-label,
+    .checkbox-card-item:has(input:checked) .checkbox-card-label {
         color: #ffffff !important;
     }
 
@@ -448,7 +471,7 @@
         margin: 0 auto 24px auto;
         box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
     }
-    
+
     .success-icon i {
         font-size: 30px;
     }
@@ -494,27 +517,32 @@
         outline: none !important;
         transition: all 0.2s ease;
     }
+
     .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: #0F172A !important;
         font-size: 15px !important;
     }
+
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 50px !important;
         right: 12px !important;
     }
+
     .select2-container--default.select2-container--focus .select2-selection--single {
         border-color: #0040E6 !important;
         background-color: #ffffff !important;
         box-shadow: 0 0 0 4px rgba(0, 64, 230, 0.12) !important;
     }
-    select[style*="display: none"] + .select2-container,
-    select[style*="display:none"] + .select2-container {
+
+    select[style*="display: none"]+.select2-container,
+    select[style*="display:none"]+.select2-container {
         display: none !important;
     }
 
     /* Responsive Spacing & Header Overlap Fixes */
     .our-register {
-        padding: 140px 0 80px 0 !important; /* Extra padding to prevent sticky header overlap on desktop */
+        padding: 140px 0 80px 0 !important;
+        /* Extra padding to prevent sticky header overlap on desktop */
     }
 
     .main-title {
@@ -528,15 +556,18 @@
     }
 
     .stepper-progress-container {
-        max-width: 480px; /* More compact for 2 steps */
+        max-width: 480px;
+        /* More compact for 2 steps */
         margin: 0 auto 20px auto !important;
     }
 
     /* Media Queries for Tablet & Mobile Support */
     @media (max-width: 991px) {
         .our-register {
-            padding: 110px 0 60px 0 !important; /* Padding for tablets/mobiles */
+            padding: 110px 0 60px 0 !important;
+            /* Padding for tablets/mobiles */
         }
+
         .main-title .title {
             font-size: 26px;
             margin-bottom: 20px;
@@ -547,53 +578,86 @@
         .our-register {
             padding: 100px 0 50px 0 !important;
         }
+
         .main-title .title {
             font-size: 22px;
             margin-bottom: 15px;
         }
+
         .enquiry-card-ui {
-            padding: 20px 15px !important; /* Smaller padding inside cards on mobile */
+            padding: 20px 15px !important;
+            /* Smaller padding inside cards on mobile */
             border-radius: 12px;
         }
+
         .stepper-progress-container {
             margin-bottom: 25px;
         }
+
         .step-circle-new {
             width: 36px;
             height: 36px;
             font-size: 14px;
             border-width: 3px;
         }
+
         .step-line-new {
-            margin: -18px 0 0 0; /* Align with center of 36px circle */
+            margin: -18px 0 0 0;
+            /* Align with center of 36px circle */
         }
+
         .step-label-new {
             font-size: 11px;
             margin-top: 6px;
         }
-        .radio-card-item, .checkbox-card-item {
+
+        .radio-card-item,
+        .checkbox-card-item {
             padding: 8px 16px !important;
             font-size: 13px !important;
         }
-        .radio-card-label, .checkbox-card-label {
+
+        .radio-card-label,
+        .checkbox-card-label {
             font-size: 13px !important;
         }
+
         .segmented-control .checkmark {
             padding: 8px 16px !important;
             font-size: 13px !important;
         }
     }
+
+    @media only screen and (max-width: 767px) {
+
+        .body_content .our-register {
+            margin-top: 107px;
+        }
+
+        .our-register {
+            padding: 0 !important;
+        }
+
+        .stepper-progress-container {
+            margin: 0 !important;
+        }
+
+        .advance-search-tab {
+            display: none;
+        }
+    }
 </style>
 <section class="our-register ">
     <div class="container">
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-lg-6 m-auto wow fadeInUp" data-wow-delay="300ms">
                 <div class="main-title text-center">
-                    <h2 class="title" id="head_hide" style="display: block">YOUR QUOTE REQUEST</h2>
-                    {{-- <p class="paragraph">Give your visitor a smooth online experience with a solid UX design</p> --}}
+                    <h2 class="title" id="head_hide" style="display: block">
+                        {{ $service_name ? $service_name . ' - ' : '' }}{{ $subservice_name }}</h2>
+
                 </div>
             </div>
-        </div>
+        </div> -->
         @php
             // echo '<pre>';
             // print_r($formFields);
@@ -615,7 +679,8 @@
         <div class="row mb-4" id="enquiry_stepper_row">
             <div class="col-12">
                 <div class="stepper-progress-container">
-                    <div class="step-item-new @if($display_oldform == 'block') active @else completed @endif" id="step1_indicator">
+                    <div class="step-item-new @if($display_oldform == 'block') active @else completed @endif"
+                        id="step1_indicator">
                         <div class="step-circle-new">
                             @if($display_oldform == 'block')
                                 1
@@ -638,14 +703,14 @@
             style="display: {{ $display_oldform }};" enctype="multipart/form-data">
             @csrf
 
-           
+
 
             <div class="enquiry-layout-grid wow fadeInRight" data-wow-delay="300ms">
                 <!-- Left Column -->
                 <div class="enquiry-left-column">
                     <div class="enquiry-card-ui">
                         {{-- @if ($package_id != '')
-                            <input name="pakage_id" type="hidden" class="form-control" value="{{ $package_id }}">
+                        <input name="pakage_id" type="hidden" class="form-control" value="{{ $package_id }}">
                         @endif --}}
 
 
@@ -654,14 +719,17 @@
                         <input name="subservice_id" type="hidden" class="form-control" value="{{ $subservice_id }}">
 
 
-                        <div <?php if(count($result2) == 0) { ?> style="display:none;" <?php } ?> style="text-align: center;">
+                        <div <?php if (count($result2) == 0) { ?> style="display:none;" <?php } ?>
+                            style="text-align: center;">
                             <div class="segmented-control">
                                 <label class="styledRadioLabel" for="localorintLocal">
-                                    <input class="styledRadio" id="localorintLocal" name="localorint" type="radio" value="loc" checked='checked' onclick="hideshow('local');">
+                                    <input class="styledRadio" id="localorintLocal" name="localorint" type="radio"
+                                        value="loc" @if(strpos(request()->url(), 'international-moving') === false) checked='checked' @endif onclick="hideshow('local');">
                                     <span class="checkmark">Local</span>
                                 </label>
                                 <label class="styledRadioLabel" for="localorintInt">
-                                    <input class="styledRadio" id="localorintInt" name="localorint" value="int" type="radio" onclick="hideshow('int');">
+                                    <input class="styledRadio" id="localorintInt" name="localorint" value="int"
+                                        type="radio" @if(strpos(request()->url(), 'international-moving') !== false) checked='checked' @endif onclick="hideshow('int');">
                                     <span class="checkmark">International</span>
                                 </label>
                             </div>
@@ -690,14 +758,14 @@
                             // exit();
                         @endphp
 
-                        <input type="hidden" name="form_type" id="form_type" value="Local Move">
+                        <input type="hidden" name="form_type" id="form_type" value="{{ strpos(request()->url(), 'international-moving') !== false ? 'International Move' : 'Local Move' }}">
                         @php
                             $userdata = Session::get('user');
                             // echo"<pre>";print_r($userdata);echo"</pre>";exit;
                         @endphp
 
                         {{-- @if($userdata == "")
-                        
+
                         <div class="row">
                             <div class="mb25">
                                 <label class="form-label fw500 dark-color">Full Name:</label>
@@ -716,7 +784,7 @@
                             </div>
 
                             <p class="form-error-text" id="mobile_new_error" style="color: red; margin-top: 10px;">
-                
+
                             <div class="mb25">
                                 <label class="form-label fw500 dark-color">Email ID:</label>
                                 <input id="email_new" name="email_new" type="text" class="form-control"
@@ -728,562 +796,566 @@
                             <p class="form-error-text" id="email_new_error" style="color: red; margin-top: 10px;">
                         </div>
                         @endif --}}
-                        <div class="row" id="localform">
-                             @for ($i = 0; $i < count($result1); $i++)
-                                 @for ($k = 0; $k < count($formFields); $k++)
- 
-                                     @php
- 
-                                         $form_additionalData = DB::table('form_attributes')
-                                             ->select('*')
-                                             ->where('form_id', '=', $result1[$i]->id)
-                                             ->get()
-                                             ->toArray();
-                                         // echo '<pre>';
-                                         // print_r($form_additionalData);
-                                         // echo '</pre>';
-                                         // exit();
- 
-                                         $required = $formFields[$k]->is_active;
+                        <div class="row" id="localform" @if(strpos(request()->url(), 'international-moving') !== false) style="display:none;" @endif>
+                            @for ($i = 0; $i < count($result1); $i++)
+                                @for ($k = 0; $k < count($formFields); $k++)
+
+                                    @php
+
+                                        $form_additionalData = DB::table('form_attributes')
+                                            ->select('*')
+                                            ->where('form_id', '=', $result1[$i]->id)
+                                            ->get()
+                                            ->unique('form_option')
+                                            ->values()
+                                            ->all();
+                                        // echo '<pre>';
+                                        // print_r($form_additionalData);
+                                        // echo '</pre>';
+                                        // exit();
+
+                                        $required = $formFields[$k]->is_active;
                                      @endphp
-                                     @if ($result1[$i]->lable_name == $formFields[$k]->lable_name)
-                                         @php
-                                             $fieldName = trim($formFields[$k]->lable_name);
-                                             $colClass = 'col-12';
-                                             if (
-                                                 strcasecmp($fieldName, 'Moving From') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving From?') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving From Area') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving To') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving To Area') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving To Country') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving To City') === 0 || 
-                                                 strcasecmp($fieldName, 'ZIP Code') === 0
-                                             ) {
-                                                 $colClass = 'col-md-6 col-12';
-                                             }
+                                    @if ($result1[$i]->lable_name == $formFields[$k]->lable_name)
+                                        @php
+                                            $fieldName = trim($formFields[$k]->lable_name);
+                                            $colClass = 'col-12';
+                                            if (
+                                                strcasecmp($fieldName, 'Moving From') === 0 ||
+                                                strcasecmp($fieldName, 'Moving From?') === 0 ||
+                                                strcasecmp($fieldName, 'Moving From Area') === 0 ||
+                                                strcasecmp($fieldName, 'Moving To') === 0 ||
+                                                strcasecmp($fieldName, 'Moving To Area') === 0 ||
+                                                strcasecmp($fieldName, 'Moving To Country') === 0 ||
+                                                strcasecmp($fieldName, 'Moving To City') === 0 ||
+                                                strcasecmp($fieldName, 'ZIP Code') === 0
+                                            ) {
+                                                $colClass = 'col-md-6 col-12';
+                                            }
                                          @endphp
 
-                                         @if ($result1[$i]->type == '1')
-                                             <div class="mb15 {{ $colClass }}" id="hide_div_{{ $formFields[$k]->id }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}" id="formfield_label_{{ $formFields[$k]->id }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value=" {{ $result1[$i]->id }}">
-                                                 <input name="formfield_value[]" type="text"
-                                                     class="form-control {{ $formFields[$k]->id }}"
-                                                     id="formfield_value_{{ $formFields[$k]->id }}"
-                                                     placeholder="{{ $formFields[$k]->lable_name }}">
- 
-                                                     <p class="form-error-text" id="name_error_{{ $formFields[$k]->id }}"
-                                                 style="color: red; margin-top: 10px;">
-                                             </p>
-                                             </div>
-                                             
-                                         @endif
- 
-                                         @if ($result1[$i]->type == '2' && $result1[$i]->lable_name != 'Do you require any additional service?')
-                                             <div class="form-group mb-3 {{ $colClass }}">
-                                                 <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}"
-                                                     for="country">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value="{{ $result1[$i]->id }}">
-                                                 
-                                                 @php
-                                                     $pill_labels = ['Move Type', 'What is the size of your move?', 'What is the size of your home?', 'What is the size of your garden?'];
-                                                     $is_pill = false;
-                                                     foreach ($pill_labels as $pill_label) {
-                                                         if (strpos(strtolower($formFields[$k]->lable_name), strtolower($pill_label)) !== false) {
-                                                             $is_pill = true;
-                                                             break;
-                                                         }
-                                                     }
+                                        @if ($result1[$i]->type == '1')
+                                            <div class="mb15 {{ $colClass }}" id="hide_div_{{ $formFields[$k]->id }}">
+                                                <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}"
+                                                    id="formfield_label_{{ $formFields[$k]->id }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value=" {{ $result1[$i]->id }}">
+                                                <input name="formfield_value[]" type="text"
+                                                    class="form-control {{ $formFields[$k]->id }}"
+                                                    id="formfield_value_{{ $formFields[$k]->id }}"
+                                                    placeholder="{{ $formFields[$k]->lable_name }}">
+
+                                                <p class="form-error-text" id="name_error_{{ $formFields[$k]->id }}"
+                                                    style="color: red; margin-top: 10px;">
+                                                </p>
+                                            </div>
+
+                                        @endif
+
+                                        @if ($result1[$i]->type == '2' && $result1[$i]->lable_name != 'Do you require any additional service?')
+                                            <div class="form-group mb-3 {{ $colClass }}">
+                                                <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}"
+                                                    for="country">{{ $result1[$i]->id == 57 ? 'Where are you moving from?' : $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value="{{ $result1[$i]->id }}">
+
+                                                @php
+                                                    $pill_labels = ['Move Type', 'What is the size of your move?', 'What is the size of your home?', 'What is the size of your garden?'];
+                                                    $is_pill = false;
+                                                    foreach ($pill_labels as $pill_label) {
+                                                        if (strpos(strtolower($formFields[$k]->lable_name), strtolower($pill_label)) !== false) {
+                                                            $is_pill = true;
+                                                            break;
+                                                        }
+                                                    }
                                                  @endphp
- 
-                                                 @if($is_pill)
-                                                     <div class="radio-card-group select-pill-group" data-select-id="formfield_value_test{{ $formFields[$k]->id }}">
-                                                         @if($formFields[$k]->id == 20)
-                                                             @php
-                                                                if($subservice_id == 23){
-                                                                     $in_array = array(56);
-                                                                }elseif($subservice_id == 26){
-                                                                     $in_array = array(57);
-                                                                }elseif($subservice_id == 53){
-                                                                     $in_array = array(496);
-                                                                }else{
-                                                                     $in_array = array();
-                                                                }
+
+                                                @if($is_pill)
+                                                    <div class="radio-card-group select-pill-group"
+                                                        data-select-id="formfield_value_test{{ $formFields[$k]->id }}">
+                                                        @if($formFields[$k]->id == 20)
+                                                            @php
+                                                                // if ($subservice_id == 23) {
+                                                                //     $in_array = array(56);
+                                                                // } elseif ($subservice_id == 26) {
+                                                                //     $in_array = array(57);
+                                                                // } elseif ($subservice_id == 53) {
+                                                                //     $in_array = array(496);
+                                                                // } else {
+                                                                //     $in_array = array();
+                                                                // }
                                                              @endphp
-                                                             @foreach ($form_additionalData as $form_additional)
-                                                                 @if(in_array($form_additional->id, $in_array))
-                                                                     <div class="radio-card-item select-pill-item" data-value="{{ $form_additional->id }}">
-                                                                         <span class="radio-card-label">{{ $form_additional->form_option }}</span>
-                                                                     </div>
-                                                                 @endif
-                                                             @endforeach
-                                                         @else
-                                                             @foreach ($form_additionalData as $form_additional)
-                                                                 <div class="radio-card-item select-pill-item" data-value="{{ $form_additional->id }}">
-                                                                     <span class="radio-card-label">{{ $form_additional->form_option }}</span>
-                                                                 </div>
-                                                             @endforeach
-                                                         @endif
-                                                     </div>
-                                                 @endif
- 
-                                                 <select class="form-control searches_drop_{{ $formFields[$k]->id }}"
-                                                     id="formfield_value_test{{ $formFields[$k]->id }}"
-                                                     name="formfield_value[]"
-                                                     onchange="get_sub_select(this.value,'{{ $formFields[$k]->id }}')"
-                                                     @if($is_pill) style="display: none;" @endif>
-                                                     <option value="">Select {{ $formFields[$k]->lable_name }}
-                                                     </option>
- 
-                                                     
-                                                     @if($formFields[$k]->id == 20)
- 
-                                                         @php
-                                                            if($subservice_id == 23){
-                                                                 $in_array = array(56);
-                                                            }elseif($subservice_id == 26){
-                                                                 $in_array = array(57);
-                                                            }elseif($subservice_id == 53){
-                                                                 $in_array = array(496);
-                                                            }else{
-                                                                 $in_array = array();
-                                                            }
+                                                            @foreach ($form_additionalData as $form_additional)
+                                                                {{-- @if(in_array($form_additional->id, $in_array)) --}}
+                                                                <div class="radio-card-item select-pill-item"
+                                                                    data-value="{{ $form_additional->id }}">
+                                                                    <span class="radio-card-label">{{ $form_additional->form_option }}</span>
+                                                                </div>
+                                                                {{-- @endif --}}
+                                                            @endforeach
+                                                        @else
+                                                            @foreach ($form_additionalData as $form_additional)
+                                                                <div class="radio-card-item select-pill-item"
+                                                                    data-value="{{ $form_additional->id }}">
+                                                                    <span class="radio-card-label">{{ $form_additional->form_option }}</span>
+                                                                </div>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                @endif
+
+                                                <select class="form-control searches_drop_{{ $formFields[$k]->id }}"
+                                                    id="formfield_value_test{{ $formFields[$k]->id }}" name="formfield_value[]"
+                                                    onchange="get_sub_select(this.value,'{{ $formFields[$k]->id }}')" @if($is_pill)
+                                                    style="display: none;" @endif>
+                                                    <option value="">Select
+                                                        {{ $result1[$i]->id == 57 ? 'Where are you moving from?' : $formFields[$k]->lable_name }}
+                                                    </option>
+
+
+                                                    @if($formFields[$k]->id == 20)
+
+                                                        @php
+                                                            // if ($subservice_id == 23) {
+                                                            //     $in_array = array(56);
+                                                            // } elseif ($subservice_id == 26) {
+                                                            //     $in_array = array(57);
+                                                            // } elseif ($subservice_id == 53) {
+                                                            //     $in_array = array(496);
+                                                            // } else {
+                                                            //     $in_array = array();
+                                                            // }
                                                          @endphp
- 
- @foreach ($form_additionalData as $form_additional)
- @if(in_array($form_additional->id, $in_array))
-     <option value="{{ $form_additional->id}}">
-         {{ $form_additional->form_option }}
-     </option>
- @endif
- @endforeach
- 
-                                                     @else
- 
-                                                         @foreach ($form_additionalData as $form_additional)
-                                                             <option value="{{ $form_additional->id }}"
-                                                                 @if ($form_additional->form_id == 39 && $form_additional->form_option == 'UAE' || $form_additional->form_id == 39 && $form_additional->form_option == 'United Arab Emirates') selected @endif>
-                                                                 {{ $form_additional->form_option }}</option>
-                                                         @endforeach
- 
-                                                     @endif
-                                                 </select>
-                                                 <p class="form-error-text"
-                                                     id="drop_down_error_formfield_value_{{ $formFields[$k]->id }}"
-                                                     style="color: red; margin-top: 10px;"></p>
-                                                 <span id="replace_select_{{ $formFields[$k]->id }}"></span>
-                                             </div>
-                                         @endif
- 
-                                         @if ($result1[$i]->type == '3')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
- 
-                                                 <input name="form_field_radio_id_one[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value="{{ $result1[$i]->id }}">
- 
-                                                 <div class="radio-card-group">
-                                                     @foreach ($form_additionalData as $form_additional)
-                                                         <label class="radio-card-item">
-                                                             <input name="formfield_radio_{{ $formFields[$k]->id }}"
-                                                                 type="radio"
-                                                                 id="formfield_value_{{ $formFields[$k]->id }}_{{ $loop->index }}" placeholder=""
-                                                                 value="{{ $form_additional->form_option }}">
-                                                             <span class="radio-card-label">{{ $form_additional->form_option }}</span>
-                                                         </label>
-                                                     @endforeach
-                                                 </div>
-                                                 <p class="form-error-text" id="radio_error"
-                                                     style="color: red; margin-top: 10px;">
-                                                 </p>
-                                             </div>
-                                         @endif
- 
-                                         @if ($result1[$i]->type == '4')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <input name="form_field_checkbox_id_one[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value="{{ $result1[$i]->id }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <div class="checkbox-card-group">
-                                                     @foreach ($form_additionalData as $form_additional)
-                                                         <label class="checkbox-card-item">
-                                                             <input name="formfield_checkbox_{{ $formFields[$k]->id }}[]"
-                                                                 type="checkbox"
-                                                                 id="formfield_value_checkbox{{ $formFields[$k]->id }}_{{ $loop->index }}"
-                                                                 placeholder="" value="{{ $form_additional->form_option }}">
-                                                             <span class="checkbox-card-label">{{ $form_additional->form_option }}</span>
-                                                         </label>
-                                                     @endforeach
-                                                 </div>
-                                                 <p class="form-error-text"
-                                                     id="formfield_value_checkbox1{{ $formFields[$k]->id }}"
-                                                     style="color: red; margin-top: 10px;">
-                                                 </p>
-                                             </div>
-                                         @endif
-                                         @if ($result1[$i]->type == '5')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value="{{ $result1[$i]->id }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <textarea name="formfield_value[]" id="formfield_value_textarea{{ $formFields[$k]->id }}"
-                                                     placeholder="{{ $formFields[$k]->lable_name }}" class="form-control"></textarea>
- 
-                                                 <p class="form-error-text" id="textarea_error"
-                                                     style="color: red; margin-top: 10px;">
-                                                 </p>
-                                             </div>
-                                         @endif
-                                         @if ($result1[$i]->type == '6')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value=" {{ $result1[$i]->id }}">
-                                                 <input name="formfield_value[]" type="date" class="form-control"
-                                                     id="formfield_value_date{{ $formFields[$k]->id }}"
-                                                     placeholder="{{ $formFields[$k]->lable_name }}" class="">
-                                             </div>
-                                             <p class="form-error-text"
-                                                 id="formfield_value_date12{{ $formFields[$k]->id }}"
-                                                 style="color: red; margin-top: 10px;">
-                                             </p>
-                                         @endif
- 
-                                         @if ($result1[$i]->type == '7')
-                                             <div class="form-group mb-3 {{ $colClass }}">
-                                                 <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}"
-                                                     for="country">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_mul_dropdown_id[]" type="hidden"
-                                                     class="m-0" id="form_field_id[]"
-                                                     value="{{ $formFields[$k]->id }}">
-                                                 <select class="form-control multiple"
-                                                     id="formfield_value_{{ $formFields[$k]->id }}"
-                                                     name="formfield_mul_dropdown_{{ $formFields[$k]->id }}[]"
-                                                     multiple="multiple">
-                                                     <option value="">Select {{ $formFields[$k]->lable_name }}
-                                                     </option>
-                                                     @foreach ($form_additionalData as $form_additional)
-                                                         <option value="{{ $form_additional->form_option }}">
-                                                             {{ $form_additional->form_option }}</option>
-                                                     @endforeach
-                                                 </select>
-                                             </div>
-                                             <p class="form-error-text" id="mul_drop_error_{{ $formFields[$k]->id }}"
-                                                 style="color: red; margin-top: 10px;">
-                                             </p>
-                                         @endif
-                                         {{-- @if ($result1[$i]->type == '8')
-                                             <div class="mb15">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value=" {{ $result1[$i]->id }}">
-                                                 <input name="formfield_Image_value[]" type="file"
-                                                     class="form-control {{ $formFields[$k]->id }}"
-                                                     id="formfield_value_Image{{ $formFields[$k]->id }}"
-                                                     placeholder="{{ $formFields[$k]->lable_name }}">
-                                             </div>
-                                             <p class="form-error-text" id="file_error_{{ $formFields[$k]->id }}"
-                                                 style="color: red; margin-top: 10px;">
-                                             </p>
-                                         @endif --}}
-                                         @if ($result1[$i]->type == '8')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id_image[]" type="hidden" class="m-0"
-                                                     id="form_field_id" value="{{ $result1[$i]->id }}">
-                                                 
-                                                 <div class="file-upload-wrapper" onclick="document.getElementById('formfield_value_Image{{ $formFields[$k]->id }}').click()">
-                                                     <div class="file-upload-icon">
-                                                         <i class="fa-solid fa-cloud-arrow-up"></i>
-                                                     </div>
-                                                     <div style="font-weight: 600; color: #475569; font-size: 14px;">Click to upload photos</div>
-                                                     <div style="color: #94A3B8; font-size: 12px; margin-top: 4px;">PNG, JPG or JPEG (multiple allowed)</div>
-                                                     <input name="formfield_Image_value{{ $formFields[$k]->id }}[]"
-                                                         type="file" class="form-control {{ $formFields[$k]->id }}"
-                                                         id="formfield_value_Image{{ $formFields[$k]->id }}"
-                                                         placeholder="{{ $formFields[$k]->lable_name }}" multiple style="display: none;"
-                                                         onchange="updateFileNameDisplay(this, 'file_name_display_{{ $formFields[$k]->id }}')">
-                                                     
-                                                     <div id="file_name_display_{{ $formFields[$k]->id }}" style="margin-top: 10px; font-weight: 600; color: #0040E6; font-size: 13px;"></div>
-                                                 </div>
-                                             </div>
-                                             <p class="form-error-text" id="file_error_{{ $formFields[$k]->id }}"
-                                                 style="color: red; margin-top: 10px;"></p>
-                                         @endif
-                                         @if ($result1[$i]->type == '9')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value=" {{ $result1[$i]->id }}">
-                                                 <input name="formfield_value[]" type="time" class="form-control"
-                                                     id="formfield_value_time{{ $formFields[$k]->id }}"
-                                                     placeholder="{{ $formFields[$k]->lable_name }}" class="">
-                                             </div>
-                                             <p class="form-error-text"
-                                                 id="formfield_value_time_one{{ $formFields[$k]->id }}"
-                                                 style="color: red; margin-top: 10px;">
-                                             </p>
-                                         @endif
-                                     @endif
-                                 @endfor
-                             @endfor
+
+                                                        @foreach ($form_additionalData as $form_additional)
+                                                            {{-- @if(in_array($form_additional->id, $in_array)) --}}
+                                                            <option value="{{ $form_additional->id}}">
+                                                                {{ $form_additional->form_option }}
+                                                            </option>
+                                                            {{-- @endif --}}
+                                                        @endforeach
+
+                                                    @else
+
+                                                        @foreach ($form_additionalData as $form_additional)
+                                                            <option value="{{ $form_additional->id }}" @if (($form_additional->form_id == 39 || $form_additional->form_id == 57) && ($form_additional->form_option == 'UAE' || $form_additional->form_option == 'United Arab Emirates')) selected @endif>
+                                                                {{ $form_additional->form_option }}
+                                                            </option>
+                                                        @endforeach
+
+                                                    @endif
+                                                </select>
+                                                <p class="form-error-text"
+                                                    id="drop_down_error_formfield_value_{{ $formFields[$k]->id }}"
+                                                    style="color: red; margin-top: 10px;"></p>
+                                                <span id="replace_select_{{ $formFields[$k]->id }}"></span>
+                                            </div>
+                                        @endif
+
+                                        @if ($result1[$i]->type == '3')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+
+                                                <input name="form_field_radio_id_one[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value="{{ $result1[$i]->id }}">
+
+                                                <div class="radio-card-group">
+                                                    @foreach ($form_additionalData as $form_additional)
+                                                        <label class="radio-card-item">
+                                                            <input name="formfield_radio_{{ $formFields[$k]->id }}" type="radio"
+                                                                id="formfield_value_{{ $formFields[$k]->id }}_{{ $loop->index }}"
+                                                                placeholder="" value="{{ $form_additional->form_option }}">
+                                                            <span class="radio-card-label">{{ $form_additional->form_option }}</span>
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+                                                <p class="form-error-text" id="radio_error" style="color: red; margin-top: 10px;">
+                                                </p>
+                                            </div>
+                                        @endif
+
+                                        @if ($result1[$i]->type == '4')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <input name="form_field_checkbox_id_one[]" type="hidden" class="m-0"
+                                                    id="form_field_id[]" value="{{ $result1[$i]->id }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <div class="checkbox-card-group">
+                                                    @foreach ($form_additionalData as $form_additional)
+                                                        <label class="checkbox-card-item">
+                                                            <input name="formfield_checkbox_{{ $formFields[$k]->id }}[]" type="checkbox"
+                                                                id="formfield_value_checkbox{{ $formFields[$k]->id }}_{{ $loop->index }}"
+                                                                placeholder="" value="{{ $form_additional->form_option }}">
+                                                            <span class="checkbox-card-label">{{ $form_additional->form_option }}</span>
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+                                                <p class="form-error-text" id="formfield_value_checkbox1{{ $formFields[$k]->id }}"
+                                                    style="color: red; margin-top: 10px;">
+                                                </p>
+                                            </div>
+                                        @endif
+                                        @if ($result1[$i]->type == '5')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value="{{ $result1[$i]->id }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <textarea name="formfield_value[]"
+                                                    id="formfield_value_textarea{{ $formFields[$k]->id }}"
+                                                    placeholder="{{ $formFields[$k]->lable_name }}" class="form-control"></textarea>
+
+                                                <p class="form-error-text" id="textarea_error" style="color: red; margin-top: 10px;">
+                                                </p>
+                                            </div>
+                                        @endif
+                                        @if ($result1[$i]->type == '6')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value=" {{ $result1[$i]->id }}">
+                                                <input name="formfield_value[]" type="date" class="form-control"
+                                                    id="formfield_value_date{{ $formFields[$k]->id }}"
+                                                    placeholder="{{ $formFields[$k]->lable_name }}" class="">
+                                            </div>
+                                            <p class="form-error-text" id="formfield_value_date12{{ $formFields[$k]->id }}"
+                                                style="color: red; margin-top: 10px;">
+                                            </p>
+                                        @endif
+
+                                        @if ($result1[$i]->type == '7')
+                                            <div class="form-group mb-3 {{ $colClass }}">
+                                                <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}"
+                                                    for="country">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_mul_dropdown_id[]" type="hidden" class="m-0"
+                                                    id="form_field_id[]" value="{{ $formFields[$k]->id }}">
+                                                <select class="form-control multiple" id="formfield_value_{{ $formFields[$k]->id }}"
+                                                    name="formfield_mul_dropdown_{{ $formFields[$k]->id }}[]" multiple="multiple">
+                                                    <option value="">Select {{ $formFields[$k]->lable_name }}
+                                                    </option>
+                                                    @foreach ($form_additionalData as $form_additional)
+                                                        <option value="{{ $form_additional->form_option }}">
+                                                            {{ $form_additional->form_option }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <p class="form-error-text" id="mul_drop_error_{{ $formFields[$k]->id }}"
+                                                style="color: red; margin-top: 10px;">
+                                            </p>
+                                        @endif
+                                        {{-- @if ($result1[$i]->type == '8')
+                                        <div class="mb15">
+                                            <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{
+                                                $formFields[$k]->lable_name }}</label>
+                                            <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                value=" {{ $result1[$i]->id }}">
+                                            <input name="formfield_Image_value[]" type="file"
+                                                class="form-control {{ $formFields[$k]->id }}"
+                                                id="formfield_value_Image{{ $formFields[$k]->id }}"
+                                                placeholder="{{ $formFields[$k]->lable_name }}">
+                                        </div>
+                                        <p class="form-error-text" id="file_error_{{ $formFields[$k]->id }}"
+                                            style="color: red; margin-top: 10px;">
+                                        </p>
+                                        @endif --}}
+                                        @if ($result1[$i]->type == '8')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id_image[]" type="hidden" class="m-0" id="form_field_id"
+                                                    value="{{ $result1[$i]->id }}">
+
+                                                <div class="file-upload-wrapper"
+                                                    onclick="document.getElementById('formfield_value_Image{{ $formFields[$k]->id }}').click()">
+                                                    <div class="file-upload-icon">
+                                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                                    </div>
+                                                    <div style="font-weight: 600; color: #475569; font-size: 14px;">Click to upload
+                                                        photos</div>
+                                                    <div style="color: #94A3B8; font-size: 12px; margin-top: 4px;">PNG, JPG or JPEG
+                                                        (multiple allowed)</div>
+                                                    <input name="formfield_Image_value{{ $formFields[$k]->id }}[]" type="file"
+                                                        class="form-control {{ $formFields[$k]->id }}"
+                                                        id="formfield_value_Image{{ $formFields[$k]->id }}"
+                                                        placeholder="{{ $formFields[$k]->lable_name }}" multiple style="display: none;"
+                                                        onchange="updateFileNameDisplay(this, 'file_name_display_{{ $formFields[$k]->id }}')">
+
+                                                    <div id="file_name_display_{{ $formFields[$k]->id }}"
+                                                        style="margin-top: 10px; font-weight: 600; color: #0040E6; font-size: 13px;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="form-error-text" id="file_error_{{ $formFields[$k]->id }}"
+                                                style="color: red; margin-top: 10px;"></p>
+                                        @endif
+                                        @if ($result1[$i]->type == '9')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value=" {{ $result1[$i]->id }}">
+                                                <input name="formfield_value[]" type="time" class="form-control"
+                                                    id="formfield_value_time{{ $formFields[$k]->id }}"
+                                                    placeholder="{{ $formFields[$k]->lable_name }}" class="">
+                                            </div>
+                                            <p class="form-error-text" id="formfield_value_time_one{{ $formFields[$k]->id }}"
+                                                style="color: red; margin-top: 10px;">
+                                            </p>
+                                        @endif
+                                        @break
+                                    @endif
+                                @endfor
+                            @endfor
                         </div>
 
-                         <div class="row" id="intform" style="display:none;">
-                             @for ($i = 0; $i < count($result2); $i++)
-                                 @for ($k = 0; $k < count($formFields); $k++)
-                                     @php
- 
-                                         $form_additionalData = DB::table('form_attributes')
-                                             ->select('*')
-                                             ->where('form_id', '=', $result2[$i]->id)
-                                             ->get()
-                                             ->toArray();
-                                         // echo '<pre>';
-                                         // print_r($form_additionalData);
-                                         // echo '</pre>';
-                                         // exit();
- 
-                                         $required = $formFields[$k]->is_active;
+                        <div class="row" id="intform" @if(strpos(request()->url(), 'international-moving') === false) style="display:none;" @endif>
+                            @for ($i = 0; $i < count($result2); $i++)
+                                @for ($k = 0; $k < count($formFields); $k++)
+                                    @php
+
+                                        $form_additionalData = DB::table('form_attributes')
+                                            ->select('*')
+                                            ->where('form_id', '=', $result2[$i]->id)
+                                            ->get()
+                                            ->unique('form_option')
+                                            ->values()
+                                            ->all();
+                                        // echo '<pre>';
+                                        // print_r($form_additionalData);
+                                        // echo '</pre>';
+                                        // exit();
+
+                                        $required = $formFields[$k]->is_active;
                                      @endphp
-                                     @if ($result2[$i]->lable_name == $formFields[$k]->lable_name)
-                                         @php
-                                             $fieldName = trim($formFields[$k]->lable_name);
-                                             $colClass = 'col-12';
-                                             if (
-                                                 strcasecmp($fieldName, 'Moving From') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving From?') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving From Area') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving To') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving To Area') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving To Country') === 0 || 
-                                                 strcasecmp($fieldName, 'Moving To City') === 0 || 
-                                                 strcasecmp($fieldName, 'ZIP Code') === 0
-                                             ) {
-                                                 $colClass = 'col-md-6 col-12';
-                                             }
+                                    @if ($result2[$i]->lable_name == $formFields[$k]->lable_name)
+                                        @php
+                                            $fieldName = trim($formFields[$k]->lable_name);
+                                            $colClass = 'col-12';
+                                            if (
+                                                strcasecmp($fieldName, 'Moving From') === 0 ||
+                                                strcasecmp($fieldName, 'Moving From?') === 0 ||
+                                                strcasecmp($fieldName, 'Moving From Area') === 0 ||
+                                                strcasecmp($fieldName, 'Moving To') === 0 ||
+                                                strcasecmp($fieldName, 'Moving To Area') === 0 ||
+                                                strcasecmp($fieldName, 'Moving To Country') === 0 ||
+                                                strcasecmp($fieldName, 'Moving To City') === 0 ||
+                                                strcasecmp($fieldName, 'ZIP Code') === 0
+                                            ) {
+                                                $colClass = 'col-md-6 col-12';
+                                            }
                                          @endphp
 
-                                         @if ($result2[$i]->type == '1')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value=" {{ $result2[$i]->id }}">
-                                                 <input name="formfield_value[]" type="text" class="form-control"
-                                                     id="formfield_value_123{{ $formFields[$k]->id }}"
-                                                     placeholder="{{ $formFields[$k]->lable_name }}" class="">
- 
-                                                 <p class="form-error-text" id="name2_error_{{ $formFields[$k]->id }}"
-                                                     style="color: red; margin-top: 10px;">
-                                                 </p>
-                                             </div>
-                                         @endif
-                                         @if ($result2[$i]->type == '2' && $result2[$i]->lable_name != 'Do you require any additional service?')
-                                             <div class="form-group mb-3 {{ $colClass }}">
-                                                 <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}"
-                                                     for="country">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value="{{ $result2[$i]->id }}">
-                                                 
-                                                 @php
-                                                     $pill_labels = ['Move Type', 'What is the size of your move?', 'What is the size of your home?', 'What is the size of your garden?'];
-                                                     $is_pill = false;
-                                                     foreach ($pill_labels as $pill_label) {
-                                                         if (strpos(strtolower($formFields[$k]->lable_name), strtolower($pill_label)) !== false) {
-                                                             $is_pill = true;
-                                                             break;
-                                                         }
-                                                     }
+                                        @if ($result2[$i]->type == '1')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value=" {{ $result2[$i]->id }}">
+                                                <input name="formfield_value[]" type="text" class="form-control"
+                                                    id="formfield_value_123{{ $formFields[$k]->id }}"
+                                                    placeholder="{{ $formFields[$k]->lable_name }}" class="">
+
+                                                <p class="form-error-text" id="name2_error_{{ $formFields[$k]->id }}"
+                                                    style="color: red; margin-top: 10px;">
+                                                </p>
+                                            </div>
+                                        @endif
+                                        @if ($result2[$i]->type == '2' && $result2[$i]->lable_name != 'Do you require any additional service?')
+                                            <div class="form-group mb-3 {{ $colClass }}">
+                                                <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}"
+                                                    for="country">{{ $result2[$i]->id == 57 ? 'Moving From Country' : $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value="{{ $result2[$i]->id }}">
+
+                                                @php
+                                                    $pill_labels = ['Move Type', 'What is the size of your move?', 'What is the size of your home?', 'What is the size of your garden?'];
+                                                    $is_pill = false;
+                                                    foreach ($pill_labels as $pill_label) {
+                                                        if (strpos(strtolower($formFields[$k]->lable_name), strtolower($pill_label)) !== false) {
+                                                            $is_pill = true;
+                                                            break;
+                                                        }
+                                                    }
                                                  @endphp
- 
-                                                 @if($is_pill)
-                                                     <div class="radio-card-group select-pill-group" data-select-id="formfield_value_drop{{ $formFields[$k]->id }}">
-                                                         @foreach ($form_additionalData as $form_additional)
-                                                             <div class="radio-card-item select-pill-item" data-value="{{ $form_additional->id }}">
-                                                                 <span class="radio-card-label">{{ $form_additional->form_option }}</span>
-                                                             </div>
-                                                         @endforeach
-                                                     </div>
-                                                 @endif
- 
-                                                 <select class="form-control searches_drop_{{ $formFields[$k]->id }}"
-                                                     id="formfield_value_drop{{ $formFields[$k]->id }}"
-                                                     name="formfield_value[]"
-                                                     onchange="get_sub_select_two(this.value,'{{ $formFields[$k]->id }}')"
-                                                     @if($is_pill) style="display: none;" @endif>
-                                                     <option value="">Select {{ $formFields[$k]->lable_name }}
-                                                     </option>
-                                                     @foreach ($form_additionalData as $form_additional)
-                                                         <option value="{{ $form_additional->id }}"
-                                                             {{-- @if ($form_additional->form_id == 57 && $form_additional->form_option == 'UAE') selected @endif --}}>
-                                                             {{ $form_additional->form_option }}</option>
-                                                     @endforeach
-                                                 </select>
-                                                 <p class="form-error-text"
-                                                     id="drop_down_error_formfield_value_drop{{ $formFields[$k]->id }}"
-                                                     style="color: red; margin-top: 10px;">
-                                                 </p>
-                                                 <span id="replace_select_two{{ $formFields[$k]->id }}"></span>
-                                             </div>
-                                         @endif
-                                         @if ($result2[$i]->type == '3')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color">{{ $formFields[$k]->lable_name }}</label>
- 
-                                                 <input name="form_field_radio_id_two[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value="{{ $result2[$i]->id }}">
- 
-                                                 <div class="radio-card-group">
-                                                     @foreach ($form_additionalData as $form_additional)
-                                                         <label class="radio-card-item">
-                                                             <input name="formfield_radio_{{ $formFields[$k]->id }}"
-                                                                 type="radio"
-                                                                 id="formfield_value_{{ $formFields[$k]->id }}_{{ $loop->index }}" placeholder=""
-                                                                 value="{{ $form_additional->form_option }}">
-                                                             <span class="radio-card-label">{{ $form_additional->form_option }}</span>
-                                                         </label>
-                                                     @endforeach
-                                                 </div>
-                                                 <p class="form-error-text"
-                                                     id="formfield_value_red{{ $formFields[$k]->id }}"
-                                                     style="color: red; margin-top: 10px;">
-                                                 </p>
-                                             </div>
-                                         @endif
- 
-                                         @if ($result2[$i]->type == '4')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <input name="form_field_checkbox_id_two[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value="{{ $result2[$i]->id }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <div class="checkbox-card-group">
-                                                     @foreach ($form_additionalData as $form_additional)
-                                                         <label class="checkbox-card-item">
-                                                             <input name="formfield_checkbox_{{ $formFields[$k]->id }}[]"
-                                                                 type="checkbox"
-                                                                 id="formfield_value_{{ $formFields[$k]->id }}_{{ $loop->index }}"
-                                                                 placeholder="" value="{{ $form_additional->form_option }}">
-                                                             <span class="checkbox-card-label">{{ $form_additional->form_option }}</span>
-                                                         </label>
-                                                     @endforeach
-                                                 </div>
-                                                 <p class="form-error-text"
-                                                     id="formfield_value_c2{{ $formFields[$k]->id }}"
-                                                     style="color: red; margin-top: 10px;">
-                                                 </p>
-                                             </div>
-                                         @endif
-                                         @if ($result2[$i]->type == '5')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value="{{ $result2[$i]->id }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <textarea name="formfield_value[]" id="formfield_value{{ $formFields[$k]->id }}"
-                                                     placeholder="{{ $formFields[$k]->lable_name }}" class="form-control"></textarea>
- 
-                                                 <p class="form-error-text"
-                                                     id="formfield_value_01{{ $formFields[$k]->id }}"
-                                                     style="color: red; margin-top: 10px;">
-                                                 </p>
-                                             </div>
-                                         @endif
- 
-                                         @if ($result2[$i]->type == '6')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value=" {{ $result2[$i]->id }}">
-                                                 <input name="formfield_value[]" type="date" class="form-control"
-                                                     id="formfield_value{{ $formFields[$k]->id }}"
-                                                     placeholder="{{ $formFields[$k]->lable_name }}" class="">
-                                             </div>
-                                             <p class="form-error-text"
-                                                 id="formfield_value_date_2{{ $formFields[$k]->id }}"
-                                                 style="color: red; margin-top: 10px;">
-                                             </p>
-                                         @endif
- 
-                                         @if ($result2[$i]->type == '7')
-                                             <div class="form-group mb-3 {{ $colClass }}">
-                                                 <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}"
-                                                     for="country">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="formfield_mul_dropdown_[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value="{{ $result2[$i]->id }}">
-                                                 <select class="form-control multiple"
-                                                     id="formfield_value_mul_test2{{ $formFields[$k]->id }}"
-                                                     name="formfield_mul_dropdown_{{ $formFields[$k]->id }}[]"
-                                                     multiple="multiple">
-                                                     <option value="">Select {{ $formFields[$k]->lable_name }}
-                                                     </option>
-                                                     @foreach ($form_additionalData as $form_additional)
-                                                         <option value="{{ $form_additional->form_option }}">
-                                                             {{ $form_additional->form_option }}</option>
-                                                     @endforeach
-                                                 </select>
-                                                 <p class="form-error-text"
-                                                     id="mul2_drop_error_{{ $formFields[$k]->id }}"
-                                                     style="color: red; margin-top: 10px;">
-                                                 </p>
-                                             </div>
-                                         @endif
-                                         @if ($result2[$i]->type == '8')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id_image[]" type="hidden" class="m-0"
-                                                     id="form_field_id" value="{{ $result1[$i]->id }}">
-                                                 
-                                                 <div class="file-upload-wrapper" onclick="document.getElementById('formfield_value_Image_two{{ $formFields[$k]->id }}').click()">
-                                                     <div class="file-upload-icon">
-                                                         <i class="fa-solid fa-cloud-arrow-up"></i>
-                                                     </div>
-                                                     <div style="font-weight: 600; color: #475569; font-size: 14px;">Click to upload photos</div>
-                                                     <div style="color: #94A3B8; font-size: 12px; margin-top: 4px;">PNG, JPG or JPEG (multiple allowed)</div>
-                                                     <input name="formfield_Image_value{{ $formFields[$k]->id }}[]"
-                                                         type="file" class="form-control {{ $formFields[$k]->id }}"
-                                                         id="formfield_value_Image_two{{ $formFields[$k]->id }}"
-                                                         placeholder="{{ $formFields[$k]->lable_name }}" multiple style="display: none;"
-                                                         onchange="updateFileNameDisplay(this, 'file_name_display_two_{{ $formFields[$k]->id }}')">
-                                                     
-                                                     <div id="file_name_display_two_{{ $formFields[$k]->id }}" style="margin-top: 10px; font-weight: 600; color: #0040E6; font-size: 13px;"></div>
-                                                 </div>
-                                             </div>
-                                             <p class="form-error-text" id="file_error_two_{{ $formFields[$k]->id }}"
-                                                 style="color: red; margin-top: 10px;"></p>
-                                         @endif
-                                         @if ($result2[$i]->type == '9')
-                                             <div class="mb15 {{ $colClass }}">
-                                                 <label
-                                                     class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
-                                                 <input name="form_field_id[]" type="hidden" class="m-0"
-                                                     id="form_field_id[]" value=" {{ $result1[$i]->id }}">
-                                                 <input name="formfield_value[]" type="time" class="form-control"
-                                                     id="formfield_value_time_two{{ $formFields[$k]->id }}"
-                                                     placeholder="{{ $formFields[$k]->lable_name }}" class="">
-                                             </div>
-                                             <p class="form-error-text"
-                                                 id="formfield_value_time_sec{{ $formFields[$k]->id }}"
-                                                 style="color: red; margin-top: 10px;">
-                                         @endif
-                                     @endif
-                                 @endfor
-                             @endfor
+
+                                                @if($is_pill)
+                                                    <div class="radio-card-group select-pill-group"
+                                                        data-select-id="formfield_value_drop{{ $formFields[$k]->id }}">
+                                                        @foreach ($form_additionalData as $form_additional)
+                                                            <div class="radio-card-item select-pill-item"
+                                                                data-value="{{ $form_additional->id }}">
+                                                                <span class="radio-card-label">{{ $form_additional->form_option }}</span>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+
+                                                <select class="form-control searches_drop_{{ $formFields[$k]->id }}"
+                                                    id="formfield_value_drop{{ $formFields[$k]->id }}" name="formfield_value[]"
+                                                    onchange="get_sub_select_two(this.value,'{{ $formFields[$k]->id }}')" @if($is_pill)
+                                                    style="display: none;" @endif>
+                                                    <option value="">Select
+                                                        {{ $result2[$i]->id == 57 ? 'Where are you moving from?' : $formFields[$k]->lable_name }}
+                                                    </option>
+                                                    @foreach ($form_additionalData as $form_additional)
+                                                        <option value="{{ $form_additional->id }}" @if (($form_additional->form_id == 39 || $form_additional->form_id == 57) && ($form_additional->form_option == 'UAE' || $form_additional->form_option == 'United Arab Emirates')) selected @endif>
+                                                            {{ $form_additional->form_option }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <p class="form-error-text"
+                                                    id="drop_down_error_formfield_value_drop{{ $formFields[$k]->id }}"
+                                                    style="color: red; margin-top: 10px;">
+                                                </p>
+                                                <span id="replace_select_two{{ $formFields[$k]->id }}"></span>
+                                            </div>
+                                        @endif
+                                        @if ($result2[$i]->type == '3')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <label class="form-label fw500 dark-color">{{ $formFields[$k]->lable_name }}</label>
+
+                                                <input name="form_field_radio_id_two[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value="{{ $result2[$i]->id }}">
+
+                                                <div class="radio-card-group">
+                                                    @foreach ($form_additionalData as $form_additional)
+                                                        <label class="radio-card-item">
+                                                            <input name="formfield_radio_{{ $formFields[$k]->id }}" type="radio"
+                                                                id="formfield_value_{{ $formFields[$k]->id }}_{{ $loop->index }}"
+                                                                placeholder="" value="{{ $form_additional->form_option }}">
+                                                            <span class="radio-card-label">{{ $form_additional->form_option }}</span>
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+                                                <p class="form-error-text" id="formfield_value_red{{ $formFields[$k]->id }}"
+                                                    style="color: red; margin-top: 10px;">
+                                                </p>
+                                            </div>
+                                        @endif
+
+                                        @if ($result2[$i]->type == '4')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <input name="form_field_checkbox_id_two[]" type="hidden" class="m-0"
+                                                    id="form_field_id[]" value="{{ $result2[$i]->id }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <div class="checkbox-card-group">
+                                                    @foreach ($form_additionalData as $form_additional)
+                                                        <label class="checkbox-card-item">
+                                                            <input name="formfield_checkbox_{{ $formFields[$k]->id }}[]" type="checkbox"
+                                                                id="formfield_value_{{ $formFields[$k]->id }}_{{ $loop->index }}"
+                                                                placeholder="" value="{{ $form_additional->form_option }}">
+                                                            <span class="checkbox-card-label">{{ $form_additional->form_option }}</span>
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+                                                <p class="form-error-text" id="formfield_value_c2{{ $formFields[$k]->id }}"
+                                                    style="color: red; margin-top: 10px;">
+                                                </p>
+                                            </div>
+                                        @endif
+                                        @if ($result2[$i]->type == '5')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value="{{ $result2[$i]->id }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <textarea name="formfield_value[]" id="formfield_value{{ $formFields[$k]->id }}"
+                                                    placeholder="{{ $formFields[$k]->lable_name }}" class="form-control"></textarea>
+
+                                                <p class="form-error-text" id="formfield_value_01{{ $formFields[$k]->id }}"
+                                                    style="color: red; margin-top: 10px;">
+                                                </p>
+                                            </div>
+                                        @endif
+
+                                        @if ($result2[$i]->type == '6')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value=" {{ $result2[$i]->id }}">
+                                                <input name="formfield_value[]" type="date" class="form-control"
+                                                    id="formfield_value{{ $formFields[$k]->id }}"
+                                                    placeholder="{{ $formFields[$k]->lable_name }}" class="">
+                                            </div>
+                                            <p class="form-error-text" id="formfield_value_date_2{{ $formFields[$k]->id }}"
+                                                style="color: red; margin-top: 10px;">
+                                            </p>
+                                        @endif
+
+                                        @if ($result2[$i]->type == '7')
+                                            <div class="form-group mb-3 {{ $colClass }}">
+                                                <label class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}"
+                                                    for="country">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="formfield_mul_dropdown_[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value="{{ $result2[$i]->id }}">
+                                                <select class="form-control multiple"
+                                                    id="formfield_value_mul_test2{{ $formFields[$k]->id }}"
+                                                    name="formfield_mul_dropdown_{{ $formFields[$k]->id }}[]" multiple="multiple">
+                                                    <option value="">Select {{ $formFields[$k]->lable_name }}
+                                                    </option>
+                                                    @foreach ($form_additionalData as $form_additional)
+                                                        <option value="{{ $form_additional->form_option }}">
+                                                            {{ $form_additional->form_option }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <p class="form-error-text" id="mul2_drop_error_{{ $formFields[$k]->id }}"
+                                                    style="color: red; margin-top: 10px;">
+                                                </p>
+                                            </div>
+                                        @endif
+                                        @if ($result2[$i]->type == '8')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id_image[]" type="hidden" class="m-0" id="form_field_id"
+                                                    value="{{ $result1[$i]->id }}">
+
+                                                <div class="file-upload-wrapper"
+                                                    onclick="document.getElementById('formfield_value_Image_two{{ $formFields[$k]->id }}').click()">
+                                                    <div class="file-upload-icon">
+                                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                                    </div>
+                                                    <div style="font-weight: 600; color: #475569; font-size: 14px;">Click to upload
+                                                        photos</div>
+                                                    <div style="color: #94A3B8; font-size: 12px; margin-top: 4px;">PNG, JPG or JPEG
+                                                        (multiple allowed)</div>
+                                                    <input name="formfield_Image_value{{ $formFields[$k]->id }}[]" type="file"
+                                                        class="form-control {{ $formFields[$k]->id }}"
+                                                        id="formfield_value_Image_two{{ $formFields[$k]->id }}"
+                                                        placeholder="{{ $formFields[$k]->lable_name }}" multiple style="display: none;"
+                                                        onchange="updateFileNameDisplay(this, 'file_name_display_two_{{ $formFields[$k]->id }}')">
+
+                                                    <div id="file_name_display_two_{{ $formFields[$k]->id }}"
+                                                        style="margin-top: 10px; font-weight: 600; color: #0040E6; font-size: 13px;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="form-error-text" id="file_error_two_{{ $formFields[$k]->id }}"
+                                                style="color: red; margin-top: 10px;"></p>
+                                        @endif
+                                        @if ($result2[$i]->type == '9')
+                                            <div class="mb15 {{ $colClass }}">
+                                                <label
+                                                    class="form-label fw500 dark-color {{ $required == 1 ? 'requiredStar' : '' }}">{{ $formFields[$k]->lable_name }}</label>
+                                                <input name="form_field_id[]" type="hidden" class="m-0" id="form_field_id[]"
+                                                    value=" {{ $result1[$i]->id }}">
+                                                <input name="formfield_value[]" type="time" class="form-control"
+                                                    id="formfield_value_time_two{{ $formFields[$k]->id }}"
+                                                    placeholder="{{ $formFields[$k]->lable_name }}" class="">
+                                            </div>
+                                            <p class="form-error-text" id="formfield_value_time_sec{{ $formFields[$k]->id }}"
+                                                style="color: red; margin-top: 10px;">
+                                        @endif
+                                        @break
+                                    @endif
+                                @endfor
+                            @endfor
                         </div>
 
                         <!-- Step 1 Actions -->
@@ -1293,8 +1365,8 @@
                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                 Loading...
                             </button>
-                            <button type="button" class="btn-thm"
-                                onclick="javascript:category_validation()" id="submit_button">
+                            <button type="button" class="btn-thm" onclick="javascript:category_validation()"
+                                id="submit_button">
                                 Continue <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </div>
@@ -1307,8 +1379,7 @@
         <form id="category_form_new" action="{{ route('package_inquiry_new') }}" method="POST"
             style="display: {{ $display_newform }};">
             @csrf
-            <input name="service_id" id="service_id" type="hidden" class="form-control"
-                value="{{ $service_id }}">
+            <input name="service_id" id="service_id" type="hidden" class="form-control" value="{{ $service_id }}">
             <input name="subservice_id" id="subservice_id" type="hidden" class="form-control"
                 value="{{ $subservice_id }}">
 
@@ -1316,22 +1387,28 @@
                 <!-- Left Column: Step Cards -->
                 <div class="enquiry-left-column">
                     <div class="enquiry-card-ui">
-                        <div class="card-title-new" style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
+                        <div class="card-title-new"
+                            style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
                             <i class="fa-solid fa-clipboard-check" style="color: #0040E6; font-size: 20px;"></i>
                             <span style="font-size: 20px; font-weight: 700; color: #0F172A;">Booking Summary</span>
                         </div>
 
                         <ul class="detail-list" style="list-style: none; padding: 0; margin: 0 0 25px 0;">
-                            <li style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
+                            <li
+                                style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
                                 <span style="color: #64748B; font-weight: 500;">Service Category</span>
-                                <span style="color: #0F172A; font-weight: 600;">{!! Helper::servicename($service_id) !!}</span>
+                                <span
+                                    style="color: #0F172A; font-weight: 600;">{!! Helper::servicename($service_id) !!}</span>
                             </li>
-                            <li style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
+                            <li
+                                style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
                                 <span style="color: #64748B; font-weight: 500;">Service Type</span>
-                                <span style="color: #0F172A; font-weight: 600;">{!! Helper::subservicename($subservice_id) !!}</span>
+                                <span
+                                    style="color: #0F172A; font-weight: 600;">{!! Helper::subservicename($subservice_id) !!}</span>
                             </li>
                             @if(isset($enquiry))
-                                <li style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
+                                <li
+                                    style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
                                     <span style="color: #64748B; font-weight: 500;">Move/Job Type</span>
                                     <span style="color: #0F172A; font-weight: 600;">{{ $enquiry->form_type }}</span>
                                 </li>
@@ -1342,13 +1419,16 @@
                                         @php
                                             $displayValue = $field->formfield_value;
                                             if (is_numeric($displayValue)) {
-                                                $option = DB::table('form_attributes')->where('id', $displayValue)->first();
+                                                $option = \Illuminate\Support\Facades\Cache::remember("form_attr_{$displayValue}", 86400, function() use ($displayValue) {
+                                                    return DB::table('form_attributes')->where('id', $displayValue)->first();
+                                                });
                                                 if ($option) {
                                                     $displayValue = $option->form_option;
                                                 }
                                             }
                                         @endphp
-                                        <li style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
+                                        <li
+                                            style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
                                             <span style="color: #64748B; font-weight: 500;">{{ $field->lable_name }}</span>
                                             <span style="color: #0F172A; font-weight: 600;">{{ $displayValue }}</span>
                                         </li>
@@ -1368,7 +1448,8 @@
                                                     }
                                                     $subValue = \Helper::form_fields_attr_more($subField->more_form_attributes_id);
                                                 @endphp
-                                                <li style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
+                                                <li
+                                                    style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F1F5F9;">
                                                     <span style="color: #64748B; font-weight: 500;">{{ $subLabel }}</span>
                                                     <span style="color: #0F172A; font-weight: 600;">{{ $subValue }}</span>
                                                 </li>
@@ -1385,10 +1466,10 @@
                             </button>
                         </div>
                         <script>
-                            document.addEventListener('DOMContentLoaded', function() {
+                            document.addEventListener('DOMContentLoaded', function () {
                                 const form = document.getElementById('category_form_new');
                                 if (form) {
-                                    form.addEventListener('submit', function() {
+                                    form.addEventListener('submit', function (e) {
                                         const btn = document.getElementById('submit_button_final');
                                         if (btn) {
                                             btn.disabled = true;
@@ -1409,103 +1490,133 @@
 
 
 <!-- OTP Popup Start-->
-<div class="modal modal-mobile-bottom-otp otp-login-form-modal" id="exampleModalLong" tabindex="-1" aria-labelledby="otpLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-bottom-otp user-modal-dialog modal-dialog-centered">
-    <div class="modal-content details-modal-content">
-      <div class="modal-header details-header">
-      <h5 class="modal-title w-100" id="modalStepTitle">Log in or Sign Up</h5>
-      </div> 
-
-      <div class="modal-body">
-        <div id="booknow_refresh_otp_div">
-        <input type="hidden" name="book_session_otp" id="book_session_otp" value= "{{session('book-login-otp')}}">
-        </div>
-        <form class="form-horizontal details-form" id="BookOtpForm" method="POST" action="{{ route('booknow-user-otp-login') }}">
-
-        <input type="hidden" name="redirectUrl" value="{{ $redirectUrl }}">
-        <input type="hidden" name="service_id" id="service_id" value="{{ $service_id }}">
-        <input type="hidden" name="subservice_id" id="subservice_id" value="{{ $subservice_id }}">
-
-        @csrf
-
-          <!-- STEP 1: Mobile Input -->
-          <div id="booknow-step-phone">
-            <div class="form-group mb-2">
-              <label id="mobilename-label">Please Enter Your WhatsApp mobile number</label>
-              <input type="hidden" name="country_code_otp_popup_Modal" id="country_code_otp_popup_Modal_book" value="">
-              <input type="text" class="input-field" name="phone" id="user-phone-number" placeholder="Mobile No" onkeypress="return validateNumber(event)">
-              <p id="booknow_otp_phone_error" style="display:none;color:red;"></p>
+<div class="modal modal-mobile-bottom-otp otp-login-form-modal" id="exampleModalLong" tabindex="-1" role="dialog"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-bottom-otp user-modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content details-modal-content">
+            <div class="modal-header details-header bn-modal-header">
+                <h5 class="modal-title w-100" id="modalStepTitle">Log in or Sign Up</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-			<a href="javascript:void(0)" data-bs-toggle="modal" class="email-whatsapp" data-bs-target="#book_email_otp_popup_Modal">Don't have a WhatsApp Number? Login with Email</a>
-            <div class="text-center mt-3">
-			
-			<button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button" disabled id="spinner_button_phone_book1" style="display: none;">
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...
-            </button>
-			
-              <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" id="submit_button_phone_book1" onclick="booknow_otp_verification('1')">Continue</button>
+
+            <div class="modal-body">
+                <div id="booknow_refresh_otp_div">
+                    <input type="hidden" name="book_session_otp" id="book_session_otp"
+                        value="{{session('book-login-otp')}}">
+                </div>
+                <form class="form-horizontal details-form" id="BookOtpForm" method="POST"
+                    action="{{ route('booknow-user-otp-login') }}">
+
+                    <input type="hidden" name="redirectUrl" value="{{ $redirectUrl }}">
+                    <input type="hidden" name="service_id" id="service_id" value="{{ $service_id }}">
+                    <input type="hidden" name="subservice_id" id="subservice_id" value="{{ $subservice_id }}">
+
+                    @csrf
+
+                    <!-- STEP 1: Mobile Input -->
+                    <div id="booknow-step-phone">
+                        <div class="form-group mb-2">
+                            <label id="mobilename-label">Please Enter Your WhatsApp mobile number</label>
+                            <input type="hidden" name="country_code_otp_popup_Modal"
+                                id="country_code_otp_popup_Modal_book" value="">
+                            <input type="tel" class="input-field" name="phone" id="enquiry-user-phone-number"
+                                placeholder="Mobile No" onkeypress="return validateNumber(event)">
+                            <p id="booknow_otp_phone_error" style="display:none;color:red;"></p>
+                        </div>
+                        <a href="javascript:void(0)" data-bs-toggle="modal" class="email-whatsapp"
+                            data-bs-target="#book_email_otp_popup_Modal">Don't have a WhatsApp Number? Login with
+                            Email</a>
+                        <div class="text-center mt-3">
+
+                            <button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button"
+                                disabled id="spinner_button_phone_book1" style="display: none;">
+                                <span class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true"></span>Loading...
+                            </button>
+
+                            <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn"
+                                id="submit_button_phone_book1" onclick="booknow_otp_verification('1')">Continue</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: OTP Verification -->
+                    <div id="booknow-step-otp" style="display: none;">
+                        <label id="mobilename-label">Please enter the <strong>WhatsApp code</strong> that was sent
+                            to:<br>
+                            <span id="booknow-whatsapp-number">+971 58 520 0722</span>
+                        </label>
+
+                        <div class="d-flex justify-content-center gap-2 my-3">
+                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                                style="width: 40px;">
+                        </div>
+                        <p id="booknow_otp_error" style="display:none;color:red;"></p>
+
+                        <a href="javascript:void(0)" data-bs-toggle="modal" class="email-whatsapp"
+                            data-bs-target="#book_email_otp_popup_Modal">Can't log in? Use your Email Address</a>
+
+                        <div class="text-center mt-3">
+                            <button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button"
+                                disabled id="spinner_button_phone_book2" style="display: none;">
+                                <span class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true"></span>Loading...
+                            </button>
+                            <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn"
+                                id="submit_button_phone_book2" onclick="booknow_otp_verification('2')">Verify
+                                Number</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Personal Details -->
+                    <div id="booknow-step-details" style="display: none;">
+                        <label id="mobilename-label">Contact information</label>
+                        <div class="form-group mt-3">
+                            <input type="text" class="form-control" name="book_name" id="booknow_user_name"
+                                placeholder="Full Name">
+                            <p id="booknow_name_error" style="display:none;color:red;"></p>
+                        </div>
+                        <div class="form-group mt-3">
+                            <input type="email" class="form-control" id="booknow_user_email" name="book_email"
+                                placeholder="Email">
+                            <p id="booknow_email_error" style="display:none;color:red;"></p>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button"
+                                disabled id="spinner_button_phone_book3" style="display: none;">
+
+                                <span class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true"></span>Loading...</button>
+
+                            <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn"
+                                id="submit_button_phone_book3" onclick="booknow_otp_verification('3')">All Done</button>
+
+                        </div>
+
+                        <div class="mt-3">
+                            <a href="{{ route('privacy_policy') }}" class="footer-link me-3">Privacy Policy</a>
+                            <a href="{{ route('term_condition') }}" class="footer-link">Terms of Service</a>
+                        </div>
+
+                    </div>
+
+
+                </form>
             </div>
-          </div>
-
-          <!-- STEP 2: OTP Verification -->
-          <div id="booknow-step-otp" style="display: none;">
-            <label id="mobilename-label">Please enter the <strong>WhatsApp code</strong> that was sent to:<br>
-              <span id="booknow-whatsapp-number">+971 58 520 0722</span>
-            </label>
-
-            <div class="d-flex justify-content-center gap-2 my-3">
-              <input type="text" maxlength="1" class="booknow-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="booknow-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="booknow-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="booknow-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="booknow-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="booknow-otp-input form-control text-center" style="width: 40px;">
-            </div>
-            <p id="booknow_otp_error" style="display:none;color:red;"></p>
-
-            <a href="javascript:void(0)" data-bs-toggle="modal" class="email-whatsapp" data-bs-target="#book_email_otp_popup_Modal">Can't log in? Use your Email Address</a>
-
-            <div class="text-center mt-3">
-			<button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button" disabled id="spinner_button_phone_book2" style="display: none;">
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...
-            </button>
-              <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" id="submit_button_phone_book2" onclick="booknow_otp_verification('2')" >Verify Number</button>
-            </div>
-          </div>
-
-          <!-- STEP 3: Personal Details -->
-        <div id="booknow-step-details" style="display: none;">
-        <label id="mobilename-label">Contact information</label>
-        <div class="form-group mt-3">
-            <input type="text" class="form-control" name="book_name" id="booknow_user_name" placeholder="Full Name">
-            <p id="booknow_name_error" style="display:none;color:red;"></p>
-        </div>
-        <div class="form-group mt-3">
-            <input type="email" class="form-control" id="booknow_user_email" name="book_email" placeholder="Email">
-            <p id="booknow_email_error" style="display:none;color:red;"></p>
-        </div>
-        <div class="text-center mt-3">
-		<button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button" disabled id="spinner_button_phone_book3" style="display: none;">
-
-        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button>
-
-        <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" id="submit_button_phone_book3" onclick="booknow_otp_verification('3')">All Done</button>
 
         </div>
-        
-        <div class="mt-3">
-            <a href="{{ route('privacy_policy') }}" class="footer-link me-3">Privacy Policy</a>
-            <a href="{{ route('term_condition') }}" class="footer-link">Terms of Service</a>
-        </div>
-
-        </div>
-
-
-        </form>
-      </div>
-
     </div>
-  </div>
 </div>
 
 <!-- OTP Popup End-->
@@ -1513,104 +1624,134 @@
 
 <!-- email OTP Popup Start-->
 
-<div class="modal modal-mobile-bottom-otp otp-login-form-modal" id="book_email_otp_popup_Modal" tabindex="-1" aria-labelledby="otpLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-bottom-otp user-modal-dialog modal-dialog-centered">
-    <div class="modal-content details-modal-content">
-      <div class="modal-header details-header">
-      <h5 class="modal-title w-100" id="booknow_email_modalStepTitle">Log in or Sign Up</h5>
-      </div> 
-
-      <div class="modal-body">
-        <div id="book_email_refresh_otp_div">
-        <input type="hidden" name="book_email_session_otp" id="book_email_session_otp" value= "{{session('book-email-login-otp')}}">
-        </div>
-        <form class="form-horizontal details-form" id="bookemailOtpForm" method="POST" action="{{ route('home.book-email-otp-login') }}">
-        <input type="hidden" name="redirectUrl" value="{{ $redirectUrl }}">
-        <input type="hidden" name="service_id" id="service_id" value="{{ $service_id }}">
-        <input type="hidden" name="subservice_id" id="subservice_id" value="{{ $subservice_id }}">
-		<input type="hidden" name="country_code_book_popup_Modal_book" id="country_code_book_popup_Modal_book" value="">
-          @csrf
-
-
-          <!-- STEP 1: Mobile Input -->
-          <div id="book-email-step-phone">
-            <div class="form-group mb-2">
-              <label id="mobilename-label">Please Enter Your Email Address</label>
-              <input type="text" class="input-field" name="book_email_email" id="book_email_email" placeholder="Email Address">
-              <p id="book_email_email_error" style="display:none;color:red;"></p>
+<div class="modal modal-mobile-bottom-otp otp-login-form-modal" id="book_email_otp_popup_Modal" tabindex="-1"
+    role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-bottom-otp user-modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content details-modal-content">
+            <div class="modal-header details-header bn-modal-header">
+                <h5 class="modal-title w-100" id="booknow_email_modalStepTitle">Log in or Sign Up</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-			<a href="javascript:void(0)" data-bs-toggle="modal" class="email-whatsapp" data-bs-target="#exampleModalLong">Can't access your email? Log in with WhatsApp</a>
-            <div class="text-center mt-3">
-				<button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button" disabled id="spinner_button_email_book1"
-                                style="display: none;">
 
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <div class="modal-body">
+                <div id="book_email_refresh_otp_div">
+                    <input type="hidden" name="book_email_session_otp" id="book_email_session_otp"
+                        value="{{session('book-email-login-otp')}}">
+                </div>
+                <form class="form-horizontal details-form" id="bookemailOtpForm" method="POST"
+                    action="{{ route('home.book-email-otp-login') }}">
+                    <input type="hidden" name="redirectUrl" value="{{ $redirectUrl }}">
+                    <input type="hidden" name="service_id" id="service_id" value="{{ $service_id }}">
+                    <input type="hidden" name="subservice_id" id="subservice_id" value="{{ $subservice_id }}">
+                    <input type="hidden" name="country_code_book_popup_Modal_book"
+                        id="country_code_book_popup_Modal_book" value="">
+                    @csrf
 
-                Loading...
 
-            </button>
-              <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" id="submit_button_email_book1" onclick="book_email_goToOtpVerification('1')">Continue</button>
+                    <!-- STEP 1: Mobile Input -->
+                    <div id="book-email-step-phone">
+                        <div class="form-group mb-2">
+                            <label id="mobilename-label">Please Enter Your Email Address</label>
+                            <input type="text" class="input-field" name="book_email_email" id="book_email_email"
+                                placeholder="Email Address">
+                            <p id="book_email_email_error" style="display:none;color:red;"></p>
+                        </div>
+                        <a href="javascript:void(0)" data-bs-toggle="modal" class="email-whatsapp"
+                            data-bs-target="#exampleModalLong">Can't access your email? Log in with WhatsApp</a>
+                        <div class="text-center mt-3">
+                            <button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button"
+                                disabled id="spinner_button_email_book1" style="display: none;">
+
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+
+                                Loading...
+
+                            </button>
+                            <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn"
+                                id="submit_button_email_book1"
+                                onclick="book_email_goToOtpVerification('1')">Continue</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: OTP Verification -->
+                    <div id="booknow-email-step-otp" style="display: none;">
+                        <label id="mobilename-label">Please enter the <strong>OTP</strong> that was sent to:<br>
+                            <span id="book_email_address_model">+971 58 520 0722</span>
+                        </label>
+
+                        <div class="d-flex justify-content-center gap-2 my-3">
+                            <input type="text" maxlength="1" class="book-email-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="book-email-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="book-email-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="book-email-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="book-email-otp-input form-control text-center"
+                                style="width: 40px;">
+                            <input type="text" maxlength="1" class="book-email-otp-input form-control text-center"
+                                style="width: 40px;">
+                        </div>
+                        <p id="book_email_otp_error" style="display:none;color:red;"></p>
+                        <a href="javascript:void(0)" data-bs-toggle="modal" class="email-whatsapp"
+                            data-bs-target="#exampleModalLong">Can't access your email? Log in with WhatsApp</a>
+
+                        <div class="text-center mt-3">
+                            <button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button"
+                                disabled id="spinner_button_email_book2" style="display: none;">
+                                <span class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true"></span>Loading...</button>
+
+                            <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn"
+                                id="submit_button_email_book2" onclick="book_email_goToOtpVerification('2')">Verify
+                                Email</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Personal Details -->
+                    <div id="booknow-email-step-details" style="display: none;">
+                        <label id="mobilename-label">Contact information</label>
+                        <div class="form-group mt-3">
+                            <input type="text" class="form-control" name="book_email_name" id="book_email_name"
+                                placeholder="Full Name">
+                            <p id="book_email_name_error" style="display:none;color:red;"></p>
+                        </div>
+                        <div class="form-group mt-3">
+                            <input type="text" class="form-control" id="book_email_mobile" name="book_email_mobile"
+                                placeholder="Phone Number" onkeypress="return validateNumber(event)">
+                            <p id="book_email_mobile_error" style="display:none;color:red;"></p>
+                        </div>
+                        {{-- <div class="form-group mt-3">
+                            <input type="text" class="form-control" id="book_email_area" name="book_email_area"
+                                placeholder="Area">
+                            <p id="book_email_area_error" style="display:none;color:red;"></p>
+                        </div> --}}
+                        <div class="text-center mt-3">
+                            <button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button"
+                                disabled id="spinner_button_email_book3" style="display: none;"><span
+                                    class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true"></span>Loading...</button>
+
+                            <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn"
+                                id="submit_button_email_book3" onclick="book_email_goToOtpVerification('3')">All
+                                Done</button>
+                        </div>
+
+                        <div class="mt-3">
+                            <a href="{{ route('privacy_policy') }}" class="footer-link me-3">Privacy Policy</a>
+                            <a href="{{ route('term_condition') }}" class="footer-link">Terms of Service</a>
+                        </div>
+                    </div>
+
+
+                </form>
             </div>
-          </div>
 
-          <!-- STEP 2: OTP Verification -->
-          <div id="booknow-email-step-otp" style="display: none;">
-            <label id="mobilename-label">Please enter the <strong>OTP</strong> that was sent to:<br>
-			 <span id="book_email_address_model">+971 58 520 0722</span>
-            </label>
-
-            <div class="d-flex justify-content-center gap-2 my-3">
-              <input type="text" maxlength="1" class="book-email-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="book-email-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="book-email-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="book-email-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="book-email-otp-input form-control text-center" style="width: 40px;">
-              <input type="text" maxlength="1" class="book-email-otp-input form-control text-center" style="width: 40px;">
-            </div>
-            <p id="book_email_otp_error" style="display:none;color:red;"></p>
-            <a href="javascript:void(0)" data-bs-toggle="modal" class="email-whatsapp" data-bs-target="#exampleModalLong">Can't access your email? Log in with WhatsApp</a>
-
-            <div class="text-center mt-3">
-			<button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button" disabled id="spinner_button_email_book2" style="display: none;">
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button>
-
-              <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" id="submit_button_email_book2" onclick="book_email_goToOtpVerification('2')" >Verify Email</button>
-            </div>
-          </div>
-
-          <!-- STEP 3: Personal Details -->
-        <div id="booknow-email-step-details" style="display: none;">
-        <label id="mobilename-label">Contact information</label>
-        <div class="form-group mt-3">
-            <input type="text" class="form-control" name="book_email_name" id="book_email_name" placeholder="Full Name">
-            <p id="book_email_name_error" style="display:none;color:red;"></p>
         </div>
-        <div class="form-group mt-3">
-            <input type="text" class="form-control" id="book_email_mobile" name="book_email_mobile" placeholder="Phone Number" onkeypress="return validateNumber(event)">
-            <p id="book_email_mobile_error" style="display:none;color:red;"></p>
-        </div>
-        {{-- <div class="form-group mt-3">
-            <input type="text" class="form-control" id="book_email_area" name="book_email_area" placeholder="Area">
-            <p id="book_email_area_error" style="display:none;color:red;"></p>
-        </div> --}}
-        <div class="text-center mt-3">
-		<button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" type="button" disabled id="spinner_button_email_book3" style="display: none;"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button>
-
-        <button type="button" class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn" id="submit_button_email_book3" onclick="book_email_goToOtpVerification('3')">All Done</button>
-        </div>
-
-        <div class="mt-3">
-            <a href="{{ route('privacy_policy') }}" class="footer-link me-3">Privacy Policy</a>
-            <a href="{{ route('term_condition') }}" class="footer-link">Terms of Service</a>
-        </div>
-        </div>
-
-
-        </form>
-      </div>
-
     </div>
-  </div>
 </div>
 
 <!-- Email Otp Popup end -->
@@ -1620,741 +1761,792 @@
 
 <script>
     @for ($k = 0; $k < count($formFields); $k++)
-        $(document).ready(function() {
-            $('.searches_drop_{{ $formFields[$k]->id }}').select2();
+        $(document).ready(function () {
+            $('.searches_drop_{{ $formFields[$k]->id }}').select2({
+                minimumResultsForSearch: Infinity
+            });
         });
     @endfor
 </script>
 
 <script>
-    function updateFileNameDisplay(input, elementId) {
-        var display = document.getElementById(elementId);
-        if (input.files && input.files.length > 0) {
-            var names = Array.from(input.files).map(f => f.name).join(', ');
-            display.innerHTML = '<i class="fa-solid fa-file-image"></i> Selected: ' + names;
-        } else {
-            display.innerHTML = '';
+        function updateFileNameDisplay(input, elementId) {
+            var display = document.getElementById(elementId);
+            if (input.files && input.files.length > 0) {
+                var names = Array.from(input.files).map(f => f.name).join(', ');
+                display.innerHTML = '<i class="fa-solid fa-file-image"></i> Selected: ' + names;
+            } else {
+                display.innerHTML = '';
+            }
         }
-    }
 
     function validateNumber(event) {
-    var key = window.event ? event.keyCode : event.which;
-    if (event.keyCode === 8 || event.keyCode === 46) {
-        return true;
-    } else if (key < 48 || key > 57) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    const Otpphoneinput = document.querySelector("#user-phone-number");
-
-    const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
-        initialCountry: "ae",  // UAE
-        separateDialCode: true,
-        autoPlaceholder: "aggressive",
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-    });
-
-    // Assign globally
-    window.Otpphoneinputnew = Otpphoneinputnew;
-
-    // Update hidden country code when user selects a country
-    const countryCodeInput = document.querySelector("#country_code_otp_popup_Modal_book");
-
-    function setCountryCode() {
-        const countryData = Otpphoneinputnew.getSelectedCountryData();
-        countryCodeInput.value = countryData.dialCode; // store only dial code (e.g. 971)
-        // If you want full ISO code (like 'AE') → use countryData.iso2
-    }
-
-    // Set default initially
-    setCountryCode();
-
-    // Listen to country change
-    Otpphoneinput.addEventListener("countrychange", function () {
-        setCountryCode();
-    });
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const Otpphoneinput = document.querySelector("#book_email_mobile");
-
-    const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
-        initialCountry: "ae",  // UAE
-        separateDialCode: true,
-        autoPlaceholder: "aggressive",
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-    });
-
-    // Assign globally
-    window.Otpphoneinputnew = Otpphoneinputnew;
-
-    // Update hidden country code when user selects a country
-    const countryCodeInput = document.querySelector("#country_code_book_popup_Modal_book");
-
-    function setCountryCode() {
-        const countryData = Otpphoneinputnew.getSelectedCountryData();
-        countryCodeInput.value = countryData.dialCode; // store only dial code (e.g. 971)
-        // If you want full ISO code (like 'AE') → use countryData.iso2
-    }
-
-    // Set default initially
-    setCountryCode();
-
-    // Listen to country change
-    Otpphoneinput.addEventListener("countrychange", function () {
-        setCountryCode();
-    });
-});
-
-// @if(Session::get('user') =="")
-// $(document).ready(function() {
-//   $('#exampleModalLong').modal({
-//     backdrop: 'static',  // Prevent closing on clicking outside
-//     keyboard: false       // Prevent closing with ESC key
-//   }).modal('show');      // Show the modal on page load
-// });
-
-// $(document).ready(function() {
-//     $('#exampleModalLong').modal('show'); // Show the modal on page load
-//   });
-// @endif
-
-// const phoneInputField = document.querySelector("#user-phone-number"); // flagphone
-// const phoneInput = window.intlTelInput(phoneInputField, {
-//   initialCountry: "ae",  // UAE flag and country code (+971) as default
-//   separateDialCode: true, // Separate country code from the number field
-//   autoPlaceholder: "aggressive",
-//   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-// });
-
-// // Function to get the selected country code
-// function getCountryCode() {
-//   const countryData = phoneInput.getSelectedCountryData();
-//   const countryCode = countryData.dialCode; // Get the dial code (country code)
-//   console.log(countryCode); // Example: "+971" for UAE
-//   return countryCode;
-// }
-
-// function userPopupLoginForm(){
-
-// var name = $('#user-name').val();
-// if (name == '') {
-//     jQuery('#name-error').html("Please enter a your name");
-//     jQuery('#name-error').show().delay(0).fadeIn('show');
-//     jQuery('#name-error').show().delay(2000).fadeOut('show');
-//     return false;
-// }
-
-// var email = $('#user-email').val();
-// if (email == '') {
-//     jQuery('#email-error').html("Please enter a your email");
-//     jQuery('#email-error').show().delay(0).fadeIn('show');
-//     jQuery('#email-error').show().delay(2000).fadeOut('show');
-//     return false;
-// }
-
-// var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-// if (!filter.test(email)) {
-
-//     jQuery('#email-error').html("Please Enter Valid Email");
-//     jQuery('#email-error').show().delay(0).fadeIn('show');
-//     jQuery('#email-error').show().delay(2000).fadeOut('show');
-//     return false;
-
-// }
-
-// var mobile = jQuery("#user-phone-number").val();
-// if (mobile == '') {
-
-//     jQuery('#phone-error').html("Please Enter Mobile No");
-//     jQuery('#phone-error').show().delay(0).fadeIn('show');
-//     jQuery('#phone-error').show().delay(2000).fadeOut('show');
-//     return false;
-
-// }
-// if (mobile != '') {
-//     // var filter = /^\d{7}$/;
-//     if (mobile.length < 7 || mobile.length > 15) {
-//         jQuery('#phone-error').html("Please Enter Valid Mobile Number");
-//         jQuery('#phone-error').show().delay(0).fadeIn('show');
-//         jQuery('#phone-error').show().delay(2000).fadeOut('show');
-//         return false;
-//     }
-// }
-
-// const selectedCountryCode = getCountryCode();
-// $("#country_code").val(selectedCountryCode);
-// $("#userDetailForm").submit();
-// }
-
-$(document).ready(function () {
-  // Lock both modals on load
-  $('#exampleModalLong').modal({
-    backdrop: 'static',
-    keyboard: false,
-    show: false // Don't show initially
-  });
-
-  $('#book_email_otp_popup_Modal').modal({
-    backdrop: 'static',
-    keyboard: false,
-    show: false
-  });
-
-  // Show if user not logged in
-  @if(Session::get('user') == "")
-    $('#exampleModalLong').modal('show');
-  @endif
-});
-
-/* const phoneInputField = document.querySelector("#user-phone-number"); // flagphone
-const phoneInput = window.intlTelInput(phoneInputField, {
-  initialCountry: "ae",  // UAE flag and country code (+971) as default
-  separateDialCode: true, // Separate country code from the number field
-  autoPlaceholder: "aggressive",
-  utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-});
-
-// Function to get the selected country code
-function getCountryCode() {
-  const countryData = phoneInput.getSelectedCountryData();
-  const countryCode = countryData.dialCode; // Get the dial code (country code)
-  console.log(countryCode); // Example: "+971" for UAE
-  return countryCode;
-} */
-
-   
-function booknow_otp_verification(id) {
-    // STEP 1: Mobile Input
-    // alert('here');
-    if (id == '1') {
-        var mobile = jQuery("#user-phone-number").val().trim();
-        // alert(mobile);
-
-        const selectedCountryCode = getCountryCode();
-        $("#country_code").val(selectedCountryCode);
-        if (mobile == '') {
-
-        jQuery('#booknow_otp_phone_error').html("Please Enter Mobile No");
-        jQuery('#booknow_otp_phone_error').show().delay(0).fadeIn('show');
-        jQuery('#booknow_otp_phone_error').show().delay(2000).fadeOut('show');
-        return false;
-
+        var key = window.event ? event.keyCode : event.which;
+        if (event.keyCode === 8 || event.keyCode === 46) {
+            return true;
+        } else if (key < 48 || key > 57) {
+            return false;
+        } else {
+            return true;
         }
-        if (mobile != '') {
-            // var filter = /^\d{7}$/;
-            if (mobile.length < 7 || mobile.length > 15) {
-                jQuery('#booknow_otp_phone_error').html("Please Enter Valid Mobile Number");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const Otpphoneinput = document.querySelector("#enquiry-user-phone-number");
+        if (Otpphoneinput) {
+            const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
+                initialCountry: "ae",  // UAE
+                separateDialCode: true,
+                autoPlaceholder: "aggressive",
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+            });
+
+            window.Otpphoneinputnew = Otpphoneinputnew;
+
+            const countryCodeInput = document.querySelector("#country_code_otp_popup_Modal_book");
+            function setCountryCode() {
+                const countryData = Otpphoneinputnew.getSelectedCountryData();
+                if (countryCodeInput) countryCodeInput.value = countryData.dialCode;
+            }
+            setCountryCode();
+
+            Otpphoneinput.addEventListener("countrychange", function () {
+                setCountryCode();
+            });
+
+            // Fix intlTelInput width in hidden modal
+            $('#exampleModalLong').on('shown.bs.modal', function () {
+                if (Otpphoneinputnew) {
+                    var currentNumber = Otpphoneinputnew.getNumber();
+                    Otpphoneinputnew.setNumber(currentNumber);
+                }
+            });
+        }
+    });
+
+    window.getCountryCode = function () {
+        if (window.Otpphoneinputnew) {
+            return window.Otpphoneinputnew.getSelectedCountryData().dialCode;
+        }
+        return '971';
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const Otpphoneinput = document.querySelector("#book_email_mobile");
+        if (Otpphoneinput) {
+            const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
+                initialCountry: "ae",  // UAE
+                separateDialCode: true,
+                autoPlaceholder: "aggressive",
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+            });
+
+            window.Otpphoneinputnew = Otpphoneinputnew;
+
+            const countryCodeInput = document.querySelector("#country_code_book_popup_Modal_book");
+            function setCountryCode() {
+                const countryData = Otpphoneinputnew.getSelectedCountryData();
+                if (countryCodeInput) countryCodeInput.value = countryData.dialCode;
+            }
+            setCountryCode();
+
+            Otpphoneinput.addEventListener("countrychange", function () {
+                setCountryCode();
+            });
+        }
+    });
+
+    // @if(Session::get('user') == "")
+        // $(document).ready(function() {
+        //   $('#exampleModalLong').modal({
+        //     backdrop: 'static',  // Prevent closing on clicking outside
+        //     keyboard: false       // Prevent closing with ESC key
+        //   }).modal('show');      // Show the modal on page load
+        // });
+
+        // $(document).ready(function() {
+        //     $('#exampleModalLong').modal('show'); // Show the modal on page load
+        //   });
+    // @endif
+
+
+    // function userPopupLoginForm(){
+
+    // var name = $('#user-name').val();
+    // if (name == '') {
+    //     jQuery('#name-error').html("Please enter a your name");
+    //     jQuery('#name-error').show().delay(0).fadeIn('show');
+    //     jQuery('#name-error').show().delay(2000).fadeOut('show');
+    //     return false;
+    // }
+
+    // var email = $('#user-email').val();
+    // if (email == '') {
+    //     jQuery('#email-error').html("Please enter a your email");
+    //     jQuery('#email-error').show().delay(0).fadeIn('show');
+    //     jQuery('#email-error').show().delay(2000).fadeOut('show');
+    //     return false;
+    // }
+
+    // var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    // if (!filter.test(email)) {
+
+    //     jQuery('#email-error').html("Please Enter Valid Email");
+    //     jQuery('#email-error').show().delay(0).fadeIn('show');
+    //     jQuery('#email-error').show().delay(2000).fadeOut('show');
+    //     return false;
+
+    // }
+
+    // var mobile = jQuery("#user-phone-number").val();
+    // if (mobile == '') {
+
+    //     jQuery('#phone-error').html("Please Enter Mobile No");
+    //     jQuery('#phone-error').show().delay(0).fadeIn('show');
+    //     jQuery('#phone-error').show().delay(2000).fadeOut('show');
+    //     return false;
+
+    // }
+    // if (mobile != '') {
+    //     // var filter = /^\d{7}$/;
+    //     if (mobile.length < 7 || mobile.length > 15) {
+    //         jQuery('#phone-error').html("Please Enter Valid Mobile Number");
+    //         jQuery('#phone-error').show().delay(0).fadeIn('show');
+    //         jQuery('#phone-error').show().delay(2000).fadeOut('show');
+    //         return false;
+    //     }
+    // }
+
+    // const selectedCountryCode = getCountryCode();
+    // $("#country_code").val(selectedCountryCode);
+    // $("#userDetailForm").submit();
+    // }
+
+    $(document).ready(function () {
+        // Lock both modals on load
+        $('#exampleModalLong').modal({
+            backdrop: 'static',
+            keyboard: false,
+            show: false // Don't show initially
+        });
+
+        $('#book_email_otp_popup_Modal').modal({
+            backdrop: 'static',
+            keyboard: false,
+            show: false
+        });
+
+        // Show if user not logged in
+        // (Removed to prevent showing login on first load)
+    });
+
+
+
+
+    function booknow_otp_verification(id) {
+        // STEP 1: Mobile Input
+        if (id == '1') {
+            var mobile = jQuery("#enquiry-user-phone-number").val().trim();
+            const selectedCountryCode = window.getCountryCode();
+            $("#country_code").val(selectedCountryCode);
+
+            if (mobile == '') {
+                jQuery('#booknow_otp_phone_error').html("Please Enter Mobile No");
                 jQuery('#booknow_otp_phone_error').show().delay(0).fadeIn('show');
                 jQuery('#booknow_otp_phone_error').show().delay(2000).fadeOut('show');
                 return false;
             }
+            if (mobile != '') {
+                if (mobile.length < 7 || mobile.length > 15) {
+                    jQuery('#booknow_otp_phone_error').html("Please Enter Valid Mobile Number");
+                    jQuery('#booknow_otp_phone_error').show().delay(0).fadeIn('show');
+                    jQuery('#booknow_otp_phone_error').show().delay(2000).fadeOut('show');
+                    return false;
+                }
+            }
+
+            var url = '{{ url(session('search_city_name') . '/booknow-otp-sent') }}';
+            var country_code = $('#country_code_otp_popup_Modal_book').val();
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    'mobile': mobile,
+                    'country_code': country_code
+                },
+                beforeSend: function () {
+
+                    $('#spinner_button_phone_book1').show();
+                    $('#submit_button_phone_book1').hide();
+                    //$('.detail-continue-btn').prop('disabled', true);
+                },
+                success: function (response) {
+
+                    if (response.success === true) {
+
+                        $("#booknow_refresh_otp_div").load(location.href + " #booknow_refresh_otp_div");
+
+                        document.getElementById('booknow-step-phone').style.display = 'none';
+                        document.getElementById('booknow-step-otp').style.display = 'block';
+                        document.getElementById('modalStepTitle').innerText = "Verify your phone number";
+
+                        $('#booknow-whatsapp-number').text('+' + country_code + mobile);
+
+                        if (response.user_data) {
+                            $('#booknow_user_name').val(response.user_data.name);
+                            $('#booknow_user_email').val(response.user_data.email);
+                        }
+
+                    }
+
+                    $('#spinner_button_phone_book1').hide();
+                    $('#submit_button_phone_book1').show();
+
+
+                },
+                error: function (xhr) {
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        alert(xhr.responseJSON.message);
+                        $('#exampleModalLong form')[0].reset();
+                        $('#exampleModalLong #spinner_button_phone_book1').hide();
+                        $('#exampleModalLong #submit_button_phone_book1').show();
+                        $('#exampleModalLong').modal('show');
+                    } else {
+                        alert("Failed to send OTP. Please try again.");
+                        $('#exampleModalLong form')[0].reset();
+                        $('#exampleModalLong #spinner_button_phone_book1').hide();
+                        $('#exampleModalLong #submit_button_phone_book1').show();
+                        $('#exampleModalLong').modal('show');
+                    }
+
+                },
+                complete: function () {
+                    $('.detail-continue-btn').prop('disabled', false);
+                }
+            });
+
+            return false;
+
+
         }
 
-        var url = '{{ url('booknow-otp-sent') }}';
-        var mobile = $('#user-phone-number').val();
-        var country_code = $('#country_code_otp_popup_Modal_book').val();
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                'mobile': mobile,
-                'country_code': country_code
-            },
-            beforeSend: function () {
-                
-				$('#spinner_button_phone_book1').show();
-				$('#submit_button_phone_book1').hide();
-                //$('.detail-continue-btn').prop('disabled', true);
-            },
-            success: function (response) {
-                
-                if(response.success === true){
-                 
-                $("#booknow_refresh_otp_div").load(location.href + " #booknow_refresh_otp_div");
-
-                document.getElementById('booknow-step-phone').style.display = 'none';
-                document.getElementById('booknow-step-otp').style.display = 'block';
-                document.getElementById('modalStepTitle').innerText = "Verify your phone number";
-
-                $('#booknow-whatsapp-number').text('+' + country_code  + mobile);
-                
-                if (response.user_data) {
-                    $('#booknow_user_name').val(response.user_data.name);
-                    $('#booknow_user_email').val(response.user_data.email);
+        // STEP 2: OTP Verification
+        if (id == '2') {
+            var allFilled = true;
+            jQuery('.booknow-otp-input').each(function () {
+                if (jQuery(this).val().trim() === '') {
+                    allFilled = false;
                 }
+            });
 
+            if (!allFilled) {
+                jQuery('#booknow_otp_error').html("Please Enter OTP");
+                jQuery('#booknow_otp_error').show().delay(0).fadeIn('show');
+                jQuery('#booknow_otp_error').show().delay(2000).fadeOut('show');
+                return false;
+            }
+
+            let otp = $('#book_session_otp').val();
+            // alert(otp);
+            let enteredOtp = '';
+            document.querySelectorAll('.booknow-otp-input').forEach(input => {
+                enteredOtp += input.value;
+            });
+            // alert(enteredOtp);
+
+            if (otp != enteredOtp) {
+                jQuery('#booknow_otp_error').html("OTP doesn't match");
+                jQuery('#booknow_otp_error').show().delay(0).fadeIn('show');
+                jQuery('#booknow_otp_error').show().delay(2000).fadeOut('show');
+                return false;
+            }
+
+
+
+            let name = jQuery("input[name='book_name']").val().trim();
+            let email = jQuery("input[name='book_email']").val().trim();
+
+            $('#spinner_button_phone_book2').show();
+            $('#submit_button_phone_book2').hide();
+
+            if (name !== '' && email !== '') {
+                $.ajax({
+                    url: jQuery("#BookOtpForm").attr('action'),
+                    type: 'POST',
+                    data: jQuery("#BookOtpForm").serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            $('#exampleModalLong').modal('hide');
+                            $('#spinner_button').show();
+                            $('#submit_button').hide();
+                            $('#category_form').submit();
+                        } else {
+                            alert("Login failed. Please try again.");
+                            $('#spinner_button_phone_book2').hide();
+                            $('#submit_button_phone_book2').show();
+                        }
+                    },
+                    error: function () {
+                        alert("An error occurred during login.");
+                        $('#spinner_button_phone_book2').hide();
+                        $('#submit_button_phone_book2').show();
+                    }
+                });
+            } else {
+                document.getElementById('booknow-step-otp').style.display = 'none';
+                document.getElementById('booknow-step-details').style.display = 'block';
+                document.getElementById('modalStepTitle').innerText = "Personal Details";
+            }
+        }
+
+        // STEP 3: Personal Details
+        if (id == '3') {
+            var name = jQuery("input[name='book_name']").val().trim();
+            var email = jQuery("input[name='book_email']").val().trim();
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (name === '') {
+
+                jQuery('#booknow_name_error').html("Please Enter Full  Name");
+                jQuery('#booknow_name_error').show().delay(0).fadeIn('show');
+                jQuery('#booknow_name_error').show().delay(2000).fadeOut('show');
+                return false;
+            }
+            if (email === '') {
+                jQuery('#booknow_email_error').html("Please Enter email");
+                jQuery('#booknow_email_error').show().delay(0).fadeIn('show');
+                jQuery('#booknow_email_error').show().delay(2000).fadeOut('show');
+                return false;
+            }
+
+            if (!emailRegex.test(email)) {
+                jQuery('#booknow_email_error').html("Please Enter Valid email");
+                jQuery('#booknow_email_error').show().delay(0).fadeIn('show');
+                jQuery('#booknow_email_error').show().delay(2000).fadeOut('show');
+                return false;
+            }
+
+            $('#spinner_button_phone_book3').show();
+            $('#submit_button_phone_book3').hide();
+
+            // All validation passed, submit the form via AJAX
+            $.ajax({
+                url: jQuery("#BookOtpForm").attr('action'),
+                type: 'POST',
+                data: jQuery("#BookOtpForm").serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        $('#exampleModalLong').modal('hide');
+                        $('#spinner_button').show();
+                        $('#submit_button').hide();
+                        $('#category_form').submit();
+                    } else {
+                        alert("Login failed. Please try again.");
+                        $('#spinner_button_phone_book3').hide();
+                        $('#submit_button_phone_book3').show();
+                    }
+                },
+                error: function () {
+                    alert("An error occurred during login.");
+                    $('#spinner_button_phone_book3').hide();
+                    $('#submit_button_phone_book3').show();
                 }
+            });
+        }
+    }
 
-				$('#spinner_button_phone_book1').hide();
-				$('#submit_button_phone_book1').show();
-
-                
-            },
-            error: function (xhr) {
-
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    alert(xhr.responseJSON.message);
-                    $('#exampleModalLong form')[0].reset();
-                    $('#exampleModalLong #spinner_button_phone_book1').hide();
-                    $('#exampleModalLong #submit_button_phone_book1').show();
-                    $('#exampleModalLong').modal('show'); 
-                } else {
-                    alert("Failed to send OTP. Please try again.");
-                     $('#exampleModalLong form')[0].reset();
-                    $('#exampleModalLong #spinner_button_phone_book1').hide();
-                    $('#exampleModalLong #submit_button_phone_book1').show();
-                    $('#exampleModalLong').modal('show'); 
-                }
-                
-            },
-            complete: function () {
-                $('.detail-continue-btn').prop('disabled', false);
+    $(document).ready(function () {
+        $('.booknow-otp-input').on('input', function () {
+            let input = $(this);
+            let value = input.val();
+            if (/^\d$/.test(value)) {
+                input.next('.booknow-otp-input').focus();
+            } else {
+                input.val('');
             }
         });
 
-        return false;
-
-       
-    }
-
-    // STEP 2: OTP Verification
-    if (id == '2') {
-        var allFilled = true;
-        jQuery('.booknow-otp-input').each(function () {
-            if (jQuery(this).val().trim() === '') {
-                allFilled = false;
+        $('.booknow-otp-input').on('keydown', function (e) {
+            let input = $(this);
+            if (e.key === "Backspace" && input.val() === '') {
+                input.prev('.booknow-otp-input').focus();
             }
         });
 
-        if (!allFilled) {
-            jQuery('#booknow_otp_error').html("Please Enter OTP");
-            jQuery('#booknow_otp_error').show().delay(0).fadeIn('show');
-            jQuery('#booknow_otp_error').show().delay(2000).fadeOut('show');
-            return false;
-        }
-
-        let otp = $('#book_session_otp').val();
-        // alert(otp);
-        let enteredOtp = '';
-        document.querySelectorAll('.booknow-otp-input').forEach(input => {
-            enteredOtp += input.value;
+        $('.booknow-otp-input').on('paste', function (e) {
+            let data = e.originalEvent.clipboardData.getData('text');
+            let digits = data.replace(/\D/g, '').substring(0, 6).split('');
+            $('.booknow-otp-input').each(function (index, element) {
+                $(element).val(digits[index] || '');
+            });
+            if (digits.length > 0) {
+                $('.booknow-otp-input').eq(digits.length - 1).focus();
+            }
+            e.preventDefault();
         });
-        // alert(enteredOtp);
-
-        if(otp != enteredOtp){
-            jQuery('#booknow_otp_error').html("OTP doesn't match");
-            jQuery('#booknow_otp_error').show().delay(0).fadeIn('show');
-            jQuery('#booknow_otp_error').show().delay(2000).fadeOut('show');
-            return false;
-        }
-        
-      
-
-        let name = jQuery("input[name='book_name']").val().trim();
-        let email = jQuery("input[name='book_email']").val().trim();
-		
-		$('#spinner_button_phone_book2').show();
-		$('#submit_button_phone_book2').hide();
-
-        if (name !== '' && email !== '' ) {
-                jQuery("#BookOtpForm").submit();
-        } else {
-            document.getElementById('booknow-step-otp').style.display = 'none';
-            document.getElementById('booknow-step-details').style.display = 'block';
-            document.getElementById('modalStepTitle').innerText = "Personal Details";
-        }
-    }
-
-    // STEP 3: Personal Details
-    if (id == '3') {
-        var name = jQuery("input[name='book_name']").val().trim();
-        var email = jQuery("input[name='book_email']").val().trim();
-        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (name === '') {
-
-            jQuery('#booknow_name_error').html("Please Enter Full  Name");
-            jQuery('#booknow_name_error').show().delay(0).fadeIn('show');
-            jQuery('#booknow_name_error').show().delay(2000).fadeOut('show');
-            return false;
-        }
-        if (email === '') {
-            jQuery('#booknow_email_error').html("Please Enter email");
-            jQuery('#booknow_email_error').show().delay(0).fadeIn('show');
-            jQuery('#booknow_email_error').show().delay(2000).fadeOut('show');
-            return false;
-        }
-
-        if (!emailRegex.test(email)) {
-            jQuery('#booknow_email_error').html("Please Enter Valid email");
-            jQuery('#booknow_email_error').show().delay(0).fadeIn('show');
-            jQuery('#booknow_email_error').show().delay(2000).fadeOut('show');
-            return false;
-        }
-        
-		$('#spinner_button_phone_book3').show();
-		$('#submit_button_phone_book3').hide();
-
-        // All validation passed, submit the form
-        jQuery("#BookOtpForm").submit();
-    }
-}
-
-$(document).ready(function () {
-    $('.booknow-otp-input').on('input', function () {
-        let input = $(this);
-        let value = input.val();
-        if (/^\d$/.test(value)) {
-            input.next('.booknow-otp-input').focus();
-        } else {
-            input.val('');
-        }
     });
 
-    $('.booknow-otp-input').on('keydown', function (e) {
-        let input = $(this);
-        if (e.key === "Backspace" && input.val() === '') {
-            input.prev('.booknow-otp-input').focus();
-        }
-    });
+    function book_email_goToOtpVerification(id) {
 
-    $('.booknow-otp-input').on('paste', function (e) {
-        let data = e.originalEvent.clipboardData.getData('text');
-        let digits = data.replace(/\D/g, '').substring(0, 6).split('');
-        $('.booknow-otp-input').each(function (index, element) {
-            $(element).val(digits[index] || '');
-        });
-        if (digits.length > 0) {
-            $('.booknow-otp-input').eq(digits.length - 1).focus();
-        }
-        e.preventDefault();
-    });
-});
+        if (id == '1') {
 
-function book_email_goToOtpVerification(id) {
-	
-	if (id == '1') {
-		
-        
-		var email_email = jQuery("input[name='book_email_email']").val().trim();
-		var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (email_email === '') {
-            jQuery('#book_email_email_error').html("Please Enter email");
-            jQuery('#book_email_email_error').show().delay(0).fadeIn('show');
-            jQuery('#book_email_email_error').show().delay(2000).fadeOut('show');
-            return false;
-        }
 
-        if (!emailRegex.test(email_email)) {
-            jQuery('#book_email_email_error').html("Please Enter Valid email");
-            jQuery('#book_email_email_error').show().delay(0).fadeIn('show');
-            jQuery('#book_email_email_error').show().delay(2000).fadeOut('show');
-            return false;
-        }
-		
-		// alert(email_email);
-		
-		var url = '{{ route('home.book-email-otp-sent') }}';
-      
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                'email_email': email_email
-            },
-            beforeSend: function () {
-				
-				$('#spinner_button_email_book1').show();
-				$('#submit_button_email_book1').hide();
-                
-                //$('.email-detail-continue-btn').prop('disabled', true);
-            },
-            success: function (response) {
-                
-                if(response.success === true){
-                 
-					$("#book_email_refresh_otp_div").load(location.href + " #book_email_refresh_otp_div");
-
-					document.getElementById('book-email-step-phone').style.display = 'none';
-					document.getElementById('booknow-email-step-otp').style.display = 'block';
-					document.getElementById('booknow_email_modalStepTitle').innerText = "Verify your Email";
-
-					$('#book_email_address_model').text(email_email);
-					
-					if (response.user_data) {
-						$('#book_email_name').val(response.user_data.name);
-						$('#book_email_mobile').val(response.user_data.mobile);
-						//$('#book_email_area').val(response.user_data.area);
-						$('#country_code_book_popup_Modal_book').val(response.user_data.country_code);
-					}
-
-                }
-
-                
-            },
-            error: function (xhr) {
-
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    alert(xhr.responseJSON.message);
-                    $('#book_email_otp_popup_Modal form')[0].reset();
-                    $('#book_email_otp_popup_Modal #spinner_button_email_book1').hide();
-                    $('#book_email_otp_popup_Modal #submit_button_email_book1').hide();
-                    $('#book_email_otp_popup_Modal').modal('show'); 
-                } else {
-                    alert("Failed to send OTP. Please try again.");
-                    $('#book_email_otp_popup_Modal form')[0].reset();
-                    $('#book_email_otp_popup_Modal #spinner_button_email_book1').hide();
-                    $('#book_email_otp_popup_Modal #submit_button_email_book1').hide();
-                    $('#book_email_otp_popup_Modal').modal('show'); 
-                }
-				
-				$('#spinner_button_email_book1').hide();
-				$('#submit_button_email_book1').show();
-                
-            },
-            complete: function () {
-				
-				$('#spinner_button_email_book1').hide();
-				$('#submit_button_email_book1').show();
-                // Re-enable button
-                //$('.email-detail-continue-btn').prop('disabled', false);
+            var email_email = jQuery("input[name='book_email_email']").val().trim();
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email_email === '') {
+                jQuery('#book_email_email_error').html("Please Enter email");
+                jQuery('#book_email_email_error').show().delay(0).fadeIn('show');
+                jQuery('#book_email_email_error').show().delay(2000).fadeOut('show');
+                return false;
             }
-        });
-		
-	}
-	
-	// STEP 2: OTP Verification
-    if (id == '2') {
-        var allFilled = true;
-        jQuery('.book-email-otp-input').each(function () {
-            if (jQuery(this).val().trim() === '') {
-                allFilled = false;
+
+            if (!emailRegex.test(email_email)) {
+                jQuery('#book_email_email_error').html("Please Enter Valid email");
+                jQuery('#book_email_email_error').show().delay(0).fadeIn('show');
+                jQuery('#book_email_email_error').show().delay(2000).fadeOut('show');
+                return false;
             }
-        });
 
-        if (!allFilled) {
-            jQuery('#book_email_otp_error').html("Please Enter OTP");
-            jQuery('#book_email_otp_error').show().delay(0).fadeIn('show');
-            jQuery('#book_email_otp_error').show().delay(2000).fadeOut('show');
-            return false;
+            // alert(email_email);
+
+            var url = '{{ route('home.book-email-otp-sent') }}';
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    'email_email': email_email
+                },
+                beforeSend: function () {
+
+                    $('#spinner_button_email_book1').show();
+                    $('#submit_button_email_book1').hide();
+
+                    //$('.email-detail-continue-btn').prop('disabled', true);
+                },
+                success: function (response) {
+
+                    if (response.success === true) {
+
+                        $("#book_email_refresh_otp_div").load(location.href + " #book_email_refresh_otp_div");
+
+                        document.getElementById('book-email-step-phone').style.display = 'none';
+                        document.getElementById('booknow-email-step-otp').style.display = 'block';
+                        document.getElementById('booknow_email_modalStepTitle').innerText = "Verify your Email";
+
+                        $('#book_email_address_model').text(email_email);
+
+                        if (response.user_data) {
+                            $('#book_email_name').val(response.user_data.name);
+                            $('#book_email_mobile').val(response.user_data.mobile);
+                            //$('#book_email_area').val(response.user_data.area);
+                            $('#country_code_book_popup_Modal_book').val(response.user_data.country_code);
+                        }
+
+                    }
+
+
+                },
+                error: function (xhr) {
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        alert(xhr.responseJSON.message);
+                        $('#book_email_otp_popup_Modal form')[0].reset();
+                        $('#book_email_otp_popup_Modal #spinner_button_email_book1').hide();
+                        $('#book_email_otp_popup_Modal #submit_button_email_book1').hide();
+                        $('#book_email_otp_popup_Modal').modal('show');
+                    } else {
+                        alert("Failed to send OTP. Please try again.");
+                        $('#book_email_otp_popup_Modal form')[0].reset();
+                        $('#book_email_otp_popup_Modal #spinner_button_email_book1').hide();
+                        $('#book_email_otp_popup_Modal #submit_button_email_book1').hide();
+                        $('#book_email_otp_popup_Modal').modal('show');
+                    }
+
+                    $('#spinner_button_email_book1').hide();
+                    $('#submit_button_email_book1').show();
+
+                },
+                complete: function () {
+
+                    $('#spinner_button_email_book1').hide();
+                    $('#submit_button_email_book1').show();
+                    // Re-enable button
+                    //$('.email-detail-continue-btn').prop('disabled', false);
+                }
+            });
+
         }
 
-        let otp = $('#book_email_session_otp').val();
-        let enteredOtp = '';
-        document.querySelectorAll('.book-email-otp-input').forEach(input => {
-            enteredOtp += input.value;
-        });
-        // alert(otp);
+        // STEP 2: OTP Verification
+        if (id == '2') {
+            var allFilled = true;
+            jQuery('.book-email-otp-input').each(function () {
+                if (jQuery(this).val().trim() === '') {
+                    allFilled = false;
+                }
+            });
 
-        if(otp != enteredOtp){
-            jQuery('#book_email_otp_error').html("OTP doesn't match");
-            jQuery('#book_email_otp_error').show().delay(0).fadeIn('show');
-            jQuery('#book_email_otp_error').show().delay(2000).fadeOut('show');
-            return false;
+            if (!allFilled) {
+                jQuery('#book_email_otp_error').html("Please Enter OTP");
+                jQuery('#book_email_otp_error').show().delay(0).fadeIn('show');
+                jQuery('#book_email_otp_error').show().delay(2000).fadeOut('show');
+                return false;
+            }
+
+            let otp = $('#book_email_session_otp').val();
+            let enteredOtp = '';
+            document.querySelectorAll('.book-email-otp-input').forEach(input => {
+                enteredOtp += input.value;
+            });
+            // alert(otp);
+
+            if (otp != enteredOtp) {
+                jQuery('#book_email_otp_error').html("OTP doesn't match");
+                jQuery('#book_email_otp_error').show().delay(0).fadeIn('show');
+                jQuery('#book_email_otp_error').show().delay(2000).fadeOut('show');
+                return false;
+            }
+
+
+            let email_name = jQuery("input[name='book_email_name']").val().trim();
+            let email_mobile = jQuery("input[name='book_email_mobile']").val().trim();
+
+            $('#spinner_button_email_book2').show();
+            $('#submit_button_email_book2').hide();
+
+            if (email_name !== '' && email_mobile !== '') {
+
+                // All validation passed, submit the form via AJAX
+                $.ajax({
+                    url: jQuery("#bookemailOtpForm").attr('action'),
+                    type: 'POST',
+                    data: jQuery("#bookemailOtpForm").serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            $('#book_email_otp_popup_Modal').modal('hide');
+                            $('#spinner_button').show();
+                            $('#submit_button').hide();
+                            $('#category_form').submit();
+                        } else {
+                            alert("Login failed. Please try again.");
+                            $('#spinner_button_email_book2').hide();
+                            $('#submit_button_email_book2').show();
+                        }
+                    },
+                    error: function () {
+                        alert("An error occurred during login.");
+                        $('#spinner_button_email_book2').hide();
+                        $('#submit_button_email_book2').show();
+                    }
+                });
+
+            } else {
+                // One or both fields are empty, show Step 3
+                document.getElementById('booknow-email-step-otp').style.display = 'none';
+                document.getElementById('booknow-email-step-details').style.display = 'block';
+                document.getElementById('booknow_email_modalStepTitle').innerText = "Personal Details";
+
+                $('#spinner_button_email_book2').hide();
+                $('#submit_button_email_book2').show();
+            }
         }
-       
 
-        let email_name = jQuery("input[name='book_email_name']").val().trim();
-        let email_mobile = jQuery("input[name='book_email_mobile']").val().trim();
-		
-		$('#spinner_button_email_book2').show();
-		$('#submit_button_email_book2').hide();
+        // STEP 3: Personal Details
+        if (id == '3') {
+            var email_name = jQuery("input[name='book_email_name']").val().trim();
+            var email_mobile = jQuery("input[name='book_email_mobile']").val().trim();
+            //var email_area = jQuery("input[name='book_email_area']").val().trim();
 
-        if (email_name !== '' && email_mobile !== '') {
-           
-            jQuery("#bookemailOtpForm").submit();
-           
-        } else {
-            // One or both fields are empty, show Step 3
-            document.getElementById('booknow-email-step-otp').style.display = 'none';
-            document.getElementById('booknow-email-step-details').style.display = 'block';
-            document.getElementById('booknow_email_modalStepTitle').innerText = "Personal Details";
-			
-			$('#spinner_button_email_book2').hide();
-			$('#submit_button_email_book2').show();
-        }
-    }
+            if (email_name === '') {
 
-    // STEP 3: Personal Details
-    if (id == '3') {
-        var email_name = jQuery("input[name='book_email_name']").val().trim();
-        var email_mobile = jQuery("input[name='book_email_mobile']").val().trim();
-        //var email_area = jQuery("input[name='book_email_area']").val().trim();
-
-        if (email_name === '') {
-
-            jQuery('#book_email_name_error').html("Please Enter Full  Name");
-            jQuery('#book_email_name_error').show().delay(0).fadeIn('show');
-            jQuery('#book_email_name_error').show().delay(2000).fadeOut('show');
-            return false;
-        }
-        if (email_mobile === '') {
-            jQuery('#book_email_mobile_error').html("Please Enter Mobile Number");
-            jQuery('#book_email_mobile_error').show().delay(0).fadeIn('show');
-            jQuery('#book_email_mobile_error').show().delay(2000).fadeOut('show');
-            return false;
-        }
-
-        if (email_mobile != '') {
-            // var filter = /^\d{7}$/;
-            if (email_mobile.length < 7 || email_mobile.length > 15) {
-                jQuery('#book_email_mobile_error').html("Please Enter Valid Mobile Number");
+                jQuery('#book_email_name_error').html("Please Enter Full  Name");
+                jQuery('#book_email_name_error').show().delay(0).fadeIn('show');
+                jQuery('#book_email_name_error').show().delay(2000).fadeOut('show');
+                return false;
+            }
+            if (email_mobile === '') {
+                jQuery('#book_email_mobile_error').html("Please Enter Mobile Number");
                 jQuery('#book_email_mobile_error').show().delay(0).fadeIn('show');
                 jQuery('#book_email_mobile_error').show().delay(2000).fadeOut('show');
                 return false;
             }
+
+            if (email_mobile != '') {
+                // var filter = /^\d{7}$/;
+                if (email_mobile.length < 7 || email_mobile.length > 15) {
+                    jQuery('#book_email_mobile_error').html("Please Enter Valid Mobile Number");
+                    jQuery('#book_email_mobile_error').show().delay(0).fadeIn('show');
+                    jQuery('#book_email_mobile_error').show().delay(2000).fadeOut('show');
+                    return false;
+                }
+            }
+            /* if (email_area === '') {
+  
+              jQuery('#book_email_area_error').html("Please Enter Area");
+              jQuery('#book_email_area_error').show().delay(0).fadeIn('show');
+              jQuery('#book_email_area_error').show().delay(2000).fadeOut('show');
+              return false;
+          } */
+
+            $('#spinner_button_email_book3').show();
+            $('#submit_button_email_book3').hide();
+
+            // All validation passed, submit the form via AJAX
+            $.ajax({
+                url: jQuery("#bookemailOtpForm").attr('action'),
+                type: 'POST',
+                data: jQuery("#bookemailOtpForm").serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        $('#book_email_otp_popup_Modal').modal('hide');
+                        $('#spinner_button').show();
+                        $('#submit_button').hide();
+                        $('#category_form').submit();
+                    } else {
+                        alert("Login failed. Please try again.");
+                        $('#spinner_button_email_book3').hide();
+                        $('#submit_button_email_book3').show();
+                    }
+                },
+                error: function () {
+                    alert("An error occurred during login.");
+                    $('#spinner_button_email_book3').hide();
+                    $('#submit_button_email_book3').show();
+                }
+            });
         }
-          /* if (email_area === '') {
-
-            jQuery('#book_email_area_error').html("Please Enter Area");
-            jQuery('#book_email_area_error').show().delay(0).fadeIn('show');
-            jQuery('#book_email_area_error').show().delay(2000).fadeOut('show');
-            return false;
-        } */
-		
-		$('#spinner_button_email_book3').show();
-		$('#submit_button_email_book3').hide();
-
-        // All validation passed, submit the form
-        jQuery("#bookemailOtpForm").submit();
     }
-}
 
-$(document).ready(function () {
-    // Toggle active classes on custom radio/checkbox pills
-    $(document).on('change', '.radio-card-item input[type="radio"]', function() {
-        let name = $(this).attr('name');
-        $(`input[type="radio"][name="${name}"]`).closest('.radio-card-item').removeClass('active');
-        if ($(this).is(':checked')) {
-            $(this).closest('.radio-card-item').addClass('active');
-        }
-    });
-
-    $(document).on('change', '.checkbox-card-item input[type="checkbox"]', function() {
-        if ($(this).is(':checked')) {
-            $(this).closest('.checkbox-card-item').addClass('active');
-        } else {
-            $(this).closest('.checkbox-card-item').removeClass('active');
-        }
-    });
-
-    // Set initial active states for pre-filled values
-    $('.radio-card-item input[type="radio"]:checked').closest('.radio-card-item').addClass('active');
-    $('.checkbox-card-item input[type="checkbox"]:checked').closest('.checkbox-card-item').addClass('active');
-
-    // Toggle active classes on select-pill items and update the hidden select element
-    $(document).on('click', '.select-pill-item', function() {
-        let parent = $(this).closest('.select-pill-group');
-        let selectId = parent.data('select-id');
-        let value = $(this).data('value');
-
-        parent.find('.select-pill-item').removeClass('active');
-        $(this).addClass('active');
-
-        let selectElement = $('#' + selectId);
-        selectElement.val(value).trigger('change');
-    });
-
-    // Set initial active states for select pills on load
-    $('.select-pill-group').each(function() {
-        let selectId = $(this).data('select-id');
-        let selectVal = $('#' + selectId).val();
-        if (selectVal) {
-            $(this).find(`.select-pill-item[data-value="${selectVal}"]`).addClass('active');
-        }
-    });
-
-    $('.book-email-otp-input').on('input', function () {
-        let input = $(this);
-        let value = input.val();
-        if (/^\d$/.test(value)) {
-            input.next('.book-email-otp-input').focus();
-        } else {
-            input.val('');
-        }
-    });
-
-    $('.book-email-otp-input').on('keydown', function (e) {
-        let input = $(this);
-        if (e.key === "Backspace" && input.val() === '') {
-            input.prev('.book-email-otp-input').focus();
-        }
-    });
-
-    $('.book-email-otp-input').on('paste', function (e) {
-        let data = e.originalEvent.clipboardData.getData('text');
-        let digits = data.replace(/\D/g, '').substring(0, 6).split('');
-        $('.book-email-otp-input').each(function (index, element) {
-            $(element).val(digits[index] || '');
+    $(document).ready(function () {
+        // Toggle active classes on custom radio/checkbox pills
+        $(document).on('change', '.radio-card-item input[type="radio"]', function () {
+            let name = $(this).attr('name');
+            $(`input[type="radio"][name="${name}"]`).closest('.radio-card-item').removeClass('active');
+            if ($(this).is(':checked')) {
+                $(this).closest('.radio-card-item').addClass('active');
+            }
         });
-        if (digits.length > 0) {
-            $('.book-email-otp-input').eq(digits.length - 1).focus();
-        }
-        e.preventDefault();
+
+        $(document).on('change', '.checkbox-card-item input[type="checkbox"]', function () {
+            if ($(this).is(':checked')) {
+                $(this).closest('.checkbox-card-item').addClass('active');
+            } else {
+                $(this).closest('.checkbox-card-item').removeClass('active');
+            }
+        });
+
+        // Set initial active states for pre-filled values
+        $('.radio-card-item input[type="radio"]:checked').closest('.radio-card-item').addClass('active');
+        $('.checkbox-card-item input[type="checkbox"]:checked').closest('.checkbox-card-item').addClass('active');
+
+        // Toggle active classes on select-pill items and update the hidden select element
+        $(document).on('click', '.select-pill-item', function () {
+            let parent = $(this).closest('.select-pill-group');
+            let selectId = parent.data('select-id');
+            let value = $(this).data('value');
+
+            parent.find('.select-pill-item').removeClass('active');
+            $(this).addClass('active');
+
+            let selectElement = $('#' + selectId);
+            selectElement.val(value).trigger('change');
+        });
+
+        // Set initial active states for select pills on load
+        $('.select-pill-group').each(function () {
+            let selectId = $(this).data('select-id');
+            let selectVal = $('#' + selectId).val();
+            if (selectVal) {
+                $(this).find(`.select-pill-item[data-value="${selectVal}"]`).addClass('active');
+            }
+        });
+
+        $('.book-email-otp-input').on('input', function () {
+            let input = $(this);
+            let value = input.val();
+            if (/^\d$/.test(value)) {
+                input.next('.book-email-otp-input').focus();
+            } else {
+                input.val('');
+            }
+        });
+
+        $('.book-email-otp-input').on('keydown', function (e) {
+            let input = $(this);
+            if (e.key === "Backspace" && input.val() === '') {
+                input.prev('.book-email-otp-input').focus();
+            }
+        });
+
+        $('.book-email-otp-input').on('paste', function (e) {
+            let data = e.originalEvent.clipboardData.getData('text');
+            let digits = data.replace(/\D/g, '').substring(0, 6).split('');
+            $('.book-email-otp-input').each(function (index, element) {
+                $(element).val(digits[index] || '');
+            });
+            if (digits.length > 0) {
+                $('.book-email-otp-input').eq(digits.length - 1).focus();
+            }
+            e.preventDefault();
+        });
     });
-});
 
-document.addEventListener('DOMContentLoaded', function () {
-  const otpModal = document.getElementById('exampleModalLong');
+    document.addEventListener('DOMContentLoaded', function () {
+        const otpModal = document.getElementById('exampleModalLong');
 
-  otpModal.addEventListener('shown.bs.modal', function () {
-    // Reset to step 1
-    document.getElementById('booknow-step-phone').style.display = 'block';
-    document.getElementById('book-email-step-phone').style.display = 'block';
-    document.getElementById('booknow-step-otp').style.display = 'none';
-    document.getElementById('booknow-step-details').style.display = 'none';
-    document.getElementById('booknow-email-step-otp').style.display = 'none';
-    document.getElementById('booknow-email-step-details').style.display = 'none';
+        otpModal.addEventListener('shown.bs.modal', function () {
+            // Reset to step 1
+            document.getElementById('booknow-step-phone').style.display = 'block';
+            document.getElementById('book-email-step-phone').style.display = 'block';
+            document.getElementById('booknow-step-otp').style.display = 'none';
+            document.getElementById('booknow-step-details').style.display = 'none';
+            document.getElementById('booknow-email-step-otp').style.display = 'none';
+            document.getElementById('booknow-email-step-details').style.display = 'none';
 
-    // Reset input fields
-    document.getElementById('user-phone-number').value = '';
-    document.getElementById('booknow_user_name').value = '';
-    document.getElementById('booknow_user_email').value = '';
-    document.getElementById('booknow_user_area').value = '';
-    document.getElementById('book_email_email').value = '';
-    document.getElementById('book_email_name').value = '';
-    document.getElementById('book_email_mobile').value = '';
-    //document.getElementById('book_email_area').value = '';
-    document.querySelectorAll('.booknow-otp-input').forEach(input => input.value = '');
-    document.querySelectorAll('.book-email-otp-input').forEach(input => input.value = '');
+            // Reset input fields
+            document.getElementById('user-phone-number').value = '';
+            document.getElementById('booknow_user_name').value = '';
+            document.getElementById('booknow_user_email').value = '';
+            document.getElementById('booknow_user_area').value = '';
+            document.getElementById('book_email_email').value = '';
+            document.getElementById('book_email_name').value = '';
+            document.getElementById('book_email_mobile').value = '';
+            //document.getElementById('book_email_area').value = '';
+            document.querySelectorAll('.booknow-otp-input').forEach(input => input.value = '');
+            document.querySelectorAll('.book-email-otp-input').forEach(input => input.value = '');
 
-    // Hide errors
-    document.getElementById('booknow_otp_phone_error').style.display = 'none';
-    document.getElementById('booknow_otp_error').style.display = 'none';
-    document.getElementById('booknow_name_error').style.display = 'none';
-    document.getElementById('booknow_email_error').style.display = 'none';
-    document.getElementById('booknow_area_error').style.display = 'none';
-    document.getElementById('book_email_email_error').style.display = 'none';
-    document.getElementById('book_email_otp_error').style.display = 'none';
-    document.getElementById('book_email_name_error').style.display = 'none';
-    document.getElementById('book_email_mobile_error').style.display = 'none';
-    //document.getElementById('book_email_area_error').style.display = 'none';
+            // Hide errors
+            document.getElementById('booknow_otp_phone_error').style.display = 'none';
+            document.getElementById('booknow_otp_error').style.display = 'none';
+            document.getElementById('booknow_name_error').style.display = 'none';
+            document.getElementById('booknow_email_error').style.display = 'none';
+            document.getElementById('booknow_area_error').style.display = 'none';
+            document.getElementById('book_email_email_error').style.display = 'none';
+            document.getElementById('book_email_otp_error').style.display = 'none';
+            document.getElementById('book_email_name_error').style.display = 'none';
+            document.getElementById('book_email_mobile_error').style.display = 'none';
+            //document.getElementById('book_email_area_error').style.display = 'none';
 
-    // Reset spinner buttons and enable primary buttons
-    ['1', '2', '3'].forEach(step => {
-      document.getElementById(`spinner_button_phone_book${step}`).style.display = 'none';
-      document.getElementById(`submit_button_phone_book${step}`).style.display = 'inline-block';
+            // Reset spinner buttons and enable primary buttons
+            ['1', '2', '3'].forEach(step => {
+                document.getElementById(`spinner_button_phone_book${step}`).style.display = 'none';
+                document.getElementById(`submit_button_phone_book${step}`).style.display = 'inline-block';
+            });
+            ['1', '2', '3'].forEach(step => {
+                document.getElementById(`spinner_button_email_book${step}`).style.display = 'none';
+                document.getElementById(`submit_button_email_book${step}`).style.display = 'inline-block';
+            });
+        });
     });
-    ['1', '2', '3'].forEach(step => {
-      document.getElementById(`spinner_button_email_book${step}`).style.display = 'none';
-      document.getElementById(`submit_button_email_book${step}`).style.display = 'inline-block';
-    });
-  });
-});
 </script>
 
 
 <script>
-    function get_hide_show(id)
-
-    {
+    function get_hide_show(id) {
         if (id == 1) {
 
             $(".tab1").css("display", "block");
@@ -2413,7 +2605,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#spinner_button_final').show();
             $('#submit_button_final').hide();
 
-            var url = '{{ url('package_inquiry_new') }}';
+            var url = '{{ url(session('search_city_name') . '/package_inquiry_new') }}';
 
             $.ajax({
                 url: url,
@@ -2426,7 +2618,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     "service_id": service_id,
                     "subservice_id": subservice_id,
                 },
-                success: function(msg) {
+                success: function (msg) {
                     var response_ajax = JSON.parse(msg);
 
                     if (response_ajax.status === "success") {
@@ -2474,7 +2666,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //alert('Local form validation not implemented yet.');
 
-        
+
         // var name_new = jQuery("#name_new").val();
         // if (name_new == '') {
 
@@ -2561,159 +2753,159 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     @endif
 
-                    @if ($result1[$i]->type == '2' && $result1[$i]->is_active == '1')
-                        var drop_down = jQuery("#formfield_value_test{{ $formFields[$k]->id }}").val();
-                        if (drop_down == '') {
-                            jQuery('#drop_down_error_formfield_value_{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#drop_down_error_formfield_value_{{ $formFields[$k]->id }}').show().delay(0)
-                                .fadeIn('show');
-                            jQuery('#drop_down_error_formfield_value_{{ $formFields[$k]->id }}').show().delay(2000)
-                                .fadeOut('show');
-                            
-                            var targetScroll = jQuery('#formfield_value_test{{ $formFields[$k]->id }}');
-                            if (!targetScroll.is(':visible')) {
-                                var pillGroup = targetScroll.prev('.select-pill-group');
-                                if (pillGroup.length > 0) {
-                                    targetScroll = pillGroup;
-                                }
-                            }
-                            var offset = targetScroll.offset();
-                            var scrollTopVal = offset ? offset.top - 150 : 0;
-                            $('html, body').animate({
-                                scrollTop: scrollTopVal
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result1[$i]->type == '3' && $result1[$i]->is_active == '1')
-                        var radioSelected = jQuery('input[name="formfield_radio_{{ $formFields[$k]->id }}"]:checked')
-                            .val();
-
-                        if (!radioSelected) {
-                            jQuery('#radio_error').html("Please select {{ $formFields[$k]->lable_name }}");
-                            jQuery('#radio_error').show().delay(2000).fadeOut('show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_{{ $formFields[$k]->id }}').offset().top - 150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-
-                    // @if ($result1[$i]->type == '3' && $result1[$i]->is_active == '1')
-                    //     var radio = jQuery("#formfield_value_{{ $formFields[$k]->id }}").val();
-                    //     // alert(drop_down);
-                    //     if (radio == '') {
-                    //         jQuery('#radio_error').html("Please Enter {{ $formFields[$k]->lable_name }}");
-                    //         jQuery('#radio_error').show().delay(0).fadeIn('show');
-                    //         jQuery('#radio_error').show().delay(2000).fadeOut('show');
-                    //         $('html, body').animate({
-                    //             scrollTop: $('#formfield_value_{{ $formFields[$k]->id }}').offset().top - 150
-                    //         }, 1000);
-                    //         return false;
-                    //     }
-                    // @endif
-
-                    @if ($result1[$i]->type == '4' && $result1[$i]->is_active == '1')
-                        // var checkbox = jQuery("#formfield_value_checkbox{{ $formFields[$k]->id }}").val();
-                        var checkboxes = document.querySelectorAll(
-                            'input[name^="formfield_checkbox_{{ $formFields[$k]->id }}"]:checked');
-                        // alert(checkbox);
-                        if (checkboxes.length === 0) {
-                            var errorMessage =
-                                jQuery('#formfield_value_checkbox1{{ $formFields[$k]->id }}').html(
+                        @if ($result1[$i]->type == '2' && $result1[$i]->is_active == '1')
+                            var drop_down = jQuery("#formfield_value_test{{ $formFields[$k]->id }}").val();
+                            if (drop_down == '') {
+                                jQuery('#drop_down_error_formfield_value_{{ $formFields[$k]->id }}').html(
                                     "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#formfield_value_checkbox1{{ $formFields[$k]->id }}').show().delay(0).fadeIn(
-                                'show');
-                            jQuery('#formfield_value_checkbox1{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
-                                'show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_checkbox1{{ $formFields[$k]->id }}').offset()
-                                    .top - 150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result1[$i]->type == '5' && $result1[$i]->is_active == '1')
-                        var textarea = jQuery("#formfield_value_textarea{{ $formFields[$k]->id }}").val();
-                        // alert(drop_down);
-                        if (textarea == '') {
-                            jQuery('#textarea_error').html("Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#textarea_error').show().delay(0).fadeIn('show');
-                            jQuery('#textarea_error').show().delay(2000).fadeOut('show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_textarea{{ $formFields[$k]->id }}').offset()
-                                    .top - 150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result1[$i]->type == '6' && $result1[$i]->is_active == '1')
-                        var date = jQuery("#formfield_value_date{{ $formFields[$k]->id }}").val();
-                        if (date == '') {
-                            jQuery('#formfield_value_date12{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#formfield_value_date12{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
-                            jQuery('#formfield_value_date12{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
-                                'show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_date{{ $formFields[$k]->id }}').offset().top -
-                                    150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result1[$i]->type == '7' && $result1[$i]->is_active == '1')
-                        var mul_drop_down = jQuery("#formfield_value_{{ $formFields[$k]->id }}").val();
-                        if (mul_drop_down == '') {
-                            jQuery('#mul_drop_error_{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#mul_drop_error_{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
-                            jQuery('#mul_drop_error_{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_{{ $formFields[$k]->id }}').offset().top - 150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result1[$i]->type == '8' && $result1[$i]->is_active == '1')
-                        var Image = jQuery("#formfield_value_Image{{ $formFields[$k]->id }}").val();
+                                jQuery('#drop_down_error_formfield_value_{{ $formFields[$k]->id }}').show().delay(0)
+                                    .fadeIn('show');
+                                jQuery('#drop_down_error_formfield_value_{{ $formFields[$k]->id }}').show().delay(2000)
+                                    .fadeOut('show');
 
-                        if (Image == '') {
-                            jQuery('#file_error_{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#file_error_{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
-                            jQuery('#file_error_{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_Image{{ $formFields[$k]->id }}').offset().top -
-                                    150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result1[$i]->type == '9' && $result1[$i]->is_active == '1')
-                        var Time = jQuery("#formfield_value_time{{ $formFields[$k]->id }}").val();
+                                var targetScroll = jQuery('#formfield_value_test{{ $formFields[$k]->id }}');
+                                if (!targetScroll.is(':visible')) {
+                                    var pillGroup = targetScroll.prev('.select-pill-group');
+                                    if (pillGroup.length > 0) {
+                                        targetScroll = pillGroup;
+                                    }
+                                }
+                                var offset = targetScroll.offset();
+                                var scrollTopVal = offset ? offset.top - 150 : 0;
+                                $('html, body').animate({
+                                    scrollTop: scrollTopVal
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result1[$i]->type == '3' && $result1[$i]->is_active == '1')
+                            var radioSelected = jQuery('input[name="formfield_radio_{{ $formFields[$k]->id }}"]:checked')
+                                .val();
 
-                        if (Time == '') {
-                            jQuery('#formfield_value_time_one{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#formfield_value_time_one{{ $formFields[$k]->id }}').show().delay(0).fadeIn(
-                                'show');
-                            jQuery('#formfield_value_time_one{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
-                                'show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_time{{ $formFields[$k]->id }}').offset().top -
-                                    150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
+                            if (!radioSelected) {
+                                jQuery('#radio_error').html("Please select {{ $formFields[$k]->lable_name }}");
+                                jQuery('#radio_error').show().delay(2000).fadeOut('show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_{{ $formFields[$k]->id }}').offset().top - 150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+
+                        // @if ($result1[$i]->type == '3' && $result1[$i]->is_active == '1')
+                            //     var radio = jQuery("#formfield_value_{{ $formFields[$k]->id }}").val();
+                            //     // alert(drop_down);
+                            //     if (radio == '') {
+                            //         jQuery('#radio_error').html("Please Enter {{ $formFields[$k]->lable_name }}");
+                            //         jQuery('#radio_error').show().delay(0).fadeIn('show');
+                            //         jQuery('#radio_error').show().delay(2000).fadeOut('show');
+                            //         $('html, body').animate({
+                            //             scrollTop: $('#formfield_value_{{ $formFields[$k]->id }}').offset().top - 150
+                            //         }, 1000);
+                            //         return false;
+                            //     }
+                        // @endif
+
+                        @if ($result1[$i]->type == '4' && $result1[$i]->is_active == '1')
+                            // var checkbox = jQuery("#formfield_value_checkbox{{ $formFields[$k]->id }}").val();
+                            var checkboxes = document.querySelectorAll(
+                                'input[name^="formfield_checkbox_{{ $formFields[$k]->id }}"]:checked');
+                            // alert(checkbox);
+                            if (checkboxes.length === 0) {
+                                var errorMessage =
+                                    jQuery('#formfield_value_checkbox1{{ $formFields[$k]->id }}').html(
+                                        "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#formfield_value_checkbox1{{ $formFields[$k]->id }}').show().delay(0).fadeIn(
+                                    'show');
+                                jQuery('#formfield_value_checkbox1{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
+                                    'show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_checkbox1{{ $formFields[$k]->id }}').offset()
+                                        .top - 150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result1[$i]->type == '5' && $result1[$i]->is_active == '1')
+                            var textarea = jQuery("#formfield_value_textarea{{ $formFields[$k]->id }}").val();
+                            // alert(drop_down);
+                            if (textarea == '') {
+                                jQuery('#textarea_error').html("Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#textarea_error').show().delay(0).fadeIn('show');
+                                jQuery('#textarea_error').show().delay(2000).fadeOut('show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_textarea{{ $formFields[$k]->id }}').offset()
+                                        .top - 150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result1[$i]->type == '6' && $result1[$i]->is_active == '1')
+                            var date = jQuery("#formfield_value_date{{ $formFields[$k]->id }}").val();
+                            if (date == '') {
+                                jQuery('#formfield_value_date12{{ $formFields[$k]->id }}').html(
+                                    "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#formfield_value_date12{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
+                                jQuery('#formfield_value_date12{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
+                                    'show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_date{{ $formFields[$k]->id }}').offset().top -
+                                        150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result1[$i]->type == '7' && $result1[$i]->is_active == '1')
+                            var mul_drop_down = jQuery("#formfield_value_{{ $formFields[$k]->id }}").val();
+                            if (mul_drop_down == '') {
+                                jQuery('#mul_drop_error_{{ $formFields[$k]->id }}').html(
+                                    "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#mul_drop_error_{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
+                                jQuery('#mul_drop_error_{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_{{ $formFields[$k]->id }}').offset().top - 150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result1[$i]->type == '8' && $result1[$i]->is_active == '1')
+                            var Image = jQuery("#formfield_value_Image{{ $formFields[$k]->id }}").val();
+
+                            if (Image == '') {
+                                jQuery('#file_error_{{ $formFields[$k]->id }}').html(
+                                    "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#file_error_{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
+                                jQuery('#file_error_{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_Image{{ $formFields[$k]->id }}').offset().top -
+                                        150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result1[$i]->type == '9' && $result1[$i]->is_active == '1')
+                            var Time = jQuery("#formfield_value_time{{ $formFields[$k]->id }}").val();
+
+                            if (Time == '') {
+                                jQuery('#formfield_value_time_one{{ $formFields[$k]->id }}').html(
+                                    "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#formfield_value_time_one{{ $formFields[$k]->id }}').show().delay(0).fadeIn(
+                                    'show');
+                                jQuery('#formfield_value_time_one{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
+                                    'show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_time{{ $formFields[$k]->id }}').offset().top -
+                                        150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
                 @endif
             @endfor
         @endfor
 
 
-           
+
 
 
 
@@ -2721,6 +2913,10 @@ document.addEventListener('DOMContentLoaded', function () {
         //     return false;
         // }
 
+        @if(Session::get('user') == "")
+            $('#exampleModalLong').modal('show');
+            return false;
+        @endif
 
         $('#spinner_button').show();
 
@@ -2825,152 +3021,152 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     @endif
 
-                    @if ($result2[$i]->type == '2' && $result2[$i]->is_active == '1')
-                        // Define drop_down_test within the scope
-                        var drop_down_test = jQuery("#formfield_value_drop{{ $formFields[$k]->id }}").val();
-                        if (drop_down_test == '') {
-                            jQuery('#drop_down_error_formfield_value_drop{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#drop_down_error_formfield_value_drop{{ $formFields[$k]->id }}').show().delay(0)
-                                .fadeIn('show');
-                            jQuery('#drop_down_error_formfield_value_drop{{ $formFields[$k]->id }}').show().delay(
-                                    2000)
-                                .fadeOut('show');
-                            
-                            var targetScroll2 = jQuery('#formfield_value_drop{{ $formFields[$k]->id }}');
-                            if (!targetScroll2.is(':visible')) {
-                                var pillGroup2 = targetScroll2.prev('.select-pill-group');
-                                if (pillGroup2.length > 0) {
-                                    targetScroll2 = pillGroup2;
-                                }
-                            }
-                            var offset2 = targetScroll2.offset();
-                            var scrollTopVal2 = offset2 ? offset2.top - 150 : 0;
-                            $('html, body').animate({
-                                scrollTop: scrollTopVal2
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-
-
-                    @if ($result2[$i]->type == '3' && $result2[$i]->is_active == '1')
-                        var radio2 = jQuery('input[name="formfield_radio_{{ $formFields[$k]->id }}"]:checked')
-                            .val();
-
-                        if (!radio2) {
-                            jQuery('#formfield_value_red{{ $formFields[$k]->id }}').html(
-                                "Please select {{ $formFields[$k]->lable_name }}");
-                            jQuery('#formfield_value_red{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
-                                'show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_red{{ $formFields[$k]->id }}').offset()
-                                    .top -
-                                    150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-
-
-                    @if ($result2[$i]->type == '4' && $result2[$i]->is_active == '1')
-                        var checkboxes2 = document.querySelectorAll(
-                            'input[name^="formfield_checkbox_{{ $formFields[$k]->id }}"]:checked');
-                        if (checkboxes2.length === 0) {
-                            var errorMessage =
-                                jQuery('#formfield_value_c2{{ $formFields[$k]->id }}').html(
+                        @if ($result2[$i]->type == '2' && $result2[$i]->is_active == '1')
+                            // Define drop_down_test within the scope
+                            var drop_down_test = jQuery("#formfield_value_drop{{ $formFields[$k]->id }}").val();
+                            if (drop_down_test == '') {
+                                jQuery('#drop_down_error_formfield_value_drop{{ $formFields[$k]->id }}').html(
                                     "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#formfield_value_c2{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
-                            jQuery('#formfield_value_c2{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
-                                'show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_c2{{ $formFields[$k]->id }}').offset()
-                                    .top -
-                                    150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result2[$i]->type == '5' && $result2[$i]->is_active == '1')
-                        var textareas = jQuery("#formfield_value{{ $formFields[$k]->id }}").val();
-                        // alert(textareas);
-                        if (textareas == '') {
-                            jQuery('#formfield_value_01{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#formfield_value_01{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
-                            jQuery('#formfield_value_01{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value{{ $formFields[$k]->id }}').offset()
-                                    .top - 150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result2[$i]->type == '6' && $result2[$i]->is_active == '1')
-                        var date_test = jQuery("#formfield_value{{ $formFields[$k]->id }}").val();
-                        if (date_test == '') {
-                            jQuery('#formfield_value_date_2{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#formfield_value_date_2{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
-                            jQuery('#formfield_value_date_2{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
-                                'show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value{{ $formFields[$k]->id }}').offset().top -
-                                    150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
+                                jQuery('#drop_down_error_formfield_value_drop{{ $formFields[$k]->id }}').show().delay(0)
+                                    .fadeIn('show');
+                                jQuery('#drop_down_error_formfield_value_drop{{ $formFields[$k]->id }}').show().delay(
+                                    2000)
+                                    .fadeOut('show');
 
-                    @if ($result2[$i]->type == '7' && $result2[$i]->is_active == '1')
-                        var mul_drop_down = jQuery("#formfield_value_mul_test2{{ $formFields[$k]->id }}").val();
-                        if (mul_drop_down == '') {
-                            jQuery('#mul2_drop_error_{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#mul2_drop_error_{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
-                            jQuery('#mul2_drop_error_{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_mul_test2{{ $formFields[$k]->id }}').offset()
-                                    .top -
-                                    150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result2[$i]->type == '8' && $result2[$i]->is_active == '1')
-                        var Image_int = jQuery("#formfield_value_Image_two{{ $formFields[$k]->id }}").val();
+                                var targetScroll2 = jQuery('#formfield_value_drop{{ $formFields[$k]->id }}');
+                                if (!targetScroll2.is(':visible')) {
+                                    var pillGroup2 = targetScroll2.prev('.select-pill-group');
+                                    if (pillGroup2.length > 0) {
+                                        targetScroll2 = pillGroup2;
+                                    }
+                                }
+                                var offset2 = targetScroll2.offset();
+                                var scrollTopVal2 = offset2 ? offset2.top - 150 : 0;
+                                $('html, body').animate({
+                                    scrollTop: scrollTopVal2
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
 
-                        if (Image_int == '') {
-                            jQuery('#file_error_two_{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#file_error_two_{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
-                            jQuery('#file_error_two_{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_Image_two{{ $formFields[$k]->id }}').offset()
-                                    .top -
-                                    150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
-                    @if ($result2[$i]->type == '9' && $result2[$i]->is_active == '1')
-                        var time_sec = jQuery("#formfield_value_time_two{{ $formFields[$k]->id }}").val();
 
-                        if (time_sec == '') {
-                            jQuery('#formfield_value_time_sec{{ $formFields[$k]->id }}').html(
-                                "Please Enter {{ $formFields[$k]->lable_name }}");
-                            jQuery('#formfield_value_time_sec{{ $formFields[$k]->id }}').show().delay(0).fadeIn(
-                                'show');
-                            jQuery('#formfield_value_time_sec{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
-                                'show');
-                            $('html, body').animate({
-                                scrollTop: $('#formfield_value_time_two{{ $formFields[$k]->id }}').offset()
-                                    .top -
-                                    150
-                            }, 1000);
-                            return false;
-                        }
-                    @endif
+                        @if ($result2[$i]->type == '3' && $result2[$i]->is_active == '1')
+                            var radio2 = jQuery('input[name="formfield_radio_{{ $formFields[$k]->id }}"]:checked')
+                                .val();
+
+                            if (!radio2) {
+                                jQuery('#formfield_value_red{{ $formFields[$k]->id }}').html(
+                                    "Please select {{ $formFields[$k]->lable_name }}");
+                                jQuery('#formfield_value_red{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
+                                    'show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_red{{ $formFields[$k]->id }}').offset()
+                                        .top -
+                                        150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+
+
+                        @if ($result2[$i]->type == '4' && $result2[$i]->is_active == '1')
+                            var checkboxes2 = document.querySelectorAll(
+                                'input[name^="formfield_checkbox_{{ $formFields[$k]->id }}"]:checked');
+                            if (checkboxes2.length === 0) {
+                                var errorMessage =
+                                    jQuery('#formfield_value_c2{{ $formFields[$k]->id }}').html(
+                                        "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#formfield_value_c2{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
+                                jQuery('#formfield_value_c2{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
+                                    'show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_c2{{ $formFields[$k]->id }}').offset()
+                                        .top -
+                                        150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result2[$i]->type == '5' && $result2[$i]->is_active == '1')
+                            var textareas = jQuery("#formfield_value{{ $formFields[$k]->id }}").val();
+                            // alert(textareas);
+                            if (textareas == '') {
+                                jQuery('#formfield_value_01{{ $formFields[$k]->id }}').html(
+                                    "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#formfield_value_01{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
+                                jQuery('#formfield_value_01{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value{{ $formFields[$k]->id }}').offset()
+                                        .top - 150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result2[$i]->type == '6' && $result2[$i]->is_active == '1')
+                            var date_test = jQuery("#formfield_value{{ $formFields[$k]->id }}").val();
+                            if (date_test == '') {
+                                jQuery('#formfield_value_date_2{{ $formFields[$k]->id }}').html(
+                                    "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#formfield_value_date_2{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
+                                jQuery('#formfield_value_date_2{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
+                                    'show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value{{ $formFields[$k]->id }}').offset().top -
+                                        150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+
+                        @if ($result2[$i]->type == '7' && $result2[$i]->is_active == '1')
+                            var mul_drop_down = jQuery("#formfield_value_mul_test2{{ $formFields[$k]->id }}").val();
+                            if (mul_drop_down == '') {
+                                jQuery('#mul2_drop_error_{{ $formFields[$k]->id }}').html(
+                                    "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#mul2_drop_error_{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
+                                jQuery('#mul2_drop_error_{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_mul_test2{{ $formFields[$k]->id }}').offset()
+                                        .top -
+                                        150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result2[$i]->type == '8' && $result2[$i]->is_active == '1')
+                            var Image_int = jQuery("#formfield_value_Image_two{{ $formFields[$k]->id }}").val();
+
+                            if (Image_int == '') {
+                                jQuery('#file_error_two_{{ $formFields[$k]->id }}').html(
+                                    "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#file_error_two_{{ $formFields[$k]->id }}').show().delay(0).fadeIn('show');
+                                jQuery('#file_error_two_{{ $formFields[$k]->id }}').show().delay(2000).fadeOut('show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_Image_two{{ $formFields[$k]->id }}').offset()
+                                        .top -
+                                        150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
+                        @if ($result2[$i]->type == '9' && $result2[$i]->is_active == '1')
+                            var time_sec = jQuery("#formfield_value_time_two{{ $formFields[$k]->id }}").val();
+
+                            if (time_sec == '') {
+                                jQuery('#formfield_value_time_sec{{ $formFields[$k]->id }}').html(
+                                    "Please Enter {{ $formFields[$k]->lable_name }}");
+                                jQuery('#formfield_value_time_sec{{ $formFields[$k]->id }}').show().delay(0).fadeIn(
+                                    'show');
+                                jQuery('#formfield_value_time_sec{{ $formFields[$k]->id }}').show().delay(2000).fadeOut(
+                                    'show');
+                                $('html, body').animate({
+                                    scrollTop: $('#formfield_value_time_two{{ $formFields[$k]->id }}').offset()
+                                        .top -
+                                        150
+                                }, 1000);
+                                return false;
+                            }
+                        @endif
                 @endif
             @endfor
         @endfor
@@ -2978,6 +3174,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // if (!intFormValid) {
         //     return false;
         // }
+        @if(Session::get('user') == "")
+            $('#exampleModalLong').modal('show');
+            return false;
+        @endif
+
         $('#spinner_button').show();
 
         $('#submit_button').hide();
@@ -3027,64 +3228,64 @@ document.addEventListener('DOMContentLoaded', function () {
         // alert(val);
         // alert(form_id);
 
-        if(form_id == 42){
+        if (form_id == 42) {
 
-            if(val == 129){
+            if (val == 129) {
 
-                $('#hide_div_59').css('display','block');
-                $('#hide_div_60').css('display','none');
-                $('#hide_div_64').css('display','none');
-                $('#hide_div_65').css('display','none');
-                $('#hide_div_66').css('display','none');
+                $('#hide_div_59').css('display', 'block');
+                $('#hide_div_60').css('display', 'none');
+                $('#hide_div_64').css('display', 'none');
+                $('#hide_div_65').css('display', 'none');
+                $('#hide_div_66').css('display', 'none');
 
-                
+
             }
 
-            if(val == 130){
-                $('#hide_div_59').css('display','block');
-                $('#hide_div_60').css('display','block');
-                $('#hide_div_64').css('display','none');
-                $('#hide_div_65').css('display','none');
-                $('#hide_div_66').css('display','none');
+            if (val == 130) {
+                $('#hide_div_59').css('display', 'block');
+                $('#hide_div_60').css('display', 'block');
+                $('#hide_div_64').css('display', 'none');
+                $('#hide_div_65').css('display', 'none');
+                $('#hide_div_66').css('display', 'none');
             }
 
-            if(val == 131){
-                $('#hide_div_59').css('display','block');
-                $('#hide_div_60').css('display','block');
-                $('#hide_div_64').css('display','block');
-                $('#hide_div_65').css('display','none');
-                $('#hide_div_66').css('display','none');
+            if (val == 131) {
+                $('#hide_div_59').css('display', 'block');
+                $('#hide_div_60').css('display', 'block');
+                $('#hide_div_64').css('display', 'block');
+                $('#hide_div_65').css('display', 'none');
+                $('#hide_div_66').css('display', 'none');
             }
 
-            if(val == 132){
-               $('#hide_div_59').css('display','block');
-                $('#hide_div_60').css('display','block');
-                $('#hide_div_64').css('display','block');
-                $('#hide_div_65').css('display','block');
-                $('#hide_div_66').css('display','none');
+            if (val == 132) {
+                $('#hide_div_59').css('display', 'block');
+                $('#hide_div_60').css('display', 'block');
+                $('#hide_div_64').css('display', 'block');
+                $('#hide_div_65').css('display', 'block');
+                $('#hide_div_66').css('display', 'none');
             }
 
-            if(val == 133){
-                $('#hide_div_59').css('display','block');
-                $('#hide_div_60').css('display','block');
-                $('#hide_div_64').css('display','block');
-                $('#hide_div_65').css('display','block');
-                $('#hide_div_66').css('display','block');
+            if (val == 133) {
+                $('#hide_div_59').css('display', 'block');
+                $('#hide_div_60').css('display', 'block');
+                $('#hide_div_64').css('display', 'block');
+                $('#hide_div_65').css('display', 'block');
+                $('#hide_div_66').css('display', 'block');
             }
 
-            if(val == 134 || val == ''){
-                $('#hide_div_59').css('display','none');
-                $('#hide_div_60').css('display','none');
-                $('#hide_div_64').css('display','none');
-                $('#hide_div_65').css('display','none');
-                $('#hide_div_66').css('display','none');
+            if (val == 134 || val == '') {
+                $('#hide_div_59').css('display', 'none');
+                $('#hide_div_60').css('display', 'none');
+                $('#hide_div_64').css('display', 'none');
+                $('#hide_div_65').css('display', 'none');
+                $('#hide_div_66').css('display', 'none');
             }
 
 
 
-        }else{
+        } else {
 
-            var url = '{{ url('change_drop_down') }}';
+            var url = '{{ url(session('search_city_name') . '/change_drop_down') }}';
 
             $.ajax({
                 url: url,
@@ -3094,7 +3295,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     "form_inner_id": val,
                     "form_id": form_id
                 },
-                success: function(msg) {
+                success: function (msg) {
                     document.getElementById('replace_select_' + form_id).innerHTML = msg;
                     transformDynamicSelectToPills('replace_select_' + form_id);
                     $(".multiple").select2({
@@ -3105,7 +3306,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         }
 
-        
+
     }
 
     function transformDynamicSelectToPills(containerId) {
@@ -3115,7 +3316,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let label = container.find('label').text().trim();
         let pill_labels = ['Move Type', 'What is the size of your move?', 'What is the size of your home?', 'What is the size of your garden?', 'Type of Paint?'];
-        
+
         let is_pill = false;
         pill_labels.forEach(l => {
             if (label.toLowerCase().includes(l.toLowerCase())) {
@@ -3127,8 +3328,8 @@ document.addEventListener('DOMContentLoaded', function () {
             select.hide();
             let selectId = select.attr('id');
             let pillsHtml = `<div class="radio-card-group select-pill-group" data-select-id="${selectId}">`;
-            
-            select.find('option').each(function() {
+
+            select.find('option').each(function () {
                 let optVal = $(this).val();
                 let optText = $(this).text().trim();
                 if (optVal !== '') {
@@ -3140,7 +3341,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
             pillsHtml += '</div>';
-            
+
             select.before(pillsHtml);
         }
     }
@@ -3148,26 +3349,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.onload = custom_function;
 
-    function custom_function() { 
+    function custom_function() {
 
-        $('#hide_div_59').css('display','none');
-        $('#hide_div_60').css('display','none');
-
-
-        $('#hide_div_64').css('display','none');
-        $('#hide_div_65').css('display','none');
-
-        $('#hide_div_66').css('display','none');
+        $('#hide_div_59').css('display', 'none');
+        $('#hide_div_60').css('display', 'none');
 
 
-     }
+        $('#hide_div_64').css('display', 'none');
+        $('#hide_div_65').css('display', 'none');
+
+        $('#hide_div_66').css('display', 'none');
+
+
+    }
 
 
     function get_sub_select_two(val, form_id) {
         // alert(val);
         // alert(form_id);
 
-        var url = '{{ url('change_drop_down_two') }}';
+        var url = '{{ url(session('search_city_name') . '/change_drop_down_two') }}';
 
         $.ajax({
             url: url,
@@ -3177,7 +3378,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 "form_inner_id": val,
                 "form_id": form_id
             },
-            success: function(msg) {
+            success: function (msg) {
                 document.getElementById('replace_select_two' + form_id).innerHTML = msg;
                 transformDynamicSelectToPills('replace_select_two' + form_id);
             }
@@ -3185,105 +3386,108 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     @for ($i = 0; $i < count($result1); $i++)
-            @for ($k = 0; $k < count($formFields); $k++)
+        @for ($k = 0; $k < count($formFields); $k++)
 
             @if ($result1[$i]->id == '21' && $result1[$i]->type == '6' && $result1[$i]->is_active == '1')
 
-            document.addEventListener('DOMContentLoaded', () => {
-            const dateInput = document.getElementById('formfield_value_date{{ $formFields[$k]->id }}');
-            if (dateInput) {
-                // Get tomorrow's date
-                const today = new Date();
-                const tomorrow = new Date(today);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                
-                // Format the date to yyyy-mm-dd
-                const yyyy = tomorrow.getFullYear();
-                const mm = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                const dd = String(tomorrow.getDate()).padStart(2, '0');
-                const minDate = `${yyyy}-${mm}-${dd}`;
-                
-                // Set the min attribute
-                dateInput.setAttribute('min', minDate);
-            }
-        });
-            // document.addEventListener('DOMContentLoaded', (event) => {
+                document.addEventListener('DOMContentLoaded', () => {
+                    const dateInput = document.getElementById('formfield_value_date{{ $formFields[$k]->id }}');
+                    if (dateInput) {
+                        // Get tomorrow's date
+                        const today = new Date();
+                        const tomorrow = new Date(today);
+                        tomorrow.setDate(tomorrow.getDate() + 1);
 
-                
-            //     const dateInput = document.getElementById('formfield_value_date{{ $formFields[$k]->id }}');
-            //     const form = document.getElementById('category_form');
+                        // Format the date to yyyy-mm-dd
+                        const yyyy = tomorrow.getFullYear();
+                        const mm = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                        const dd = String(tomorrow.getDate()).padStart(2, '0');
+                        const minDate = `${yyyy}-${mm}-${dd}`;
 
-            //     // Get today's date
-            //     const today = new Date();
-            //     // Set tomorrow's date
-            //     const tomorrow = new Date(today);
-            //     tomorrow.setDate(tomorrow.getDate() + 1);
+                        // Set the min attribute
+                        dateInput.setAttribute('min', minDate);
+                    }
+                });
+                // document.addEventListener('DOMContentLoaded', (event) => {
 
-            //     // Format the dates as yyyy-mm-dd
-            //     const formatDate = (date) => {
-            //         const yyyy = date.getFullYear();
-            //         const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-            //         const dd = String(date.getDate()).padStart(2, '0');
-            //         return `${yyyy}-${mm}-${dd}`;
-            //     };
 
-            //     const todayStr = formatDate(today);
-            //     const tomorrowStr = formatDate(tomorrow);
+                //     const dateInput = document.getElementById('formfield_value_date{{ $formFields[$k]->id }}');
+                //     const form = document.getElementById('category_form');
 
-            //     // Set the min and max attributes of the date input to restrict to today and tomorrow
-            //     dateInput.setAttribute('min', todayStr);
-            //     dateInput.setAttribute('max', tomorrowStr);
+                //     // Get today's date
+                //     const today = new Date();
+                //     // Set tomorrow's date
+                //     const tomorrow = new Date(today);
+                //     tomorrow.setDate(tomorrow.getDate() + 1);
 
-            //     // Additional validation on form submission
-            //     form.addEventListener('submit', (event) => {
-            //         const selectedDate = new Date(dateInput.value);
-            //         if (selectedDate < today || selectedDate > tomorrow) {
-            //             alert('Please select a date either today or tomorrow.');
-            //             event.preventDefault(); // Prevent form submission
-            //         }
-            //     });
-            // });
+                //     // Format the dates as yyyy-mm-dd
+                //     const formatDate = (date) => {
+                //         const yyyy = date.getFullYear();
+                //         const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                //         const dd = String(date.getDate()).padStart(2, '0');
+                //         return `${yyyy}-${mm}-${dd}`;
+                //     };
+
+                //     const todayStr = formatDate(today);
+                //     const tomorrowStr = formatDate(tomorrow);
+
+                //     // Set the min and max attributes of the date input to restrict to today and tomorrow
+                //     dateInput.setAttribute('min', todayStr);
+                //     dateInput.setAttribute('max', tomorrowStr);
+
+                //     // Additional validation on form submission
+                //     form.addEventListener('submit', (event) => {
+                //         const selectedDate = new Date(dateInput.value);
+                //         if (selectedDate < today || selectedDate > tomorrow) {
+                //             alert('Please select a date either today or tomorrow.');
+                //             event.preventDefault(); // Prevent form submission
+                //         }
+                //     });
+                // });
 
 
             @endif
-            
-            @endfor
+
+        @endfor
     @endfor
 </script>
 @php
     $packageEnquiryFormId = session('packages_enquiry_form_id');
     if (isset($packageEnquiryFormId)) {
 @endphp
-        <script>
-            // Function will be called on page load
-            window.onload = function() {
+<script>
+    // Function will be called on page load
+    window.onload = function() {
 
-                // alert('here');
-                get_hide_show(2);
-            };
-        </script>
+        // alert('here');
+        get_hide_show(2);
+        @if(Session::get('user') == "")
+            $('#exampleModalLong').modal('show');
+        @endif
+    };
+</script>
 @php
     }
-@endphp 
+@endphp
 
 {{-- @if (isset($formFields[$k]) && isset($formFields[$k]->id))
-    <script>
-        $("#formfield_value_{{ $formFields[$k]->id }}").select2({
-            placeholder: "Select "
-            // Add any other Select2 options you need
-        });
-    </script>
+<script>
+    $("#formfield_value_{{ $formFields[$k]->id }}").select2({
+        placeholder: "Select "
+        // Add any other Select2 options you need
+    });
+</script>
 @endif --}}
 
 {{-- @if (isset($formFields) && is_array($formFields))
-    @foreach ($formFields as $k => $formField)
-        @if (isset($formField->id))
-            <script>
-                $("#formfield_value_{{ $formField->id }}").select2({
-                    placeholder: "Select {{ $formFields[$k]->lable_name }}"
-                    // Add any other Select2 options you need
-                });
-            </script>
-        @endif
-    @endforeach
+@foreach ($formFields as $k => $formField)
+@if (isset($formField->id))
+<script>
+    $("#formfield_value_{{ $formField->id }}").select2({
+        placeholder: "Select {{ $formFields[$k]->lable_name }}"
+        // Add any other Select2 options you need
+    });
+</script>
+@endif
+@endforeach
 @endif --}}

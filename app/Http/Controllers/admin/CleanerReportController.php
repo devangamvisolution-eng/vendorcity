@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Helper;
 use PhpOffice\PhpSpreadsheet\Style\Color;
@@ -78,7 +78,7 @@ class CleanerReportController extends Controller
 
         // Salesperson filter
         if ($user_data->role_id == 11) {
-            $query->where('ci_orders.salesperson_id', $user_data->id);
+            $query->where('ci_order_item.salesperson_id', $user_data->id);
         }
 
         // Get orders
@@ -89,6 +89,19 @@ class CleanerReportController extends Controller
         $filterEnd   = !empty($enddate) ? date('Y-m-d', strtotime($enddate)) : null;
 
         $final_data = [];
+
+        // Pre-fetch all explicit visit assignments
+        $all_order_ids = $orders->pluck('order_id')->toArray();
+        $visit_overrides = [];
+        if (\Illuminate\Support\Facades\Schema::hasTable('ci_order_visits')) {
+            $overrides = DB::table('ci_order_visits')
+                ->whereIn('order_id', $all_order_ids)
+                ->whereNotNull('cleaner_id')
+                ->get();
+            foreach ($overrides as $ov) {
+                $visit_overrides[$ov->order_id][$ov->visit_date] = $ov->cleaner_id;
+            }
+        }
 
         foreach ($orders as $order) {
 
@@ -103,10 +116,18 @@ class CleanerReportController extends Controller
                 $days = array_map('trim', explode(',', strtolower($order->which_day_of_the_week_do_you_want_the_service)));
             }
 
+            $order_default_cleaners = explode(',', $order->cleaner_id ?? '');
+
             // ✅ CASE 1: Once / Deep Cleaning
             if (empty($days)) {
 
                 $visitDate = $start;
+                $active_cleaner = isset($visit_overrides[$order->order_id][$visitDate]) ? $visit_overrides[$order->order_id][$visitDate] : (count($order_default_cleaners) > 0 ? $order_default_cleaners[0] : null);
+
+                // Apply cleaner filter
+                if (!empty($cleaner_name) && $active_cleaner != $cleaner_name) {
+                    continue;
+                }
 
                 // Apply visit date filter
                 if (
@@ -118,6 +139,7 @@ class CleanerReportController extends Controller
 
                 $newRow = clone $order;
                 $newRow->visit_date = $visitDate;
+                $newRow->actual_cleaner_id = $active_cleaner;
 
                 $final_data[] = $newRow;
             }
@@ -138,6 +160,12 @@ class CleanerReportController extends Controller
                     if (in_array($dayName, $days)) {
 
                         $visitDate = $date->format('Y-m-d');
+                        $active_cleaner = isset($visit_overrides[$order->order_id][$visitDate]) ? $visit_overrides[$order->order_id][$visitDate] : (count($order_default_cleaners) > 0 ? $order_default_cleaners[0] : null);
+
+                        // Apply cleaner filter
+                        if (!empty($cleaner_name) && $active_cleaner != $cleaner_name) {
+                            continue;
+                        }
 
                         // Apply visit date filter
                         if (
@@ -149,6 +177,7 @@ class CleanerReportController extends Controller
 
                         $newRow = clone $order;
                         $newRow->visit_date = $visitDate;
+                        $newRow->actual_cleaner_id = $active_cleaner;
 
                         $final_data[] = $newRow;
                     }

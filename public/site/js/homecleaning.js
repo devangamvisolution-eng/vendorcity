@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("tabsContainer : ", tabsContainer);
 
     // ❗ Exit if tabsContainer doesn't exist
-    // if (!tabsContainer) return;
+    if (!tabsContainer) return;
 
     const buttons = tabsContainer.querySelectorAll("button");
 
@@ -457,7 +457,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function prevStep() {
         let idx = stepNumbers.indexOf(currentStep);
 
-        if (idx == 5) {
+        if (idx == 4) {
             $("#service_fee").val("0");
             calculation();
         }
@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function () {
             4: "Schedule Service",
             5: "Review & Confirm"
         };
-        
+
         const title = stepTitles[currentIndex] || "";
 
         if (currentIndex === 1) {
@@ -676,69 +676,73 @@ $(document).ready(function () {
 document.addEventListener("DOMContentLoaded", function () {
     const Otpphoneinput = document.querySelector("#user-phone-number");
 
-    const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
-        initialCountry: "ae", // UAE
-        separateDialCode: true,
-        autoPlaceholder: "aggressive",
-        utilsScript:
-            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-    });
+    if (Otpphoneinput && typeof window.intlTelInput === 'function') {
+        const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
+            initialCountry: "ae", // UAE
+            separateDialCode: true,
+            autoPlaceholder: "aggressive",
+            utilsScript:
+                "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        });
 
-    // Assign globally
-    window.Otpphoneinputnew = Otpphoneinputnew;
+        // Assign globally
+        window.Otpphoneinputnew = Otpphoneinputnew;
 
-    // Update hidden country code when user selects a country
-    const countryCodeInput = document.querySelector(
-        "#country_code_otp_popup_Modal_book",
-    );
+        // Update hidden country code when user selects a country
+        const countryCodeInput = document.querySelector(
+            "#country_code_otp_popup_Modal_book",
+        );
 
-    function setCountryCode() {
-        const countryData = Otpphoneinputnew.getSelectedCountryData();
-        countryCodeInput.value = countryData.dialCode; // store only dial code (e.g. 971)
-        // If you want full ISO code (like 'AE') → use countryData.iso2
-    }
+        function setCountryCode() {
+            const countryData = Otpphoneinputnew.getSelectedCountryData();
+            if (countryCodeInput) countryCodeInput.value = countryData.dialCode; // store only dial code (e.g. 971)
+            // If you want full ISO code (like 'AE') → use countryData.iso2
+        }
 
-    // Set default initially
-    setCountryCode();
-
-    // Listen to country change
-    Otpphoneinput.addEventListener("countrychange", function () {
+        // Set default initially
         setCountryCode();
-    });
+
+        // Listen to country change
+        Otpphoneinput.addEventListener("countrychange", function () {
+            setCountryCode();
+        });
+    }
 });
 
 document.addEventListener("DOMContentLoaded", function () {
     const Otpphoneinput = document.querySelector("#book_email_mobile");
 
-    const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
-        initialCountry: "ae", // UAE
-        separateDialCode: true,
-        autoPlaceholder: "aggressive",
-        utilsScript:
-            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-    });
+    if (Otpphoneinput && typeof window.intlTelInput === 'function') {
+        const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
+            initialCountry: "ae", // UAE
+            separateDialCode: true,
+            autoPlaceholder: "aggressive",
+            utilsScript:
+                "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        });
 
-    // Assign globally
-    window.Otpphoneinputnew = Otpphoneinputnew;
+        // Assign globally
+        window.Otpphoneinputnew = Otpphoneinputnew;
 
-    // Update hidden country code when user selects a country
-    const countryCodeInput = document.querySelector(
-        "#country_code_book_popup_Modal_book",
-    );
+        // Update hidden country code when user selects a country
+        const countryCodeInput = document.querySelector(
+            "#country_code_book_popup_Modal_book",
+        );
 
-    function setCountryCode() {
-        const countryData = Otpphoneinputnew.getSelectedCountryData();
-        countryCodeInput.value = countryData.dialCode; // store only dial code (e.g. 971)
-        // If you want full ISO code (like 'AE') → use countryData.iso2
-    }
+        function setCountryCode() {
+            const countryData = Otpphoneinputnew.getSelectedCountryData();
+            if (countryCodeInput) countryCodeInput.value = countryData.dialCode; // store only dial code (e.g. 971)
+            // If you want full ISO code (like 'AE') → use countryData.iso2
+        }
 
-    // Set default initially
-    setCountryCode();
-
-    // Listen to country change
-    Otpphoneinput.addEventListener("countrychange", function () {
+        // Set default initially
         setCountryCode();
-    });
+
+        // Listen to country change
+        Otpphoneinput.addEventListener("countrychange", function () {
+            setCountryCode();
+        });
+    }
 });
 
 function booknow_otp_verification(id) {

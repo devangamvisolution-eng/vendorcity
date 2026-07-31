@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
 use Image;
-use App\Models\Admin\City;
-use App\Models\Admin\UserPermission;
+use App\Models\admin\City;
+use App\Models\admin\UserPermission;
 
 class VendorsProfileController extends Controller
 {

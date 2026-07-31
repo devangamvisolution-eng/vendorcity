@@ -1,16 +1,16 @@
 <!--Header -->
 <!-- Logo -->
 <div class="header-left">
-    @if(Auth::user()->vendor != 1)
-    <a href="{{ url('/admin') }}" class="logo">
-        <img src="{{ asset('public/admin/assets/img/logo.png') }}" alt="Logo" style="width: 100%;">
-    </a>
+    @if (Auth::user()->vendor != 1)
+        <a href="{{ url('/admin') }}" class="logo">
+            <img src="{{ asset('public/admin/assets/img/logo.png') }}" alt="Logo" style="width: 100%;">
+        </a>
     @else
-    <a href="{{ url('/vendors') }}" class="logo">
-        <img src="{{ asset('public/admin/assets/img/logo.png') }}" alt="Logo" style="width: 100%;">
-    </a>
+        <a href="{{ url('/vendors') }}" class="logo">
+            <img src="{{ asset('public/admin/assets/img/logo.png') }}" alt="Logo" style="width: 100%;">
+        </a>
     @endif
-     <a href="{{ url('/admin') }}" class="logo logo-small">
+    <a href="{{ url('/admin') }}" class="logo logo-small">
         <img src="{{ asset('public/admin/assets/img/logo-small.png') }}" alt="Logo" width="30" height="30">
     </a>
 </div>
@@ -143,10 +143,11 @@
     <!-- /Notifications -->
     @php
         $notification = DB::table('notification')
-                        ->where('vendor_id',Auth::user()->id)
-                        ->where('view_notification', 0)
-                        ->get()->toArray();
-        
+            ->where('vendor_id', Auth::user()->id)
+            ->where('view_notification', 0)
+            ->get()
+            ->toArray();
+
         $notification_count = DB::table('notification')
             ->where('vendor_id', Auth::user()->id)
             ->where('view_notification', 0)
@@ -157,39 +158,41 @@
         <a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
             <i data-feather="bell"></i> <span class="badge rounded-pill">{{ $notification_count }}</span>
         </a>
-        @if(!empty($notification))
-        <div class="dropdown-menu notifications">
-            <div class="topnav-dropdown-header">
-                <span class="notification-title">Notifications</span>
-                <a href="javascript:void(0)" class="clear-noti"> Clear All</a>
+        @if (!empty($notification))
+            <div class="dropdown-menu notifications">
+                <div class="topnav-dropdown-header">
+                    <span class="notification-title">Notifications</span>
+                    <a href="javascript:void(0)" class="clear-noti"> Clear All</a>
+                </div>
+                <div class="noti-content">
+                    <ul class="notification-list">
+                        @foreach ($notification as $notification_data)
+                            @php
+                                //    $currentDateTime = new DateTime();
+                                //     $notificationDateTime = new DateTime($notification_data->added_datetime);
+                                //     $timeDiff = $currentDateTime->diff($notificationDateTime);
+                                //     $timeAgo = $timeDiff->format('%h hours %i minutes ago');
+                            @endphp
+                            <li class="notification-message">
+                                <a href="javascript:void(0)">
+                                    <div class="media d-flex">
+
+                                        <div class="media-body">
+                                            <p class="noti-details">{{ $notification_data->subject }}</p>
+                                            <p class="noti-time"><span
+                                                    class="notification-time">{{ date('d-m-y', strtotime($notification_data->added_datetime)) }}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                {{-- <div class="topnav-dropdown-footer">
+                    <a href="activities.html">View all Notifications</a>
+                </div> --}}
             </div>
-            <div class="noti-content">
-                <ul class="notification-list">
-                    @foreach($notification as $notification_data)
-                    @php
-                    //    $currentDateTime = new DateTime();
-                    //     $notificationDateTime = new DateTime($notification_data->added_datetime);
-                    //     $timeDiff = $currentDateTime->diff($notificationDateTime);
-                    //     $timeAgo = $timeDiff->format('%h hours %i minutes ago');
-                    @endphp
-                    <li class="notification-message">
-                        <a href="javascript:void(0)">
-                            <div class="media d-flex">
-                                
-                                <div class="media-body">
-                                    <p class="noti-details">{{ $notification_data->subject }}</p>
-                                    <p class="noti-time"><span class="notification-time">{{ date('d-m-y', strtotime($notification_data->added_datetime)) }}</span></p>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    @endforeach
-                </ul>
-            </div>
-            {{-- <div class="topnav-dropdown-footer">
-                <a href="activities.html">View all Notifications</a>
-            </div> --}}
-        </div>
         @endif
     </li>
     <!-- User Menu -->
@@ -202,9 +205,18 @@
             <span>{{ Auth::user()->name }}</span>
         </a>
         <div class="dropdown-menu">
-            <a class="dropdown-item" href="{{route('profile.edit')}}"><i data-feather="user" class="me-1"></i> Profile</a>
-            <a class="dropdown-item" href="{{ route('logout') }}"><i data-feather="log-out" class="me-1"></i>
-                Logout</a>
+            @if (Auth::user()->role_id == 1)
+                <a class="dropdown-item" href="{{ route('profile.edit') }}"><i data-feather="user"
+                        class="me-1"></i>
+                    Profile</a>
+            @endif
+            <a class="dropdown-item" href="{{ route('logout') }}"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i data-feather="log-out" class="me-1"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
         </div>
     </li>
     <!-- /User Menu -->

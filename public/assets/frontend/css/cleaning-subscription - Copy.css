@@ -1,0 +1,240 @@
+/* Cleaning Subscription - Step 1 Redesign */
+
+.step-header-main {
+    padding: 20px 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.step-content {
+    display: none;
+}
+
+.step-content.active {
+    display: block;
+}
+
+.radio-group input[type="radio"], 
+.radio-group input[type="checkbox"] {
+    display: none;
+}
+
+.radio-group input[type="checkbox"]:checked + label {
+    background-color: #0046fd;
+    color: white;
+    border-color: #0046fd;
+}
+
+/* --- Hours Selection: Perfect Circles --- */
+.hours-pills {
+    display: flex;
+    gap: 15px;
+    flex-wrap: nowrap;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.hours-pills::-webkit-scrollbar {
+    height: 4px;
+}
+.hours-pills::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 4px;
+}
+
+.hours-pills .pill {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0046fd;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+.hours-pills .pill:hover {
+    border-color: #0046fd;
+    color: #0046fd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 70, 253, 0.15);
+}
+
+.hours-pills .pill.selected {
+    background: #0046fd;
+    border-color: #0046fd;
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(0, 70, 253, 0.25);
+}
+
+/* --- Packages & Frequency Radio Cards --- */
+.subscription-option {
+    border: 2px solid #eaeaea;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    transition: all 0.25s ease;
+}
+
+.subscription-option:hover {
+    border-color: #0d6efd;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+}
+
+.subscription-option.selected {
+    border-color: #0d6efd;
+    background-color: #f0f6ff;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.1);
+}
+
+.radio-circle {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    margin-right: 15px;
+    display: inline-block;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.subscription-option.selected .radio-circle {
+    border-color: #0d6efd;
+    background-color: #0d6efd;
+}
+
+.subscription-option.selected .radio-circle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+}
+
+.subscription-option strong {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Badges */
+.subscription-option .badge {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background-color: #ffeeb5 !important;
+    color: #d97706 !important;
+    font-weight: 700;
+}
+
+.duration-pills,
+.days-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.days-pills .pill {
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.main-card {
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    padding: 30px;
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    margin-bottom: 30px;
+}
+
+.sidebar-booking {
+    background: #fff;
+    padding: 30px;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    position: sticky;
+    top: 20px;
+}
+
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    padding: 15px 20px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-next-black {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 25px;
+    font-weight: bold;
+    min-width: 250px;
+    cursor: pointer;
+}
+
+.btn-next-black:hover {
+    background: #333;
+}
+
+.btn-next {
+    background: #f7c93e;
+    color: #000;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .subscription-option {
+        flex-direction: column;
+        align-items: flex-start;
+        position: relative;
+    }
+    
+    .radio-circle {
+        position: absolute;
+        right: 15px;
+        top: 20px;
+        margin-right: 0;
+    }
+    
+    .subscription-option .badge {
+        margin-left: 0 !important;
+        margin-top: 8px;
+        display: inline-block;
+    }
+}

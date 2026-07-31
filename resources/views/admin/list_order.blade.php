@@ -161,6 +161,8 @@
                             Package Order - Automobile
                         @elseif(Route::currentRouteName() == 'storage_package_order')
                             Package Order - Storage
+                        @elseif(Route::currentRouteName() == 'healthcare_at_home_package_order')
+                            Package Order - Healthcare At Home
                         @else
                             Package Order - Moving
                         @endif
@@ -171,11 +173,13 @@
                     </ul>
                 </div>
 
+
                 @if (in_array('40', $edit_perm) ||
                         in_array('19', $edit_perm) ||
                         in_array('44', $edit_perm) ||
                         in_array('45', $edit_perm) ||
                         in_array('42', $edit_perm) ||
+                        in_array('75', $edit_perm) ||
                         in_array('59', $edit_perm))
                     <div class="col-auto">
                         @php
@@ -197,6 +201,10 @@
                                 ],
                                 'automobile-order' => ['route' => 'automobile-admin-order', 'label' => 'Automobile'],
                                 'storage_package_order' => ['route' => 'storage-admin-order', 'label' => 'Storage'],
+                                'healthcare_at_home_package_order' => [
+                                    'route' => 'healthcare_at_home_admin_order',
+                                    'label' => 'Healthcare At Home',
+                                ],
                             ];
                             $curr = Route::currentRouteName();
                         @endphp
@@ -445,6 +453,14 @@
                                                                     'route' => 'storage-package-order-edit',
                                                                     'param' => 'id',
                                                                 ],
+                                                                'storage_package_order' => [
+                                                                    'route' => 'storage-package-order-edit',
+                                                                    'param' => 'id',
+                                                                ],
+                                                                // 'healthcare_at_home_package_order' => [
+                                                                //     'route' => 'healthcare_at_home_order_edit',
+                                                                //     'param' => 'id',
+                                                                // ],
                                                             ];
                                                             $currentRoute = Route::currentRouteName();
                                                         @endphp
@@ -464,9 +480,12 @@
                                                                 @elseif($orders->items[0]->service_id == 71)
                                                                     <a class="dropdown-item"
                                                                         href="{{ route('handyman-detail', [$orders->order_id]) }}">
-                                                                    @else
+                                                                    @elseif($orders->items[0]->service_id == 54)
                                                                         <a class="dropdown-item"
-                                                                            href="{{ route('moving-detail', [$orders->order_id]) }}">
+                                                                            href="{{ route('healthcare_at_home_detail', [$orders->order_id]) }}">
+                                                                        @else
+                                                                            <a class="dropdown-item"
+                                                                                href="{{ route('moving-detail', [$orders->order_id]) }}">
                                                         @endif
                                                         <i class="far fa-eye me-2"></i>Details
                                                         </a>

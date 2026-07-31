@@ -50,8 +50,14 @@
         height: 0;
         width: 100%;
     }
-	.pd_sec{margin-left: 3%;}
-	.pd_sec .ml25{margin-left: 0 !important;}
+
+    .pd_sec {
+        margin-left: 3%;
+    }
+
+    .pd_sec .ml25 {
+        margin-left: 0 !important;
+    }
 </style>
 
 <section class="breadcumb-section pt-4 container package_detail_banner">
@@ -212,9 +218,7 @@
                         @endif
 
                         @php
-                            $package_attr = DB::table('package_attr')
-                                ->where('pid', $package_detail->id)
-                                ->get();
+                            $package_attr = DB::table('package_attr')->where('pid', $package_detail->id)->get();
 
                         @endphp
                         @isset($package_attr)
@@ -270,9 +274,7 @@
 
 
                         @php
-                            $faq_packages = DB::table('faqs')
-                                ->where('packages', $package_detail->id)
-                                ->get();
+                            $faq_packages = DB::table('faqs')->where('packages', $package_detail->id)->get();
 
                             // echo '<pre>';
                             // print_r($faq_packages);
@@ -896,8 +898,11 @@
 
 
         @php
-            
-            $services = DB::table('subservices')->where('id', '!=', $package_detail->subservice_id)->where('serviceid', $package_detail->service_id)->get();
+
+            $services = DB::table('subservices')
+                ->where('id', '!=', $package_detail->subservice_id)
+                ->where('serviceid', $package_detail->service_id)
+                ->get();
             // echo '<pre>';
             // print_r($services);
             // echo '</pre>';
@@ -913,7 +918,8 @@
                         <div class="item">
                             <div class="listing-style1">
                                 <div class="list-thumb">
-                                    <a href="{{ url('package-lists/' . $services_data->page_url) }}">
+                                    <a
+                                        href="{{ route('front.package_lists', ['page_url' => $services_data->page_url]) }}">
                                         @if (isset($services_data->image) && $services_data->image != '')
                                             <img class="w-100"
                                                 src="{{ asset('public/upload/subservice/large/' . $services_data->image) }}"
@@ -938,7 +944,8 @@
                                     </div> --}}
 
                                     <div class="list-meta d-flex justify-content-between align-items-center">
-                                        <a class="d-flex" href="{{ url('package-lists/' . $services_data->page_url) }}">
+                                        <a class="d-flex"
+                                            href="{{ route('front.package_lists', ['page_url' => $services_data->page_url]) }}">
                                             <span class="fz14"
                                                 style="font-size: 20px;!important">{{ $services_data->subservicename }}</span>
                                         </a>
@@ -1050,40 +1057,40 @@
             </div>
 
             <div class="col-md-6 col-lg-4 col-xl-4">
-                @if(!empty($googleReview))
+                @if (!empty($googleReview))
 
-                <div class="testimonial-slider2 mb15 navi_pagi_bottom_center slider-1-grid owl-carousel owl-theme wow fadeInUp"
-                    data-wow-delay="300ms">
+                    <div class="testimonial-slider2 mb15 navi_pagi_bottom_center slider-1-grid owl-carousel owl-theme wow fadeInUp"
+                        data-wow-delay="300ms">
 
-                    @foreach($googleReview as $googleReview_data)
-                    <div class="item">
-                        <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
-                            <div class="testimonial-content">
-                                @if($googleReview_data->label != '')
-                                    <h4 class="title text-thm text_blue">{{$googleReview_data->label}}</h4>
-                                @endif 
-                                <span class="icon fas fa-quote-left"></span>
-                                @if($googleReview_data->description != '')
-                                <h4 class="t_content">“{{$googleReview_data->description}}”</h4>
-                                     @endif 
-                            </div>
-                            <div class="thumb d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <img src="{{ asset('public/site/images/profileimage.png') }}"
-                                    alt="" style="width: 75px !important;">
+                        @foreach ($googleReview as $googleReview_data)
+                            <div class="item">
+                                <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
+                                    <div class="testimonial-content">
+                                        @if ($googleReview_data->label != '')
+                                            <h4 class="title text-thm text_blue">{{ $googleReview_data->label }}</h4>
+                                        @endif
+                                        <span class="icon fas fa-quote-left"></span>
+                                        @if ($googleReview_data->description != '')
+                                            <h4 class="t_content">“{{ $googleReview_data->description }}”</h4>
+                                        @endif
+                                    </div>
+                                    <div class="thumb d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <img src="{{ asset('public/site/images/profileimage.png') }}"
+                                                alt="" style="width: 75px !important;">
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            @if ($googleReview_data->name != '')
+                                                <h6 class="mb-0">{{ $googleReview_data->name }}</h6>
+                                            @endif
+                                            <!-- <p class="fz14 mb-0">Web Designer</p> -->
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1 ms-3">
-                                    @if($googleReview_data->name != '')
-                                    <h6 class="mb-0">{{$googleReview_data->name}}</h6>
-                                    @endif 
-                                    <!-- <p class="fz14 mb-0">Web Designer</p> -->
-                                </div>
                             </div>
-                        </div>
-                    </div>
-                    @endforeach
+                        @endforeach
 
-                    <!-- <div class="item">
+                        <!-- <div class="item">
 
                         <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
 
@@ -1173,8 +1180,8 @@
 
 
 
-                </div>
-                @endif 
+                    </div>
+                @endif
             </div>
 
         </div>
@@ -1184,38 +1191,38 @@
 </section>
 
 
-@if(!empty($faq))
-<section class="our-faq pb90">
+@if (!empty($faq))
+    <section class="our-faq pb90">
 
-    <div class="container">
+        <div class="container">
 
-        <div class="row">
+            <div class="row">
 
-            <div class="col-lg-12 m-auto wow fadeInUp" data-wow-delay="300ms">
+                <div class="col-lg-12 m-auto wow fadeInUp" data-wow-delay="300ms">
 
-                <div class="main-title mb30">
+                    <div class="main-title mb30">
 
-                    <h2 class="title">Have Questions?<br>Get Answers.</h2>
+                        <h2 class="title">Have Questions?<br>Get Answers.</h2>
 
-                    <h4 class="title">Payments</h4>
+                        <h4 class="title">Payments</h4>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
+            <div class="row wow fadeInUp" data-wow-delay="300ms">
 
-        <div class="row wow fadeInUp" data-wow-delay="300ms">
+                <div class="col-lg-12 mx-auto">
 
-            <div class="col-lg-12 mx-auto">
+                    <div class="ui-content">
 
-                <div class="ui-content">
+                        <div class="accordion-style1 faq-page mb-4 mb-lg-5">
 
-                    <div class="accordion-style1 faq-page mb-4 mb-lg-5">
+                            <div class="accordion" id="accordionExample">
 
-                        <div class="accordion" id="accordionExample">
-
-                             @php
+                                @php
                                     $i = 0;
                                 @endphp
 
@@ -1242,7 +1249,7 @@
                                     @endphp
                                 @endforeach
 
-                            <!-- <div class="accordion-item active">
+                                <!-- <div class="accordion-item active">
 
                                 <h2 class="accordion-header" id="headingOne">
 
@@ -1363,6 +1370,8 @@
 
                             </div> -->
 
+                            </div>
+
                         </div>
 
                     </div>
@@ -1371,13 +1380,11 @@
 
             </div>
 
+
+
         </div>
 
-
-
-    </div>
-
-</section>
+    </section>
 @endif
 
 

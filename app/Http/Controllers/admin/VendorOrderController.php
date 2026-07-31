@@ -215,6 +215,72 @@ class VendorOrderController extends Controller
         return view('admin.list_vendororder', $data);
     }
 
+    public function healthcare_at_home_listing($order_id = '', $status = '')
+    {
+        $vendors_id = Auth::user()->id;
+        $data['error'] = '';
+
+        $query = DB::table('ci_orders')->where('ci_orders.is_delete', '0')
+            ->leftJoin('frontloginregisters', 'ci_orders.user_id', '=', 'frontloginregisters.id')
+            ->select(
+                'frontloginregisters.email as user_email',
+                'frontloginregisters.name as user_name',
+                'frontloginregisters.mobile as user_mobile',
+                'ci_orders.*'
+            )
+            ->where('ci_orders.order_from', 1) // This already excludes 0 and 2
+            ->where('ci_orders.vendor_id', $vendors_id);
+
+        if (!empty($order_id)) {
+            $query->where('ci_orders.order_id', $order_id);
+        }
+
+        if (!empty($status)) {
+            if ($status == 'SUCCESS' || $status == 'FAILED') {
+                $query->where('ci_orders.payment_status', $status);
+            } else {
+                $query->where('ci_orders.order_status', $status);
+            }
+        }
+
+        $query->orderBy('ci_orders.order_id', 'DESC');
+        $allOrders = $query->get();
+
+        $filteredOrders = [];
+
+        foreach ($allOrders as $order) {
+            $itemList = DB::table('ci_order_item')
+                ->where('order_id', $order->order_id)
+                ->where('service_id', 54)
+                ->get();
+
+            if ($itemList->isEmpty()) {
+                continue; // Skip orders that don't have service_id 48
+            }
+
+            $total = 0;
+            foreach ($itemList as $item) {
+                $product = DB::table('packages')
+                    ->where('id', $item->package_id)
+                    ->first();
+
+                if ($item->product_discount_amount != 0 && $item->product_discount_amount != '') {
+                    $product_item_price = $item->product_discount_amount;
+                } else {
+                    $product_item_price = $item->package_item_price;
+                }
+
+                $total += $product_item_price * $item->package_quantity;
+            }
+
+            $order->items = $itemList;
+            $filteredOrders[] = $order;
+        }
+
+        $data['vendororders_list'] = $filteredOrders;
+        return view('admin.list_vendororder', $data);
+    }
+
     public function salon_spa_listing($order_id = '', $status = '')
     {
         $vendors_id = Auth::user()->id;

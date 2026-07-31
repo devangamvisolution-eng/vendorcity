@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin\Continent;
+use App\Models\admin\Continent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 

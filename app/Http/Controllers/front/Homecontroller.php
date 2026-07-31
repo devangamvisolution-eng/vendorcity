@@ -51,7 +51,7 @@ class Homecontroller extends Controller
 
 
 
-    public function index($city)
+    public function index($city = null)
     {
 
         // $ip = "37.41.54.71";
@@ -90,12 +90,13 @@ class Homecontroller extends Controller
         $formattedCity = ucwords(str_replace('-', ' ', $CityName));
 
         $cityData = City::where('name', $formattedCity)->first();
+        $cityDataId = $cityData?->id ?? null;
 
-        $data['service'] = DB::table('services')->where('is_active', 0)->whereRaw("FIND_IN_SET(?, city)", [$cityData->id])->orderBy('set_order', 'ASC')->get();
+        $data['service'] = DB::table('services')->where('is_active', 0)->whereRaw("FIND_IN_SET(?, city)", [$cityDataId])->orderBy('set_order', 'ASC')->get();
         // $data['service']=DB::table('services')->orderBy('set_order')->get();
         $data['faq'] = DB::table('faqs')->orderBy('id', 'DESC')->get();
         $data['googleReview'] = DB::table('googlereviews')->orderBy('id', 'DESC')->get()->toArray();
-        $data['sub_service'] = DB::table('subservices')->whereRaw("FIND_IN_SET(?, city)", [$cityData->id])->where('is_active', 0)->orderBy('set_order', 'ASC')->get();
+        $data['sub_service'] = DB::table('subservices')->where('id', '!=', 102)->whereRaw("FIND_IN_SET(?, city)", [$cityDataId])->where('is_active', 0)->orderBy('set_order', 'ASC')->get();
 
         if ((session('search_country_name') == 'United Arab Emirates')) {
             $data['city'] = DB::table('cities')->where('country', session('search_country_id'))->orderBy('name', 'asc')->get();
@@ -263,7 +264,7 @@ class Homecontroller extends Controller
 
         // echo "here";exit;
         $data['service_data'] = Service::where('page_url', $service_url)->first();
-        $data['subservice_data'] = Subservice::where('serviceid', $data['service_data']->id)->whereRaw("FIND_IN_SET(?, city)", [$cityId])->where('is_active', 0)->orderBy('set_order')->get();
+        $data['subservice_data'] = Subservice::where('serviceid', $data['service_data']->id)->where('id', '!=', 102)->whereRaw("FIND_IN_SET(?, city)", [$cityId])->where('is_active', 0)->orderBy('set_order')->get();
 
         $data['subservice_count'] = $data['subservice_data']->count();
         $data['googleReview'] = DB::table('googlereviews')->orderBy('id', 'DESC')->get()->toArray();
@@ -319,6 +320,7 @@ class Homecontroller extends Controller
 
         $subservices = DB::table('subservices')
             ->whereIn('serviceid', $serviceIds)
+            ->where('id', '!=', 102)
             ->where('is_active', 0)
             ->select('id', 'subservicename', 'serviceid')
             ->get();
@@ -1272,7 +1274,7 @@ class Homecontroller extends Controller
                 'error' => $response // already an array
             ], 500);
         } else {
-            if (isset($response['messages'][0]['status']) && $response['messages'][0]['status'] === 'SENT' || $response['messages'][0]['status'] === 'DELIVERED' || $response['messages'][0]['status'] === 'ENQUEUED') {
+            if (isset($response['messages'][0]['status']) && in_array($response['messages'][0]['status'], ['SENT', 'DELIVERED', 'ENQUEUED'])) {
 
                 session(['login-otp' => $otp]);
 
@@ -1704,9 +1706,9 @@ class Homecontroller extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'status'  => 'success',
+                'status' => 'success',
                 'message' => 'You have successfully logged in.',
-                'user'    => $newuserdata
+                'user' => $newuserdata
             ]);
         }
 
@@ -1910,9 +1912,9 @@ class Homecontroller extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'status'  => 'success',
+                'status' => 'success',
                 'message' => 'You have successfully logged in.',
-                'user'    => $newuserdata
+                'user' => $newuserdata
             ]);
         }
 

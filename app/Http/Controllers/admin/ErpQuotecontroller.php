@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Mpdf\Mpdf;
 use Mail;
 use Route;
-use App\Models\Admin\Erpdescriptionofgoods;
+use App\Models\admin\Erpdescriptionofgoods;
 
 class ErpQuotecontroller extends Controller
 {

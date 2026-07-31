@@ -10,12 +10,15 @@ use App\Models\front\Frontloginregister;
 use DB;
 use Session;
 use Cart;
-use App\Models\admin\Form_filed;
+use App\Models\Admin\Form_filed;
 use Illuminate\Support\Facades\Crypt;
 use DateTime;
 use Helper;
 use Str;
 use App\Models\Admin\City;
+use App\Models\Admin\Service;
+use App\Models\Admin\Subservice;
+use Illuminate\Support\Facades\Cache;
 
 class Packagecontroller extends Controller
 {
@@ -52,7 +55,7 @@ class Packagecontroller extends Controller
 
 
         $subservices_data = DB::table('subservices')->where('page_url', $page_url)->first();
-        $service_data = $subservices_data->serviceid;
+        $service_data = $subservices_data ? $subservices_data->serviceid : null;
 
 
         //  echo"<pre>";
@@ -127,7 +130,7 @@ class Packagecontroller extends Controller
                 }
             }
 
-            $package_cat_ids  =  $request->get('package_cat');
+            $package_cat_ids = $request->get('package_cat');
             if ($package_cat_ids !== null && $request->get('package_cat') !== null) {
 
                 $query = $query->whereIn('packagecategory_id', $package_cat_ids);
@@ -146,7 +149,7 @@ class Packagecontroller extends Controller
 
             $data['package_pagination'] = $pagination;
             // $data['package_count'] = $pagination->count();
-            $data['subservice_data'] = DB::table('subservices')->where('serviceid', $service_data)->get();
+            $data['subservice_data'] = DB::table('subservices')->where('id', '!=', 102)->where('serviceid', $service_data)->get();
             $data['package_category'] = DB::table('package_categories')->get();
             $data['subservices_new'] = $subservices_data;
             $data['services_id'] = $service_data;
@@ -188,7 +191,7 @@ class Packagecontroller extends Controller
 
         $subserviceMetaContent = DB::table('sub_service_contains')->where('city', $cityId)->where('subservice_id', $subservices_data->id)->first();
 
-        $data['meta_title'] =  $subserviceMetaContent->meta_title ?? $subservices_data->meta_title ?? '';
+        $data['meta_title'] = $subserviceMetaContent->meta_title ?? $subservices_data->meta_title ?? '';
         $data['meta_keyword'] = $subserviceMetaContent->meta_keyword ?? $subservices_data->meta_keyword ?? '';
         $data['meta_description'] = $subserviceMetaContent->meta_description ?? $subservices_data->meta_description ?? '';
         //echo"<pre>";print_r($data['subservice_banner_attr']);echo"</pre>";exit;
@@ -226,24 +229,40 @@ class Packagecontroller extends Controller
         return view('front.package_detail', $data);
     }
 
-    public function enquiry(Request $request, $service_id)
+    public function enquiry(Request $request, $service_param)
     {
+        if (is_numeric($service_param)) {
+            $service = Service::findOrFail($service_param);
 
-        $form_field_data = DB::table('services')->where('id', $service_id)->first();
+            $city = $request->route('city') ?? 'dubai';
+            $url = url($city . '/enquiry/' . $service->page_url);
+            if ($request->getQueryString()) {
+                $url .= '?' . $request->getQueryString();
+            }
+            return redirect($url, 301);
+        }
 
+        $service = Service::where('page_url', $service_param)->firstOrFail();
 
-        $tags = explode(',', $form_field_data->form_fields);
-        $data['result1'] = DB::table('form_fileds')->whereIn('id', $tags)->orderBy('set_order')->get()->toArray();
-        $data['formFields'] = DB::table('form_fileds')->get()->toArray();
+        $service_id = $service->id;
 
-        $tags = explode(',', $form_field_data->form_fields_two);
+        $form_field_data = Cache::remember("form_field_data_{$service_id}", 86400, function () use ($service_id) {
+            return DB::table('services')->where('id', $service_id)->first();
+        });
 
+        $data['result1'] = Cache::remember("form_fields_result1_{$service_id}", 86400, function () use ($form_field_data) {
+            $tags = explode(',', $form_field_data->form_fields);
+            return DB::table('form_fileds')->whereIn('id', $tags)->orderBy('set_order')->get()->toArray();
+        });
 
-        $data['result2'] = DB::table('form_fileds')
-            ->whereIn('id', $tags)
-            ->orderBy('set_order')
-            ->get()
-            ->toArray();
+        $data['formFields'] = Cache::remember('form_fields_all', 86400, function () {
+            return DB::table('form_fileds')->get()->toArray();
+        });
+
+        $data['result2'] = Cache::remember("form_fields_result2_{$service_id}", 86400, function () use ($form_field_data) {
+            $tags = explode(',', $form_field_data->form_fields_two);
+            return DB::table('form_fileds')->whereIn('id', $tags)->orderBy('set_order')->get()->toArray();
+        });
 
 
         $data['service_id'] = $service_id;
@@ -251,8 +270,31 @@ class Packagecontroller extends Controller
         return view('front.enquiry', $data);
     }
 
-    public function booknow(Request $request, $service_id, $subservice_id)
+    public function booknow(Request $request, $service_param, $subservice_param)
     {
+        if (is_numeric($service_param) || is_numeric($subservice_param)) {
+            $service = is_numeric($service_param)
+                ? Service::findOrFail($service_param)
+                : Service::where('page_url', $service_param)->firstOrFail();
+
+            $subservice = Subservice::where(is_numeric($subservice_param) ? 'id' : 'page_url', $subservice_param)
+                ->where('serviceid', $service->id)
+                ->firstOrFail();
+
+            $city = $request->route('city') ?? 'dubai';
+            $url = url($city . '/booknow/' . $service->page_url . '/' . $subservice->page_url);
+            if ($request->getQueryString()) {
+                $url .= '?' . $request->getQueryString();
+            }
+            return redirect($url, 301);
+        }
+
+        $service = Service::where('page_url', $service_param)->firstOrFail();
+        $subservice = Subservice::where('page_url', $subservice_param)->where('serviceid', $service->id)->firstOrFail();
+
+        $service_id = $service->id;
+        $subservice_id = $subservice->id;
+
         $coupan_data = session::get('coupan_data');
 
 
@@ -295,28 +337,78 @@ class Packagecontroller extends Controller
         $lastReferringUrl = // Get the current URL
             $currentUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
-
-
-
         $explodedUrls = explode('/', $lastReferringUrl);
         $endUrl = end($explodedUrls);
-
-        // echo "<pre>";print_r($endUrl);echo "</pre>";exit; 
 
         if ($endUrl != 'register') {
             Session::put('redirect_url', $lastReferringUrl);
         }
 
-        // echo "<pre>";print_r(Session::get('redirect_url'));echo "</pre>";exit; 
-
         $userData = Session::get('user');
 
-        /* if($subservice_id != 47){
-            if ($userData == ''){
-                return redirect()->to('Sign-in');
-            }
-        } */
+        if (!empty($userData) && isset($userData['userid'])) {
+            $user_id = $userData['userid'];
+            $customerInfo = DB::table('frontloginregisters')->where('id', $user_id)->first();
 
+            if ($customerInfo) {
+                // Check if they already have an active pending lead for this service in this session
+                $existingLeadId = Session::get('booknow_pending_lead_id');
+                $shouldCreateNew = true;
+
+                if ($existingLeadId) {
+                    $existingLead = DB::table('general_enquiries')->where('id', $existingLeadId)->first();
+                    if ($existingLead && $existingLead->service_id == $service_id && $existingLead->subservice_id == $subservice_id) {
+                        $shouldCreateNew = false;
+                    }
+                }
+
+                if ($shouldCreateNew) {
+                    $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                    $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
+
+                    $pastOrders = DB::table('ci_orders')->where('user_id', $user_id)->count();
+                    $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
+                    $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
+
+                    if ($pastOrders > 0 && $repeatedSourceId && $sourceWebsiteId) {
+                        $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+                    } else {
+                        $sourceLeadId = $sourceWebsiteId;
+                    }
+
+                    $salespersonId = null;
+                    if ($pastOrders > 0) {
+                        $lastOrder = DB::table('ci_orders')
+                            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+                            ->where('ci_orders.user_id', $user_id)
+                            ->whereNotNull('ci_order_item.salesperson_id')
+                            ->orderBy('ci_orders.order_id', 'desc')
+                            ->select('ci_order_item.salesperson_id')
+                            ->first();
+                        if ($lastOrder) {
+                            $salespersonId = $lastOrder->salesperson_id;
+                        }
+                    }
+
+                    $leadId = DB::table('general_enquiries')->insertGetId([
+                        'customer_id' => $user_id,
+                        'customer_name' => $customerInfo->name,
+                        'customer_phone' => $customerInfo->mobile,
+                        'customer_email' => $customerInfo->email,
+                        'country_code' => $customerInfo->country_code,
+                        'service_id' => $service_id,
+                        'subservice_id' => $subservice_id,
+                        'source_lead_id' => $sourceLeadId,
+                        'salesperson_id' => $salespersonId,
+                        'status' => 'Pending',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    Session::put('booknow_pending_lead_id', $leadId);
+                }
+            }
+        }
 
         $data['error'] = "";
         $data['price_data'] = DB::table('cleanin_subserviceprice')->where('subservice_id', $subservice_id)->first();
@@ -346,12 +438,86 @@ class Packagecontroller extends Controller
             ->where('id', $subservice_id)
             ->first();
 
-        $data['package_cat'] = DB::table('package_categories')
+        $cityId = Session::get('search_city_id', 17);
+        $data['subservice_why_choose'] = DB::table('subservice_why_choose_attr')
+            ->where('subservice_id', $subservice_id)
+            ->where('city', $cityId)
+            ->get();
+
+        $subservice_more_service = DB::table('subservice_more_services')
+            ->where('subservice_id', $subservice_id)
+            ->where('city', $cityId)
+            ->first();
+
+        $more_services = [];
+        if ($subservice_more_service && !empty($subservice_more_service->more_subservice_id)) {
+            $more_ids = explode(',', $subservice_more_service->more_subservice_id);
+            $more_services = DB::table('subservices')->whereIn('id', $more_ids)->get();
+        }
+        $data['more_services_data'] = $more_services;
+
+        $subservice_what_else_service = DB::table('subservice_what_else_services')
+            ->where('subservice_id', $subservice_id)
+            ->where('city', $cityId)
+            ->first();
+
+        $what_else_services = [];
+        if ($subservice_what_else_service && !empty($subservice_what_else_service->what_else_subservice_id)) {
+            $what_else_ids = explode(',', $subservice_what_else_service->what_else_subservice_id);
+            $what_else_services = DB::table('subservices')->whereIn('id', $what_else_ids)->get();
+        }
+        $data['what_else_services_data'] = $what_else_services;
+
+        $data['subservice_description_data'] = DB::table('subservice_descriptions')
+            ->where('subservice_id', $subservice_id)
+            ->where('city', $cityId)
+            ->get();
+
+        // FAQ: load only entries linked to this subservice
+        $data['faq_data'] = DB::table('faqs')
+            ->whereRaw("FIND_IN_SET(?, packages)", [$subservice_id])
+            ->get();
+
+        // Attempt to fix database automatically if columns are missing
+        try {
+            DB::statement('ALTER TABLE `googlereviews` ADD COLUMN `review_date` DATE NULL AFTER `name`');
+            DB::statement('ALTER TABLE `googlereviews` ADD COLUMN `services` TEXT NULL AFTER `review_date`');
+            DB::statement('ALTER TABLE `googlereviews` ADD COLUMN `subservice_id` TEXT NULL AFTER `services`');
+        } catch (\Exception $e) {
+            try {
+                DB::statement('ALTER TABLE `googlereviews` CHANGE COLUMN `packages` `subservice_id` TEXT NULL');
+                DB::statement('ALTER TABLE `googlereviews` ADD COLUMN `review_date` DATE NULL AFTER `name`');
+            } catch (\Exception $e2) {
+                // Ignore, columns probably already exist
+            }
+        }
+
+        // Google Reviews: load only entries linked to this subservice
+        $data['google_reviews_data'] = DB::table('googlereviews')
+            ->whereRaw("FIND_IN_SET(?, subservice_id)", [$subservice_id])
+            ->get();
+
+        $package_cats = DB::table('package_categories')
             ->where('service_id', $service_id)
             ->where('is_active', 0)
             ->where('subservice_id', $subservice_id)
             ->orderBy("set_order", 'asc')
             ->get()->toArray();
+
+        $filtered_package_cat = [];
+        foreach ($package_cats as $cat) {
+            $has_packages = DB::table('packages')
+                ->where('service_id', $service_id)
+                ->where('subservice_id', $subservice_id)
+                ->where('packagecategory_id', $cat->id)
+                ->where('is_active', 0)
+                ->exists();
+
+            if ($has_packages) {
+                $filtered_package_cat[] = $cat;
+            }
+        }
+        $data['package_cat'] = $filtered_package_cat;
 
         $data['addons'] = DB::table('addons')
             ->where('serviceid', $service_id)
@@ -430,7 +596,27 @@ class Packagecontroller extends Controller
             $data['emiratesShow'] = false;
         }
 
-        if ($subservice_id == 28) { // home cleaning
+        if ($subservice_id == 101) { // cleaning subscription
+            $data['durations'] = DB::table('cleaning_subscription_durations')->where('is_active_web', 1)->orderBy('set_order')->get();
+            $data['frequencies'] = DB::table('cleaning_subscription_frequencies')->where('is_active_web', 1)->orderBy('set_order')->get();
+            $data['packages'] = DB::table('cleaning_subscription_packages')->where('is_active_web', 1)->orderBy('set_order')->get();
+            $data['pricing_rules'] = DB::table('cleaning_subscription_pricing')->where('is_active_web', 1)->get();
+            $user_id = Session::get('user')['userid'] ?? '';
+            $data['is_first_time_user'] = DB::table('ci_order_item')->where('user_info_id', $user_id)->where('subservice_id', '101')->first();
+            $data['promo'] = $request->query('promo', '');
+            $data['session_coupon_applied'] = session()->has('coupan_data') ? session('coupan_data.coupancode', '') : '';
+            return view('front.cleaningsubscription', $data);
+        } elseif ($subservice_id == 101) { // cleaning subscription
+            $data['durations'] = DB::table('cleaning_subscription_durations')->where('is_active_web', 1)->orderBy('set_order')->get();
+            $data['frequencies'] = DB::table('cleaning_subscription_frequencies')->where('is_active_web', 1)->orderBy('set_order')->get();
+            $data['packages'] = DB::table('cleaning_subscription_packages')->where('is_active_web', 1)->orderBy('set_order')->get();
+            $data['pricing_rules'] = DB::table('cleaning_subscription_pricing')->where('is_active_web', 1)->get();
+            $user_id = Session::get('user')['userid'] ?? '';
+            $data['is_first_time_user'] = DB::table('ci_order_item')->where('user_info_id', $user_id)->where('subservice_id', '101')->first();
+            $data['promo'] = $request->query('promo', '');
+            $data['session_coupon_applied'] = session()->has('coupan_data') ? session('coupan_data.coupancode', '') : '';
+            return view('front.cleaningsubscription', $data);
+        } elseif ($subservice_id == 28) { // home cleaning
             //    return view('front.booknow',$data);
             $data['cleaning_price'] = DB::table('cleanin_subserviceprice')->Where('subservice_id', $subservice_id)->get()->toArray();
 
@@ -762,10 +948,10 @@ class Packagecontroller extends Controller
 
     function homecleaner_time_check(Request $request)
     {
-        $cleanerId    = $request->cleaner_id;
-        $date         = $request->date;   // 01–31
-        $month        = $request->month;  // 01–12
-        $year         = $request->year;   // YYYY
+        $cleanerId = $request->cleaner_id;
+        $date = $request->date;   // 01–31
+        $month = $request->month;  // 01–12
+        $year = $request->year;   // YYYY
         $subserviceId = $request->subservice_id;
 
         // BOOKINGS
@@ -813,7 +999,8 @@ class Packagecontroller extends Controller
                 )
             );
 
-            if (!$startDate) continue;
+            if (!$startDate)
+                continue;
 
             $endDate = new DateTime($booking->end_date);
 
@@ -865,24 +1052,24 @@ class Packagecontroller extends Controller
 
         if ($matchedBookings->isEmpty()) {
             return response()->json([
-                'timeslot'        => [],
-                'date'            => $date,
-                'month'           => $month,
-                'year'            => $year,
+                'timeslot' => [],
+                'date' => $date,
+                'month' => $month,
+                'year' => $year,
                 'timeslot_master' => $timeslotMaster,
-                'cleaner_id'      => $cleanerId,
-                'hours'           => 0
+                'cleaner_id' => $cleanerId,
+                'hours' => 0
             ]);
         }
 
         return response()->json([
-            'timeslot'        => $matchedBookings->pluck('time_slot'),
-            'date'            => $date,
-            'month'           => $month,
-            'year'            => $year,
+            'timeslot' => $matchedBookings->pluck('time_slot'),
+            'date' => $date,
+            'month' => $month,
+            'year' => $year,
             'timeslot_master' => $timeslotMaster,
-            'hours'           => $matchedBookings->pluck('how_many_hours_should_they_stay'),
-            'cleaner_id'      => $cleanerId
+            'hours' => $matchedBookings->pluck('how_many_hours_should_they_stay'),
+            'cleaner_id' => $cleanerId
         ]);
     }
 
@@ -1020,7 +1207,8 @@ class Packagecontroller extends Controller
                 ->where('is_active', 1)
                 ->first();
 
-            if (!$slotPrice) continue;
+            if (!$slotPrice)
+                continue;
 
             $price = $slotPrice->price ?? 0;
 
@@ -1097,10 +1285,109 @@ class Packagecontroller extends Controller
     }
 
 
-    public function enquiry_sub(Request $request, $service_id, $subservice_id)
+    public function enquiry_sub(Request $request, $service_param, $subservice_param)
     {
-        if (!session()->has('redirected_from_first_form')) {
+        if (is_numeric($service_param) || is_numeric($subservice_param)) {
+            $service = is_numeric($service_param)
+                ? Service::findOrFail($service_param)
+                : Service::where('page_url', $service_param)->firstOrFail();
+
+            $subservice = Subservice::where(is_numeric($subservice_param) ? 'id' : 'page_url', $subservice_param)
+                ->where('serviceid', $service->id)
+                ->firstOrFail();
+
+            $city = $request->route('city') ?? 'dubai';
+            $url = url($city . '/enquiry/' . $service->page_url . '/' . $subservice->page_url);
+            if ($request->getQueryString()) {
+                $url .= '?' . $request->getQueryString();
+            }
+            return redirect($url, 301);
+        }
+
+        $service = Service::where('page_url', $service_param)->firstOrFail();
+        $subservice = Subservice::where('page_url', $subservice_param)->where('serviceid', $service->id)->firstOrFail();
+
+        $service_id = $service->id;
+        $subservice_id = $subservice->id;
+
+        $isAjax = $request->ajax() || $request->header('X-Requested-With') == 'XMLHttpRequest';
+        $fromFirstForm = session()->has('redirected_from_first_form');
+        $fromLoginOrOtp = session()->has('L_strsucessMessage') || session()->has('success') || session()->has('message') || session()->has('book-login-otp') || session()->has('book-email-login-otp') || session()->has('login-otp') || session()->has('email-login-otp');
+
+        if (!$isAjax && !$fromFirstForm && !$fromLoginOrOtp) {
             session()->forget('packages_enquiry_form_id');
+        } else {
+            $packageEnquiryFormId = session('packages_enquiry_form_id');
+            $userdata = Session::get('user');
+            if (!empty($packageEnquiryFormId) && !empty($userdata['userid'])) {
+                DB::table('packages_enquiry')->where('id', $packageEnquiryFormId)->update([
+                    'user_id' => $userdata['userid'] ?? 0,
+                    'name' => $userdata['name'] ?? '',
+                    'email' => $userdata['email'] ?? '',
+                    'mobile' => $userdata['mobile'] ?? ''
+                ]);
+            }
+        }
+
+        $userData = Session::get('user');
+        if (!empty($userData) && isset($userData['userid'])) {
+            $user_id = $userData['userid'];
+            $customerInfo = DB::table('frontloginregisters')->where('id', $user_id)->first();
+            if ($customerInfo) {
+                $existingLeadId = Session::get('enquiry_pending_lead_id');
+                $shouldCreateNew = true;
+
+                if ($existingLeadId) {
+                    $existingLead = DB::table('general_enquiries')->where('id', $existingLeadId)->first();
+                    if ($existingLead && $existingLead->service_id == $service_id && $existingLead->subservice_id == $subservice_id) {
+                        $shouldCreateNew = false;
+                    }
+                }
+
+                if ($shouldCreateNew) {
+                    $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                    $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
+                    $pastOrders = DB::table('ci_orders')->where('user_id', $user_id)->count();
+
+                    $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
+                    $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
+                    if ($pastOrders > 0 && $repeatedSourceId && $sourceWebsiteId) {
+                        $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+                    } else {
+                        $sourceLeadId = $sourceWebsiteId;
+                    }
+
+                    $salespersonId = null;
+                    if ($pastOrders > 0) {
+                        $lastOrder = DB::table('ci_orders')
+                            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+                            ->where('ci_orders.user_id', $user_id)
+                            ->whereNotNull('ci_order_item.salesperson_id')
+                            ->orderBy('ci_orders.order_id', 'desc')
+                            ->select('ci_order_item.salesperson_id')
+                            ->first();
+                        if ($lastOrder) {
+                            $salespersonId = $lastOrder->salesperson_id;
+                        }
+                    }
+
+                    $leadId = DB::table('general_enquiries')->insertGetId([
+                        'customer_id' => $user_id,
+                        'customer_name' => $customerInfo->name,
+                        'customer_phone' => $customerInfo->mobile,
+                        'customer_email' => $customerInfo->email,
+                        'country_code' => $customerInfo->country_code,
+                        'service_id' => $service_id,
+                        'subservice_id' => $subservice_id,
+                        'source_lead_id' => $sourceLeadId,
+                        'salesperson_id' => $salespersonId,
+                        'status' => 'Pending',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    Session::put('enquiry_pending_lead_id', $leadId);
+                }
+            }
         }
 
         // if($subservice_id != '31') {
@@ -1165,6 +1452,9 @@ class Packagecontroller extends Controller
         $data['service_id'] = $service_id;
         $data['subservice_id'] = $subservice_id;
 
+        $data['service_name'] = $form_field_data_ser ? $form_field_data_ser->servicename : '';
+        $data['subservice_name'] = $form_field_data_sub ? $form_field_data_sub->subservicename : '';
+
         $data['redirectUrl'] = route('enquiry', ['service_id' => $service_id, 'subservice_id' => $subservice_id]);
 
         $data['submittedFields'] = [];
@@ -1200,75 +1490,9 @@ class Packagecontroller extends Controller
             $data['email'] = $email = $userdata['email'];
             $data['mobile'] = $mobile = $userdata['mobile'];
         } else {
-
-
-            //echo "else";exit;
-            $data['name'] = $username = $request->name_new;
-            $data['email'] = $email = $request->email_new;
-            $data['mobile'] = $mobile = $request->mobile_new;
-
-
-
-            // $newuserdata = array(
-            //     'userid'  => 0,
-            //     'refer_id'  => "",
-            //     'name'  => $request->name_new,            
-            //     'email'  => $request->email_new,       
-            //     'mobile'  => $request->mobile_new,       
-            //     'logged_in' => true
-            // );
-            // $check = Session::put('user', $newuserdata);
-            $user_email = DB::table('frontloginregisters')->where('email', $request->email_new)->first();
-
-            //echo "<pre>";print_r($user_email);echo "</pre>";exit;
-
-            if (!$user_email) {
-                //  echo"test";exit;
-                $frontloginregister = new Frontloginregister;
-                if ($request->refer_id != '') {
-                    $frontloginregister->refer_id = $request->refer_id;
-                }
-                $frontloginregister->name = $request->name_new;
-                $frontloginregister->email = $request->email_new;
-                $frontloginregister->password = bcrypt(strval(time()));
-                $plainPassword = $request->password;
-                $frontloginregister->mobile = $request->mobile_new;
-                $frontloginregister->status = 1;
-
-
-                $frontloginregister->save();
-
-                $frontloginregister->customer_id = "VC-" . $frontloginregister->id; // Generate customer ID
-
-                $frontloginregister->save(); // Save the updated customer_id
-
-                // $frontloginregister_id = $frontloginregister->id;
-                // $data_u['customer_id'] = "VC-".$frontloginregister_id."";
-
-                //DB::table('frontloginregisters')->where('id', $frontloginregister_id)->update($data_u);
-
-                $newuserdata = array(
-                    'userid'  => $frontloginregister->id,
-                    'refer_id'  => $frontloginregister->refer_id,
-                    'name'  => $frontloginregister->name,
-                    'email'  => $frontloginregister->email,
-                    'mobile'  => $frontloginregister->mobile,
-                    'logged_in' => true
-                );
-                $check = Session::put('user', $newuserdata);
-            } else {
-
-                //echo "else";exit;
-                $newuserdata = array(
-                    'userid'  => 0,
-                    'refer_id'  => "",
-                    'name'  => $request->name_new,
-                    'email'  => $request->email_new,
-                    'mobile'  => $request->mobile_new,
-                    'logged_in' => true
-                );
-                $check = Session::put('user', $newuserdata);
-            }
+            $data['name'] = $username = '';
+            $data['email'] = $email = '';
+            $data['mobile'] = $mobile = '';
         }
 
         // echo "<pre>";print_r($request->all());echo "</pre>";exit;
@@ -1279,9 +1503,14 @@ class Packagecontroller extends Controller
         }
         if ($request->service_id != '') {
             $data['service_id'] = $request->service_id;
+        } elseif ($request->service != '') {
+            $data['service_id'] = $request->service;
         }
+
         if ($request->subservice_id != '') {
             $data['subservice_id'] = $request->subservice_id;
+        } elseif ($request->subservice != '') {
+            $data['subservice_id'] = $request->subservice;
         }
         if ($request->packagecategory_id != '') {
             $data['packagecategory_id'] = $request->packagecategory_id;
@@ -1289,7 +1518,7 @@ class Packagecontroller extends Controller
 
         $data['added_date'] = date('Y-m-d');
         $data['form_type'] = $request->form_type;
-        $data['user_id'] = $userdata['userid'];
+        $data['user_id'] = $userdata['userid'] ?? 0;
 
         if ($request->subservice_id == 94) {
             $data['cron_mail_send'] = 1;
@@ -1297,6 +1526,59 @@ class Packagecontroller extends Controller
 
         $package_inquiry = DB::table('packages_enquiry',)->insertGetId($data);
 
+        $customerInfo = DB::table('frontloginregisters')->where('id', $data['user_id'] ?? 0)->first();
+        $pendingLeadId = Session::get('enquiry_pending_lead_id');
+        if ($pendingLeadId) {
+            DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                'status' => 'Pending',
+                'customer_name' => $customerInfo ? $customerInfo->name : ($data['name'] ?? null),
+                'customer_phone' => $customerInfo ? $customerInfo->mobile : ($data['mobile'] ?? null),
+                'customer_email' => $customerInfo ? $customerInfo->email : ($data['email'] ?? null),
+                'updated_at' => now(),
+            ]);
+        } else {
+            $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+
+            $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
+            $pastOrders = DB::table('ci_orders')->where('user_id', $data['user_id'] ?? 0)->count();
+            $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
+            $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
+            if ($pastOrders > 0 && $repeatedSourceId) {
+                $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+            } else {
+                $sourceLeadId = $sourceWebsiteId;
+            }
+
+            $salespersonId = null;
+            if ($pastOrders > 0) {
+                $lastOrder = DB::table('ci_orders')
+                    ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+                    ->where('ci_orders.user_id', $data['user_id'] ?? 0)
+                    ->whereNotNull('ci_order_item.salesperson_id')
+                    ->orderBy('ci_orders.order_id', 'desc')
+                    ->select('ci_order_item.salesperson_id')
+                    ->first();
+                if ($lastOrder) {
+                    $salespersonId = $lastOrder->salesperson_id;
+                }
+            }
+
+            $leadId = DB::table('general_enquiries')->insertGetId([
+                'salesperson_id' => $salespersonId,
+                'customer_id' => $data['user_id'] ?? null,
+                'customer_name' => $customerInfo ? $customerInfo->name : ($data['name'] ?? null),
+                'customer_phone' => $customerInfo ? $customerInfo->mobile : ($data['mobile'] ?? null),
+                'customer_email' => $customerInfo ? $customerInfo->email : ($data['email'] ?? null),
+                'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                'service_id' => $data['service_id'] ?? null,
+                'subservice_id' => $data['subservice_id'] ?? null,
+                'source_lead_id' => $sourceLeadId,
+                'status' => 'Pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            Session::put('enquiry_pending_lead_id', $leadId);
+        }
         $package_data_n = DB::table('packages_enquiry',)->where('id', $package_inquiry)->first();
 
         $service_name = \Helper::servicename($package_data_n->service_id);
@@ -1304,13 +1586,14 @@ class Packagecontroller extends Controller
         $processed_text = strtoupper(str_replace(' ', '', $service_name));
 
         $year = date('y');
+        $data_u = []; // Initialize to prevent undefined variable error
 
-        if ($request->subservice_id == 23 || $request->subservice_id == 26 || $request->subservice_id == 53 || $request->subservice_id == 94) { //apartment moving,villa moving,office moving
+        if ($request->subservice_id == 23 || $request->subservice_id == 26 || $request->subservice_id == 53 || $request->subservice_id == 94 || $request->subservice_id == 100 || $request->subservice_id == 98) { //apartment moving,villa moving,office moving, international moving, studio moving
 
             if ($request->form_type == 'Local Move') {
 
-                $formFieldIds   = $request->form_field_id;
-                $formFieldVals  = $request->formfield_value;
+                $formFieldIds = $request->form_field_id;
+                $formFieldVals = $request->formfield_value;
 
                 $cityOptionId = null;
 
@@ -1378,8 +1661,8 @@ class Packagecontroller extends Controller
                 $data_u['inquiry_id'] = $formatOrderId;
             } else {
 
-                $formFieldIds   = $request->form_field_id;
-                $formFieldVals  = $request->formfield_value;
+                $formFieldIds = $request->form_field_id;
+                $formFieldVals = $request->formfield_value;
 
                 $countryOptionId = null;
 
@@ -1442,8 +1725,8 @@ class Packagecontroller extends Controller
 
         if ($request->subservice_id == 31) { // vehicle shipping
 
-            $formFieldIds   = $request->form_field_id;
-            $formFieldVals  = $request->formfield_value;
+            $formFieldIds = $request->form_field_id;
+            $formFieldVals = $request->formfield_value;
 
             $countryOptionId = null;
 
@@ -1512,8 +1795,8 @@ class Packagecontroller extends Controller
 
         if ($request->subservice_id == 61 || $request->subservice_id == 62 || $request->subservice_id == 64 || $request->subservice_id == 66) { // self storage,ac storage,non ac storage,vehicle storage
 
-            $formFieldIds   = $request->form_field_id;
-            $formFieldVals  = $request->formfield_value;
+            $formFieldIds = $request->form_field_id;
+            $formFieldVals = $request->formfield_value;
 
             $cityOptionId = null;
 
@@ -1582,8 +1865,9 @@ class Packagecontroller extends Controller
         }
 
         //echo"<pre>";print_r($data_u);exit;
-        DB::table('packages_enquiry')->where('id', $package_inquiry)->update($data_u);
-
+        if (!empty($data_u)) {
+            DB::table('packages_enquiry')->where('id', $package_inquiry)->update($data_u);
+        }
 
         //$data_u['inquiry_id'] = "IQ-".$processed_text."-" . $year ."-". sprintf("%06d", $package_inquiry);
         //DB::table('packages_enquiry')->where('id', $package_inquiry)->update($data_u);
@@ -1812,12 +2096,34 @@ class Packagecontroller extends Controller
 
         $package_data = DB::table('packages_enquiry')->where('id', $packageEnquiryFormId)->first();
 
+        if (!$package_data) {
+            return redirect()->to('/');
+        }
+
         $subservice_name = \Helper::subservicename($package_data->subservice_id);
 
 
         $userdata = Session::get('user');
-        $user_email = $userdata['email'];
-        $user_name = $userdata['name'];
+        $user_email = $userdata['email'] ?? '';
+        $user_name = $userdata['name'] ?? '';
+        $user_mobile = $userdata['mobile'] ?? '';
+        $user_id = $userdata['userid'] ?? 0;
+
+        DB::table('packages_enquiry')->where('id', $packageEnquiryFormId)->update([
+            'user_id' => $user_id,
+            'name' => $user_name,
+            'email' => $user_email,
+            'mobile' => $user_mobile
+        ]);
+
+        $pendingLeadId = Session::get('enquiry_pending_lead_id');
+        if ($pendingLeadId) {
+            DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                'status' => 'Booked',
+                'updated_at' => now(),
+            ]);
+            Session::forget('enquiry_pending_lead_id');
+        }
 
         $message_bodyy = '';
 
@@ -2009,8 +2315,7 @@ class Packagecontroller extends Controller
             ->join('form_fileds', 'more_formfields_details.form_field_id', '=', 'form_fileds.id')
             ->where('more_formfields_details.package_inquiry_id', $enquiryId)
             ->select('form_fileds.lable_name', 'more_formfields_details.formfield_value', 'more_formfields_details.form_field_id')
-            ->get()
-            ->toArray();
+            ->get();
 
         return view('front.enquiry_thankyou_new', [
             'enquiry' => $enquiry,
@@ -2242,11 +2547,11 @@ class Packagecontroller extends Controller
     {
         //echo "<pre>";print_r($request->all());echo"</pre>";exit;
         $subservice_id = $request->subservice_id;
-        $selectedDate  = $request->date;  // format: 2025-11-21
+        $selectedDate = $request->date;  // format: 2025-11-21
 
-        $today       = \Carbon\Carbon::now('Asia/Dubai')->format('Y-m-d');
+        $today = \Carbon\Carbon::now('Asia/Dubai')->format('Y-m-d');
         $currentTime = \Carbon\Carbon::now('Asia/Dubai');
-        $bufferTime  = $currentTime->copy()->addHours(2);
+        $bufferTime = $currentTime->copy()->addHours(2);
 
         $timeslots = \DB::table('time_slots')
             ->orderBy('set_order', 'asc')
@@ -2259,7 +2564,7 @@ class Packagecontroller extends Controller
 
             // Extract start time
             $startTimeString = explode('-', $slot->name)[0];
-            $slotStartTime   = \Carbon\Carbon::createFromFormat('g:i A', trim($startTimeString), 'Asia/Dubai');
+            $slotStartTime = \Carbon\Carbon::createFromFormat('g:i A', trim($startTimeString), 'Asia/Dubai');
 
             // Apply buffer logic ONLY if date == today
             if ($selectedDate == $today && $slotStartTime->lt($bufferTime)) {
@@ -2277,7 +2582,7 @@ class Packagecontroller extends Controller
                 continue;
             }
 
-            $price = $priceData->price > 0 ? $priceData->price : 0;
+            $price = ($priceData && $priceData->price > 0) ? $priceData->price : 0;
             $dirhamIcon = asset('public/site/images/automobile/DirhamBlack.png');
             // Build slot HTML
             $html .= '

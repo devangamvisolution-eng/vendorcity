@@ -106,8 +106,7 @@
                                                     class="form-control form-select">
                                                     <option value="">Select Charger Type</option>
                                                     @foreach ($ev_charger_type as $key => $data)
-                                                        <option value="{{ $data->name }}"
-                                                            {{ $key === 0 ? 'selected' : '' }}>
+                                                        <option value="{{ $data->name }}">
                                                             {{ $data->name }}
                                                         </option>
                                                     @endforeach
@@ -135,8 +134,7 @@
                                                     class="form-control form-select">
                                                     <option value="">Select Installation Location Type</option>
                                                     @foreach ($ev_charger_location_type as $key => $data)
-                                                        <option value="{{ $data->name }}"
-                                                            {{ $key === 0 ? 'selected' : '' }}>
+                                                        <option value="{{ $data->name }}">
                                                             {{ $data->name }}
                                                         </option>
                                                     @endforeach
@@ -187,6 +185,69 @@
 
                                     <div id="package_fields"></div>
 
+                                </div>
+
+                                <div class="col-md-12" id="manual_price_div" style="display: none;">
+                                    <hr>
+                                    <h4>Manpower Requirements:</h4>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Service Required</label>
+                                                <input type="text" name="manpower_service_required"
+                                                    class="form-control" placeholder="e.g. Cleaning, Helper">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Number of Workers Required</label>
+                                                <input type="text" name="manpower_workers_required"
+                                                    class="form-control" placeholder="e.g. 2, 5">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Duration / Per Day</label>
+                                                <input type="text" name="manpower_duration" class="form-control"
+                                                    placeholder="e.g. 8 Hours, 1 Month">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Start Date</label>
+                                                <input type="date" name="manpower_start_date" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>End Date</label>
+                                                <input type="date" name="manpower_end_date" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Job Description / Requirements</label>
+                                                <textarea name="manpower_job_description" class="form-control" rows="3"
+                                                    placeholder="Enter job description..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Additional Notes</label>
+                                                <textarea name="manpower_additional_notes" class="form-control" rows="3"
+                                                    placeholder="Enter any additional notes..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Subtotal (AED)</label>
+                                                <input type="number" name="manual_price" id="manual_price"
+                                                    class="form-control" placeholder="Enter Price"
+                                                    onkeyup="package_calculation()" onchange="package_calculation()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
                                 </div>
 
                                 <h4>Scheduling Your Service : </h4>
@@ -654,10 +715,17 @@
             if (subservice_id == 94) {
                 $('.ev_charger_form').show();
                 $('.add_to_cart').hide();
+                $('#manual_price_div').hide();
                 //$('#cleaner_div').show();
+                $('.add_to_cart').find('input, select, textarea').val('');
+            } else if (subservice_id == 102) {
+                $('.ev_charger_form').hide();
+                $('.add_to_cart').hide();
+                $('#manual_price_div').show();
                 $('.add_to_cart').find('input, select, textarea').val('');
             } else {
                 $('.ev_charger_form').hide();
+                $('#manual_price_div').hide();
                 //$('#cleaner_div').hide();
                 $('.add_to_cart').show();
                 $('.ev_charger_form').find('input, select, textarea').val('');
@@ -792,21 +860,26 @@
 
             let packageCategory = $('#package_category').val();
             let selectedPackages = $('#package').val();
+            let subservice_id = $('#subservice_id').val();
 
             let service_charge = 0;
 
-            if (selectedPackages && selectedPackages.length > 0) {
-                selectedPackages.forEach(packageId => {
-                    let quantity = $(`[name="${packageId}_quantity"]`).val();
-                    let price = $(`[name="${packageId}_price"]`).val();
+            if (subservice_id == 102) {
+                service_charge = parseFloat($('#manual_price').val()) || 0;
+            } else {
+                if (selectedPackages && selectedPackages.length > 0) {
+                    selectedPackages.forEach(packageId => {
+                        let quantity = $(`[name="${packageId}_quantity"]`).val();
+                        let price = $(`[name="${packageId}_price"]`).val();
 
-                    quantity = parseFloat(quantity) || 0;
-                    price = parseFloat(price) || 0;
+                        quantity = parseFloat(quantity) || 0;
+                        price = parseFloat(price) || 0;
 
-                    if (quantity > 0 && price >= 0) {
-                        service_charge += quantity * price;
-                    }
-                });
+                        if (quantity > 0 && price >= 0) {
+                            service_charge += quantity * price;
+                        }
+                    });
+                }
             }
 
 

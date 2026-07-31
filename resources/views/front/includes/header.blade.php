@@ -23,11 +23,7 @@
 
 
 
-    <link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}">
-
-
-
-    <script src="{{ asset('public/site/js/intlTelInput.min.js') }}"></script>
+    @stack('head_scripts')
 
 
 
@@ -51,11 +47,15 @@
 
     <!-- css file -->
 
+    @if (!request()->is('/'))
+        <link rel="stylesheet" href="{{ asset('public/site/css/jquery-ui.min.css') }}">
+    @endif
+
     <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap.min.css') }}">
 
 
 
-    <link rel="stylesheet" href="{{ asset('public/site/css/jquery-ui.min.css') }}">
+
 
     <link rel="stylesheet" href="{{ asset('public/site/css/ace-responsive-menu.css') }}">
 
@@ -64,33 +64,28 @@
     <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}">
 
     <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}">
-
+    <!-- Removed intlTelInput globally for Step 1 -->
     <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}">
-
-    <link rel="stylesheet" href="{{ asset('public/site/css/magnific-popup.css') }}">
+    @if (!request()->is('/'))
+        <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}">
+    @endif
 
     <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}">
 
+    <!-- Critical CSS Preload -->
+    <link rel="preload" href="{{ asset('public/site/css/style.css') }}" as="style">
+    <link rel="preload" href="{{ asset('public/site/css/responsive.css') }}" as="style">
+
     <link rel="stylesheet" href="{{ asset('public/site/css/style.css') }}">
-
     <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}">
-
-    <!-- Responsive stylesheet -->
-
     <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
 
     <link rel="stylesheet" href="{{ asset('public/site/css/owl.carousel.min.css') }}">
-
     <link rel="stylesheet" href="{{ asset('public/site/css/owl.theme.default.min.css') }}">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css">
+    @stack('styles')
 
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css">
-
-    <link rel="stylesheet" {{-- href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" --}} />
 
     <!-- Title -->
 
@@ -156,6 +151,12 @@
 
     <link href="{{ asset('public/site/images/v-cfavicon.png') }}" sizes="180x180" rel="apple-touch-icon">
 
+    @if (request()->is('/'))
+        <!-- LCP Optimization: Preload Hero Image -->
+        <link rel="preload" href="{{ asset('public/site/images/darkimage.jpg') }}" as="image"
+            fetchpriority="high">
+    @endif
+
 
 
 
@@ -164,7 +165,9 @@
 
 
 
-    <link rel="stylesheet" href="{{ asset('public/site/css/select2/css/select2.min.css') }}">
+    <!-- Removed select2.min.css (loaded via stack) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css">
+
 
 
 
@@ -3114,7 +3117,7 @@
 
                                         <div class="bselect-style1 bdrl1 bdrn-sm bordermob custom_button">
 
-                                            <select class="selectpicker" data-width="100%"
+                                            <select class="selectpicker" data-width="100%" id="city_picker_header"
                                                 onchange="search_city_header(this.value);">
 
                                                 <option>Choose City</option>
@@ -3123,7 +3126,7 @@
 
                                                     @foreach ($city_head as $city_head_data)
                                                         <option data-tokens="{{ $city_head_data->name }}"
-                                                            value="{{ $city_head_data->id }}"
+                                                            value="{{ strtolower(str_replace(' ', '-', $city_head_data->name)) }}"
                                                             @if ($city_head_data->id == session('search_city_id')) selected @endif>
 
                                                             {{ $city_head_data->name }}
@@ -3213,7 +3216,8 @@
 
                                     role="button"><span class="flaticon-loupe"></span></a> --}}
 
-                                <a class="login-info mx10-lg mx30" href="{{ url('/become-a-vendor') }}"><span
+                                <a class="login-info mx10-lg mx30"
+                                    href="{{ url(session('search_city_name', 'dubai') . '/become-a-vendor') }}"><span
                                         class="d-none d-xl-inline-block">Become a</span> Vendor</a>
 
                                 @php
@@ -3282,27 +3286,30 @@
 
                                             <ul>
 
-                                                <li><a href="{{ url('my-account') }}"><i
+                                                <li><a href="{{ route('front.myaccount') }}"><i
                                                             class="far fa-home"></i>Dashboard </a></li>
 
                                                 <li><a href="{{ route('front.myleads') }}"><i
                                                             class="far fa-file-alt"></i>My Quotes</a></li>
 
-                                                <li><a href="{{ url('my-order') }}"><i class="far fa-file-alt"></i>My
+                                                <li><a href="{{ route('front.myorder') }}"><i
+                                                            class="far fa-file-alt"></i>My
 
                                                         Orders</a></li>
 
-                                                <li><a href="{{ url('my-profile') }}"><i class="far fa-user"></i>My
+                                                <li><a href="{{ route('front.myprofile') }}"><i
+                                                            class="far fa-user"></i>My
 
                                                         Profile</a></li>
 
-                                                <li><a href="{{ url('my-wallet') }}"><i
+                                                <li><a href="{{ route('front.mywallet') }}"><i
                                                             class="far fa-wallet"></i>Wallet</a></li>
 
-                                                <li><a href="{{ url('refer&earn') }}"><i
+                                                <li><a href="{{ route('front.refer_earn') }}"><i
                                                             class="fa-regular fa-gift"></i>Refer And Earn</a></li>
 
-                                                <li><a href="{{ url('refral') }}"><i class="fa-regular fa-gift"></i>
+                                                <li><a href="{{ route('front.refral') }}"><i
+                                                            class="fa-regular fa-gift"></i>
 
                                                         Referral List</a></li>
 
@@ -3470,7 +3477,7 @@
                     <div class="col-auto px-0">
 
                         <div
-                            class="advance-search-tab bgc-white p10 bdrs4-sm  banner-btn position-relative zi1 animate-up-3 ">
+                            class="advance-search-tab bgc-white p10 bdrs4-sm  banner-btn position-relative zi1 animate-up-3 d-none d-md-block">
 
                             <div class="row">
 
@@ -3549,7 +3556,7 @@
 
                                                         @foreach ($city_head as $city_head_data)
                                                             <option data-tokens="{{ $city_head_data->name }}"
-                                                                value="{{ $city_head_data->id }}"
+                                                                value="{{ strtolower(str_replace(' ', '-', $city_head_data->name)) }}"
                                                                 @if ($city_head_data->id == session('search_city_id')) {{ 'selected' }} @endif>
 
                                                                 {{ $city_head_data->name }}
@@ -3738,7 +3745,9 @@
 
 
 
-                    <li><a class="list-item" href="{{ url('/become-a-vendor') }}"><span>Become a Vendor</a></li>
+                    <li><a class="list-item"
+                            href="{{ url(session('search_city_name', 'dubai') . '/become-a-vendor') }}"><span>Become a
+                                Vendor</span></a></li>
 
                     {{-- <li><a class="list-item" href="{{ url('/cart') }}"><span>Cart</span></a></li> --}}
 

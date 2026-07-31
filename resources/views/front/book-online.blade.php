@@ -3672,7 +3672,7 @@ function booknow_otp_verification(id) {
             }
         }
 
-        var url = '{{ url('booknow-otp-sent') }}';
+        var url = '{{ url(session('search_city_name') . '/booknow-otp-sent') }}';
         var mobile = $('#user-phone-number').val();
         var country_code = $('#country_code_otp_popup_Modal_book').val();
         $.ajax({
@@ -4954,7 +4954,7 @@ function no_of_walls_paint(element){
         $.ajax({
 
             type: 'POST',
-            url: '{{ url('get_price_cleaning ') }}',
+            url: '{{ url(session('search_city_name') . '/get_price_cleaning') }}',
             data: {
 
                 "_token": "{{ csrf_token() }}",

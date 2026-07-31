@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Admin\Form_filed;
+use App\Models\admin\Form_filed;
 use DB;
 
 class Form_fieldController extends Controller

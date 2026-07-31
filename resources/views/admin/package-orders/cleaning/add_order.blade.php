@@ -221,6 +221,74 @@
 
                                     </div>
                                 </div>
+                                <div class="cleaning_subscription_form" style="display: none;">
+                                    <h4>Cleaning Subscription Details:</h4>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>How many hours?</label>
+                                                <select id="sub_hours" name="hours" class="form-control form-select">
+                                                    <option value="" data-material-price="0">Select Hours</option>
+                                                    @if(isset($durations))
+                                                        @foreach($durations as $duration)
+                                                            <option value="{{ $duration->hours }}" data-material-price="{{ $duration->material_price ?? 0 }}">{{ $duration->hours }} Hours</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <p class="form-error-text" id="sub_hours_error" style="color: red; margin-top: 10px;"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Package Duration</label>
+                                                <select id="sub_package" name="package_duration_months" class="form-control form-select">
+                                                    <option value="">Select Package</option>
+                                                    @if(isset($packages))
+                                                        @foreach($packages as $pkg)
+                                                            <option value="{{ $pkg->validity_months }}" data-id="{{ $pkg->id }}" data-months="{{ $pkg->validity_months }}">{{ $pkg->name }}</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <p class="form-error-text" id="sub_package_error" style="color: red; margin-top: 10px;"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Frequency</label>
+                                                <select id="sub_frequency" name="how_often_do_you_need_cleaning" class="form-control form-select">
+                                                    <option value="">Select Frequency</option>
+                                                    @if(isset($frequencies))
+                                                        @foreach($frequencies as $freq)
+                                                            <option value="{{ $freq->label }}" data-id="{{ $freq->id }}" data-visits="{{ $freq->visits_per_week }}" data-label="{{ $freq->label }}">{{ $freq->label }}</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <p class="form-error-text" id="sub_frequency_error" style="color: red; margin-top: 10px;"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Custom Price Per Visit Override (AED)</label>
+                                                <input type="number" id="price_change_of_visit" name="price_change_of_visit" class="form-control" placeholder="Optional Override">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Need Cleaning Materials?</label>
+                                                <select id="sub_materials" name="materials" class="form-control form-select">
+                                                    <option value="No">No, I have them</option>
+                                                    <option value="Yes">Yes, please</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" id="sub_material_charge_div" style="display: none;">
+                                            <div class="form-group">
+                                                <label>Material Charge (AED)</label>
+                                                <input type="number" id="sub_cleaning_material_charge" name="sub_cleaning_material_charge" class="form-control" placeholder="Material Charge" value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="add_to_cart" style="display: none;">
                                     <h4>Service Details:</h4>
                                     <div class="row">
@@ -468,7 +536,7 @@
                 return false;
             }
             var subservice_id = $("#subservice_id").val();
-            if (subservice_id == 28) {
+            if (subservice_id == 28 || subservice_id == 97) {
 
                 var hour_value = jQuery("#hour_value").val();
                 if (hour_value == '') {
@@ -549,6 +617,33 @@
                         }, 1000);
                         return false;
                     }
+                }
+            } else if (subservice_id == 101) {
+                var sub_hours = jQuery("#sub_hours").val();
+                if (sub_hours == '') {
+                    jQuery('#sub_hours_error').html("Please Select Hours");
+                    jQuery('#sub_hours_error').show().delay(0).fadeIn('show');
+                    jQuery('#sub_hours_error').show().delay(2000).fadeOut('show');
+                    $('html, body').animate({ scrollTop: $('#sub_hours').offset().top - 150 }, 1000);
+                    return false;
+                }
+                
+                var sub_frequency = jQuery("#sub_frequency").val();
+                if (sub_frequency == '') {
+                    jQuery('#sub_frequency_error').html("Please Select Frequency");
+                    jQuery('#sub_frequency_error').show().delay(0).fadeIn('show');
+                    jQuery('#sub_frequency_error').show().delay(2000).fadeOut('show');
+                    $('html, body').animate({ scrollTop: $('#sub_frequency').offset().top - 150 }, 1000);
+                    return false;
+                }
+                
+                var sub_package = jQuery("#sub_package").val();
+                if (sub_package == '') {
+                    jQuery('#sub_package_error').html("Please Select Package");
+                    jQuery('#sub_package_error').show().delay(0).fadeIn('show');
+                    jQuery('#sub_package_error').show().delay(2000).fadeOut('show');
+                    $('html, body').animate({ scrollTop: $('#sub_package').offset().top - 150 }, 1000);
+                    return false;
                 }
             } else {
                 var package_category = jQuery("#package_category").val();
@@ -744,9 +839,12 @@
             }
 
 
-            if (subservice_id == 28) {
+            if (subservice_id == 28 || subservice_id == 97) {
                 // for home cleaning Calculation
                 home_cleaning_calculation();
+            } else if (subservice_id == 101) {
+                // for Subscription Calculation
+                calculateSubscriptionPrice();
             } else {
                 // for Package System Calculation
                 package_calculation();
@@ -837,16 +935,24 @@
             $('#time_slot').val('');
             $('#service_date').val('');
 
-            if (subservice_id == 28) {
+            if (subservice_id == 28 || subservice_id == 97) {
                 $('.home_cleaning_form').show();
                 $('.add_to_cart').hide();
+                $('.cleaning_subscription_form').hide();
                 $('#cleaner_div').show();
-                $('.add_to_cart').find('input, select, textarea').val('');
+                $('.add_to_cart, .cleaning_subscription_form').find('input, select, textarea').val('');
+            } else if (subservice_id == 101) {
+                $('.home_cleaning_form').hide();
+                $('.add_to_cart').hide();
+                $('.cleaning_subscription_form').show();
+                $('#cleaner_div').show();
+                $('.home_cleaning_form, .add_to_cart').find('input, select, textarea').val('');
             } else {
                 $('.home_cleaning_form').hide();
+                $('.cleaning_subscription_form').hide();
                 $('#cleaner_div').hide();
                 $('.add_to_cart').show();
-                $('.home_cleaning_form').find('input, select, textarea').val('');
+                $('.home_cleaning_form, .cleaning_subscription_form').find('input, select, textarea').val('');
             }
 
 
@@ -983,6 +1089,130 @@
             });
 
         }
+    </script>
+    <script>
+        var pricingRules = @json($pricing_rules ?? []);
+
+        function calculateSubscriptionPrice() {
+            var hours = parseInt($('#sub_hours').val()) || 0;
+            var frequencyOpt = $('#sub_frequency').find(':selected');
+            var frequencyId = frequencyOpt.data('id');
+            var visitsPerWeek = parseInt(frequencyOpt.data('visits')) || 0;
+            
+            var packageOpt = $('#sub_package').find(':selected');
+            var packageId = packageOpt.data('id');
+            var validityMonths = parseInt(packageOpt.data('months')) || 0;
+            
+            var subserviceId = $('#subservice_id').val();
+
+            if (subserviceId != 101) return;
+            
+            // Update the frequency dropdown labels with dynamic pricing
+            if (hours && packageId && pricingRules.length > 0) {
+                $('#sub_frequency option').each(function() {
+                    var fId = $(this).data('id');
+                    var baseLabel = $(this).data('label');
+                    if (fId && baseLabel) {
+                        var rule = pricingRules.find(r => r.package_id == packageId && r.duration_id == hours && r.frequency_id == fId);
+                        if (rule) {
+                            var hourlyRate = parseFloat(rule.price_per_hour);
+                            var formattedRate = hourlyRate % 1 === 0 ? hourlyRate.toString() : hourlyRate.toFixed(2);
+                            $(this).text(baseLabel + " - AED " + formattedRate + "/hr");
+                        } else {
+                            $(this).text(baseLabel);
+                        }
+                    }
+                });
+            } else {
+                // Revert to base labels if missing selections
+                $('#sub_frequency option').each(function() {
+                    var baseLabel = $(this).data('label');
+                    if (baseLabel) {
+                        $(this).text(baseLabel);
+                    }
+                });
+            }
+            
+            var pricePerHour = parseFloat($('#price_change_of_visit').val()) || 0;
+
+            if (hours && frequencyId && packageId && pricingRules.length > 0) {
+                var rule = pricingRules.find(r => r.package_id == packageId && r.duration_id == hours && r.frequency_id == frequencyId);
+                
+                if (rule) {
+                    if (!$('#price_change_of_visit').is(':focus')) {
+                        pricePerHour = parseFloat(rule.price_per_hour);
+                        $('#price_change_of_visit').val(pricePerHour.toFixed(2));
+                    }
+                } else if (!$('#price_change_of_visit').is(':focus')) {
+                    $('#price_change_of_visit').val('');
+                }
+            } else if (!$('#price_change_of_visit').is(':focus')) {
+                $('#price_change_of_visit').val('');
+            }
+            
+            // Calculate Totals based on pricePerHour
+            if (pricePerHour > 0 && visitsPerWeek > 0 && validityMonths > 0 && hours > 0) {
+                var totalSessions = visitsPerWeek * 4 * validityMonths;
+                var service_charge = pricePerHour * hours * totalSessions;
+                
+                let cod_charge = parseFloat($('#cod_charge').val()) || 0;
+                let timing_charge = parseFloat($('#timing_charge').val()) || 0;
+                let date_charge = parseFloat($('#date_charge').val()) || 0;
+                let service_fee = parseFloat($('#service_fee').val()) || 0;
+                
+                let material_charge = 0;
+                if ($('#sub_materials').val() === 'Yes') {
+                    material_charge = parseFloat($('#sub_cleaning_material_charge').val()) || 0;
+                }
+
+                let sub_total = service_charge + material_charge + cod_charge + service_fee + timing_charge + date_charge;
+                
+                let include_vat = $('#include_vat').val();
+                let vat_charge = 0;
+                if (include_vat === 'yes') {
+                    vat_charge = sub_total * (5 / 100); 
+                }
+                
+                let order_total = sub_total + vat_charge;
+                
+                $('#service_charge').val(service_charge.toFixed(2));
+                $('#sub_total').val(sub_total.toFixed(2));
+                $('#vat_charge').val(vat_charge.toFixed(2));
+                $('#order_total').val(order_total.toFixed(2));
+            } else {
+                $('#service_charge').val('');
+                $('#sub_total').val('');
+                $('#vat_charge').val('');
+                $('#order_total').val('');
+            }
+        }
+
+        $(document).ready(function() {
+            $('#sub_hours, #sub_frequency, #sub_package, #subservice_id, #sub_materials, #sub_cleaning_material_charge').change(calculateSubscriptionPrice);
+            $('#price_change_of_visit').on('input', calculateSubscriptionPrice);
+            $('#sub_cleaning_material_charge').on('input', calculateSubscriptionPrice);
+            
+            $('#sub_materials').change(function() {
+                if($(this).val() == 'Yes') {
+                    // Pull default material charge from selected hours option
+                    var defaultMaterialCharge = parseFloat($('#sub_hours').find(':selected').data('material-price')) || 0;
+                    $('#sub_cleaning_material_charge').val(defaultMaterialCharge);
+                    $('#sub_material_charge_div').show();
+                } else {
+                    $('#sub_material_charge_div').hide();
+                    $('#sub_cleaning_material_charge').val(0);
+                }
+                calculateSubscriptionPrice();
+            });
+
+            // Also update material charge if hours change while materials is 'Yes'
+            $('#sub_hours').change(function() {
+                if($('#sub_materials').val() == 'Yes') {
+                    var defaultMaterialCharge = parseFloat($(this).find(':selected').data('material-price')) || 0;
+                    $('#sub_cleaning_material_charge').val(defaultMaterialCharge);
+                }
+            });
+        });
     </script>
 
     <script>

@@ -13,7 +13,7 @@ class Croncontroller extends Controller
     //
     function package_inquiry_vendormailcron()
     {
-        Log::info("enter function package_inquiry_vendormailcron");
+        Log::info("enter function package_inquiry_vendormailcron" . request()->ip());
         // try {
 
         //     $subject = "Beta Cron Working";
@@ -57,7 +57,7 @@ class Croncontroller extends Controller
         //  exit;
 
         if ($pendingInquiries->isEmpty()) {
-            Log::info("No pending package enquiry cron emails.");
+            Log::info("No pending package enquiry cron emails. " . request()->ip());
             return;
         }
 
@@ -162,9 +162,9 @@ class Croncontroller extends Controller
                         'added_datetime' => now()
                     ]);
 
-                    Log::info("Cron: Email sent to vendor " . $vendor_data->email);
+                    Log::info("Cron: Email sent to vendor " . $vendor_data->email . "Ip " . request()->ip());
                 } catch (\Exception $e) {
-                    Log::error("Cron mail failed for vendor " . $vendor_data->email . " : " . $e->getMessage());
+                    Log::error("Cron mail failed for vendor " . $vendor_data->email . " : " . $e->getMessage() . "Ip " . request()->ip());
                 }
             }
 
@@ -173,7 +173,7 @@ class Croncontroller extends Controller
                 ->where('id', $packageEnquiryFormId)
                 ->update(['cron_mail_send' => 1]);
 
-            Log::info("Cron: Completed inquiry ID " . $packageEnquiryFormId);
+            Log::info("Cron: Completed inquiry ID " . $packageEnquiryFormId  . "Ip " . request()->ip());
 
             echo "Cron Run Successfully";
             exit;

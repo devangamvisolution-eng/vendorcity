@@ -96,6 +96,17 @@
                         ? $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100
                         : $attribute->prov;
 
+                // if (!empty($followup_data->margin_amount) && $followup_data->margin_amount > 0) {
+                //     // Fixed amount margin
+                //     $price = $attribute->prov + $followup_data->margin_amount;
+                // } elseif (!empty($followup_data->margin_percent) && $followup_data->margin_percent > 0) {
+                //     // Percentage margin
+                //     $price = $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100;
+                // } else {
+                //     // No margin
+                //     $price = $attribute->prov;
+                // }
+
                 $total = $price * $attribute->qty;
 
                 $total_all += $total;
@@ -256,6 +267,17 @@
                                 isset($followup_data->margin_percent) && $followup_data->margin_percent > 0
                                     ? $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100
                                     : $attribute->prov;
+
+                            // if (!empty($followup_data->margin_amount) && $followup_data->margin_amount > 0) {
+                            //     // Fixed amount margin
+                            //     $price = $attribute->prov + $followup_data->margin_amount;
+                            // } elseif (!empty($followup_data->margin_percent) && $followup_data->margin_percent > 0) {
+                            //     // Percentage margin
+                            //     $price = $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100;
+                            // } else {
+                            //     // No margin
+                            //     $price = $attribute->prov;
+                            // }
 
                             $total = $price * $attribute->qty;
 

@@ -124,7 +124,7 @@
                                 <div class="col-md-12">
                                     <div class="custom-form-text">
                                         <h4>My Profile <span class="forms-edition" style="float: right;">
-                                                <a href="{{ url('edit-profile') }}"><i class="fa fa-pencil"
+                                                <a href="{{ route('edit_profile') }}"><i class="fa fa-pencil"
                                                         aria-hidden="true"></i> Edit</a>
                                             </span></h4>
                                     </div>

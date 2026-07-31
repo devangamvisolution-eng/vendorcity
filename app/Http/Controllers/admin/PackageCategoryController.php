@@ -81,6 +81,16 @@ class PackageCategoryController extends Controller
         } else {
             $data['slider_image'] = "";
         }
+        if ($request->hasFile('app_slider_image')) {
+            $sliderImage = $request->file('app_slider_image');
+            $extension = $sliderImage->getClientOriginalExtension();
+            $originalName = pathinfo($sliderImage->getClientOriginalName(), PATHINFO_FILENAME);
+            $sliderImageName = time() . '-slider-' . $originalName . '.' . $extension;
+            $sliderImage->move(public_path('upload/packagecategory'), $sliderImageName);
+            $data['app_slider_image'] = $sliderImageName;
+        } else {
+            $data['app_slider_image'] = "";
+        }
 
         DB::table('package_categories')->insert($data);
         return redirect()->route('packagecategory.index')->with('success', 'Package Category Data Added Successfully');
@@ -162,6 +172,14 @@ class PackageCategoryController extends Controller
             $sliderImageName = time() . '-slider-' . $originalName . '.' . $extension;
             $sliderImage->move(public_path('upload/packagecategory'), $sliderImageName);
             $data['slider_image'] = $sliderImageName;
+        }
+        if ($request->hasFile('app_slider_image')) {
+            $sliderImage = $request->file('app_slider_image');
+            $extension = $sliderImage->getClientOriginalExtension();
+            $originalName = pathinfo($sliderImage->getClientOriginalName(), PATHINFO_FILENAME);
+            $sliderImageName = time() . '-slider-' . $originalName . '.' . $extension;
+            $sliderImage->move(public_path('upload/packagecategory'), $sliderImageName);
+            $data['app_slider_image'] = $sliderImageName;
         }
 
         DB::table('package_categories')->where('id', $id)->update($data);

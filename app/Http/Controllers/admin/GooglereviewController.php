@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-use App\Models\Admin\Googlereview;
+use App\Models\admin\Googlereview;
 
 
 

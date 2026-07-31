@@ -4425,7 +4425,7 @@ function booknow_otp_verification(id) {
             }
         }
 
-        var url = '{{ url('booknow-otp-sent') }}';
+        var url = '{{ url(session('search_city_name') . '/booknow-otp-sent') }}';
         var mobile = $('#user-phone-number').val();
         var country_code = $('#country_code_otp_popup_Modal_book').val();
         $.ajax({
@@ -5041,7 +5041,7 @@ $("input[name='payment_type_old']").on("change", function() {
         $.ajax({
 
             type: 'POST',
-            url: '{{ url('get_price_cleaning ') }}',
+            url: '{{ url(session('search_city_name') . '/get_price_cleaning') }}',
             data: {
 
                 "_token": "{{ csrf_token() }}",
@@ -5650,7 +5650,7 @@ function cleaner_data(id,name){
 	// }
 	
 	function date_select() {
-    var url = '{{ url('cleaner-time-check') }}';
+    var url = '{{ url(session('search_city_name') . '/cleaner-time-check') }}';
     var cleaner_id = $('#cleaner_id').val();
     var date = $('#date').val();
     var dateText = $('#date_replace').html();

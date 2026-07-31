@@ -74,7 +74,7 @@
         border-radius: 15px;
         padding: 15px 25px;
         border-left: 5px solid #f1c40f;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
     }
 
     .flash-item {
@@ -138,8 +138,15 @@
 
     /* Animations */
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(5px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     /* Modal Styling */
@@ -154,16 +161,16 @@
         box-shadow: 0 0 0 5px rgba(0, 64, 230, 0.1);
     }
 
-    .btn-booking-detail{
+    .btn-booking-detail {
         background: lightseagreen;
         color: white;
         border: none;
         border-radius: 12px !important;
     }
-    .btn-booking-detail:hover{
+
+    .btn-booking-detail:hover {
         color: #ffffff;
     }
-
 </style>
 <style>
     .success-icon-wrapper {
@@ -176,7 +183,8 @@
     .main-circle {
         width: 80px;
         height: 80px;
-        background-color: #2ecc71; /* Success Green */
+        background-color: #2ecc71;
+        /* Success Green */
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -205,16 +213,19 @@
             transform: scale(1);
             opacity: 0.6;
         }
+
         100% {
             transform: scale(1.6);
             opacity: 0;
         }
     }
+
     .mt60 {
         margin-top: 10px !important;
     }
 
     @media (max-width: 767px) {
+
         /* Stack Date and Time vertically on mobile to prevent overflow */
         .appointment-time {
             flex-direction: column;
@@ -224,7 +235,8 @@
         }
 
         /* Adjust the card padding for a tighter mobile look */
-        .header-classic-card, .classic-card {
+        .header-classic-card,
+        .classic-card {
             padding: 20px !important;
         }
 
@@ -248,94 +260,96 @@
             gap: 12px !important;
         }
 
-        .service-fee-custome-modal{
-            max-width: 450px !important; 
+        .service-fee-custome-modal {
+            max-width: 450px !important;
         }
     }
 
-  @media (max-width: 767.98px) {
+    @media (max-width: 767.98px) {
 
-    .quantity .quantity-block{
-        height: 60px;
-        width: 84px;
+        .quantity .quantity-block {
+            height: 60px;
+            width: 84px;
+        }
+
+        .modal-mobile-bottom {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 0 !important;
+        }
+
+        .modal-dialog-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: 0;
+            width: 100%;
+            max-width: 100%;
+            /* height: 90vh; */
+            transform: translateY(100%);
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1055;
+        }
+
+        .modal.show .modal-dialog-bottom {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-content {
+            border-radius: 20px 20px 0 0 !important;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .details-modal-content {
+            border-radius: 20px !important;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .login-form-modal .user-modal-dialog {
+            max-width: 60%;
+            height: auto !important;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-footer {
+            padding: 10px 16px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        /* Prevent Bootstrap's default top-down animation */
+        .modal .modal-dialog {
+            transform: none !important;
+            transition: none !important;
+        }
+
+        .modal-dialog-centered {
+            min-height: 0 !important;
+        }
     }
-    .modal-mobile-bottom {
-        background-color: rgba(0, 0, 0, 0.2);
-        padding: 0 !important;
+
+    .mb60 {
+        margin-bottom: 0 !important;
     }
-
-  .modal-dialog-bottom {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0;
-      width: 100%;
-      max-width: 100%;
-      /* height: 90vh; */
-      transform: translateY(100%);
-      transition: transform 0.5s ease-out, opacity 0.5s ease-out;
-      opacity: 0;
-      display: flex;
-      flex-direction: column;
-      z-index: 1055;
-  }
-
-  .modal.show .modal-dialog-bottom {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  .modal-content {
-    border-radius: 20px 20px 0 0 !important;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .details-modal-content{
-    border-radius: 20px !important;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  
-  .login-form-modal .user-modal-dialog{
-      max-width: 60%;
-      height: auto !important;
-  }
-
-  .modal-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .modal-footer {
-    padding: 10px 16px;
-    background-color: #fff;
-    border-top: 1px solid #ddd;
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-  }
-
-  /* Prevent Bootstrap's default top-down animation */
-  .modal .modal-dialog {
-    transform: none !important;
-    transition: none !important;
-  }
-
-  .modal-dialog-centered{
-    min-height:0 !important;
-  }
-}
-
-.mb60{
-  margin-bottom: 0 !important;
-}
 </style>
 <style>
     :root {
@@ -344,7 +358,7 @@
         --brand-blue: #1F6EEC;
         --success-green: #22c55e;
         /* Increased opacity for visibility */
-        --glass-surface: rgba(255, 255, 255, 0.98); 
+        --glass-surface: rgba(255, 255, 255, 0.98);
         --glass-border: #ffffff;
     }
 
@@ -355,11 +369,12 @@
         border: 2px solid var(--glass-border);
         border-radius: 30px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        color: var(--text-dark) !important; /* Forces text to show */
+        color: var(--text-dark) !important;
+        /* Forces text to show */
     }
 
     #ConfirmModal .modal-header {
-        border-bottom: 1px solid rgba(0,0,0,0.08);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
         padding: 20px 30px;
     }
 
@@ -418,7 +433,7 @@
         margin: 0 auto 12px;
         font-size: 18px;
         color: #94a3b8;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
     }
 
@@ -440,7 +455,8 @@
         font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
-        color: var(--text-muted); /* Ensure this isn't too light */
+        color: var(--text-muted);
+        /* Ensure this isn't too light */
     }
 
     .step-box.active .step-label-text {
@@ -469,7 +485,7 @@
         align-items: center;
         justify-content: center;
         border-radius: 15px;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .status-detail-card .text-part h6 {
@@ -503,7 +519,7 @@
         --text-muted: #64748b;
         --brand-blue: #1F6EEC;
         --success-green: #22c55e;
-        --glass-surface: rgba(255, 255, 255, 0.98); 
+        --glass-surface: rgba(255, 255, 255, 0.98);
         --glass-border: #ffffff;
     }
 
@@ -517,7 +533,7 @@
     }
 
     #ConfirmModal .modal-header {
-        border-bottom: 1px solid rgba(0,0,0,0.08);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
         padding: 20px 30px;
     }
 
@@ -572,7 +588,7 @@
         margin: 0 auto 12px;
         font-size: 18px;
         color: #94a3b8;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
     }
 
@@ -638,18 +654,21 @@
        ========================================== */
     @media (max-width: 767px) {
         .progress-line {
-            display: none; /* Hide horizontal line */
+            display: none;
+            /* Hide horizontal line */
         }
 
         .steps-wrapper {
             flex-direction: row;
-            flex-wrap: wrap; /* Allow steps to flow */
+            flex-wrap: wrap;
+            /* Allow steps to flow */
             justify-content: center;
             gap: 10px;
         }
 
         .step-box {
-            flex: 0 0 calc(33.33% - 10px); /* Show 3 icons per row */
+            flex: 0 0 calc(33.33% - 10px);
+            /* Show 3 icons per row */
             margin-bottom: 15px;
         }
 
@@ -679,11 +698,12 @@
     /* Extra Small Screen Fix (Under 400px) */
     @media (max-width: 400px) {
         .step-box {
-            flex: 0 0 calc(50% - 10px); /* Show 2 icons per row */
+            flex: 0 0 calc(50% - 10px);
+            /* Show 2 icons per row */
         }
     }
 
-    .confirm-modal{
+    .confirm-modal {
         max-width: 630px !important;
     }
 </style>
@@ -692,9 +712,10 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-7 mx-auto">
-                
-               {{--  <div class="order-success-header">
-                    <img src="{{ asset('public/site/images/orderic.png') }}" alt="Success" class="mb-3" style="width: 60px;">
+
+                {{-- <div class="order-success-header">
+                    <img src="{{ asset('public/site/images/orderic.png') }}" alt="Success" class="mb-3"
+                        style="width: 60px;">
                     <h2>Order Confirmed!</h2>
                     <p class="text-muted">Your booking has been successfully placed and is being processed.</p>
                 </div> --}}
@@ -718,25 +739,38 @@
                         <div>
                             <span class="status-badge" data-bs-toggle="modal" data-bs-target="#ConfirmModal">
                                 @php
+                                    // $statuses = [
+                                    //     'BK' => 'Booking Requested',
+                                    //     'P' => 'Booking Confirmed',
+                                    //     'PA' => 'Vendor Assigned',
+                                    //     'CO' => 'Booking Completed',
+                                    //     'CL' => 'Booking Cancelled',
+                                    // ];
                                     $statuses = [
                                         'BK' => 'Booking Requested',
-                                        'P'  => 'Booking Confirmed',
-                                        'PA' => 'Vendor Assigned',
+                                        'P' => 'Booking Confirmed',
+                                        'PA' => 'Booking Confirmed', // changed
+                                        'OTW' => 'On The Way',
+                                        'IP' => 'In Progress',
                                         'CO' => 'Booking Completed',
-                                        'CL' => 'Booking Cancelled'
+                                        'CL' => 'Booking Cancelled',
                                     ];
                                     $currentStatusText = $statuses[$thank_order_data->order_status] ?? 'Processing';
                                 @endphp
                                 {{ $currentStatusText }}
                             </span>
-                            
+
                             <div class="appointment-time mb-2">
-                                <span><i class="fa-regular fa-calendar-check text-primary"></i> {{ $thank_ci_order_data->month}} {{ $thank_ci_order_data->bookingdate}}, {{ $thank_ci_order_data->bookingyear}}</span>
-                                <span><i class="fa-regular fa-clock text-primary"></i> {!! Helper::timeslotname($thank_ci_order_data->time_slot) !!}</span>
+                                <span><i class="fa-regular fa-calendar-check text-primary"></i>
+                                    {{ $thank_ci_order_data->month }} {{ $thank_ci_order_data->bookingdate }},
+                                    {{ $thank_ci_order_data->bookingyear }}</span>
+                                <span><i class="fa-regular fa-clock text-primary"></i>
+                                    {!! Helper::timeslotname($thank_ci_order_data->time_slot) !!}</span>
                             </div>
                             <p class="text-muted small">Thank you. We'll match you with a top-rated Professional.</p>
                         </div>
-                        {{-- <img src="{{ asset('public/site/images/confirm.png') }}" width="60" class="rounded-circle shadow-sm"> --}}
+                        {{-- <img src="{{ asset('public/site/images/confirm.png') }}" width="60"
+                            class="rounded-circle shadow-sm"> --}}
                     </div>
                 </div>
 
@@ -772,15 +806,18 @@
                         </li>
                         <li class="mb-0 mt-0">
                             <span class="detail-label">Date & Time</span>
-                            <span class="detail-value text-primary">{{ $thank_ci_order_data->month}} {{ $thank_ci_order_data->bookingdate}} {{ $thank_ci_order_data->bookingyear}} , {!! Helper::timeslotname($thank_ci_order_data->time_slot) !!}</span>
+                            <span class="detail-value text-primary">{{ $thank_ci_order_data->month }}
+                                {{ $thank_ci_order_data->bookingdate }} {{ $thank_ci_order_data->bookingyear }} ,
+                                {!! Helper::timeslotname($thank_ci_order_data->time_slot) !!}</span>
                         </li>
                     </ul>
-                    
+
                     <div class="mt-2 d-flex gap-3">
-                        <button class="btn btn-outline-secondary w-100 py-3 rounded-3 btn-booking-detail" data-bs-toggle="modal" data-bs-target="#bookingDetailsModal">
+                        <button class="btn btn-outline-secondary w-100 py-3 rounded-3 btn-booking-detail"
+                            data-bs-toggle="modal" data-bs-target="#bookingDetailsModal">
                             Booking Details
                         </button>
-                        <a href="{{ url('/order-detail',$thank_order_data->order_id) }}" class="btn-manage w-100">
+                        <a href="{{ route('order-detail', $thank_order_data->order_id) }}" class="btn-manage w-100">
                             <i class="fa-regular fa-gear"></i> Manage Booking
                         </a>
                     </div>
@@ -790,53 +827,74 @@
         </div>
     </div>
 </section>
-	
-        <!-- end section -->
+
+<!-- end section -->
 @include('front.includes.footer')
 
 <div class="modal modal-mobile-bottom" id="bookingDetailsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-bottom modal-dialog-centered service-fee-custome-modal" id="modal-digi" role="document">
+    <div class="modal-dialog modal-dialog-bottom modal-dialog-centered service-fee-custome-modal" id="modal-digi"
+        role="document">
         <div class="modal-content charge-desc-popup" style="border-radius: 20px; overflow: hidden;">
             <div class="modal-header modal-header-mobile" style="background: #f1f5f9;border-radius: 35px;">
                 <div>
                     <h5 class="fw-bold mb-0" style="color: #000000; letter-spacing: 0.5px;">Booking Details</h5>
-                    <span class="badge mt-2" style="background: rgba(255,255,255,0.1); color: #000000; font-weight: 400;">REF: #{{ $thank_order_data->format_order_id }}</span>
+                    <span class="badge mt-2"
+                        style="background: rgba(255,255,255,0.1); color: #000000; font-weight: 400;">REF:
+                        #{{ $thank_order_data->format_order_id }}</span>
                 </div>
-                <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body modal-mobile" style="max-height: 70vh; overflow-y: auto;">
-                <div class="d-flex align-items-center p-3 mb-4 rounded-3" style="background: #f1f5f9; border-left: 5px solid #6366f1;">
-                    <div class="flex-shrink-0 text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: #6366f1;">
+                <div class="d-flex align-items-center p-3 mb-4 rounded-3"
+                    style="background: #f1f5f9; border-left: 5px solid #6366f1;">
+                    <div class="flex-shrink-0 text-white rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; background: #6366f1;">
                         <i class="fas fa-concierge-bell"></i>
                     </div>
                     <div class="ms-3">
-                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Service booked</small>
+                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Service
+                            booked</small>
                         <span class="fw-bold text-dark" style="font-size: 1.1rem;">{!! Helper::subservicename($thank_ci_order_data->subservice_id) !!}</span>
                     </div>
                 </div>
                 <div class="row g-4 mb-2">
                     <div class="col-6">
-                        <label class="text-muted small d-block mb-1 fw-bold text-uppercase"><i class="far fa-calendar-alt me-1 text-primary"></i> Date</label>
-                        <span class="fw-semibold">{{ $thank_ci_order_data->month }} {{ $thank_ci_order_data->bookingdate }}, {{ $thank_ci_order_data->bookingyear }}</span>
+                        <label class="text-muted small d-block mb-1 fw-bold text-uppercase"><i
+                                class="far fa-calendar-alt me-1 text-primary"></i> Date</label>
+                        <span class="fw-semibold">{{ $thank_ci_order_data->month }}
+                            {{ $thank_ci_order_data->bookingdate }}, {{ $thank_ci_order_data->bookingyear }}</span>
                     </div>
                     <div class="col-6">
-                        <label class="text-muted small d-block mb-1 fw-bold text-uppercase"><i class="far fa-clock me-1 text-primary"></i> Time</label>
+                        <label class="text-muted small d-block mb-1 fw-bold text-uppercase"><i
+                                class="far fa-clock me-1 text-primary"></i> Time</label>
                         <span class="fw-semibold">{!! Helper::timeslotname($thank_ci_order_data->time_slot) !!}</span>
                     </div>
                     <div class="col-12">
-                        <label class="text-muted small d-block mb-1 fw-bold text-uppercase"><i class="fas fa-map-marker-alt me-1 text-primary"></i> Location</label>
-                        <span class="text-dark">{{ $thank_ci_order_data->apartment_villa_no }}, {{ $thank_ci_order_data->building_street_no }}, {{ $thank_ci_order_data->area }}, {{ $thank_ci_order_data->city }}</span>
+                        <label class="text-muted small d-block mb-1 fw-bold text-uppercase"><i
+                                class="fas fa-map-marker-alt me-1 text-primary"></i> Location</label>
+                        <span class="text-dark">{{ $thank_ci_order_data->apartment_villa_no }},
+                            {{ $thank_ci_order_data->building_street_no }}, {{ $thank_ci_order_data->area }},
+                            {{ $thank_ci_order_data->city }}</span>
                     </div>
                 </div>
-                <div class="p-3 rounded-3 border-0 mb-3" style="background: linear-gradient(135deg, #0a58cafc 0%, #3891ca 100%); color: white;">
+                <div class="p-3 rounded-3 border-0 mb-3"
+                    style="background: linear-gradient(135deg, #0a58cafc 0%, #3891ca 100%); color: white;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <small class="d-block opacity-75 text-uppercase fw-bold" style="font-size: 0.65rem;">Payment via</small>
-                            <span class="fw-bold">@php $payment_modes = ['1' => 'Cash on Delivery', '2' => 'Online Payment']; echo $payment_modes[$thank_order_data->paymentmode] ?? 'N/A'; @endphp</span>
+                            <small class="d-block opacity-75 text-uppercase fw-bold"
+                                style="font-size: 0.65rem;">Payment
+                                via</small>
+                            <span class="fw-bold">@php
+                                $payment_modes = ['1' => 'Cash on Delivery', '2' => 'Online Payment'];
+                                echo $payment_modes[$thank_order_data->paymentmode] ?? 'N/A';
+                            @endphp</span>
                         </div>
                         <div class="text-end">
-                            <small class="d-block opacity-75 text-uppercase fw-bold" style="font-size: 0.65rem;">Total (Incl. VAT)</small>
-                            <span class="h4 fw-bold mb-0 text-light">{{ $thank_order_data->order_currency }} {{ $thank_order_data->order_total }}</span>
+                            <small class="d-block opacity-75 text-uppercase fw-bold" style="font-size: 0.65rem;">Total
+                                (Incl. VAT)</small>
+                            <span class="h4 fw-bold mb-0 text-light">{{ $thank_order_data->order_currency }}
+                                {{ $thank_order_data->order_total }}</span>
                         </div>
                     </div>
                 </div>
@@ -847,45 +905,118 @@
 
 <style>
     /* Add this to your stylesheet */
-   /*  .tracking-wider { letter-spacing: 1px; }
+    /*  .tracking-wider { letter-spacing: 1px; }
     #bookingDetailsModal .modal-body label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; }
     #bookingDetailsModal .btn-dark:hover { background-color: #000; transform: translateY(-1px); transition: all 0.2s; } */
 </style>
 
-<div class="modal modal-mobile-bottom" id="ConfirmModal" tabindex="-1" aria-labelledby="ConfirmModalLabel" aria-hidden="true">
+<div class="modal modal-mobile-bottom" id="ConfirmModal" tabindex="-1" aria-labelledby="ConfirmModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-bottom modal-dialog-centered service-fee-custome-modal confirm-modal">
         <div class="modal-content charge-desc-popup" style="border-radius: 20px; overflow: hidden;">
             <div class="modal-header modal-header-mobile">
                 <h5 class="modal-title" id="ConfirmModalLabel">Learn What Is Next</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: brightness(0);"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    style="filter: brightness(0);"></button>
             </div>
 
             <div class="modal-body modal-mobile" style="max-height: 70vh; overflow-y: auto;">
                 @php
                     $status = $thank_order_data->order_status;
 
-                    if($status == 'CL'){
+                    if ($status == 'CL') {
                         $statusFlow = ['CL'];
                         $steps = [
-                            ['label' => 'Booking Cancelled', 'icon' => '<i class="fa-solid fa-times-circle"></i>', 'desc' => 'Your booking has been cancelled. If this is a mistake, please contact support.'],
+                            [
+                                'label' => 'Booking Cancelled',
+                                'icon' => '<i class="fa-solid fa-times-circle"></i>',
+                                'desc' =>
+                                    'Your booking has been cancelled. If this is a mistake, please contact support.',
+                            ],
                         ];
                     } else {
-                        $statusFlow = ['BK','P', 'PA', 'OTW', 'IP', 'CO'];
+                        // $statusFlow = ['BK', 'P', 'PA', 'OTW', 'IP', 'CO'];
+                        $statusStepMap = [
+                            'BK' => 0,
+                            'P' => 1,
+                            'PA' => 1, // Same step as P
+                            'OTW' => 2,
+                            'IP' => 3,
+                            'CO' => 4,
+                        ];
+                        // $steps = [
+                        //     [
+                        //         'label' => 'Requested',
+                        //         'icon' => '<i class="fa-solid fa-calendar-check"></i>',
+                        //         'desc' =>
+                        //             'Your booking request has been received. please wait for confirmation from a service provider.',
+                        //     ],
+                        //     [
+                        //         'label' => 'Confirmed',
+                        //         'icon' => '<i class="fa-solid fa-check"></i>',
+                        //         'desc' =>
+                        //             'A Service provider has accepted your booking. Your booking will be delivered as per the booked date and time.',
+                        //     ],
+                        //     [
+                        //         'label' => 'Assigned',
+                        //         'icon' => '<i class="fa-solid fa-user"></i>',
+                        //         'desc' => 'We’ve matched you with a trusted vendor — you’re in good hands.',
+                        //     ],
+                        //     [
+                        //         'label' => 'On the way',
+                        //         'icon' => '<i class="fa-solid fa-truck"></i>',
+                        //         'desc' => 'The vendor is on their way to your location. Get ready!',
+                        //     ],
+                        //     [
+                        //         'label' => 'In progress',
+                        //         'icon' => '<i class="fa-solid fa-spinner fa-spin"></i>',
+                        //         'desc' => 'Work is currently underway. We’ll keep you posted!',
+                        //     ],
+                        //     [
+                        //         'label' => 'Completed',
+                        //         'icon' => '<i class="fa-solid fa-check-circle"></i>',
+                        //         'desc' => 'Your booking is completed! We hope you’re satisfied with the service.',
+                        //     ],
+                        // ];
                         $steps = [
-                            ['label' => 'Requested', 'icon' => '<i class="fa-solid fa-calendar-check"></i>', 'desc' => 'Your booking request has been received. please wait for confirmation from a service provider.'],
-                            ['label' => 'Confirmed', 'icon' => '<i class="fa-solid fa-check"></i>', 'desc' => 'A Service provider has accepted your booking. Your booking will be delivered as per the booked date and time.'],
-                            ['label' => 'Assigned', 'icon' => '<i class="fa-solid fa-user"></i>', 'desc' => 'We’ve matched you with a trusted vendor — you’re in good hands.'],
-                            ['label' => 'On the way', 'icon' => '<i class="fa-solid fa-truck"></i>', 'desc' => 'The vendor is on their way to your location. Get ready!'],
-                            ['label' => 'In progress', 'icon' => '<i class="fa-solid fa-spinner fa-spin"></i>', 'desc' => 'Work is currently underway. We’ll keep you posted!'],
-                            ['label' => 'Completed', 'icon' => '<i class="fa-solid fa-check-circle"></i>', 'desc' => 'Your booking is completed! We hope you’re satisfied with the service.'],
+                            [
+                                'label' => 'Requested',
+                                'icon' => '<i class="fa-solid fa-calendar-check"></i>',
+                                'desc' =>
+                                    'Your booking request has been received. Please wait for confirmation from a service provider.',
+                            ],
+                            [
+                                'label' => 'Booking Confirmed',
+                                'icon' => '<i class="fa-solid fa-check"></i>',
+                                'desc' => 'A service provider has accepted your booking and your service is confirmed.',
+                            ],
+                            [
+                                'label' => 'On the way',
+                                'icon' => '<i class="fa-solid fa-truck"></i>',
+                                'desc' => 'The vendor is on their way to your location. Get ready!',
+                            ],
+                            [
+                                'label' => 'In Progress',
+                                'icon' => '<i class="fa-solid fa-spinner fa-spin"></i>',
+                                'desc' => 'Work is currently underway. We’ll keep you posted!',
+                            ],
+                            [
+                                'label' => 'Completed',
+                                'icon' => '<i class="fa-solid fa-check-circle"></i>',
+                                'desc' => 'Your booking is completed! We hope you’re satisfied with the service.',
+                            ],
                         ];
                     }
 
-                    $currentStep = array_search($status, $statusFlow);
-                    
-                    // Logic for progress line width
-                    $count = count($statusFlow);
-                    $progressWidth = ($count > 1) ? ($currentStep / ($count - 1)) * 100 : 100;
+                    // $currentStep = array_search($status, $statusFlow);
+
+                    // // Logic for progress line width
+                    // $count = count($statusFlow);
+                    // $progressWidth = $count > 1 ? ($currentStep / ($count - 1)) * 100 : 100;
+                    $currentStep = $statusStepMap[$status] ?? 0;
+
+                    $count = count($steps);
+                    $progressWidth = $count > 1 ? ($currentStep / ($count - 1)) * 100 : 100;
                 @endphp
 
                 <div class="progress-track-container">
@@ -893,8 +1024,8 @@
                         <div class="progress-line-fill" style="width: {{ $progressWidth }}%;"></div>
                     </div>
                     <div class="steps-wrapper">
-                        @foreach($steps as $index => $step)
-                            @php 
+                        @foreach ($steps as $index => $step)
+                            @php
                                 $isCompleted = $index < $currentStep;
                                 $isActive = $index === $currentStep;
                                 $class = $isCompleted ? 'completed' : ($isActive ? 'active' : '');
@@ -925,12 +1056,12 @@
     </div>
 </div>
 <script>
-  const items = document.querySelectorAll('.flash-item');
-  let current = 0;
+    const items = document.querySelectorAll('.flash-item');
+    let current = 0;
 
-  setInterval(() => {
-    items[current].classList.remove('active');
-    current = (current + 1) % items.length;
-    items[current].classList.add('active');
-  }, 2000); // change sentence every 2 seconds
+    setInterval(() => {
+        items[current].classList.remove('active');
+        current = (current + 1) % items.length;
+        items[current].classList.add('active');
+    }, 2000); // change sentence every 2 seconds
 </script>

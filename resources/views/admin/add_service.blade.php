@@ -1,10 +1,9 @@
 @extends('admin.includes.Template')
 
 <style>
-
-ul li {
-    list-style: inherit !important;
-}
+    ul li {
+        list-style: inherit !important;
+    }
 </style>
 
 @section('content')
@@ -73,9 +72,10 @@ ul li {
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="country">Country</label>
-                                        <select class="form-control search_country" id="country" name="country[]" onchange="city_change($(this).val())" multiple="multiple">
+                                        <select class="form-control search_country" id="country" name="country[]"
+                                            onchange="city_change($(this).val())" multiple="multiple">
                                             <option value="">Select Country</option>
-                                          
+
                                             @foreach ($country_data as $country)
                                                 <option value="{{ $country->id }}">{{ $country->country }}</option>
                                             @endforeach
@@ -85,16 +85,17 @@ ul li {
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label for="city">City</label>
-                                    <span id="city_chang">
-                                        <select class="form-control" id="city" name="city[]" multiple="multiple">
-                                            <option value="">Select City</option>
-                                            
-                                        </select>
-                                    </span>
-                                    <p class="form-error-text" id="city_error" style="color: red; margin-top: 10px;"></p>
-                                </div>
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <span id="city_chang">
+                                            <select class="form-control" id="city" name="city[]" multiple="multiple">
+                                                <option value="">Select City</option>
+
+                                            </select>
+                                        </span>
+                                        <p class="form-error-text" id="city_error" style="color: red; margin-top: 10px;">
+                                        </p>
+                                    </div>
                                 </div>
 
 
@@ -179,7 +180,7 @@ ul li {
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
                                     <div class="form-group">
 
                                         <label for="name">Home Icon </label>
@@ -191,8 +192,21 @@ ul li {
 
                                     </div>
                                 </div>
-								
-								<div class="col-lg-4">
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+
+                                        <label for="name">Home Icon Alt tag</label>
+
+                                        <input id="homeicon_alt_tag" name="homeicon_alt_tag" type="text"
+                                            class="form-control" value="" placeholder="Home Icon Alt tag" />
+                                        <p class="form-error-text" id="homeicon_alt_tag_error"
+                                            style="color: red; margin-top: 10px;"></p>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
                                     <div class="form-group">
 
                                         <label for="name">Home Banner (1350px x 440px)</label>
@@ -200,12 +214,26 @@ ul li {
                                         <input id="image" name="image" type="file" class="form-control"
                                             value="" />
                                         <p class="form-error-text" id="image_error"
+                                            style="color: red; margin-top: 10px;">
+                                        </p>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+
+                                        <label for="name">Home Banner Alt tag</label>
+
+                                        <input id="homebanner_alt_tag" name="homebanner_alt_tag" type="text"
+                                            class="form-control" value="" placeholder="Home Banner Alt tag" />
+                                        <p class="form-error-text" id="homebanner_alt_tag_error"
                                             style="color: red; margin-top: 10px;"></p>
 
                                     </div>
                                 </div>
 
-                                 <div class="col-lg-4">
+
+                                <div class="col-lg-6">
                                     <div class="form-group">
 
                                         <label for="banner">Home Mobile Banner (400 x 475)</label>
@@ -213,45 +241,50 @@ ul li {
                                         <input id="banner" name="banner" type="file" class="form-control"
                                             value="" />
                                         <p class="form-error-text" id="banner_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-								
-								<div class="col-lg-4">
-                                    <div class="form-group">
-
-                                        <label for="name">Home Icon Alt tag</label>
-
-                                        <input id="homeicon_alt_tag" name="homeicon_alt_tag" type="text" class="form-control"
-                                            value="" placeholder="Home Icon Alt tag"/>
-                                        <p class="form-error-text" id="homeicon_alt_tag_error"
-                                            style="color: red; margin-top: 10px;"></p>
+                                            style="color: red; margin-top: 10px;">
+                                        </p>
 
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4">
-                                    <div class="form-group">
 
-                                        <label for="name">Home Banner Alt tag</label>
 
-                                        <input id="homebanner_alt_tag" name="homebanner_alt_tag" type="text" class="form-control"
-                                            value="" placeholder="Home Banner Alt tag"/>
-                                        <p class="form-error-text" id="homebanner_alt_tag_error"
-                                            style="color: red; margin-top: 10px;"></p>
 
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
                                     <div class="form-group">
 
                                         <label for="name">Home Mobile Banner Alt tag</label>
 
-                                        <input id="homebanner_mobile_alt_tag" name="homebanner_mobile_alt_tag" type="text" class="form-control"
-                                            value="" placeholder="Home Mobile Banner Alt tag"/>
+                                        <input id="homebanner_mobile_alt_tag" name="homebanner_mobile_alt_tag"
+                                            type="text" class="form-control" value=""
+                                            placeholder="Home Mobile Banner Alt tag" />
                                         <p class="form-error-text" id="homebanner_mobile_alt_tag_error"
+                                            style="color: red; margin-top: 10px;"></p>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+
+                                        <label for="name">App Icon </label>
+
+                                        <input id="app_icon" name="app_icon" type="file" class="form-control"
+                                            value="" />
+                                        <p class="form-error-text" id="app_icon_error"
+                                            style="color: red; margin-top: 10px;"></p>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+
+                                        <label for="name">App Icon Alt tag</label>
+
+                                        <input id="appicon_alt_tag" name="appicon_alt_tag" type="text"
+                                            class="form-control" value="" placeholder="App Icon Alt tag" />
+                                        <p class="form-error-text" id="appicon_alt_tag_error"
                                             style="color: red; margin-top: 10px;"></p>
 
                                     </div>
@@ -259,13 +292,15 @@ ul li {
 
                                 {{-- <div class="form-group">
 
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Top Description</label>
+                                <label for="description" style="margin:15px 0 5px 0px; width:100%;">Top
+                                    Description</label>
 
-                                    <textarea id="top_description" name="top_description" class="form-control" placeholder="Enter Top Description"></textarea>
+                                <textarea id="top_description" name="top_description" class="form-control"
+                                    placeholder="Enter Top Description"></textarea>
 
-                                </div> --}}
+                            </div> --}}
 
-                                 <div class="col-lg-6">
+                                <div class="col-lg-6">
                                     <div class="form-group">
 
                                         <label for="title">Banner Title</label>
@@ -273,7 +308,8 @@ ul li {
                                         <input id="title" name="title" type="text" class="form-control"
                                             placeholder="Enter Banner Title" value="" />
 
-                                        <p class="form-error-text" id="title_error" style="color: red; margin-top: 10px;">
+                                        <p class="form-error-text" id="title_error"
+                                            style="color: red; margin-top: 10px;">
                                         </p>
 
                                     </div>
@@ -287,13 +323,14 @@ ul li {
                                         <input id="sub_title" name="sub_title" type="text" class="form-control"
                                             placeholder="Enter Banner Sub-title" value="" />
 
-                                        <p class="form-error-text" id="sub_title_error" style="color: red; margin-top: 10px;">
+                                        <p class="form-error-text" id="sub_title_error"
+                                            style="color: red; margin-top: 10px;">
                                         </p>
 
                                     </div>
                                 </div>
-                               
-                           
+
+
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="city">Local Fields</label>
@@ -330,7 +367,8 @@ ul li {
 
                                 <div class="form-group">
 
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Scope Of Job</label>
+                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Scope Of
+                                        Job</label>
 
                                     <textarea id="scope_of_job" name="scope_of_job" class="form-control" placeholder="Enter Scope Of Job"></textarea>
 
@@ -338,7 +376,8 @@ ul li {
 
                                 <div class="form-group">
 
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Price Includes</label>
+                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Price
+                                        Includes</label>
 
                                     <textarea id="price_includes" name="price_includes" class="form-control" placeholder="Enter Price Includes"></textarea>
 
@@ -346,7 +385,8 @@ ul li {
 
                                 <div class="form-group">
 
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Price Excludes</label>
+                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Price
+                                        Excludes</label>
 
                                     <textarea id="price_excludes" name="price_excludes" class="form-control" placeholder="Enter Price Excludes"></textarea>
 
@@ -367,7 +407,8 @@ ul li {
                                 </div>
                                 <div class="form-group">
 
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Payment Terms</label>
+                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Payment
+                                        Terms</label>
 
                                     <textarea id="payment_terms" name="payment_terms" class="form-control" placeholder="Enter Payment Terms"></textarea>
 
@@ -376,34 +417,35 @@ ul li {
 
                                 <div class="row">
                                     <div class="col-md-12">
-                                            <h5>Add More Top Description Section</h5>
-                                            <hr>
+                                        <h5>Add More Top Description Section</h5>
+                                        <hr>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-9">
                                         <div class="form-group"> <label for="categoryname">City</label>
-                                        <select class="form-control" id="city_addmore_top_description" name="city_addmore_top_description[]">
-                                            <option value="">Select City</option>
-                                            @foreach ($allcity as $data)
-                                                <option value="{{ $data->id }}">{{ $data->name }}
-                                                </option>
-                                            @endforeach
+                                            <select class="form-control" id="city_addmore_top_description"
+                                                name="city_addmore_top_description[]">
+                                                <option value="">Select City</option>
+                                                @foreach ($allcity as $data)
+                                                    <option value="{{ $data->id }}">{{ $data->name }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
 
-            
+
                                     <div class="col-md-9">
                                         <div class="form-group"> <label for="categoryname">Description</label>
-                                           
-                                        <textarea id="description_addmore_top_description" name="description_addmore_top_description[]" class="form-control"
+
+                                            <textarea id="description_addmore_top_description" name="description_addmore_top_description[]" class="form-control"
                                                 placeholder="Enter Description"></textarea>
 
                                         </div>
                                     </div>
-            
+
                                 </div>
 
                                 <div class="input_fields_wrap01_top_description">
@@ -424,49 +466,51 @@ ul li {
 
 
                                 <div class="row">
-                                      <div class="col-md-12">
-                                            <h5>Add More Banners Section</h5>
-                                            <hr>
-                                      </div>
+                                    <div class="col-md-12">
+                                        <h5>Add More Banners Section</h5>
+                                        <hr>
+                                    </div>
                                 </div>
 
 
                                 <div class="row">
-                                      <div class="col-md-4">
+                                    <div class="col-md-4">
                                         <div class="form-group"> <label for="categoryname">City</label>
-                                        <select class="form-control" id="city_addmore_banner" name="city_addmore_banner[]">
-                                            <option value="">Select City</option>
-                                            @foreach ($allcity as $data)
-                                                <option value="{{ $data->id }}">{{ $data->name }}
-                                                </option>
-                                            @endforeach
+                                            <select class="form-control" id="city_addmore_banner"
+                                                name="city_addmore_banner[]">
+                                                <option value="">Select City</option>
+                                                @foreach ($allcity as $data)
+                                                    <option value="{{ $data->id }}">{{ $data->name }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group"> <label for="categoryname">Title</label>
-                                            <input type="text" id="title_addmore_banner" name="title_addmore_banner[]" class="form-control" placeholder="Enter  Title" value="">
+                                            <input type="text" id="title_addmore_banner" name="title_addmore_banner[]"
+                                                class="form-control" placeholder="Enter  Title" value="">
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
                                         <div class="form-group"> <label for="categoryname">Image (2025px X 660px)</label>
-                                            <input type="file" id="image" name="image_addmore_banner[]" class="form-control"
-                                                placeholder="">
+                                            <input type="file" id="image" name="image_addmore_banner[]"
+                                                class="form-control" placeholder="">
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                    <div class="form-group">
+                                        <div class="form-group">
 
-                                        <label for="name">Mobile Banner Image (400px x 475px)</label>
+                                            <label for="name">Mobile Banner Image (400px x 475px)</label>
 
-                                        <input id="mobile_banner_image_addmore" name="mobile_banner_image_addmore[]" type="file"
-                                            class="form-control"value="" />
-                                        <p class="form-error-text" id="mobile_banner_image_error"
-                                            style="color: red; margin-top: 10px;">
-                                        </p>
+                                            <input id="mobile_banner_image_addmore" name="mobile_banner_image_addmore[]"
+                                                type="file" class="form-control" value="" />
+                                            <p class="form-error-text" id="mobile_banner_image_error"
+                                                style="color: red; margin-top: 10px;">
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
 
                                     <div class="col-md-5">
                                         <div class="form-group"> <label for="categoryname">Short Description</label>
@@ -474,7 +518,7 @@ ul li {
                                                 placeholder="Enter Description"></textarea>
                                         </div>
                                     </div>
-                                    
+
 
                                 </div>
                                 <div class="input_fields_wrap">
@@ -482,33 +526,39 @@ ul li {
 
                                 <div class="form-group">
                                     <div class="col-sm-12">
-                                        <button style="border: medium none;margin-right: 0px;line-height: 25px;margin-top: -62px;" class="submit btn bg-purple pull-right" type="button"  id="add_field_button">Add More </button>
+                                        <button
+                                            style="border: medium none;margin-right: 0px;line-height: 25px;margin-top: -62px;"
+                                            class="submit btn bg-purple pull-right" type="button"
+                                            id="add_field_button">Add
+                                            More </button>
                                     </div>
                                 </div>
 
-                                 
+
                                 <div class="row">
-                                      <div class="col-md-12">
-                                            <h5>Add More Content Section</h5>
-                                            <hr>
-                                      </div>
+                                    <div class="col-md-12">
+                                        <h5>Add More Content Section</h5>
+                                        <hr>
+                                    </div>
                                 </div>
 
                                 <div class="row">
-                                      <div class="col-md-4">
+                                    <div class="col-md-4">
                                         <div class="form-group"> <label for="categoryname">City</label>
-                                        <select class="form-control" id="city_addmore_second" name="city_addmore_second[]">
-                                            <option value="">Select City</option>
-                                            @foreach ($allcity as $data)
-                                                <option value="{{ $data->id }}">{{ $data->name }}
-                                                </option>
-                                            @endforeach
+                                            <select class="form-control" id="city_addmore_second"
+                                                name="city_addmore_second[]">
+                                                <option value="">Select City</option>
+                                                @foreach ($allcity as $data)
+                                                    <option value="{{ $data->id }}">{{ $data->name }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group"> <label for="categoryname">Title</label>
-                                            <input type="text" id="title_addmore" name="title_addmore[]" class="form-control" placeholder="Enter  Title" value="">
+                                            <input type="text" id="title_addmore" name="title_addmore[]"
+                                                class="form-control" placeholder="Enter  Title" value="">
                                         </div>
                                     </div>
 
@@ -527,7 +577,9 @@ ul li {
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group"> <label for="categoryname">Image Alt tag</label>
-                                            <input type="text" id="image_alt_tag_addmore" name="image_alt_tag_addmore[]" class="form-control" placeholder="Enter  Image Alt tag" value="">
+                                            <input type="text" id="image_alt_tag_addmore"
+                                                name="image_alt_tag_addmore[]" class="form-control"
+                                                placeholder="Enter  Image Alt tag" value="">
                                         </div>
                                     </div>
 
@@ -537,52 +589,55 @@ ul li {
 
                                 <div class="form-group">
                                     <div class="col-sm-12">
-                                        <button style="border: medium none;margin-right: 0px;line-height: 25px;margin-top: -62px;" class="submit btn bg-purple pull-right" type="button"  id="add_field_button01">Add More </button>
+                                        <button
+                                            style="border: medium none;margin-right: 0px;line-height: 25px;margin-top: -62px;"
+                                            class="submit btn bg-purple pull-right" type="button"
+                                            id="add_field_button01">Add More </button>
                                     </div>
                                 </div>
 
 
                                 <div class="row">
-                                      <div class="col-md-12">
-                                            <h5>Add More Meta Section</h5>
-                                            <hr>
-                                      </div>
+                                    <div class="col-md-12">
+                                        <h5>Add More Meta Section</h5>
+                                        <hr>
+                                    </div>
                                 </div>
 
 
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group"> <label for="categoryname">City</label>
-                                        <select class="form-control" id="city_addmore_third" name="city_addmore_third[]">
-                                            <option value="">Select City</option>
-                                            @foreach ($allcity as $data)
-                                                <option value="{{ $data->id }}">{{ $data->name }}
-                                                </option>
-                                            @endforeach
+                                            <select class="form-control" id="city_addmore_third"
+                                                name="city_addmore_third[]">
+                                                <option value="">Select City</option>
+                                                @foreach ($allcity as $data)
+                                                    <option value="{{ $data->id }}">{{ $data->name }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
                                         <div class="form-group"> <label for="categoryname">Meta Title</label>
-                                            <input type="text" id="meta_title" name="meta_title[]" class="form-control"
-                                                placeholder="">
+                                            <input type="text" id="meta_title" name="meta_title[]"
+                                                class="form-control" placeholder="">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group"> <label for="categoryname">Meta Keyword</label>
-                                            <input type="text" id="meta_keyword" name="meta_keyword[]" class="form-control"
-                                                placeholder="">
+                                            <input type="text" id="meta_keyword" name="meta_keyword[]"
+                                                class="form-control" placeholder="">
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
                                         <div class="form-group"><label for="categoryname">Meta Description</label>
-                                            <textarea id="meta_description" name="meta_description[]" class="form-control"
-                                                placeholder="Enter Meta Description"></textarea>
+                                            <textarea id="meta_description" name="meta_description[]" class="form-control" placeholder="Enter Meta Description"></textarea>
                                         </div>
                                     </div>
-                                  
+
 
                                 </div>
                                 <div class="input_fields_wrap02">
@@ -590,7 +645,10 @@ ul li {
 
                                 <div class="form-group">
                                     <div class="col-sm-12">
-                                        <button style="border: medium none;margin-right: 0px;line-height: 25px;margin-top: -62px;" class="submit btn bg-purple pull-right" type="button"  id="add_field_button02">Add More </button>
+                                        <button
+                                            style="border: medium none;margin-right: 0px;line-height: 25px;margin-top: -62px;"
+                                            class="submit btn bg-purple pull-right" type="button"
+                                            id="add_field_button02">Add More </button>
                                     </div>
                                 </div>
 
@@ -637,7 +695,7 @@ ul li {
 
 @section('footer_js')
 
-    
+
     <script src="{{ asset('public/admin/assets/ckeditor/build/ckeditor.js') }}"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/34.2.0/classic/ckeditor.js"></script>
 
@@ -653,35 +711,68 @@ ul li {
                 console.error(error);
 
             });
-             ClassicEditor
-    .create(document.querySelector('#top_description'), {
-        ckfinder: {
-            uploadUrl: "{{ route('ckeditor.upload') . '?_token=' . csrf_token() }}"
-        }
-    })
-    .catch(error => {
-        console.error(error);
-    });
+        ClassicEditor
+            .create(document.querySelector('#top_description'), {
+                ckfinder: {
+                    uploadUrl: "{{ route('ckeditor.upload') . '?_token=' . csrf_token() }}"
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
 
 
-    ClassicEditor.create(document.querySelector('#description_addmore_top_description'), {
+        ClassicEditor.create(document.querySelector('#description_addmore_top_description'), {
             heading: {
-                options: [
-                { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-                { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-                { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-                { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-                { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
-                { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
-                { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
-            ]
+                options: [{
+                        model: 'paragraph',
+                        title: 'Paragraph',
+                        class: 'ck-heading_paragraph'
+                    },
+                    {
+                        model: 'heading1',
+                        view: 'h1',
+                        title: 'Heading 1',
+                        class: 'ck-heading_heading1'
+                    },
+                    {
+                        model: 'heading2',
+                        view: 'h2',
+                        title: 'Heading 2',
+                        class: 'ck-heading_heading2'
+                    },
+                    {
+                        model: 'heading3',
+                        view: 'h3',
+                        title: 'Heading 3',
+                        class: 'ck-heading_heading3'
+                    },
+                    {
+                        model: 'heading4',
+                        view: 'h4',
+                        title: 'Heading 4',
+                        class: 'ck-heading_heading4'
+                    },
+                    {
+                        model: 'heading5',
+                        view: 'h5',
+                        title: 'Heading 5',
+                        class: 'ck-heading_heading5'
+                    },
+                    {
+                        model: 'heading6',
+                        view: 'h6',
+                        title: 'Heading 6',
+                        class: 'ck-heading_heading6'
+                    }
+                ]
             }
         }).catch(error => {
             console.error(error);
         });
 
 
-     ClassicEditor
+        ClassicEditor
 
             .create(document.querySelector('#description_addmore'))
 
@@ -691,7 +782,7 @@ ul li {
 
             });
 
-            ClassicEditor
+        ClassicEditor
             .create(document.querySelector('#scope_of_job'), {
                 ckfinder: {
                     uploadUrl: "{{ route('ckeditor.upload') . '?_token=' . csrf_token() }}"
@@ -702,7 +793,7 @@ ul li {
             });
 
 
-            ClassicEditor
+        ClassicEditor
             .create(document.querySelector('#price_includes'), {
                 ckfinder: {
                     uploadUrl: "{{ route('ckeditor.upload') . '?_token=' . csrf_token() }}"
@@ -712,7 +803,7 @@ ul li {
                 console.error(error);
             });
 
-            ClassicEditor
+        ClassicEditor
             .create(document.querySelector('#price_excludes'), {
                 ckfinder: {
                     uploadUrl: "{{ route('ckeditor.upload') . '?_token=' . csrf_token() }}"
@@ -722,7 +813,7 @@ ul li {
                 console.error(error);
             });
 
-            ClassicEditor
+        ClassicEditor
             .create(document.querySelector('#disclaimer'), {
                 ckfinder: {
                     uploadUrl: "{{ route('ckeditor.upload') . '?_token=' . csrf_token() }}"
@@ -732,7 +823,7 @@ ul li {
                 console.error(error);
             });
 
-            ClassicEditor
+        ClassicEditor
             .create(document.querySelector('#insurance'), {
                 ckfinder: {
                     uploadUrl: "{{ route('ckeditor.upload') . '?_token=' . csrf_token() }}"
@@ -742,7 +833,7 @@ ul li {
                 console.error(error);
             });
 
-            ClassicEditor
+        ClassicEditor
             .create(document.querySelector('#payment_terms'), {
                 ckfinder: {
                     uploadUrl: "{{ route('ckeditor.upload') . '?_token=' . csrf_token() }}"
@@ -751,12 +842,10 @@ ul li {
             .catch(error => {
                 console.error(error);
             });
-            
-                        
     </script>
 
-<script>
-     $(document).ready(function() {
+    <script>
+        $(document).ready(function() {
             var max_fields = 50;
             var wrapper = $(".input_fields_wrap");
             var add_button = $("#add_field_button");
@@ -794,7 +883,7 @@ ul li {
             });
         });
 
-       $(document).ready(function() {
+        $(document).ready(function() {
             var max_fields = 50;
             var wrapper = $(".input_fields_wrap01");
             var add_button = $("#add_field_button01");
@@ -837,7 +926,7 @@ ul li {
         });
 
 
-         $(document).ready(function() {
+        $(document).ready(function() {
             var max_fields = 50;
             var wrapper = $(".input_fields_wrap02");
             var add_button = $("#add_field_button02");
@@ -874,7 +963,7 @@ ul li {
                 });
             });
         });
-</script>
+    </script>
 
     <script>
         $(function() {
@@ -899,12 +988,12 @@ ul li {
         $("#form_fields_two").select2({
             placeholder: "Select a International Fields" // Replace with your desired placeholder text
         });
-		
-		$("#country").select2({
+
+        $("#country").select2({
             placeholder: "Select a Country" // Replace with your desired placeholder text
         });
-		
-		
+
+
 
 
         function service_validation() {
@@ -966,54 +1055,54 @@ ul li {
 
         }
         /* function city_change(country_id) {
-                alert(country_id);
-				return false; 
-               //var url = '{{ url('city_show_new') }}';
-               // alert(url);
-               $.ajax({
-                   url: url,
-                   type: 'post',
-                   data: {
-                       "_token": "{{ csrf_token() }}",
-                       "country_id": country_id
-                   },
-                   success: function(msg) {
-                       document.getElementById('city_chang').innerHTML = msg;
-                       $("#city").select2({
-                           placeholder: "Select a City" // Replace with your desired placeholder text
-                       });
-                   }
-               });
-           } */
-		   
-		   function city_change(country_ids) {
-
-				// If multiple countries selected, country_ids will be an array
-				$.ajax({
-					url: "{{ url('city_show_new') }}",
-					type: "POST",
-					data: {
-						country_id: country_ids,
-						"_token": "{{ csrf_token() }}",
-					},
-					success: function (response) {
-						$("#city").empty(); // Remove old options
-
-						$("#city").append(`<option value="">Select City</option>`);
-
-						$.each(response, function (index, city) {
-							$("#city").append(`<option value="${city.id}">${city.name}</option>`);
-						});
-					}
-				});
-			}
-           $("#city").select2({
-                placeholder: "Select a City" // Replace with your desired placeholder text
+                        alert(country_id);
+        				return false; 
+                       //var url = '{{ url('city_show_new') }}';
+            // alert(url);
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "country_id": country_id
+                },
+                success: function (msg) {
+                    document.getElementById('city_chang').innerHTML = msg;
+                    $("#city").select2({
+                        placeholder: "Select a City" // Replace with your desired placeholder text
+                    });
+                }
             });
+                   } */
+
+        function city_change(country_ids) {
+
+            // If multiple countries selected, country_ids will be an array
+            $.ajax({
+                url: "{{ url('city_show_new') }}",
+                type: "POST",
+                data: {
+                    country_id: country_ids,
+                    "_token": "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    $("#city").empty(); // Remove old options
+
+                    $("#city").append(`<option value="">Select City</option>`);
+
+                    $.each(response, function(index, city) {
+                        $("#city").append(`<option value="${city.id}">${city.name}</option>`);
+                    });
+                }
+            });
+        }
+        $("#city").select2({
+            placeholder: "Select a City" // Replace with your desired placeholder text
+        });
 
 
 
-            $(document).ready(function() {
+        $(document).ready(function() {
             var max_fields = 50;
             var wrapper = $(".input_fields_wrap01_top_description");
             var add_button = $("#add_field_button01_top_description");
@@ -1034,15 +1123,48 @@ ul li {
                     if (newDescriptionField.length) {
                         ClassicEditor.create(newDescriptionField[0], {
                             heading: {
-                                options: [
-                { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-                { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-                { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-                { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-                { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
-                { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
-                { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
-            ]
+                                options: [{
+                                        model: 'paragraph',
+                                        title: 'Paragraph',
+                                        class: 'ck-heading_paragraph'
+                                    },
+                                    {
+                                        model: 'heading1',
+                                        view: 'h1',
+                                        title: 'Heading 1',
+                                        class: 'ck-heading_heading1'
+                                    },
+                                    {
+                                        model: 'heading2',
+                                        view: 'h2',
+                                        title: 'Heading 2',
+                                        class: 'ck-heading_heading2'
+                                    },
+                                    {
+                                        model: 'heading3',
+                                        view: 'h3',
+                                        title: 'Heading 3',
+                                        class: 'ck-heading_heading3'
+                                    },
+                                    {
+                                        model: 'heading4',
+                                        view: 'h4',
+                                        title: 'Heading 4',
+                                        class: 'ck-heading_heading4'
+                                    },
+                                    {
+                                        model: 'heading5',
+                                        view: 'h5',
+                                        title: 'Heading 5',
+                                        class: 'ck-heading_heading5'
+                                    },
+                                    {
+                                        model: 'heading6',
+                                        view: 'h6',
+                                        title: 'Heading 6',
+                                        class: 'ck-heading_heading6'
+                                    }
+                                ]
                             }
                         }).catch(error => {
                             console.error(error);
@@ -1064,13 +1186,12 @@ ul li {
                 });
             });
         });
-
     </script>
-<script>
-    $(document).ready(function() {
-        $('.search_country').select2();
-    });
-</script>
+    <script>
+        $(document).ready(function() {
+            $('.search_country').select2();
+        });
+    </script>
 
 
 @stop

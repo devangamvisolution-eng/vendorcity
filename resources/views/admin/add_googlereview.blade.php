@@ -57,72 +57,97 @@
                         <!-- <h4 class="card-title">Basic Info</h4> -->
 
                         <form id="category_form" action="{{ route('google_review.store') }}" method="POST"
-
                             enctype="multipart/form-data">
 
                             @csrf
 
                             <div class="row">
 
-                                <div class="form-group">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="services">Service</label>
+                                        <select class="form-control" id="services" name="services[]" multiple="multiple">
+                                            <option value="">Select Service</option>
+                                            @foreach ($allservices as $allservices_data)
+                                                <option value="{{ $allservices_data->id }}">
+                                                    {{ $allservices_data->servicename }}</option>
+                                            @endforeach
+                                        </select>
+                                        <p class="form-error-text" id="services_error"
+                                            style="color: red; margin-top: 10px;"></p>
+                                    </div>
+                                </div>
 
-                                    <label for="name">Review</label>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="packages">Sub Service</label>
+                                        <select class="form-control" id="packages" name="subservice_id[]"
+                                            multiple="multiple">
+                                            <option value="">Select Sub Service</option>
+                                        </select>
+                                        <p class="form-error-text" id="packages_error"
+                                            style="color: red; margin-top: 10px;"></p>
+                                    </div>
+                                </div>
 
-                                   <!--  <input id="label" name="label" type="text" class="form-control"
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input id="name" name="name" type="text" class="form-control"
+                                            placeholder="Enter Name" value="" />
+                                        <p class="form-error-text" id="name_error" style="color: red; margin-top: 10px;">
+                                        </p>
+                                    </div>
+                                </div>
 
-                                        placeholder="Enter Label" value="" /> -->
-
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="name">Review</label>
                                         <select id="label" name="label" class="form-control">
-                                             <option value="">Select Review</option>
+                                            <option value="">Select Review</option>
                                             <option value="1">1</option>
                                             <option value="2">2</option>
                                             <option value="3">3</option>
                                             <option value="4">4</option>
                                             <option value="5">5</option>
                                         </select>
-
-                                    <p class="form-error-text" id="label_error" style="color: red; margin-top: 10px;"></p>
-
+                                        <p class="form-error-text" id="label_error" style="color: red; margin-top: 10px;">
+                                        </p>
+                                    </div>
                                 </div>
 
-                                <div class="form-group">
-
-                                    <label for="name">Description</label>
-                                    <textarea id="description" name="description" class="form-control"
-
-                                        placeholder="Enter Description" value=""></textarea>
-
-                                    <p class="form-error-text" id="description_error" style="color: red; margin-top: 10px;"></p>
-
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="review_date">Review Date</label>
+                                        <input id="review_date" name="review_date" type="date" class="form-control" />
+                                        <p class="form-error-text" id="review_date_error"
+                                            style="color: red; margin-top: 10px;"></p>
+                                    </div>
                                 </div>
 
-                                <div class="form-group">
-
-                                    <label for="name">Name</label>
-
-                                    <input id="name" name="name" type="text" class="form-control"
-
-                                        placeholder="Enter Name" value="" />
-
-                                    <p class="form-error-text" id="name_error" style="color: red; margin-top: 10px;"></p>
-
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="name">Description</label>
+                                        <textarea id="description" name="description" class="form-control" placeholder="Enter Description" value=""></textarea>
+                                        <p class="form-error-text" id="description_error"
+                                            style="color: red; margin-top: 10px;"></p>
+                                    </div>
                                 </div>
-
-
 
                             </div>
 
                             <div class="text-end mt-4">
+
 
                                 <a class="btn btn-primary" href="{{ route('google_review.index') }}"> Cancel</a>
 
 
 
                                 <button class="btn btn-primary mb-1" type="button" disabled id="spinner_button"
-
                                     style="display: none;">
 
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span class="spinner-border spinner-border-sm" role="status"
+                                        aria-hidden="true"></span>
 
                                     Loading...
 
@@ -131,7 +156,6 @@
 
 
                                 <button type="button" class="btn btn-primary" id="submit_button"
-
                                     onclick="javascript:category_validation()">Submit</button>
 
                                 <!-- <input type="submit" name="submit" value="Submit" class="btn btn-primary"> -->
@@ -157,10 +181,9 @@
 
 
     <script>
-
         function category_validation() {
 
-            var label = jQuery("#label").val();            
+            var label = jQuery("#label").val();
 
             if (label == '') {
                 jQuery('#label_error').html("Please Select Review");
@@ -172,7 +195,7 @@
                 return false;
             }
 
-            var description = jQuery("#description").val();            
+            var description = jQuery("#description").val();
 
             if (description == '') {
                 jQuery('#description_error').html("Please Enter Description");
@@ -185,7 +208,7 @@
             }
 
 
-            var name = jQuery("#name").val();            
+            var name = jQuery("#name").val();
 
             if (name == '') {
                 jQuery('#name_error').html("Please Enter Name");
@@ -209,7 +232,50 @@
 
         }
 
+        $("#packages").select2({
+            placeholder: "Select a Sub Service"
+        });
+
+        $("#services").select2({
+            placeholder: "Select a Service"
+        });
+
+        // When service selection changes, fetch matching subservices via AJAX
+        $("#services").on("change", function() {
+            var selectedServices = $(this).val();
+            $("#packages").empty().append('<option value="">Select Sub Service</option>');
+
+            if (!selectedServices || selectedServices.length === 0) {
+                $("#packages").trigger("change");
+                return;
+            }
+
+            // Fetch subservices for each selected service and merge results
+            var allSubservices = [];
+            var fetchCount = 0;
+            $.each(selectedServices, function(i, serviceId) {
+                if (!serviceId) {
+                    fetchCount++;
+                    return;
+                }
+                $.getJSON('{{ url('admin/get-subservices-by-service') }}/' + serviceId, function(data) {
+                    allSubservices = allSubservices.concat(data);
+                    fetchCount++;
+                    if (fetchCount === selectedServices.length) {
+                        // Deduplicate by id
+                        var seen = {};
+                        $.each(allSubservices, function(j, sub) {
+                            if (!seen[sub.id]) {
+                                seen[sub.id] = true;
+                                $("#packages").append('<option value="' + sub.id + '">' +
+                                    sub.subservicename + '</option>');
+                            }
+                        });
+                        $("#packages").trigger("change");
+                    }
+                });
+            });
+        });
     </script>
 
 @stop
-

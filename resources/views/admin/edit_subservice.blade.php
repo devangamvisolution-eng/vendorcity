@@ -570,27 +570,27 @@
 
 
                                 <!-- <div class="col-lg-12">
-                                            <div class="form-group">
-                                                <label for="service_detail_popup_description" style="margin:15px 0 5px 0px; width:100%;">Meta Title</label>
-                                                <input id="meta_title" name="meta_title" type="text" class="form-control" value="{{ $subservice->meta_title }}">
-
-                                                
-                                            </div>
-                                            </div>
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label for="service_detail_popup_description" style="margin:15px 0 5px 0px; width:100%;">Meta Keyword</label>
-                                                    <input id="meta_keyword" name="meta_keyword" type="text" class="form-control" value="{{ $subservice->meta_keyword }}">
-            
-                                                    
-                                                </div>
-                                                </div>
-                                                <div class="col-lg-12">
                                                     <div class="form-group">
-                                                        <label for="meta_description" style="margin:15px 0 5px 0px; width:100%;">Meta Description</label>
-                                                        <textarea id="meta_description" name="meta_description" class="form-control" placeholder="Enter Meta Description">{{ $subservice->meta_description }}</textarea>
+                                                        <label for="service_detail_popup_description" style="margin:15px 0 5px 0px; width:100%;">Meta Title</label>
+                                                        <input id="meta_title" name="meta_title" type="text" class="form-control" value="{{ $subservice->meta_title }}">
+
+                                                        
                                                     </div>
-                                                    </div> -->
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label for="service_detail_popup_description" style="margin:15px 0 5px 0px; width:100%;">Meta Keyword</label>
+                                                            <input id="meta_keyword" name="meta_keyword" type="text" class="form-control" value="{{ $subservice->meta_keyword }}">
+                    
+                                                            
+                                                        </div>
+                                                        </div>
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label for="meta_description" style="margin:15px 0 5px 0px; width:100%;">Meta Description</label>
+                                                                <textarea id="meta_description" name="meta_description" class="form-control" placeholder="Enter Meta Description">{{ $subservice->meta_description }}</textarea>
+                                                            </div>
+                                                            </div> -->
 
                                 <div class="row">
                                     <div class="col-md-12">
@@ -1206,6 +1206,409 @@
                                     </div>
                                 </div>
 
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h5>Add More Why Choose VendorCity Section</h5>
+                                        <hr>
+                                    </div>
+                                </div>
+                                @if (!empty($subservice_why_choose_attr))
+                                    <input type="hidden" name="city_addmore_why_choose1[]" value="">
+                                    <input type="hidden" name="whychoosevc_addmore1[]" value="">
+                                    @for ($i = 0; $i < count($subservice_why_choose_attr); $i++)
+                                        <div class="row">
+                                            @if ($i != 0)
+                                                <hr>
+                                            @endif
+                                            <input type="hidden" name="updateid_why_choose[]"
+                                                id="updateid_why_choose{{ $i + 1 }}"
+                                                value="{{ $subservice_why_choose_attr[$i]->id }}">
+
+                                            <div class="col-md-4">
+                                                <div class="form-group"> <label for="categoryname">City</label>
+                                                    <select class="form-control" id="city_addmore_why_chooseu"
+                                                        name="city_addmore_why_chooseu[]">
+                                                        <option value="">Select City</option>
+                                                        @foreach ($allcity as $data)
+                                                            <option
+                                                                value="{{ $data->id }}"@if ($data->id == $subservice_why_choose_attr[$i]->city) selected @endif>
+                                                                {{ $data->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-8">
+                                                <div class="form-group"><label for="categoryname">Description</label>
+                                                    <textarea id="whychoosevc_addmoreu_{{ $subservice_why_choose_attr[$i]->id }}" name="whychoosevc_addmoreu[]"
+                                                        class="form-control" placeholder="Enter Description">{{ $subservice_why_choose_attr[$i]->description }}</textarea>
+                                                </div>
+                                            </div>
+                                            <a href="#"
+                                                onclick="singledeleteattr('{{ route('removed_why_choose_att', ['pid' => $subservice_why_choose_attr[$i]->subservice_id, 'id' => $subservice_why_choose_attr[$i]->id]) }}')"
+                                                class="btn btn-danger pull-right remove_field_why_choose"
+                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
+                                        </div>
+                                    @endfor
+                                @else
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group"> <label for="categoryname">City</label>
+                                                <select class="form-control" id="city_addmore_why_choose1"
+                                                    name="city_addmore_why_choose1[]">
+                                                    <option value="">Select City</option>
+                                                    @foreach ($allcity as $data)
+                                                        <option value="{{ $data->id }}">{{ $data->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-8">
+                                            <div class="form-group"><label for="categoryname">Description</label>
+                                                <textarea id="whychoosevc_addmore1" name="whychoosevc_addmore1[]" class="form-control"
+                                                    placeholder="Enter Description"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="input_fields_wrap_why_choose">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button
+                                            style="border: medium none;margin-right: 15px;line-height: 25px; margin-top: 10px; margin-bottom: 20px;"
+                                            class="submit btn bg-purple pull-right" type="button"
+                                            id="add_field_button_why_choose">Add More </button>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h5>Add More Description Section</h5>
+                                        <hr>
+                                    </div>
+                                </div>
+                                @if (isset($subservice_description_addmores) && count($subservice_description_addmores) > 0)
+                                    <input type="hidden" name="city_addmore_description1[]" value="">
+                                    <input type="hidden" name="description_addmore_new1[]" value="">
+                                    @for ($i = 0; $i < count($subservice_description_addmores); $i++)
+                                        <div class="row">
+                                            @if ($i != 0)
+                                                <hr>
+                                            @endif
+                                            <input type="hidden" name="updateid_description[]"
+                                                id="updateid_description{{ $i + 1 }}"
+                                                value="{{ $subservice_description_addmores[$i]['id'] }}">
+
+                                            <div class="col-md-4">
+                                                <div class="form-group"> <label for="categoryname">City</label>
+                                                    <select class="form-control" id="city_addmore_descriptionu"
+                                                        name="city_addmore_descriptionu[]">
+                                                        <option value="">Select City</option>
+                                                        @foreach ($allcity as $data)
+                                                            <option
+                                                                value="{{ $data->id }}"@if ($data->id == $subservice_description_addmores[$i]['city']) selected @endif>
+                                                                {{ $data->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-8">
+                                                <div class="form-group"><label for="categoryname">Description</label>
+                                                    <textarea id="description_addmore_newu_{{ $subservice_description_addmores[$i]['id'] }}"
+                                                        name="description_addmore_newu[]" class="form-control" placeholder="Enter Description">{{ $subservice_description_addmores[$i]['description'] }}</textarea>
+                                                </div>
+                                            </div>
+                                            <a href="#"
+                                                onclick="singledeleteattr('{{ route('removed_description_att', ['pid' => $subservice_description_addmores[$i]['subservice_id'], 'id' => $subservice_description_addmores[$i]['id']]) }}')"
+                                                class="btn btn-danger pull-right remove_field_description"
+                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
+                                        </div>
+                                    @endfor
+                                @else
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group"> <label for="categoryname">City</label>
+                                                <select class="form-control" id="city_addmore_description1"
+                                                    name="city_addmore_description1[]">
+                                                    <option value="">Select City</option>
+                                                    @foreach ($allcity as $data)
+                                                        <option value="{{ $data->id }}">{{ $data->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-8">
+                                            <div class="form-group"><label for="categoryname">Description</label>
+                                                <textarea id="description_addmore_new1" name="description_addmore_new1[]" class="form-control"
+                                                    placeholder="Enter Description"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="input_fields_wrap_description">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button
+                                            style="border: medium none;margin-right: 15px;line-height: 25px; margin-top: 10px; margin-bottom: 20px;"
+                                            class="submit btn bg-purple pull-right" type="button"
+                                            id="add_field_button_description">Add More </button>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h5>Add More Services You'll Love Section</h5>
+                                        <hr>
+                                    </div>
+                                </div>
+                                @if (!empty($subservice_more_service_attr))
+                                    <input type="hidden" name="city_addmore_more_service1[]" value="">
+                                    <input type="hidden" name="subservice_addmore_more_service1[]" value="">
+                                    @for ($i = 0; $i < count($subservice_more_service_attr); $i++)
+                                        <div class="row">
+                                            @if ($i != 0)
+                                                <hr>
+                                            @endif
+                                            <input type="hidden" name="updateid_more_service[]"
+                                                id="updateid_more_service{{ $i + 1 }}"
+                                                value="{{ $subservice_more_service_attr[$i]->id }}">
+
+                                            <div class="col-md-4">
+                                                <div class="form-group"> <label for="categoryname">City</label>
+                                                    <select class="form-control" id="city_addmore_more_serviceu"
+                                                        name="city_addmore_more_serviceu[]">
+                                                        <option value="">Select City</option>
+                                                        @foreach ($allcity as $data)
+                                                            <option
+                                                                value="{{ $data->id }}"@if ($data->id == $subservice_more_service_attr[$i]->city) selected @endif>
+                                                                {{ $data->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-8">
+                                                <div class="form-group"><label for="categoryname">Subservices</label>
+                                                    <select class="form-control select2"
+                                                        id="subservice_addmore_more_serviceu_{{ $i }}"
+                                                        name="subservice_addmore_more_serviceu[{{ $i }}][]"
+                                                        multiple="multiple" data-placeholder="Select Subservices"
+                                                        style="width: 100%;">
+                                                        @php
+                                                            $selectedSubservices = explode(
+                                                                ',',
+                                                                $subservice_more_service_attr[$i]->more_subservice_id,
+                                                            );
+                                                        @endphp
+                                                        @foreach ($all_subservices as $data)
+                                                            <option value="{{ $data->id }}"
+                                                                @if (in_array($data->id, $selectedSubservices)) selected @endif>
+                                                                {{ $data->subservicename }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <a href="#"
+                                                onclick="singledeleteattr('{{ route('removed_more_service_att', ['pid' => $subservice_more_service_attr[$i]->subservice_id, 'id' => $subservice_more_service_attr[$i]->id]) }}')"
+                                                class="btn btn-danger pull-right remove_field_more_service"
+                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
+                                        </div>
+                                    @endfor
+                                @else
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group"> <label for="categoryname">City</label>
+                                                <select class="form-control" id="city_addmore_more_service1"
+                                                    name="city_addmore_more_service1[]">
+                                                    <option value="">Select City</option>
+                                                    @foreach ($allcity as $data)
+                                                        <option value="{{ $data->id }}">{{ $data->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-8">
+                                            <div class="form-group"><label for="categoryname">Subservices</label>
+                                                <select class="form-control select2"
+                                                    id="subservice_addmore_more_service1_0"
+                                                    name="subservice_addmore_more_service1[0][]" multiple="multiple"
+                                                    data-placeholder="Select Subservices" style="width: 100%;">
+                                                    @foreach ($all_subservices as $data)
+                                                        <option value="{{ $data->id }}">{{ $data->subservicename }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="input_fields_wrap_more_service">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button
+                                            style="border: medium none;margin-right: 15px;line-height: 25px; margin-top: 10px; margin-bottom: 20px;"
+                                            class="submit btn bg-purple pull-right" type="button"
+                                            id="add_field_button_more_service">Add More </button>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h5>What Else Can We Help With? Section</h5>
+                                        <hr>
+                                    </div>
+                                </div>
+                                @if (count($subservice_what_else_service_attr) > 0)
+                                    @for ($i = 0; $i < count($subservice_what_else_service_attr); $i++)
+                                        <div class="row">
+                                            @if ($i != 0)
+                                                <hr>
+                                            @endif
+                                            <input type="hidden" name="updateid_what_else_service[]"
+                                                id="updateid_what_else_service{{ $i + 1 }}"
+                                                value="{{ $subservice_what_else_service_attr[$i]->id }}">
+
+                                            <div class="col-md-4">
+                                                <div class="form-group"> <label for="categoryname">City</label>
+                                                    <select class="form-control" id="city_addmore_what_else_serviceu"
+                                                        name="city_addmore_what_else_serviceu[]">
+                                                        <option value="">Select City</option>
+                                                        @foreach ($allcity as $data)
+                                                            <option
+                                                                value="{{ $data->id }}"@if ($data->id == $subservice_what_else_service_attr[$i]->city) selected @endif>
+                                                                {{ $data->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-8">
+                                                <div class="form-group"><label for="categoryname">Subservices</label>
+                                                    <select class="form-control select2"
+                                                        id="subservice_addmore_what_else_serviceu_{{ $i }}"
+                                                        name="subservice_addmore_what_else_serviceu[{{ $i }}][]"
+                                                        multiple="multiple" data-placeholder="Select Subservices"
+                                                        style="width: 100%;">
+                                                        @php
+                                                            $selectedSubservicesWhatElse = explode(
+                                                                ',',
+                                                                $subservice_what_else_service_attr[$i]
+                                                                    ->what_else_subservice_id,
+                                                            );
+                                                        @endphp
+                                                        @foreach ($all_subservices as $data)
+                                                            <option value="{{ $data->id }}"
+                                                                @if (in_array($data->id, $selectedSubservicesWhatElse)) selected @endif>
+                                                                {{ $data->subservicename }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <a href="#"
+                                                onclick="singledeleteattr('{{ route('removed_what_else_att', ['pid' => $subservice_what_else_service_attr[$i]->subservice_id, 'id' => $subservice_what_else_service_attr[$i]->id]) }}')"
+                                                class="btn btn-danger pull-right remove_field_what_else_service"
+                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
+                                        </div>
+                                    @endfor
+                                @else
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group"> <label for="categoryname">City</label>
+                                                <select class="form-control" id="city_addmore_what_else_service1"
+                                                    name="city_addmore_what_else_service1[]">
+                                                    <option value="">Select City</option>
+                                                    @foreach ($allcity as $data)
+                                                        <option value="{{ $data->id }}">{{ $data->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-8">
+                                            <div class="form-group"><label for="categoryname">Subservices</label>
+                                                <select class="form-control select2"
+                                                    id="subservice_addmore_what_else_service1_0"
+                                                    name="subservice_addmore_what_else_service1[0][]"
+                                                    multiple="multiple" data-placeholder="Select Subservices"
+                                                    style="width: 100%;">
+                                                    @foreach ($all_subservices as $data)
+                                                        <option value="{{ $data->id }}">
+                                                            {{ $data->subservicename }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="input_fields_wrap_what_else_service">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button
+                                            style="border: medium none;margin-right: 15px;line-height: 25px; margin-top: 10px; margin-bottom: 20px;"
+                                            class="submit btn bg-purple pull-right" type="button"
+                                            id="add_field_button_what_else_service">Add More </button>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h5>How to Book Services Section</h5>
+                                        <hr>
+                                    </div>
+                                </div>
+                                @for ($i = 1; $i <= 4; $i++)
+                                    @php
+                                        $stepTitleField = 'step_' . $i . '_title';
+                                        $stepImageField = 'step_' . $i . '_image';
+                                    @endphp
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h6>Step {{ $i }}</h6>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group"> <label for="{{ $stepTitleField }}">Step
+                                                    {{ $i }} Title</label>
+                                                <input type="text" id="{{ $stepTitleField }}"
+                                                    name="{{ $stepTitleField }}" class="form-control"
+                                                    placeholder="Enter Step {{ $i }} Title"
+                                                    value="{{ $subservice->$stepTitleField }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group"> <label for="{{ $stepImageField }}">Step
+                                                    {{ $i }} Image</label>
+                                                <input type="file" id="{{ $stepImageField }}"
+                                                    name="{{ $stepImageField }}" class="form-control"
+                                                    placeholder="">
+                                                @if ($subservice->$stepImageField != '')
+                                                    <img src="{{ url('public/upload/subservice/' . $subservice->$stepImageField) }}"
+                                                        alt="" style="width: 100px; margin-top: 10px;">
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endfor
+
                             </div>
 
                             <div class="text-end mt-4">
@@ -1599,6 +2002,121 @@
 
             });
 
+        @if ($subservice_why_choose_attr != '')
+            @for ($i = 0; $i < count($subservice_why_choose_attr); $i++)
+                ClassicEditor
+                    .create(document.querySelector(
+                        '#whychoosevc_addmoreu_{{ $subservice_why_choose_attr[$i]->id }}'))
+                    .catch(error => {
+                        console.error(error);
+                    });
+            @endfor
+        @endif
+        @if (empty($subservice_why_choose_attr))
+            ClassicEditor
+                .create(document.querySelector('#whychoosevc_addmore1'))
+                .catch(error => {
+                    console.error(error);
+                });
+        @endif
+
+        $(document).ready(function() {
+            var max_fields = 50;
+            var wrapper = $(".input_fields_wrap_why_choose");
+            var add_button = $("#add_field_button_why_choose");
+            var b = 0;
+
+            $(add_button).click(function(e) {
+                e.preventDefault();
+                if (b < max_fields) {
+                    b++;
+                    var newField = $(
+                        '<div class="row"><hr><div class="col-md-4"><div class="form-group"> <label for="categoryname">City</label><select class="form-control" name="city_addmore_why_choose1[]"><option value="">Select City</option>@foreach ($allcity as $data)<option value="{{ $data->id }}">{{ $data->name }}</option>@endforeach</select></div></div><div class="col-md-8"><div class="form-group"><label for="categoryname">Description</label><textarea id="whychoosevc_addmore_' +
+                        b +
+                        '" name="whychoosevc_addmore1[]" class="form-control" placeholder="Enter Description"></textarea></div></div><a href="#" class="btn btn-danger pull-right remove_field_why_choose" style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a></div>'
+                    );
+
+                    $(wrapper).append(newField);
+                    var newDescriptionField = newField.find('#whychoosevc_addmore_' + b);
+                    if (newDescriptionField.length) {
+                        ClassicEditor.create(newDescriptionField[0]).catch(error => {
+                            console.error(error);
+                        });
+                    }
+                }
+            });
+
+            $(wrapper).on("click", ".remove_field_why_choose", function(e) {
+                e.preventDefault();
+                $(this).parent('div').remove();
+                b--;
+            });
+
+            // Add a function to update the textarea content before form submission
+            $('form').submit(function() {
+                $('.input_fields_wrap_why_choose textarea').each(function() {
+                    $(this).val($(this).siblings('.ck-editor__editable').html());
+                });
+            });
+        });
+
+        @if (isset($subservice_description_addmores) && count($subservice_description_addmores) > 0)
+            @for ($i = 0; $i < count($subservice_description_addmores); $i++)
+                ClassicEditor
+                    .create(document.querySelector(
+                        '#description_addmore_newu_{{ $subservice_description_addmores[$i]['id'] }}'))
+                    .catch(error => {
+                        console.error(error);
+                    });
+            @endfor
+        @else
+            ClassicEditor
+                .create(document.querySelector('#description_addmore_new1'))
+                .catch(error => {
+                    console.error(error);
+                });
+        @endif
+
+        $(document).ready(function() {
+            var max_fields = 50;
+            var wrapper = $(".input_fields_wrap_description");
+            var add_button = $("#add_field_button_description");
+            var b = 0;
+
+            $(add_button).click(function(e) {
+                e.preventDefault();
+                if (b < max_fields) {
+                    b++;
+                    var newField = $(
+                        '<div class="row"><hr><div class="col-md-4"><div class="form-group"> <label for="categoryname">City</label><select class="form-control" name="city_addmore_description1[]"><option value="">Select City</option>@foreach ($allcity as $data)<option value="{{ $data->id }}">{{ $data->name }}</option>@endforeach</select></div></div><div class="col-md-8"><div class="form-group"><label for="categoryname">Description</label><textarea id="description_addmore_new_' +
+                        b +
+                        '" name="description_addmore_new1[]" class="form-control" placeholder="Enter Description"></textarea></div></div><a href="#" class="btn btn-danger pull-right remove_field_description" style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a></div>'
+                    );
+
+                    $(wrapper).append(newField);
+                    var newDescriptionField = newField.find('#description_addmore_new_' + b);
+                    if (newDescriptionField.length) {
+                        ClassicEditor.create(newDescriptionField[0]).catch(error => {
+                            console.error(error);
+                        });
+                    }
+                }
+            });
+
+            $(wrapper).on("click", ".remove_field_description", function(e) {
+                e.preventDefault();
+                $(this).parent('div').remove();
+                b--;
+            });
+
+            // Add a function to update the textarea content before form submission
+            $('form').submit(function() {
+                $('.input_fields_wrap_description textarea').each(function() {
+                    $(this).val($(this).siblings('.ck-editor__editable').html());
+                });
+            });
+        });
+
 
         @for ($i = 0; $i < count($package_attribute_data); $i++)
             ClassicEditor
@@ -1908,6 +2426,72 @@
                 $('.input_fields_wrap01_top_description textarea').each(function() {
                     $(this).val($(this).siblings('.ck-editor__editable').html());
                 });
+            });
+        });
+
+        $(document).ready(function() {
+            // Initialize existing select2 elements
+            $('select[id^="subservice_addmore_"]').select2({
+                placeholder: "Select Subservices"
+            });
+
+            var max_fields = 50;
+            var wrapper = $(".input_fields_wrap_more_service");
+            var add_button = $("#add_field_button_more_service");
+            var b = 0;
+
+            $(add_button).click(function(e) {
+                e.preventDefault();
+                if (b < max_fields) {
+                    b++;
+                    var newField = $(
+                        '<div class="row"><hr><div class="col-md-4"><div class="form-group"> <label for="categoryname">City</label><select class="form-control" name="city_addmore_more_service1[]"><option value="">Select City</option>@foreach ($allcity as $data)<option value="{{ $data->id }}">{{ $data->name }}</option>@endforeach</select></div></div><div class="col-md-8"><div class="form-group"><label for="categoryname">Subservices</label><select class="form-control select2" id="subservice_addmore_more_service1_' +
+                        b + '" name="subservice_addmore_more_service1[' + b +
+                        '][]" multiple="multiple" data-placeholder="Select Subservices" style="width: 100%;">@foreach ($all_subservices as $data)<option value="{{ $data->id }}">{{ $data->subservicename }}</option>@endforeach</select></div></div><a href="#" class="btn btn-danger pull-right remove_field_more_service" style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a></div>'
+                    );
+
+                    $(wrapper).append(newField);
+
+                    // Initialize Select2 on the new select element
+                    $('#subservice_addmore_more_service1_' + b).select2({
+                        placeholder: "Select Subservices"
+                    });
+                }
+            });
+
+            $(wrapper).on("click", ".remove_field_more_service", function(e) {
+                e.preventDefault();
+                $(this).parent('div').remove();
+            });
+        });
+        $(document).ready(function() {
+            var max_fields = 50;
+            var wrapper = $(".input_fields_wrap_what_else_service");
+            var add_button = $("#add_field_button_what_else_service");
+            var b = 0;
+
+            $(add_button).click(function(e) {
+                e.preventDefault();
+                if (b < max_fields) {
+                    b++;
+                    var newField = $(
+                        '<div class="row"><hr><div class="col-md-4"><div class="form-group"> <label for="categoryname">City</label><select class="form-control" name="city_addmore_what_else_service1[]"><option value="">Select City</option>@foreach ($allcity as $data)<option value="{{ $data->id }}">{{ $data->name }}</option>@endforeach</select></div></div><div class="col-md-8"><div class="form-group"><label for="categoryname">Subservices</label><select class="form-control select2" id="subservice_addmore_what_else_service1_' +
+                        b + '" name="subservice_addmore_what_else_service1[' + b +
+                        '][]" multiple="multiple" data-placeholder="Select Subservices" style="width: 100%;">@foreach ($all_subservices as $data)<option value="{{ $data->id }}">{{ $data->subservicename }}</option>@endforeach</select></div></div><a href="#" class="btn btn-danger pull-right remove_field_what_else_service" style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a></div>'
+                    );
+
+                    $(wrapper).append(newField);
+
+                    // Initialize Select2 on the new select element
+                    $('#subservice_addmore_what_else_service1_' + b).select2({
+                        placeholder: "Select Subservices"
+                    });
+                }
+            });
+
+            $(wrapper).on("click", ".remove_field_what_else_service", function(e) {
+                e.preventDefault();
+                $(this).parent('div').remove();
             });
         });
     </script>

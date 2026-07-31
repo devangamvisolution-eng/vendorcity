@@ -438,7 +438,7 @@
                                 id="upcoming" role="tabpanel">
                                 @if (count($upcomingOrders))
                                     @foreach ($upcomingOrders as $orders)
-                                        <a href="{{ url('order-detail/' . $orders->order_id . '?visit_date=' . $orders->visit_date) }}"
+                                        <a href="{{ route('order-detail', ['id' => $orders->order_id, 'visit_date' => $orders->visit_date]) }}"
                                             class="appointment-card-link">
                                             <div class="appointment-card">
                                                 <div class="appointment-header">
@@ -508,7 +508,7 @@
                                 role="tabpanel">
                                 @if (count($pastOrders))
                                     @foreach ($pastOrders as $orders)
-                                        <a href="{{ url('order-detail/' . $orders->order_id . '?visit_date=' . $orders->visit_date) }}"
+                                        <a href="{{ route('order-detail', ['id' => $orders->order_id, 'visit_date' => $orders->visit_date]) }}"
                                             class="appointment-card-link">
                                             <div class="appointment-card">
                                                 <div class="appointment-header">

@@ -614,7 +614,8 @@
 
                         <div class="banner-content-center">
                             <h2 class="banner_title text-white banner_static_title">
-                                {{ $subservice_banner_attr->title ?? '' }}</h2>
+                                {{ $subservice_banner_attr->title ?? '' }}
+                            </h2>
                             <h6 class="text-white banner_static_subtitle">
                                 {{ $subservice_banner_attr->short_description ?? '' }}
                             </h6>
@@ -634,7 +635,7 @@
                                             $buttomLabel = 'Get 5 Free Quotes';
                                         }
                                     @endphp
-                                    <a href="{{ route('enquiry', ['service_id' => $services_id, 'subservice_id' => $subservices_new->id]) }}"
+                                    <a href="{{ route('enquiry', ['service_id' => \App\Models\Admin\Service::find($services_id)->page_url ?? $services_id, 'subservice_id' => $subservices_new->page_url ?? $subservices_new->id]) }}"
                                         class="ud-btn btn-thm2 add-joining custome-button mb-2 mb-md-0 me-md-3"
                                         id="get_quote_button">{{ $buttomLabel }}</a>
 
@@ -648,7 +649,7 @@
                                     @endphp
 
                                     <a id="gets_button_book_now"
-                                        href="{{ route('booknow', ['service_id' => $services_id, 'subservice_id' => $subservices_new->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}"
+                                        href="{{ route('booknow', ['service_id' => \App\Models\Admin\Service::find($services_id)->page_url ?? $services_id, 'subservice_id' => $subservices_new->page_url ?? $subservices_new->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}"
                                         class="ud-btn btn-thm2 add-joining custome-button ">
                                         @if ($subservices_new->id === 47)
                                             Book Now
@@ -677,9 +678,9 @@
 
     </div>
 </section>
-{{-- 
+{{--
 @isset($subservices_new->top_description)
-   <section class="pt30 pb90 pbm0">
+<section class="pt30 pb90 pbm0">
     <div class="container">
         <div class="row">
             <div class="col-lg-12 subservice-name">
@@ -687,9 +688,10 @@
                     <div class="short-description"></div>
                     <div class="full-description d-none"></div>
 
-                    <button class="toggle-description-btn d-flex align-items-center gap-1 mt-2" style="border: none; background: none; color: #6b7177; font-weight: 500; font-size: 14px;">
+                    <button class="toggle-description-btn d-flex align-items-center gap-1 mt-2"
+                        style="border: none; background: none; color: #6b7177; font-weight: 500; font-size: 14px;">
                         <span class="btn-text">Show More</span>
-                        <i class="fa-solid fa-angle-down arrow" ></i>
+                        <i class="fa-solid fa-angle-down arrow"></i>
                     </button>
                 </div>
 
@@ -727,7 +729,7 @@
         $subservices_new->id != 41)
     @if ($package_count > 0)
         <!-- Listings All Lists -->
-        <section class="pt30 pb90 pbm0">
+        <section class="pt30 pb90 pbm0 d-none">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-3">
@@ -749,7 +751,8 @@
                                         <div class="card-body card-body px-0 pt-0">
                                             @foreach ($subservice_data as $subservices)
                                                 <div class="checkbox-style1">
-                                                    <a href="{{ url('package-lists/' . $subservices->page_url) }}">
+                                                    <a
+                                                        href="{{ route('front.package_lists', ['page_url' => $subservices->page_url]) }}">
                                                         <label
                                                             class="custom_checkbox">{{ $subservices->subservicename }}
                                                         </label>
@@ -767,44 +770,45 @@
                                     <input type="hidden" name="search" value="{{ $serach_var }}">
 
                                     {{-- <div class="card mb20 pb5">
-                                <div class="card-header active" id="heading2" data-bs-toggle="collapse"
-                                    data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
-                                    <h4>
-                                        <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse"
+                                        <div class="card-header active" id="heading2" data-bs-toggle="collapse"
                                             data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
-                                            Packages Category</button>
-                                    </h4>
-                                </div>
-                                <div id="collapse3" class="collapse show" aria-labelledby="heading2"
-                                    data-parent="#accordionExample">
-                                    <div class="card-body card-body px-0 pt-0">
+                                            <h4>
+                                                <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
+                                                    Packages Category</button>
+                                            </h4>
+                                        </div>
+                                        <div id="collapse3" class="collapse show" aria-labelledby="heading2"
+                                            data-parent="#accordionExample">
+                                            <div class="card-body card-body px-0 pt-0">
 
-                                        @php
-                                            if ($package_cat_ids != '') {
+                                                @php
+                                                if ($package_cat_ids != '') {
                                                 $package_cat_array = explode(',', $package_cat_ids);
-                                            } else {
+                                                } else {
                                                 $package_cat_array = [];
-                                            }
-                                        @endphp
+                                                }
+                                                @endphp
 
-                                        @foreach ($package_category as $package_catgory_data)
-                                            <div class="checkbox-style1">
-                                                <div class="checkbox-style1 mb15">
-                                                    <label class="custom_checkbox">{{ $package_catgory_data->name }}
-                                                        <input type="checkbox" onclick="allfilter1()"
-                                                            value="{{ $package_catgory_data->id }}" name="package_cat[]"
-                                                            @php if(in_array($package_catgory_data->id,$package_cat_array)){ echo "checked"; } @endphp>
-                                                        <span class="checkmark"></span>
+                                                @foreach ($package_category as $package_catgory_data)
+                                                <div class="checkbox-style1">
+                                                    <div class="checkbox-style1 mb15">
+                                                        <label class="custom_checkbox">{{ $package_catgory_data->name }}
+                                                            <input type="checkbox" onclick="allfilter1()"
+                                                                value="{{ $package_catgory_data->id }}" name="package_cat[]"
+                                                                @php if(in_array($package_catgory_data->id,$package_cat_array)){
+                                                            echo "checked"; } @endphp>
+                                                            <span class="checkmark"></span>
 
-                                                    </label>
+                                                        </label>
+                                                    </div>
+
                                                 </div>
+                                                @endforeach
 
                                             </div>
-                                        @endforeach
-
-                                    </div>
-                                </div>
-                            </div> --}}
+                                        </div>
+                                    </div> --}}
 
                                     <div class="card mb20 pb0">
                                         <div class="card-header active" id="heading1" data-bs-toggle="collapse"
@@ -864,137 +868,137 @@
                                     </div>
                                 </form>
                                 <!-- <div class="card mb20 pb5">
-                            <div class="card-header active" id="heading2">
-                                <h4>
-                                    <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapse2" aria-expanded="true"
-                                        aria-controls="collapse2">Region</button>
-                                </h4>
-                            </div>
-                            <div id="collapse2" class="collapse show" aria-labelledby="heading2"
-                                data-parent="#accordionExample">
-                                <div class="card-body card-body px-0 pt-0">
-                                    <div class="checkbox-style1 mb15">
-                                        <label class="custom_checkbox">Dubai
-                                            <input type="checkbox">
-                                            <span class="checkmark"></span>
-                                            
-                                        </label>
-                                    </div>
-                                    <a class="text-thm" href="">+Show more</a>
-                                </div>
-                            </div>
-                        </div> -->
+                                            <div class="card-header active" id="heading2">
+                                                <h4>
+                                                    <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse"
+                                                        data-bs-target="#collapse2" aria-expanded="true"
+                                                        aria-controls="collapse2">Region</button>
+                                                </h4>
+                                            </div>
+                                            <div id="collapse2" class="collapse show" aria-labelledby="heading2"
+                                                data-parent="#accordionExample">
+                                                <div class="card-body card-body px-0 pt-0">
+                                                    <div class="checkbox-style1 mb15">
+                                                        <label class="custom_checkbox">Dubai
+                                                            <input type="checkbox">
+                                                            <span class="checkmark"></span>
+
+                                                        </label>
+                                                    </div>
+                                                    <a class="text-thm" href="">+Show more</a>
+                                                </div>
+                                            </div>
+                                        </div> -->
                                 <!-- <div class="card mb20 pb5">
-                  <div class="card-header active" id="heading3">
-                    <h4>
-                      <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">Location</button>
-                    </h4>
-                  </div>
-                  <div id="collapse3" class="collapse show" aria-labelledby="heading3" data-parent="#accordionExample">
-                    <div class="card-body card-body px-0 pt-0">
-                      <div class="search_area mb15">
-                        <input type="text" class="form-control" placeholder="What are you looking for?">
-                        <label><span class="flaticon-loupe"></span></label>
-                      </div>
-                      <div class="checkbox-style1 mb15">
-                        <label class="custom_checkbox">United States
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(1,945)</span>
-                        </label>
-                        <label class="custom_checkbox">United Kingdom
-                          <input type="checkbox" checked="checked">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(8,136)</span>
-                        </label>
-                        <label class="custom_checkbox">Canada
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(917)</span>
-                        </label>
-                        <label class="custom_checkbox">Germany
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(240)</span>
-                        </label>
-                        <label class="custom_checkbox">Turkey
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">((2,460)</span>
-                        </label>
-                      </div>
-                      <a class="text-thm" href="">+20 more</a>
-                    </div>
-                  </div>
-                </div>
-                <div class="card mb20 pb5">
-                  <div class="card-header active" id="heading4">
-                    <h4>
-                      <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="true" aria-controls="collapse4">Speaks</button>
-                    </h4>
-                  </div>
-                  <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordionExample">
-                    <div class="card-body card-body px-0 pt-0">
-                      <div class="checkbox-style1 mb15">
-                        <label class="custom_checkbox">Turkish
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(1,945)</span>
-                        </label>
-                        <label class="custom_checkbox">English
-                          <input type="checkbox" checked="checked">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(8,136)</span>
-                        </label>
-                        <label class="custom_checkbox">Italian
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(917)</span>
-                        </label>
-                        <label class="custom_checkbox">Spanish
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(240)</span>
-                        </label>
-                      </div>
-                      <a class="text-thm" href="">+20 more</a>
-                    </div>
-                  </div>
-                </div> -->
+                                  <div class="card-header active" id="heading3">
+                                    <h4>
+                                      <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">Location</button>
+                                    </h4>
+                                  </div>
+                                  <div id="collapse3" class="collapse show" aria-labelledby="heading3" data-parent="#accordionExample">
+                                    <div class="card-body card-body px-0 pt-0">
+                                      <div class="search_area mb15">
+                                        <input type="text" class="form-control" placeholder="What are you looking for?">
+                                        <label><span class="flaticon-loupe"></span></label>
+                                      </div>
+                                      <div class="checkbox-style1 mb15">
+                                        <label class="custom_checkbox">United States
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(1,945)</span>
+                                        </label>
+                                        <label class="custom_checkbox">United Kingdom
+                                          <input type="checkbox" checked="checked">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(8,136)</span>
+                                        </label>
+                                        <label class="custom_checkbox">Canada
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(917)</span>
+                                        </label>
+                                        <label class="custom_checkbox">Germany
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(240)</span>
+                                        </label>
+                                        <label class="custom_checkbox">Turkey
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">((2,460)</span>
+                                        </label>
+                                      </div>
+                                      <a class="text-thm" href="">+20 more</a>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="card mb20 pb5">
+                                  <div class="card-header active" id="heading4">
+                                    <h4>
+                                      <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="true" aria-controls="collapse4">Speaks</button>
+                                    </h4>
+                                  </div>
+                                  <div id="collapse4" class="collapse show" aria-labelledby="heading4" data-parent="#accordionExample">
+                                    <div class="card-body card-body px-0 pt-0">
+                                      <div class="checkbox-style1 mb15">
+                                        <label class="custom_checkbox">Turkish
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(1,945)</span>
+                                        </label>
+                                        <label class="custom_checkbox">English
+                                          <input type="checkbox" checked="checked">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(8,136)</span>
+                                        </label>
+                                        <label class="custom_checkbox">Italian
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(917)</span>
+                                        </label>
+                                        <label class="custom_checkbox">Spanish
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(240)</span>
+                                        </label>
+                                      </div>
+                                      <a class="text-thm" href="">+20 more</a>
+                                    </div>
+                                  </div>
+                                </div> -->
                                 <!--  <div class="card mb20 pb0">
-                  <div class="card-header active" id="heading5">
-                    <h4>
-                      <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">Level</button>
-                    </h4>
-                  </div>
-                  <div id="collapse5" class="collapse show" aria-labelledby="heading5" data-parent="#accordionExample">
-                    <div class="card-body card-body px-0 pt-0">
-                      <div class="checkbox-style1">
-                        <label class="custom_checkbox">Top Rated Seller
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(1,945)</span>
-                        </label>
-                        <label class="custom_checkbox">Level Two
-                          <input type="checkbox" checked="checked">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(8,136)</span>
-                        </label>
-                        <label class="custom_checkbox">Level One
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(917)</span>
-                        </label>
-                        <label class="custom_checkbox">New Seller
-                          <input type="checkbox">
-                          <span class="checkmark"></span>
-                          <span class="right-tags">(240)</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
+                                  <div class="card-header active" id="heading5">
+                                    <h4>
+                                      <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">Level</button>
+                                    </h4>
+                                  </div>
+                                  <div id="collapse5" class="collapse show" aria-labelledby="heading5" data-parent="#accordionExample">
+                                    <div class="card-body card-body px-0 pt-0">
+                                      <div class="checkbox-style1">
+                                        <label class="custom_checkbox">Top Rated Seller
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(1,945)</span>
+                                        </label>
+                                        <label class="custom_checkbox">Level Two
+                                          <input type="checkbox" checked="checked">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(8,136)</span>
+                                        </label>
+                                        <label class="custom_checkbox">Level One
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(917)</span>
+                                        </label>
+                                        <label class="custom_checkbox">New Seller
+                                          <input type="checkbox">
+                                          <span class="checkmark"></span>
+                                          <span class="right-tags">(240)</span>
+                                        </label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -1019,26 +1023,28 @@
                                                 <button type="button" class="open-btn filter-btn-left"> <img
                                                         class="me-2"
                                                         src="{{ asset('public/site/images/icon/all-filter-icon.svg') }}"
-                                                        alt=""> All Filter</button>
+                                                        alt="">
+                                                    All Filter</button>
                                             </li>
                                         </ul>
                                     </div>
                                     {{-- <div class="pcs_dropdown dark-color pr10 text-center text-md-end"><span>Sort by</span>
-                                <select class="selectpicker show-tick">
-                                    <option>Best Selling</option>
-                                    <option>Recommended</option>
-                                    <option>New Arrivals</option>
-                                </select>
-                            </div> --}}
+                                        <select class="selectpicker show-tick">
+                                            <option>Best Selling</option>
+                                            <option>Recommended</option>
+                                            <option>New Arrivals</option>
+                                        </select>
+                                    </div> --}}
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             {{-- @php
-                        echo '<pre>';
-                        print_r($package_data);
-                        echo '</pre>';
-                    @endphp --}}
+                            echo '
+                            <pre>';
+                                        print_r($package_data);
+                                        echo '</pre>';
+                            @endphp --}}
 
                             @if ($package_data != '' && count($package_data) > 0)
 
@@ -1065,20 +1071,20 @@
                                         <div class="col-sm-6 col-xl-4">
                                             <div class="listing-style1">
                                                 {{-- <div class="list-thumb">
-                                        @if ($package_data_new->image)
-                                            <a href="{{ url('package-detail/' . $package_data_new->page_url) }}">
-                                                <img class="w-100"
-                                                    src="{{ asset('public/upload/packages/large/' . $package_data_new->image) }}"
-                                                    alt="">
-                                            </a>
-                                        @endif
-                                        <a href="" class="listing-fav fz12"><span
-                                                class="far fa-heart"></span></a>
-                                    </div> --}}
+                                                    @if ($package_data_new->image)
+                                                    <a
+                                                        href="{{ route('front.package_detail', ['page_url' => $package_data_new->page_url]) }}">
+                                                        <img class="w-100"
+                                                            src="{{ asset('public/upload/packages/large/' . $package_data_new->image) }}"
+                                                            alt="">
+                                                    </a>
+                                                    @endif
+                                                    <a href="" class="listing-fav fz12"><span class="far fa-heart"></span></a>
+                                                </div> --}}
                                                 <div class="list-content">
                                                     <h5 class="list-title" style="text-align: center">
                                                         <a
-                                                            href="{{ url('package-detail/' . $package_data_new->page_url) }}">
+                                                            href="{{ route('front.package_detail', ['page_url' => $package_data_new->page_url]) }}">
                                                             <span
                                                                 style="font-size: 30px;font-family: 'SF Pro Rounded';font-size;">{{ $package_data_new->title }}</span><br>
                                                             <span
@@ -1206,10 +1212,10 @@
                                                             {{-- @endif --}}
 
                                                             {{-- @if (in_array('1', explode(',', $subservice->is_bookable)))
-                                                    <a class="ud-btn btn-thm add-joining"
-                                                        href="{{ route('enquiry', ['id' => $package_data_new->id, 'service_id' => 0]) }}">Get
-                                                        Multiple Quote</a>
-                                                @endif --}}
+                                                            <a class="ud-btn btn-thm add-joining"
+                                                                href="{{ route('enquiry', ['id' => $package_data_new->id, 'service_id' => 0]) }}">Get
+                                                                Multiple Quote</a>
+                                                            @endif --}}
 
                                                         </div>
 
@@ -1228,28 +1234,28 @@
                         </div>
                         {{-- {!! $package_pagination->appends($_GET)->render('pagination::bootstrap-4') !!} --}}
                         <!--  <div class="row">
-              <div class="mbp_pagination mt30 text-center">
-                <ul class="page_navigation">
-                  <li class="page-item">
-                    <a class="page-link" href="#"> <span class="fas fa-angle-left"></span></a>
-                  </li>
-                  <li class="page-item"><a class="page-link" href="#">1</a></li>
-                  <li class="page-item active" aria-current="page">
-                    <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
-                  </li>
-                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                  <li class="page-item"><a class="page-link" href="#">4</a></li>
-                  <li class="page-item d-inline-block d-sm-none"><a class="page-link" href="#">...</a></li>
-                  <li class="page-item"><a class="page-link" href="#">5</a></li>
-                  <li class="page-item d-none d-sm-inline-block"><a class="page-link" href="#">...</a></li>
-                  <li class="page-item d-none d-sm-inline-block"><a class="page-link" href="#">20</a></li>
-                  <li class="page-item">
-                    <a class="page-link" href="#"><span class="fas fa-angle-right"></span></a>
-                  </li>
-                </ul>
-                <p class="mt10 mb-0 pagination_page_count text-center">1 – 20 of 300+ property available</p>
-              </div>
-            </div> -->
+                              <div class="mbp_pagination mt30 text-center">
+                                <ul class="page_navigation">
+                                  <li class="page-item">
+                                    <a class="page-link" href="#"> <span class="fas fa-angle-left"></span></a>
+                                  </li>
+                                  <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                  <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+                                  </li>
+                                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                  <li class="page-item d-inline-block d-sm-none"><a class="page-link" href="#">...</a></li>
+                                  <li class="page-item"><a class="page-link" href="#">5</a></li>
+                                  <li class="page-item d-none d-sm-inline-block"><a class="page-link" href="#">...</a></li>
+                                  <li class="page-item d-none d-sm-inline-block"><a class="page-link" href="#">20</a></li>
+                                  <li class="page-item">
+                                    <a class="page-link" href="#"><span class="fas fa-angle-right"></span></a>
+                                  </li>
+                                </ul>
+                                <p class="mt10 mb-0 pagination_page_count text-center">1 – 20 of 300+ property available</p>
+                              </div>
+                            </div> -->
                     </div>
                 </div>
             </div>
@@ -1376,9 +1382,9 @@
                             <div class="package-mobile-section mt-4">
                                 @foreach ($package_attr as $index => $package_attribut)
                                     <div class="mb-5">
-                                        <div class="placeholder rect bg-primary rounded"
+                                        {{-- <div class="placeholder rect bg-primary rounded"
                                             style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
-                                        </div>
+                                        </div> --}}
                                         <div class="mt-3">
                                             <h3 class="mb-2 font-weight-bold">{{ $package_attribut->title_addmore }}</h3>
                                             {!! html_entity_decode($package_attribut->description_addmore) !!}
@@ -1400,44 +1406,55 @@
 
                     {{-- ✅ Desktop Full Description --}}
                     <div class="d-none d-md-block">
-                        {!! html_entity_decode($top_description->description) !!}
+
+                        <div class="row mb-1 align-items-center mrgb0">
+                            {!! html_entity_decode($top_description->description) !!}
+
+                        </div>
 
                         {{-- Desktop Package Attributes --}}
                         <div class="row mb-5 align-items-center mrgb0">
                             @foreach ($package_attr as $index => $package_attribut)
                                 @if ($index % 2 == 1)
                                     {{-- Right Image --}}
-                                    <div class="col-12 col-md-7 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right">
-                                        <div class="rounded p-3">
+                                    <div class="col-12 col-md-12 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right">
+                                        <div class="rounded mb-2">
                                             <div class="row">
                                                 <div class="col-12">
-                                                    <h3 class="mb-4 font-weight-bold">
-                                                        {{ $package_attribut->title_addmore }}</h3>
+                                                    <h3 class="font-weight-bold">
+                                                        {{ $package_attribut->title_addmore }}
+                                                    </h3>
                                                 </div>
-                                                <div class="col-12">{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
+                                                <div class="col-12">
+                                                    {!! html_entity_decode($package_attribut->description_addmore) !!}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-md-5 pl-md-0 stack-top stack-adjust--left mrgb0">
+                                    {{-- <div class="col-12 col-md-5 pl-md-0 stack-top stack-adjust--left mrgb0">
                                         <div class="placeholder rect bg-primary rounded"
                                             style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 @else
                                     {{-- Left Image --}}
-                                    <div class="col-12 col-md-5 pl-md-0 stack-top stack-adjust--left">
+                                    {{-- <div class="col-12 col-md-5 pl-md-0 stack-top stack-adjust--left">
                                         <div class="placeholder rect bg-primary rounded"
                                             style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
                                         </div>
-                                    </div>
-                                    <div class="col-12 col-md-7 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right">
-                                        <div class="rounded p-3">
+                                    </div> --}}
+                                    {{-- <div class="col-12 col-md-7 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right"> --}}
+                                    <div class="col-12 col-md-12 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right">
+                                        <div class="rounded mb-2">
                                             <div class="row">
                                                 <div class="col-12">
-                                                    <h3 class="mb-4 font-weight-bold">
-                                                        {{ $package_attribut->title_addmore }}</h3>
+                                                    <h3 class="font-weight-bold">
+                                                        {{ $package_attribut->title_addmore }}
+                                                    </h3>
                                                 </div>
-                                                <div class="col-12">{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
+                                                <div class="col-12">
+                                                    {!! html_entity_decode($package_attribut->description_addmore) !!}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1454,108 +1471,108 @@
     </section>
 @endisset
 
-{{-- 
+{{--
 @isset($package_attr)
 
-    <section class="pb10 pb30-md pt10 ptm0" id="package-section">
-        <div class="container web-view">
-            <div class="row mb-5 align-items-center mrgb0">
-                @foreach ($package_attr as $index => $package_attribut)
-                    @if ($index % 2 == 1)
-                        <div class="col-12 col-md-7 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right bullet-scope">
-                            <div class="rounded p-3">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h3 class="mb-4 font-weight-bold">
-                                            {{ $package_attribut->title_addmore }}</h3>
-                                    </div>
-                                    <div class="col-12" >{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
-                                </div>
-                            </div>
+<section class="pb10 pb30-md pt10 ptm0" id="package-section">
+    <div class="container web-view">
+        <div class="row mb-5 align-items-center mrgb0">
+            @foreach ($package_attr as $index => $package_attribut)
+            @if ($index % 2 == 1)
+            <div class="col-12 col-md-7 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right bullet-scope">
+                <div class="rounded p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 class="mb-4 font-weight-bold">
+                                {{ $package_attribut->title_addmore }}</h3>
                         </div>
+                        <div class="col-12">{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="col-12  col-md-5 pl-md-0 stack-top stack-adjust--left mrgb0">
-                            <div class="placeholder rect bg-primary rounded"
-                                style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
-                            </div>
-                            
-                        </div>
-                    @else
-                        <!-- Reverse the order for odd indices -->
-                        <div class="col-12  col-md-5 pl-md-0 stack-top stack-adjust--left">
-                            <div class="placeholder rect bg-primary rounded"
-                                style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
-                            </div>
-                        </div>
+            <div class="col-12  col-md-5 pl-md-0 stack-top stack-adjust--left mrgb0">
+                <div class="placeholder rect bg-primary rounded"
+                    style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
+                </div>
 
-                        <div class="col-12 
+            </div>
+            @else
+            <!-- Reverse the order for odd indices -->
+            <div class="col-12  col-md-5 pl-md-0 stack-top stack-adjust--left">
+                <div class="placeholder rect bg-primary rounded"
+                    style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
+                </div>
+            </div>
+
+            <div class="col-12 
                 col-md-7 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right bullet-scope">
-                            <div class="rounded p-3">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h3 class="mb-4 font-weight-bold">
-                                            {{ $package_attribut->title_addmore }}</h3>
-                                    </div>
-                                    <div class="col-12" >{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
-                                </div>
-                            </div>
+                <div class="rounded p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 class="mb-4 font-weight-bold">
+                                {{ $package_attribut->title_addmore }}</h3>
                         </div>
-                    @endif
-                @endforeach
+                        <div class="col-12">{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
+                    </div>
+                </div>
+            </div>
+            @endif
+            @endforeach
+
+        </div>
+    </div>
+
+    <!-- For mobile View Only-->
+    <div class="container mobile-view">
+        <div class="row mb-5 align-items-center mrgb0">
+            @foreach ($package_attr as $index => $package_attribut)
+            @if ($index % 2 == 1)
+            <div class="col-12 col-md-6 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right bullet-scope">
+                <div class="rounded p-3">
+                    <div class="row">
+                        <div class="placeholder rect bg-primary rounded"
+                            style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mb-5 col-md-6 pl-md-0 stack-top stack-adjust--left mrgb0">
+                <div class="col-12">
+                    <h3 class="mb-4 font-weight-bold">
+                        {{ $package_attribut->title_addmore }}</h3>
+                </div>
+                <div class="col-12">{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
 
             </div>
-        </div>
-
-        <!-- For mobile View Only-->
-        <div class="container mobile-view">
-            <div class="row mb-5 align-items-center mrgb0">
-                @foreach ($package_attr as $index => $package_attribut)
-                    @if ($index % 2 == 1)
-                        <div class="col-12 col-md-6 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right bullet-scope">
-                            <div class="rounded p-3">
-                                <div class="row">
-                                <div class="placeholder rect bg-primary rounded"
-                                style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
-                                </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 mb-5 col-md-6 pl-md-0 stack-top stack-adjust--left mrgb0">
-                            <div class="col-12">
-                                <h3 class="mb-4 font-weight-bold">
-                                    {{ $package_attribut->title_addmore }}</h3>
-                            </div>
-                            <div class="col-12" >{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
-                            
-                        </div>
-                    @else
-                        <!-- Reverse the order for odd indices -->
-                        <div class="col-12 mb-5 col-md-6 pl-md-0 stack-top stack-adjust--left">
-                            <div class="placeholder rect bg-primary rounded"
-                                style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-6 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right bullet-scope">
-                            <div class="rounded p-3">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h3 class="mb-4 font-weight-bold">
-                                            {{ $package_attribut->title_addmore }}</h3>
-                                    </div>
-                                    <div class="col-12" >{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                @endforeach
-
+            @else
+            <!-- Reverse the order for odd indices -->
+            <div class="col-12 mb-5 col-md-6 pl-md-0 stack-top stack-adjust--left">
+                <div class="placeholder rect bg-primary rounded"
+                    style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
+                </div>
             </div>
-        </div>
 
-        <!-- For Mobile view -->
-    </section>
+            <div class="col-12 col-md-6 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right bullet-scope">
+                <div class="rounded p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 class="mb-4 font-weight-bold">
+                                {{ $package_attribut->title_addmore }}</h3>
+                        </div>
+                        <div class="col-12">{!! html_entity_decode($package_attribut->description_addmore) !!}</div>
+                    </div>
+                </div>
+            </div>
+            @endif
+            @endforeach
+
+        </div>
+    </div>
+
+    <!-- For Mobile view -->
+</section>
 @endisset --}}
 
 
@@ -1738,70 +1755,70 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
                         @endforeach
 
                         <!--  <div class="item">
-                        <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
-                            <div class="testimonial-content">
-                                <h4 class="title text-thm text_blue">Good Service</h4>
-                                <span class="icon fas fa-quote-left"></span>
-                                <h4 class="t_content">“Very friendly staff, i got few big boxes, and 10 small boxea and
-                                    some moving-needed stuff.
-                                    I tell you it is reliable to conyltain your home stuff while moving homes.
-                                    Highly recommended. And one more thing... It is half the price of the box from
-                                    Amazon”</h4>
-                            </div>
-                            <div class="thumb d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <img src="{{ asset('public/site/images/profileimage.png') }}" alt=""
-                                        style="width: 75px !important;">
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-0">Ali Boshra</h6>
-                                   
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
+                                    <div class="testimonial-content">
+                                        <h4 class="title text-thm text_blue">Good Service</h4>
+                                        <span class="icon fas fa-quote-left"></span>
+                                        <h4 class="t_content">“Very friendly staff, i got few big boxes, and 10 small boxea and
+                                            some moving-needed stuff.
+                                            I tell you it is reliable to conyltain your home stuff while moving homes.
+                                            Highly recommended. And one more thing... It is half the price of the box from
+                                            Amazon”</h4>
+                                    </div>
+                                    <div class="thumb d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <img src="{{ asset('public/site/images/profileimage.png') }}" alt=""
+                                                style="width: 75px !important;">
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">Ali Boshra</h6>
 
-                    <div class="item">
-                        <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
-                            <div class="testimonial-content">
-                                <h4 class="title text-thm text_blue">Great Service</h4>
-                                <span class="icon fas fa-quote-left"></span>
-                                <h4 class="t_content">“Really good service! Very importantly they came on time, they
-                                    did their job quickly and cleaned up after. Highly recommend this company.”</h4>
-                            </div>
-                            <div class="thumb d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <img src="{{ asset('public/site/images/profileimage.png') }}" alt=""
-                                        style="width: 75px !important;">
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-0">Anna B</h6>
-                                   
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="item">
-                        <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
-                            <div class="testimonial-content">
-                                <h4 class="title text-thm text_blue">Professional Service</h4>
-                                <span class="icon fas fa-quote-left"></span>
-                                <h4 class="t_content">“Professional and friendly team moved all our goods and helped us
-                                    with a few other odds and ends around the house - highly recommended”</h4>
-                            </div>
-                            <div class="thumb d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <img src="{{ asset('public/site/images/profileimage.png') }}" alt=""
-                                        style="width: 75px !important;">
+                            <div class="item">
+                                <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
+                                    <div class="testimonial-content">
+                                        <h4 class="title text-thm text_blue">Great Service</h4>
+                                        <span class="icon fas fa-quote-left"></span>
+                                        <h4 class="t_content">“Really good service! Very importantly they came on time, they
+                                            did their job quickly and cleaned up after. Highly recommend this company.”</h4>
+                                    </div>
+                                    <div class="thumb d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <img src="{{ asset('public/site/images/profileimage.png') }}" alt=""
+                                                style="width: 75px !important;">
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">Anna B</h6>
+
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-0">Tim Jaja</h6>
-                                   
-                                </div>
                             </div>
-                        </div>
-                    </div> -->
+
+                            <div class="item">
+                                <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
+                                    <div class="testimonial-content">
+                                        <h4 class="title text-thm text_blue">Professional Service</h4>
+                                        <span class="icon fas fa-quote-left"></span>
+                                        <h4 class="t_content">“Professional and friendly team moved all our goods and helped us
+                                            with a few other odds and ends around the house - highly recommended”</h4>
+                                    </div>
+                                    <div class="thumb d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <img src="{{ asset('public/site/images/profileimage.png') }}" alt=""
+                                                style="width: 75px !important;">
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">Tim Jaja</h6>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
 
 
 
@@ -1918,17 +1935,24 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
                                 @endphp
 
                                 @foreach ($faq as $faq_data)
-                                    <div class="accordion-item @php if($i == 0){echo 'active';} @endphp">
+                                    <div
+                                        class="accordion-item @php if ($i == 0) {
+                                        echo 'active';
+                                    } @endphp">
                                         <h2 class="accordion-header" id="headingOne_{{ $faq_data->id }}">
                                             <button
-                                                class="accordion-button @php if($i != 0){echo 'collapsed';} @endphp"
+                                                class="accordion-button @php if ($i != 0) {
+                                                echo 'collapsed';
+                                            } @endphp"
                                                 type="button" data-bs-toggle="collapse"
                                                 data-bs-target="#collapseOne_{{ $faq_data->id }}"
                                                 aria-expanded="true"
                                                 aria-controls="collapseOne">{{ $faq_data->question }}</button>
                                         </h2>
                                         <div id="collapseOne_{{ $faq_data->id }}"
-                                            class="accordion-collapse collapse @php if($i == 0){echo 'show';} @endphp"
+                                            class="accordion-collapse collapse @php if ($i == 0) {
+                                            echo 'show';
+                                        } @endphp"
                                             aria-labelledby="headingOne_{{ $faq_data->id }}"
                                             data-parent="#accordionExample">
                                             <div class="accordion-body">{!! html_entity_decode($faq_data->answer) !!}</div>
@@ -1941,92 +1965,92 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
                                 @endforeach
 
                                 <!-- <div class="accordion-item active">
-                                <h2 class="accordion-header" id="headingOne">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseOne" aria-expanded="true"
-                                        aria-controls="collapseOne">What methods of payments are
-                                        supported?</button>
-                                </h2>
-                                <div id="collapseOne" class="accordion-collapse collapse show"
-                                    aria-labelledby="headingOne" data-parent="#accordionExample">
-                                    <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
-                                        at
-                                        phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
-                                        Metus,
-                                        scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
-                                    </div>
-                                </div>
-                            </div> -->
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#collapseOne" aria-expanded="true"
+                                                aria-controls="collapseOne">What methods of payments are
+                                                supported?</button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show"
+                                            aria-labelledby="headingOne" data-parent="#accordionExample">
+                                            <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
+                                                at
+                                                phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
+                                                Metus,
+                                                scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
+                                            </div>
+                                        </div>
+                                    </div> -->
                                 <!-- <div class="accordion-item">
-                                <h2 class="accordion-header" id="headingTwo">
-                                    <button class="accordion-button collapsed" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false"
-                                        aria-controls="collapseTwo">Can I cancel at
-                                        anytime?</button>
-                                </h2>
-                                <div id="collapseTwo" class="accordion-collapse collapse"
-                                    aria-labelledby="headingTwo" data-parent="#accordionExample">
-                                    <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
-                                        at
-                                        phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
-                                        Metus,
-                                        scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false"
+                                                aria-controls="collapseTwo">Can I cancel at
+                                                anytime?</button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse"
+                                            aria-labelledby="headingTwo" data-parent="#accordionExample">
+                                            <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
+                                                at
+                                                phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
+                                                Metus,
+                                                scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="headingThree">
-                                    <button class="accordion-button collapsed" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#collapseThree"
-                                        aria-expanded="false" aria-controls="collapseThree">How do I get a
-                                        receipt for
-                                        my purchase?</button>
-                                </h2>
-                                <div id="collapseThree" class="accordion-collapse collapse"
-                                    aria-labelledby="headingThree" data-parent="#accordionExample">
-                                    <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
-                                        at
-                                        phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
-                                        Metus,
-                                        scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingThree">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#collapseThree"
+                                                aria-expanded="false" aria-controls="collapseThree">How do I get a
+                                                receipt for
+                                                my purchase?</button>
+                                        </h2>
+                                        <div id="collapseThree" class="accordion-collapse collapse"
+                                            aria-labelledby="headingThree" data-parent="#accordionExample">
+                                            <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
+                                                at
+                                                phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
+                                                Metus,
+                                                scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="headingFour">
-                                    <button class="accordion-button collapsed" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#collapseFour"
-                                        aria-expanded="false" aria-controls="collapseFour">Which license do I
-                                        need?</button>
-                                </h2>
-                                <div id="collapseFour" class="accordion-collapse collapse"
-                                    aria-labelledby="headingFour" data-parent="#accordionExample">
-                                    <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
-                                        at
-                                        phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
-                                        Metus,
-                                        scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingFour">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#collapseFour"
+                                                aria-expanded="false" aria-controls="collapseFour">Which license do I
+                                                need?</button>
+                                        </h2>
+                                        <div id="collapseFour" class="accordion-collapse collapse"
+                                            aria-labelledby="headingFour" data-parent="#accordionExample">
+                                            <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
+                                                at
+                                                phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
+                                                Metus,
+                                                scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="headingFive">
-                                    <button class="accordion-button collapsed" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#collapseFive"
-                                        aria-expanded="false" aria-controls="collapseFive">How do I get access
-                                        to a
-                                        theme I purchased?</button>
-                                </h2>
-                                <div id="collapseFive" class="accordion-collapse collapse"
-                                    aria-labelledby="headingFive" data-parent="#accordionExample">
-                                    <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
-                                        at
-                                        phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
-                                        Metus,
-                                        scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
-                                    </div>
-                                </div>
-                            </div> -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingFive">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#collapseFive"
+                                                aria-expanded="false" aria-controls="collapseFive">How do I get access
+                                                to a
+                                                theme I purchased?</button>
+                                        </h2>
+                                        <div id="collapseFive" class="accordion-collapse collapse"
+                                            aria-labelledby="headingFive" data-parent="#accordionExample">
+                                            <div class="accordion-body">Cras vitae ac nunc orci. Purus amet tortor non
+                                                at
+                                                phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa.
+                                                Metus,
+                                                scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.
+                                            </div>
+                                        </div>
+                                    </div> -->
                             </div>
                         </div>
                     </div>
@@ -2088,7 +2112,7 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
             <h3 class="scrollButton-h3-book-now">Looking for {{ $subservices_new->subservicename }} Services in Dubai?
             </h3>
             <a id="gets_button_sticky_book_now" style="top:12px;"
-                href="{{ route('booknow', ['service_id' => $services_id, 'subservice_id' => $subservices_new->id]) }}"
+                href="{{ route('booknow', ['service_id' => \App\Models\Admin\Service::find($services_id)->page_url ?? $services_id, 'subservice_id' => $subservices_new->page_url ?? $subservices_new->id]) }}"
                 class="ud-btn btn-thm2 add-joining">
                 @if ($subservices_new->id === 47)
                     Get Started

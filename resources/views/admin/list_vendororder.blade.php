@@ -126,6 +126,8 @@
                             Package Order - Automobile
                         @elseif(Route::currentRouteName() == 'storage-vendor-listing')
                             Package Order - Storage
+                        @elseif(Route::currentRouteName() == 'healthcare_at_home_listing')
+                            Package Order - Healthcare At Home
                         @else
                             Package Order - Moving
                         @endif
@@ -242,6 +244,8 @@
                                                             $detailRoute = 'vendor-automobile-detail';
                                                         } elseif ($vendororders->items[0]->service_id == 44) {
                                                             $detailRoute = 'vendor-storage-detail';
+                                                        } elseif ($vendororders->items[0]->service_id == 54) {
+                                                            $detailRoute = 'vendor-healthcare-at-home-detail';
                                                         }
                                                     @endphp
                                                     <a class="btn-utility"

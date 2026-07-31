@@ -5,10 +5,10 @@ namespace App\Http\Controllers\admin;
 use App\Helpers\Helper as HelpersHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\Order;
-use App\Models\admin\VerifyBuyPackage;
-use App\Models\admin\Vehicles;
-use App\Models\admin\ModelModule;
+use App\Models\Admin\Order;
+use App\Models\Admin\VerifyBuyPackage;
+use App\Models\Admin\Vehicles;
+use App\Models\Admin\ModelModule;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\Helper;
 use Illuminate\Support\Facades\Mail;
@@ -156,6 +156,67 @@ class Ordercontroller extends Controller
             $itemList = DB::table('ci_order_item')
                 ->where('order_id', $order->order_id)
                 ->where('service_id', 45)
+                ->get();
+            $total = 0;
+            // echo"<pre>";print_r($itemList);echo"</pre>";
+            foreach ($itemList as $item) {
+                $product = DB::table('packages')
+                    ->where('id', $item->package_id)
+                    ->first();
+                // echo"<pre>";print_r($product);echo"</pre>";exit;
+
+                if ($item->product_discount_amount != 0 && $item->product_discount_amount != '') {
+                    $product_item_price = $item->product_discount_amount;
+                } else {
+                    $product_item_price = $item->package_item_price;
+                }
+                $total += $product_item_price * $item->package_quantity;
+            }
+            // Attach the items and subtotal to the order object
+            $order->items = $itemList;
+            //$order->sub_total = $total;
+        }
+        $data['orders_list'] = $orderList;
+        // echo"<pre>";print_r($data);echo"</pre>";exit;
+        return view('admin.list_order', $data);
+    }
+
+    public function healthcare_at_home_package_order($order_id = '', $status = '')
+    {
+        $data['error'] = '';
+        // First, fetch distinct orders
+        $query = DB::table('ci_orders')->where('ci_orders.is_delete', '0')
+            ->leftJoin('frontloginregisters', 'ci_orders.user_id', '=', 'frontloginregisters.id')
+            ->select(
+                'frontloginregisters.email as user_email',
+                'frontloginregisters.name as user_name',
+                'frontloginregisters.mobile as user_mobile',
+                'ci_orders.*'
+            )->whereExists(function ($subQuery) {
+                $subQuery->select(DB::raw(1))
+                    ->from('ci_order_item')
+                    ->whereColumn('ci_order_item.order_id', 'ci_orders.order_id')
+                    ->where('ci_order_item.service_id', 54);
+            });
+        //$query = $query->where('order_from','!=',2); 
+        if (!empty($order_id)) {
+            $query->where('ci_orders.order_id', $order_id);
+        }
+        if (!empty($status)) {
+            if ($status == 'SUCCESS' || $status == 'FAILED') {
+                $query->where('ci_orders.payment_status', $status);
+            } else {
+                $query->where('ci_orders.order_status', $status);
+            }
+        }
+        $query->orderBy('ci_orders.order_id', 'DESC');
+        // Get distinct orders where service_id is 71
+        $orderList = $query->get();
+        // Now, for each order, fetch its items
+        foreach ($orderList as $order) {
+            $itemList = DB::table('ci_order_item')
+                ->where('order_id', $order->order_id)
+                ->where('service_id', 54)
                 ->get();
             $total = 0;
             // echo"<pre>";print_r($itemList);echo"</pre>";
@@ -363,7 +424,7 @@ class Ordercontroller extends Controller
             $destinationPath = public_path('upload/documents/');
             $image->move($destinationPath, $data['image']);
             $image = $data['image'];
-            $data['verifybuy_documents']  = $image;
+            $data['verifybuy_documents'] = $image;
         }
         $order_id = $request->id;
         $res = DB::table('ci_order_item')
@@ -553,7 +614,7 @@ class Ordercontroller extends Controller
         $data['error'] = '';
         $query = Ciorder::leftJoin('frontloginregisters', 'ci_orders.user_id', '=', 'frontloginregisters.id')
             ->leftJoin('ci_shipping_address', 'ci_orders.order_id', '=', 'ci_shipping_address.order_id')
-            ->select('frontloginregisters.email as user_email', 'frontloginregisters.name as user_name', 'frontloginregisters.mobile as user_mobile', 'frontloginregisters.country_code as user_country_code', 'ci_orders.*',  'ci_shipping_address.*');
+            ->select('frontloginregisters.email as user_email', 'frontloginregisters.name as user_name', 'frontloginregisters.mobile as user_mobile', 'frontloginregisters.country_code as user_country_code', 'ci_orders.*', 'ci_shipping_address.*');
         if (!empty($order_id)) {
             $query->where('ci_orders.order_id', $order_id);
         }
@@ -718,8 +779,8 @@ class Ordercontroller extends Controller
 
     function checkcar_vendor_available(Request $request)
     {
-        $order_id   = $request->order_id;
-        $vendor_id  = $request->vendor_id_car;
+        $order_id = $request->order_id;
+        $vendor_id = $request->vendor_id_car;
 
         // 1. Get order item (date & slot info)
         $orderItem = DB::table('ci_order_item')
@@ -739,7 +800,7 @@ class Ordercontroller extends Controller
             $orderItem->bookingyear . '-' . $orderItem->month . '-' . $orderItem->bookingdate
         )->format('Y-m-d');
 
-        $time_slot   = $orderItem->time_slot;
+        $time_slot = $orderItem->time_slot;
         // echo"<pre>";print_r($orderItem);echo"</pre>";
         // echo $booked_date;
         // echo $time_slot;exit;
@@ -762,11 +823,11 @@ class Ordercontroller extends Controller
 
             //3. Insert into vendor booked timeslot
             DB::table('carwashvendor_bookedtimeslot')->insert([
-                'service_id'    => $orderItem->service_id ?? null,
+                'service_id' => $orderItem->service_id ?? null,
                 'subservice_id' => $orderItem->subservice_id ?? null,
-                'vendor_id'     => $vendor_id,
-                'timeslot_id'   => $time_slot,
-                'booked_date'   => $booked_date,
+                'vendor_id' => $vendor_id,
+                'timeslot_id' => $time_slot,
+                'booked_date' => $booked_date,
             ]);
 
             // 4. Assign vendor in ci_orders
@@ -959,9 +1020,9 @@ h3 {
                            <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:vendors@vendorscity.com">vendors@vendorscity.com</a></p>
                            <p style="margin:0;">VendorsCity Portal LLC</p>
                            <div class="footer_links" style=" margin:10px 0;">
-                           <a href="' . url("/terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                           <a href="' . url("/privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                           <a href="' . url("/contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                           <a href="' . \App\Helpers\Helper::get_front_url("terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                           <a href="' . \App\Helpers\Helper::get_front_url("privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                           <a href="' . \App\Helpers\Helper::get_front_url("contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                            </div>
                            
                        </div>
@@ -1107,9 +1168,9 @@ h3 {
                            <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a></p>
                            <p style="margin:0;">VendorsCity Portal LLC</p>
                            <div class="footer_links" style=" margin:10px 0;">
-                           <a href="' . url("/terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                           <a href="' . url("/privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                           <a href="' . url("/contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                           <a href="' . \App\Helpers\Helper::get_front_url("terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                           <a href="' . \App\Helpers\Helper::get_front_url("privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                           <a href="' . \App\Helpers\Helper::get_front_url("contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                            </div>
                            
                        </div>
@@ -1142,9 +1203,9 @@ h3 {
 
         $bookingDate = $currentOrder->bookingdate;
         $bookingmonth = $currentOrder->month;
-        $bookingyear   = $currentOrder->bookingyear;
+        $bookingyear = $currentOrder->bookingyear;
         $hour = $currentOrder->how_many_hours_should_they_stay;
-        $timeSlot =  $currentOrder->time_slot;
+        $timeSlot = $currentOrder->time_slot;
 
         $requiredSlots = [];
         for ($i = 0; $i <= $hour; $i++) {
@@ -1210,7 +1271,7 @@ h3 {
                 foreach ($items as $item) {
 
                     $hours = $item->how_many_hours_should_they_stay;
-                    $start_slot = (int)$item->time_slot;
+                    $start_slot = (int) $item->time_slot;
 
                     // Block current slot and next slots based on hours
                     for ($i = 0; $i <= $hours; $i++) {
@@ -1310,7 +1371,7 @@ h3 {
             ->where('id', $driver_id)
             ->first();
 
-        $ci_orders_data  = DB::table('ci_orders')
+        $ci_orders_data = DB::table('ci_orders')
             ->where('order_id', $order_id)
             ->first();
 
@@ -1443,9 +1504,9 @@ h3 {
                                     <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:vendors@vendorscity.com">vendors@vendorscity.com</a></p>
                                     <p style="margin:0;">VendorsCity Portal LLC</p>
                                     <div class="footer_links" style=" margin:10px 0;">
-                                    <a href="' . url("/terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                                    <a href="' . url("/privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                                    <a href="' . url("/contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                                    <a href="' . \App\Helpers\Helper::get_front_url("terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                                    <a href="' . \App\Helpers\Helper::get_front_url("privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                                    <a href="' . \App\Helpers\Helper::get_front_url("contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                                     </div>
                                     
                                 </div>
@@ -1745,40 +1806,40 @@ h3 {
         $sheet->getStyle('A' . $row_new)->getFont()->setBold(true)->setUnderline(true);
 
 
-        $sheet->setCellValue('A' . $row_new + 1  . '', 'Vat on Sum of charges');
-        $sheet->setCellValue('B' . $row_new + 1  . '', '' . $vat_on_sum_charge . '');
+        $sheet->setCellValue('A' . $row_new + 1 . '', 'Vat on Sum of charges');
+        $sheet->setCellValue('B' . $row_new + 1 . '', '' . $vat_on_sum_charge . '');
 
-        $sheet->setCellValue('A' . $row_new + 2  . '', 'Total VC Commision');
-        $sheet->setCellValue('B' . $row_new + 2  . '', '' . $vc_commission . '');
+        $sheet->setCellValue('A' . $row_new + 2 . '', 'Total VC Commision');
+        $sheet->setCellValue('B' . $row_new + 2 . '', '' . $vc_commission . '');
 
-        $sheet->setCellValue('A' . $row_new + 3  . '', 'Vendors Total');
-        $sheet->setCellValue('B' . $row_new + 3  . '', '' . $vendor_total . '');
+        $sheet->setCellValue('A' . $row_new + 3 . '', 'Vendors Total');
+        $sheet->setCellValue('B' . $row_new + 3 . '', '' . $vendor_total . '');
 
-        $sheet->setCellValue('A' . $row_new + 4  . '', 'Vendor Received');
-        $sheet->setCellValue('B' . $row_new + 4  . '', '' . $vendor_received . '');
+        $sheet->setCellValue('A' . $row_new + 4 . '', 'Vendor Received');
+        $sheet->setCellValue('B' . $row_new + 4 . '', '' . $vendor_received . '');
 
-        $sheet->setCellValue('A' . $row_new + 5  . '', 'Paid to Vendor');
-        $sheet->setCellValue('B' . $row_new + 5  . '', '' . $paid_to_vendor . '');
+        $sheet->setCellValue('A' . $row_new + 5 . '', 'Paid to Vendor');
+        $sheet->setCellValue('B' . $row_new + 5 . '', '' . $paid_to_vendor . '');
 
 
-        $sheet->setCellValue('E' . $row_new + 1  . '', 'Date:');
-        $sheet->setCellValue('F' . $row_new + 1  . '', '' . $download_date . '');
+        $sheet->setCellValue('E' . $row_new + 1 . '', 'Date:');
+        $sheet->setCellValue('F' . $row_new + 1 . '', '' . $download_date . '');
 
-        $sheet->setCellValue('E' . $row_new + 2  . '', 'From Date:');
+        $sheet->setCellValue('E' . $row_new + 2 . '', 'From Date:');
         if ($startdate) {
-            $sheet->setCellValue('F' . $row_new + 2  . '', '' . $startdate . '');
+            $sheet->setCellValue('F' . $row_new + 2 . '', '' . $startdate . '');
         } else {
-            $sheet->setCellValue('F' . $row_new + 2  . '', '-');
+            $sheet->setCellValue('F' . $row_new + 2 . '', '-');
         }
 
-        $sheet->setCellValue('E' . $row_new + 3  . '', 'To Date:');
+        $sheet->setCellValue('E' . $row_new + 3 . '', 'To Date:');
         if ($enddate) {
-            $sheet->setCellValue('F' . $row_new + 3  . '', '' . $enddate . '');
+            $sheet->setCellValue('F' . $row_new + 3 . '', '' . $enddate . '');
         } else {
-            $sheet->setCellValue('F' . $row_new + 3  . '', '-');
+            $sheet->setCellValue('F' . $row_new + 3 . '', '-');
         }
 
-        $sheet->setCellValue('A' . $row_new + 7  . '', 'Vendor Name');
+        $sheet->setCellValue('A' . $row_new + 7 . '', 'Vendor Name');
         $sheet->getStyle('A' . $row_new + 7)->getFont()->setBold(true);
         $sheet->setCellValue('B' . ($row_new + 7), Helper::vendorsname($vendorname));
 
@@ -1909,7 +1970,7 @@ h3 {
                     $sheet->setCellValue('I' . $row, '-');
                 }
 
-                if ($data_new->add_amount  !== null) {
+                if ($data_new->add_amount !== null) {
                     $sheet->setCellValue('J' . $row, $data_new->add_amount);
                 } else {
                     $sheet->setCellValue('J' . $row, '-');
@@ -2004,7 +2065,7 @@ h3 {
         }
 
         $total_add_amount = DB::table('package_order_amount_attr')
-            ->where('order_id',  $order->format_order_id) // ✅ FIXED
+            ->where('order_id', $order->format_order_id) // ✅ FIXED
             ->sum('add_amount');
 
         // ✅ PERFECT MONEY CALCULATION
@@ -2026,18 +2087,18 @@ h3 {
             ->first();
 
         DB::table('package_order_amount_attr')->insert([
-            'order_id'      => $order->format_order_id, // ✅ IMPORTANT FIX
-            'vendor_id'     => $order->vendor_id,
-            'service_id'    => $service->service_id ?? null,
-            'order_total'   => $order->order_total,
-            'vatcharge'     => $order->vatcharge,
+            'order_id' => $order->format_order_id, // ✅ IMPORTANT FIX
+            'vendor_id' => $order->vendor_id,
+            'service_id' => $service->service_id ?? null,
+            'order_total' => $order->order_total,
+            'vatcharge' => $order->vatcharge,
             'booking_percentage' => $service->subservice_booking_percentage ?? null,
-            'add_amount'    => $request->add_amount,
-            'collect_by'    => $request->collect_by,
-            'payment_type'  => $request->payment_type,
-            'date'          => $request->date,
-            'order_date'    => $service->cdate ?? null,
-            'added_date'    => date("Y-m-d"),
+            'add_amount' => $request->add_amount,
+            'collect_by' => $request->collect_by,
+            'payment_type' => $request->payment_type,
+            'date' => $request->date,
+            'order_date' => $service->cdate ?? null,
+            'added_date' => date("Y-m-d"),
         ]);
 
         return response()->json(['status' => 'success']);
@@ -2076,10 +2137,22 @@ h3 {
     {
         $data['customer_data'] = DB::table('frontloginregisters')->orderBy('id', 'DESC')->get();
 
-        $data['subservice_data'] = DB::table('subservices')->where('serviceid', '45')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        // $data['subservice_data'] = DB::table('subservices')->where('serviceid', '45')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        $data['subservice_data'] = DB::table('subservices')
+            ->where('serviceid', 45)
+            ->where(function ($query) {
+                $query->where('id', 97)
+                    ->orWhere('is_active', 0);
+            })
+            ->orderBy('id', 'DESC')
+            ->get();
 
         $data['cleanin_subserviceprice'] = DB::table('cleanin_subserviceprice')->where('subservice_id', '28')->get();
 
+        $data['durations'] = DB::table('cleaning_subscription_durations')->where('is_active_web', 1)->orderBy('set_order')->get();
+        $data['frequencies'] = DB::table('cleaning_subscription_frequencies')->where('is_active_web', 1)->orderBy('set_order')->get();
+        $data['packages'] = DB::table('cleaning_subscription_packages')->where('is_active_web', 1)->orderBy('set_order')->get();
+        $data['pricing_rules'] = DB::table('cleaning_subscription_pricing')->where('is_active_web', 1)->get();
 
         return view('admin.package-orders.cleaning.add_order', $data);
     }
@@ -2149,10 +2222,33 @@ h3 {
         $order->items = $itemList;
         $order->sub_total = $total;
 
+        $package_duration_months = 1;
+        if (isset($itemList[0]->end_date) && !empty($itemList[0]->end_date) && isset($itemList[0]->bookingyear)) {
+            $booking_full_date = date('Y-m-d', strtotime($itemList[0]->bookingyear . '-' . $itemList[0]->month . '-' . $itemList[0]->bookingdate));
+            $d1 = new \DateTime($booking_full_date);
+            $d2 = new \DateTime($itemList[0]->end_date);
+            $package_duration_months = $d1->diff($d2)->m + ($d1->diff($d2)->y * 12);
+        }
+        $order->package_duration_months = $package_duration_months;
+
         $data['order'] = $order;
         $data['customer_data'] = DB::table('frontloginregisters')->orderBy('id', 'DESC')->get();
-        $data['subservice_data'] = DB::table('subservices')->where('serviceid', '45')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        // $data['subservice_data'] = DB::table('subservices')->where('serviceid', '45')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        $data['subservice_data'] = DB::table('subservices')
+            ->where('serviceid', 45)
+            ->where(function ($query) {
+                $query->where('id', 97)
+                    ->orWhere('is_active', 0);
+            })
+            ->orderBy('id', 'DESC')
+            ->get();
         $data['cleanin_subserviceprice'] = DB::table('cleanin_subserviceprice')->where('subservice_id', '28')->get();
+
+        $data['durations'] = DB::table('cleaning_subscription_durations')->where('is_active_web', 1)->orderBy('set_order')->get();
+        $data['frequencies'] = DB::table('cleaning_subscription_frequencies')->where('is_active_web', 1)->orderBy('set_order')->get();
+        $data['packages'] = DB::table('cleaning_subscription_packages')->where('is_active_web', 1)->orderBy('set_order')->get();
+        $data['pricing_rules'] = DB::table('cleaning_subscription_pricing')->where('is_active_web', 1)->get();
+
         $data['orderItemPackages'] = DB::table('ci_order_item_packages')->where('order_id', $order_id)->get();
         return view('admin.package-orders.cleaning.edit_order', $data);
     }
@@ -2168,13 +2264,13 @@ h3 {
 
 
         $data['emiratesList'] = [
-            ['name' => 'Dubai',          'id' => 17],
-            ['name' => 'Abu Dhabi',      'id' => 20],
-            ['name' => 'Sharjah',        'id' => 22],
-            ['name' => 'Ajman',          'id' => 23],
-            ['name' => 'Umm Al Quwain',  'id' => 24],
+            ['name' => 'Dubai', 'id' => 17],
+            ['name' => 'Abu Dhabi', 'id' => 20],
+            ['name' => 'Sharjah', 'id' => 22],
+            ['name' => 'Ajman', 'id' => 23],
+            ['name' => 'Umm Al Quwain', 'id' => 24],
             ['name' => 'Ras Al Khaimah', 'id' => 25],
-            ['name' => 'Fujairah',       'id' => 26],
+            ['name' => 'Fujairah', 'id' => 26],
         ];
 
         return view('admin.package-orders.moving.add_order', $data);
@@ -2393,30 +2489,30 @@ h3 {
         );
 
         $content = array(
-            'user_id'               => $userid,
-            'order_number'          => $order_number,
-            'order_total'           => $order_total_new,
-            'front_wallet_amount'   => $front_wallet_amount_new,
-            'shippingcost'          => '',
-            'vatcharge'             => '',
-            'order_currency'        => 'AED',
-            'order_status'          => $order_status,
-            'paymentmode'           => $paymentmode,
-            'payment_status'        => $payment_status,
-            'created_at'            => date('Y-m-d H:i:s'),
-            'coupan_to_wallet'      => '',
-            'coupondiscount'        => '',
-            'coupon_code'           => '',
-            'moving_date'           => $request->inspection_date,
-            'send_notification'           => $request->send_notification,
+            'user_id' => $userid,
+            'order_number' => $order_number,
+            'order_total' => $order_total_new,
+            'front_wallet_amount' => $front_wallet_amount_new,
+            'shippingcost' => '',
+            'vatcharge' => '',
+            'order_currency' => 'AED',
+            'order_status' => $order_status,
+            'paymentmode' => $paymentmode,
+            'payment_status' => $payment_status,
+            'created_at' => date('Y-m-d H:i:s'),
+            'coupan_to_wallet' => '',
+            'coupondiscount' => '',
+            'coupon_code' => '',
+            'moving_date' => $request->inspection_date,
+            'send_notification' => $request->send_notification,
             //'ip_address'            => $_SERVER['REMOTE_ADDR'],
-            'list_order_status'     => $list_order_status,
-            'order_from'     => $order_from,
-            'subservice_code'       => $subserviceCode,
-            'city_code'             => $cityCode,
-            'order_year'            => $year,
-            'sequence_no'           => $nextSequence,
-            'format_order_id'           => $formatOrderId,
+            'list_order_status' => $list_order_status,
+            'order_from' => $order_from,
+            'subservice_code' => $subserviceCode,
+            'city_code' => $cityCode,
+            'order_year' => $year,
+            'sequence_no' => $nextSequence,
+            'format_order_id' => $formatOrderId,
         );
 
         $arrOrderId = DB::table('ci_orders')->insertGetId($content);
@@ -2446,26 +2542,26 @@ h3 {
 
 
         $arrData = array(
-            'order_id'                             => $arrOrderId,
-            'user_info_id'                         => $userid,
-            'service_id'                           => 50,
-            'subservice_id'                        => 92,
-            'bookingdate'                          => $booking_date,
-            'bookingyear'                          => $year,
-            'month'                                => $monthName,
-            'time_slot'                            => $request->inspection_time,
-            'end_date'                            => $request->inspection_date,
-            'verifybuy_package_id'                => $request->package_id,
-            'verifybuy_mobile'                     => $request->mobile,
-            'verifybuy_location'                 => $request->location,
-            'verifybuy_address'                  => $request->address,
-            'verifybuy_additional_details'       => $request->additional_details,
-            'verifybuy_where_is_car_parked'      => $request->where_is_car_parked,
-            'verifybuy_vehicle'                    => $vehicle_make,
-            'verifybuy_model'                    => $request->other_vehicle_model,
-            'verifybuy_category'                 => $request->category,
-            'verifybuy_others'                  => $others,
-            'cdate'                                => date('Y-m-d'),
+            'order_id' => $arrOrderId,
+            'user_info_id' => $userid,
+            'service_id' => 50,
+            'subservice_id' => 92,
+            'bookingdate' => $booking_date,
+            'bookingyear' => $year,
+            'month' => $monthName,
+            'time_slot' => $request->inspection_time,
+            'end_date' => $request->inspection_date,
+            'verifybuy_package_id' => $request->package_id,
+            'verifybuy_mobile' => $request->mobile,
+            'verifybuy_location' => $request->location,
+            'verifybuy_address' => $request->address,
+            'verifybuy_additional_details' => $request->additional_details,
+            'verifybuy_where_is_car_parked' => $request->where_is_car_parked,
+            'verifybuy_vehicle' => $vehicle_make,
+            'verifybuy_model' => $request->other_vehicle_model,
+            'verifybuy_category' => $request->category,
+            'verifybuy_others' => $others,
+            'cdate' => date('Y-m-d'),
         );
 
         DB::table('ci_order_item')->insertGetId($arrData);
@@ -2584,11 +2680,31 @@ h3 {
 
         $data['customer_data'] = DB::table('frontloginregisters')->orderBy('id', 'DESC')->get();
 
-        $data['subservice_data'] = DB::table('subservices')->where('serviceid', '34')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        // $data['subservice_data'] = DB::table('subservices')->where('serviceid', '34')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+
+        $data['subservice_data'] = DB::table('subservices')
+            ->where('serviceid', 34)
+            ->where(function ($query) {
+                $query->where('id', 102)
+                    ->orWhere('is_active', 0);
+            })
+            ->orderBy('id', 'DESC')
+            ->get();
         $data['ev_charger_type'] = DB::table('ev_charger_type')->orderBy('set_order', 'asc')->get();
         $data['ev_charger_location_type'] = DB::table('ev_charger_location_type')->orderBy('set_order', 'asc')->get();
 
         return view('admin.package-orders.handyman.add_order', $data);
+    }
+    public function healthcare_at_home_admin_order()
+    {
+
+        $data['customer_data'] = DB::table('frontloginregisters')->orderBy('id', 'DESC')->get();
+
+        $data['subservice_data'] = DB::table('subservices')->where('serviceid', '54')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        $data['ev_charger_type'] = DB::table('ev_charger_type')->orderBy('set_order', 'asc')->get();
+        $data['ev_charger_location_type'] = DB::table('ev_charger_location_type')->orderBy('set_order', 'asc')->get();
+
+        return view('admin.package-orders.healthcare.add_order', $data);
     }
 
     public function get_package_category(Request $request)
@@ -2601,7 +2717,7 @@ h3 {
         $html .= "<option value=''>Select Package Category</option>";
         if ($package_category->isNotEmpty()) {
             foreach ($package_category as $data) {
-                $selected = in_array($data->id, (array)$selectedCategories) ? 'selected' : '';
+                $selected = in_array($data->id, (array) $selectedCategories) ? 'selected' : '';
                 $html .= "<option value='" . $data->id . "' $selected>" . $data->name . "</option>";
             }
         }
@@ -2782,16 +2898,18 @@ h3 {
         // Format selected date
         $selectedDate = DateTime::createFromFormat('Y-F-d', "$year-$month-$day");
 
+        $timeslot_subservice = $subservice_id == 101 ? 97 : $subservice_id;
+
         // Get all time slots
         $time_slots = DB::table('subservice_timeslot_price')
-            ->where('subservice_id', $subservice_id)
+            ->where('subservice_id', $timeslot_subservice)
             ->where('is_active', '1')
             ->pluck('time_slot_id')
             ->toArray();
 
         $matchedBookings = collect();
 
-        if ($cleaner != 2) {
+        if ($cleaner != 2 && $subservice_id != 101) {
             $all_bookings = DB::table('ci_order_item')
                 ->whereRaw("FIND_IN_SET(?, cleaner_id)", [$cleaner])
                 ->where('subservice_id', $subservice_id)
@@ -3061,34 +3179,34 @@ h3 {
 
             // echo"<pre>";print_r($formatOrderId);echo"</pre>";exit;
             $content = array(
-                'user_id'               => $user_id,
-                'order_number'          => $intOrderNumber_new,
-                'order_total'           => $request->order_total,
-                'vatcharge'             => $request->vat_charge,
-                'front_wallet_amount'   => '0',
-                'order_currency'        => 'AED',
-                'order_status'          => 'BK',
-                'paymentmode'           => $mode,
-                'payment_status'        => 'Success',
-                'created_at'            => date('Y-m-d H:i:s'),
-                'list_order_status'     => '0',
-                'date_charge'       => $request->date_charge_hidden,
-                'time_charge'       => $request->time_charge_hidden,
-                'cleaner_per_hour_charge'       => $request->cleaner_per_hour_charge,
-                'material_charge_per_hour'       => $request->cleaning_material_charge,
-                'service_charge'     => $request->service_charge,
-                'timing_charge'     => $timing_date_charge,
+                'user_id' => $user_id,
+                'order_number' => $intOrderNumber_new,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
+                'front_wallet_amount' => '0',
+                'order_currency' => 'AED',
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'created_at' => date('Y-m-d H:i:s'),
+                'list_order_status' => '0',
+                'date_charge' => $request->date_charge_hidden,
+                'time_charge' => $request->time_charge_hidden,
+                'cleaner_per_hour_charge' => $request->cleaner_per_hour_charge,
+                'material_charge_per_hour' => $request->cleaning_material_charge,
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
                 'additional_charge' => $additional_charge,
-                'sub_total'     => $request->sub_total,
-                'cod_charge'     => $request->cod_charge,
-                'service_fee'     => $request->service_fee,
-                'send_notification'     => $request->send_notification,
-                'order_from'     => '1',
-                'subservice_code'       => $subserviceCode,
-                'city_code'             => $cityCode,
-                'order_year'            => $year,
-                'sequence_no'           => $nextSequence,
-                'format_order_id'           => $formatOrderId,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'service_fee' => $request->service_fee,
+                'send_notification' => $request->send_notification,
+                'order_from' => '1',
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
             );
             // echo"<pre>";print_r($content);echo"</pre>";exit;
 
@@ -3135,28 +3253,28 @@ h3 {
 
             // Save to DB
             $data = [
-                'order_id'                             => $arrOrderId,
-                'user_info_id'                         => $user_id,
-                'cleaner_id'                           => $request->cleaner,
-                'service_id'                           => $service_id,
-                'subservice_id'                        => $request->subservice_id,
-                'how_many_cleaners_do_you_need'        => $request->how_many_cleaner,
-                'how_many_hours_should_they_stay'      => $request->hour_value,
-                'how_often_do_you_need_cleaning'       => $request->how_often_you_need,
-                'do_you_need_cleaning_material'        => $request->need_cleaning_material,
-                'any_special_instruction'              => $request->special_instruction,
-                'address_type'                         => $request->address_type,
-                'city'                                 => $request->city,
-                'area'                                 => $request->area,
-                'building_street_no'                   => $request->building_name,
-                'apartment_villa_no'                   => $request->apartment_villa_num,
-                'bookingdate'                          => $day,
-                'bookingyear'                          => $bookingyear,
-                'month'                                => $month,
-                'end_date'                             => $end_date,
-                'time_slot'                            => $request->time_slot,
+                'order_id' => $arrOrderId,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $request->subservice_id,
+                'how_many_cleaners_do_you_need' => $request->how_many_cleaner,
+                'how_many_hours_should_they_stay' => $request->hour_value,
+                'how_often_do_you_need_cleaning' => $request->how_often_you_need,
+                'do_you_need_cleaning_material' => $request->need_cleaning_material,
+                'any_special_instruction' => $request->special_instruction,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'end_date' => $end_date,
+                'time_slot' => $request->time_slot,
                 'which_day_of_the_week_do_you_want_the_service' => $which_day_of_the_week_do_you_want_the_service,
-                'cdate'                                => date('Y-m-d'),
+                'cdate' => date('Y-m-d'),
             ];
 
             // echo"<pre>";print_r($data);echo"</pre>";exit;
@@ -3164,20 +3282,121 @@ h3 {
 
 
             $shipping_data = array(
-                'order_id'      => $arrOrderId,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $arrOrderId,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
+            DB::table('ci_shipping_address')->insert($shipping_data);
+        } elseif ($request->subservice_id == '101') {
+
+            if ($request->payment_method == 'ONLINE') {
+                $mode = 2;
+            } else {
+                $mode = 1;
+            }
+
+            $subservice_id = $request->subservice_id;
+            $cityData = DB::table('cities')->whereRaw('name LIKE ?', ['%' . strtolower($request->city) . '%'])->first();
+            $subserviceData = DB::table('subservices')->where('id', $subservice_id)->first();
+            $subserviceCode = isset($subserviceData->subservice_code) ? $subserviceData->subservice_code : 'OT';
+            $cityCode = isset($cityData->city_code) ? $cityData->city_code : 'DU';
+            $year = date('y');
+
+            $lastSequence = DB::table('ci_orders')
+                ->where('subservice_code', $subserviceCode)
+                ->where('city_code', $cityCode)
+                ->where('order_year', $year)
+                ->selectRaw('MAX(CAST(sequence_no AS UNSIGNED)) as seq')
+                ->lockForUpdate()
+                ->value('seq');
+            $nextSequence = $lastSequence ? $lastSequence + 1 : 1;
+            $formatOrderId = sprintf("%s-%s-%s-%06d", $subserviceCode, $year, $cityCode, $nextSequence);
+
+            $content = array(
+                'user_id' => $user_id,
+                'order_number' => $intOrderNumber_new,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
+                'front_wallet_amount' => '0',
+                'order_currency' => 'AED',
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'created_at' => date('Y-m-d H:i:s'),
+                'list_order_status' => '0',
+                'sub_total' => $request->sub_total,
+                'order_from' => '1',
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
+            );
+            $arrOrderId = DB::table('ci_orders')->insertGetId($content);
+
+            $service_id = DB::table('subservices')->where('id', $request->subservice_id)->pluck('serviceid')->first();
+            $bookingdate = $request->service_date;
+            $bookingyear = date('Y', strtotime($bookingdate));
+            $month = date('F', strtotime($bookingdate));
+            $day = date('j', strtotime($bookingdate));
+            $formatted_date = date('Y-m-d', strtotime($bookingdate));
+
+            $package_duration_months = (int) $request->package_duration_months;
+            if ($package_duration_months < 1)
+                $package_duration_months = 1;
+            $end_date = date('Y-m-d', strtotime($formatted_date . " +{$package_duration_months} months"));
+
+            $data = [
+                'order_id' => $arrOrderId,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner ?? 0,
+                'service_id' => $service_id,
+                'subservice_id' => $request->subservice_id,
+                'how_many_cleaners_do_you_need' => 1,
+                'how_many_hours_should_they_stay' => $request->hours,
+                'how_often_do_you_need_cleaning' => $request->how_often_do_you_need_cleaning,
+                'do_you_need_cleaning_material' => $request->materials,
+                'any_special_instruction' => $request->special_instruction,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'end_date' => $end_date,
+                'time_slot' => $request->time_slot,
+                'which_day_of_the_week_do_you_want_the_service' => $request->which_day_you_want ? implode(',', (array) $request->which_day_you_want) : null,
+                'cdate' => date('Y-m-d')
+            ];
+
+            $order_item_id = DB::table('ci_order_item')->insertGetId($data);
+
+            $shipping_data = array(
+                'order_id' => $arrOrderId,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
+                'email_address' => "",
+            );
             DB::table('ci_shipping_address')->insert($shipping_data);
         } else {
 
@@ -3234,29 +3453,29 @@ h3 {
             $timing_date_charge = $request->timing_charge + $request->date_charge;
             // echo"here";exit;
             $content = array(
-                'user_id'               => $user_id,
-                'order_number'          => $intOrderNumber_new,
-                'order_total'           => $request->order_total,
-                'vatcharge'             => $request->vat_charge,
-                'front_wallet_amount'   => '0',
-                'order_currency'        => 'AED',
-                'order_status'          => 'P',
-                'paymentmode'           => '1',
-                'payment_status'        => 'Success',
-                'created_at'            => date('Y-m-d H:i:s'),
-                'list_order_status'     => '0',
-                'service_charge'     => $request->service_charge,
-                'timing_charge'     => $timing_date_charge,
+                'user_id' => $user_id,
+                'order_number' => $intOrderNumber_new,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
+                'front_wallet_amount' => '0',
+                'order_currency' => 'AED',
+                'order_status' => 'P',
+                'paymentmode' => '1',
+                'payment_status' => 'Success',
+                'created_at' => date('Y-m-d H:i:s'),
+                'list_order_status' => '0',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
                 'additional_charge' => "",
-                'sub_total'     => $request->sub_total,
-                'cod_charge'     => $request->cod_charge,
-                'service_fee'     => $request->service_fee,
-                'order_from'     => '1',
-                'subservice_code'       => $subserviceCode,
-                'city_code'             => $cityCode,
-                'order_year'            => $year,
-                'sequence_no'           => $nextSequence,
-                'format_order_id'           => $formatOrderId,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'service_fee' => $request->service_fee,
+                'order_from' => '1',
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
             );
 
             // echo"<pre>";print_r($content);echo"</pre>";exit;
@@ -3278,27 +3497,27 @@ h3 {
 
 
             $data = array(
-                'order_id'                             => $arrOrderId,
-                'user_info_id'                         => $user_id,
-                'cleaner_id'                           => $request->cleaner,
-                'service_id'                           => $service_id,
-                'subservice_id'                        => $request->subservice_id,
-                'how_many_cleaners_do_you_need'        => $request->how_many_cleaner,
-                'how_many_hours_should_they_stay'      => $request->hour_value,
-                'how_often_do_you_need_cleaning'       => $request->how_often_you_need,
-                'do_you_need_cleaning_material'        => $request->need_cleaning_material,
-                'any_special_instruction'              => $request->special_instruction,
-                'address_type'                         => $request->address_type,
-                'city'                                 => $request->city,
-                'area'                                 => $request->area,
-                'building_street_no'                   => $request->building_name,
-                'apartment_villa_no'                   => $request->apartment_villa_num,
-                'bookingdate'                          => $day,
-                'bookingyear'                          => $bookingyear,
-                'month'                                => $month,
-                'time_slot'                            => $request->time_slot,
+                'order_id' => $arrOrderId,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $request->subservice_id,
+                'how_many_cleaners_do_you_need' => $request->how_many_cleaner,
+                'how_many_hours_should_they_stay' => $request->hour_value,
+                'how_often_do_you_need_cleaning' => $request->how_often_you_need,
+                'do_you_need_cleaning_material' => $request->need_cleaning_material,
+                'any_special_instruction' => $request->special_instruction,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'time_slot' => $request->time_slot,
                 'which_day_of_the_week_do_you_want_the_service' => implode(',', $request->which_day_you_want ?? []),
-                'cdate'                                => date('Y-m-d'),
+                'cdate' => date('Y-m-d'),
             );
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($data);
@@ -3323,22 +3542,22 @@ h3 {
                         // Check if quantity and price exist
                         if (isset($request->$quantityKey) && isset($request->$priceKey)) {
                             $data = [
-                                'order_id'              => $arrOrderId,
-                                'order_item_id'         => $order_item_id,
-                                'user_info_id'          => $user_id,
-                                'package_id'            => $packageId,
-                                'package_item_name'     => $package_item->name,
-                                'package_quantity'      => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                                'package_item_price'    => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                                'service_id'            => $service_id,
-                                'service_name'          => $service_name,
-                                'subservice_id'         => $request->subservice_id,
-                                'subservice_name'       => $subservice_name,
-                                'packagecategory_id'    => $package_category_id,
-                                'packagecategory_name'  => $package_category_name,
-                                'page_url'              => $package_item->page_url,
-                                'image'                 => $package_item->image,
-                                'cdate'                 => date('Y-m-d'),
+                                'order_id' => $arrOrderId,
+                                'order_item_id' => $order_item_id,
+                                'user_info_id' => $user_id,
+                                'package_id' => $packageId,
+                                'package_item_name' => $package_item->name,
+                                'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                                'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                                'service_id' => $service_id,
+                                'service_name' => $service_name,
+                                'subservice_id' => $request->subservice_id,
+                                'subservice_name' => $subservice_name,
+                                'packagecategory_id' => $package_category_id,
+                                'packagecategory_name' => $package_category_name,
+                                'page_url' => $package_item->page_url,
+                                'image' => $package_item->image,
+                                'cdate' => date('Y-m-d'),
                             ];
 
                             // Insert data into the database
@@ -3349,17 +3568,17 @@ h3 {
             }
 
             $shipping_data = array(
-                'order_id'      => $arrOrderId,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $arrOrderId,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
@@ -3392,28 +3611,28 @@ h3 {
 
         // Prepare order data to update
         $content = [
-            'user_id'             => $user_id,
-            'order_total'         => $request->order_total,
-            'vatcharge'           => $request->vat_charge,
+            'user_id' => $user_id,
+            'order_total' => $request->order_total,
+            'vatcharge' => $request->vat_charge,
             'front_wallet_amount' => '0',
-            'order_currency'      => 'AED',
-            'order_status'        => 'P',
-            'paymentmode'         => $mode,
-            'payment_status'      => 'Success',
-            'service_charge'      => $request->service_charge,
-            'timing_charge'       => $request->time_charge_hidden + $request->date_charge_hidden,
-            'date_charge'       => $request->date_charge_hidden,
-            'time_charge'       => $request->time_charge_hidden,
-            'cleaner_per_hour_charge'       => $request->cleaner_per_hour_charge,
-            'material_charge_per_hour'       => $request->cleaning_material_charge,
-            'additional_charge'   => $request->hour_value * $request->how_many_cleaner * $request->cleaning_material_charge,
-            'sub_total'           => $request->sub_total,
-            'cod_charge'          => $request->cod_charge,
-            'service_fee'         => $request->service_fee,
-            'date_charge'         => $request->date_charge,
+            'order_currency' => 'AED',
+            'order_status' => 'P',
+            'paymentmode' => $mode,
+            'payment_status' => 'Success',
+            'service_charge' => $request->service_charge,
+            'timing_charge' => $request->time_charge_hidden + $request->date_charge_hidden,
+            'date_charge' => $request->date_charge_hidden,
+            'time_charge' => $request->time_charge_hidden,
+            'cleaner_per_hour_charge' => $request->cleaner_per_hour_charge,
             'material_charge_per_hour' => $request->cleaning_material_charge,
-            'service_fee'         => $request->service_fee,
-            'order_from'          => '1',
+            'additional_charge' => $request->hour_value * $request->how_many_cleaner * $request->cleaning_material_charge,
+            'sub_total' => $request->sub_total,
+            'cod_charge' => $request->cod_charge,
+            'service_fee' => $request->service_fee,
+            'date_charge' => $request->date_charge,
+            'material_charge_per_hour' => $request->cleaning_material_charge,
+            'service_fee' => $request->service_fee,
+            'order_from' => '1',
 
         ];
 
@@ -3489,28 +3708,28 @@ h3 {
 
         // Save to DB
         $order_item_data = [
-            'order_id'                             => $order_id,
-            'user_info_id'                         => $user_id,
-            'cleaner_id'                           => $request->cleaner,
-            'service_id'                           => $service_id,
-            'subservice_id'                        => $request->subservice_id,
-            'how_many_cleaners_do_you_need'        => $request->how_many_cleaner,
-            'how_many_hours_should_they_stay'      => $request->hour_value,
-            'how_often_do_you_need_cleaning'       => $request->how_often_you_need,
-            'do_you_need_cleaning_material'        => $request->need_cleaning_material,
-            'any_special_instruction'              => $request->special_instruction,
-            'address_type'                         => $request->address_type,
-            'city'                                 => $request->city,
-            'area'                                 => $request->area,
-            'building_street_no'                   => $request->building_name,
-            'apartment_villa_no'                   => $request->apartment_villa_num,
-            'bookingdate'                          => $day,
-            'bookingyear'                          => $bookingyear,
-            'month'                                => $month,
-            'end_date'                             => $end_date,
-            'time_slot'                            => $request->time_slot,
+            'order_id' => $order_id,
+            'user_info_id' => $user_id,
+            'cleaner_id' => $request->cleaner,
+            'service_id' => $service_id,
+            'subservice_id' => $request->subservice_id,
+            'how_many_cleaners_do_you_need' => $request->how_many_cleaner,
+            'how_many_hours_should_they_stay' => $request->hour_value,
+            'how_often_do_you_need_cleaning' => $request->how_often_you_need,
+            'do_you_need_cleaning_material' => $request->need_cleaning_material,
+            'any_special_instruction' => $request->special_instruction,
+            'address_type' => $request->address_type,
+            'city' => $request->city,
+            'area' => $request->area,
+            'building_street_no' => $request->building_name,
+            'apartment_villa_no' => $request->apartment_villa_num,
+            'bookingdate' => $day,
+            'bookingyear' => $bookingyear,
+            'month' => $month,
+            'end_date' => $end_date,
+            'time_slot' => $request->time_slot,
             'which_day_of_the_week_do_you_want_the_service' => $which_day_of_the_week_do_you_want_the_service,
-            'cdate'                                => date('Y-m-d'),
+            'cdate' => date('Y-m-d'),
         ];
 
         DB::table('ci_order_item')->where('order_id', $order_id)->update($order_item_data);
@@ -3539,22 +3758,22 @@ h3 {
                     if (isset($request->$quantityKey) && isset($request->$priceKey)) {
 
                         $data = [
-                            'order_id'              => $order_id,
-                            'order_item_id'         => $orderItem->id,
-                            'user_info_id'          => $user_id,
-                            'package_id'            => $packageId,
-                            'package_item_name'     => $package_item->name,
-                            'package_quantity'      => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                            'package_item_price'    => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                            'service_id'            => $service_id,
-                            'service_name'          => $service_name,
-                            'subservice_id'         => $request->subservice_id,
-                            'subservice_name'       => $subservice_name,
-                            'packagecategory_id'    => $package_category_id,
-                            'packagecategory_name'  => $package_category_name,
-                            'page_url'              => $package_item->page_url,
-                            'image'                 => $package_item->image,
-                            'cdate'                 => date('Y-m-d'),
+                            'order_id' => $order_id,
+                            'order_item_id' => $orderItem->id,
+                            'user_info_id' => $user_id,
+                            'package_id' => $packageId,
+                            'package_item_name' => $package_item->name,
+                            'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                            'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                            'service_id' => $service_id,
+                            'service_name' => $service_name,
+                            'subservice_id' => $request->subservice_id,
+                            'subservice_name' => $subservice_name,
+                            'packagecategory_id' => $package_category_id,
+                            'packagecategory_name' => $package_category_name,
+                            'page_url' => $package_item->page_url,
+                            'image' => $package_item->image,
+                            'cdate' => date('Y-m-d'),
                         ];
 
                         // Insert data into the database
@@ -3567,16 +3786,16 @@ h3 {
 
         // Prepare shipping data to update
         $shipping_data = [
-            'first_name'     => "",
-            'last_name'      => "",
-            'country'        => "",
-            'address1'       => "",
-            'state'          => "",
-            'city'           => "",
-            'zipcode'        => "",
-            'address2'       => "",
-            'phone_number'   => "",
-            'email_address'  => "",
+            'first_name' => "",
+            'last_name' => "",
+            'country' => "",
+            'address1' => "",
+            'state' => "",
+            'city' => "",
+            'zipcode' => "",
+            'address2' => "",
+            'phone_number' => "",
+            'email_address' => "",
         ];
 
         // Update shipping address
@@ -3661,30 +3880,30 @@ h3 {
             );
 
             $content = array(
-                'user_id'               => $user_id,
-                'order_number'          => $intOrderNumber_new,
-                'order_total'           => $request->order_total,
-                'vatcharge'             => $request->vat_charge,
-                'front_wallet_amount'   => '0',
-                'order_currency'        => 'AED',
-                'order_status'          => 'BK',
-                'paymentmode'           => $mode,
-                'payment_status'        => 'Success',
-                'created_at'            => date('Y-m-d H:i:s'),
-                'list_order_status'     => '0',
-                'service_charge'     => $request->service_charge,
-                'timing_charge'     => $timing_date_charge,
+                'user_id' => $user_id,
+                'order_number' => $intOrderNumber_new,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
+                'front_wallet_amount' => '0',
+                'order_currency' => 'AED',
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'created_at' => date('Y-m-d H:i:s'),
+                'list_order_status' => '0',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
                 'additional_charge' => "",
-                'sub_total'     => $request->sub_total,
-                'cod_charge'     => $request->cod_charge,
-                'service_fee'     => $request->service_fee,
-                'send_notification'     => $request->send_notification,
-                'order_from'     => '1',
-                'subservice_code'       => $subserviceCode,
-                'city_code'             => $cityCode,
-                'order_year'            => $year,
-                'sequence_no'           => $nextSequence,
-                'format_order_id'           => $formatOrderId,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'service_fee' => $request->service_fee,
+                'send_notification' => $request->send_notification,
+                'order_from' => '1',
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
             );
 
             $arrOrderId = DB::table('ci_orders')->insertGetId($content);
@@ -3701,27 +3920,27 @@ h3 {
             $day = date('j', strtotime($request->service_date));
 
             $data = array(
-                'order_id'                             => $arrOrderId,
-                'user_info_id'                         => $user_id,
-                'cleaner_id'                           => $request->cleaner,
-                'service_id'                           => $service_id,
-                'subservice_id'                        => $request->subservice_id,
-                'how_many_cleaners_do_you_need'        => $request->how_many_cleaner,
-                'how_many_hours_should_they_stay'      => $request->hour_value,
-                'how_often_do_you_need_cleaning'       => $request->how_often_you_need,
-                'do_you_need_cleaning_material'        => $request->need_cleaning_material,
-                'any_special_instruction'              => $request->special_instruction,
-                'address_type'                         => $request->address_type,
-                'city'                                 => $request->city,
-                'area'                                 => $request->area,
-                'building_street_no'                   => $request->building_name,
-                'apartment_villa_no'                   => $request->apartment_villa_num,
-                'bookingdate'                          => $day,
-                'bookingyear'                          => $bookingyear,
-                'month'                                => $month,
-                'time_slot'                            => $request->time_slot,
+                'order_id' => $arrOrderId,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $request->subservice_id,
+                'how_many_cleaners_do_you_need' => $request->how_many_cleaner,
+                'how_many_hours_should_they_stay' => $request->hour_value,
+                'how_often_do_you_need_cleaning' => $request->how_often_you_need,
+                'do_you_need_cleaning_material' => $request->need_cleaning_material,
+                'any_special_instruction' => $request->special_instruction,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'time_slot' => $request->time_slot,
                 'which_day_of_the_week_do_you_want_the_service' => implode(',', $request->which_day_you_want ?? []),
-                'cdate'                                => date('Y-m-d'),
+                'cdate' => date('Y-m-d'),
             );
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($data);
@@ -3746,22 +3965,22 @@ h3 {
                         // Check if quantity and price exist
                         if (isset($request->$quantityKey) && isset($request->$priceKey)) {
                             $data = [
-                                'order_id'              => $arrOrderId,
-                                'order_item_id'         => $order_item_id,
-                                'user_info_id'          => $user_id,
-                                'package_id'            => $packageId,
-                                'package_item_name'     => $package_item->name,
-                                'package_quantity'      => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                                'package_item_price'    => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                                'service_id'            => $service_id,
-                                'service_name'          => $service_name,
-                                'subservice_id'         => $request->subservice_id,
-                                'subservice_name'       => $subservice_name,
-                                'packagecategory_id'    => $package_category_id,
-                                'packagecategory_name'  => $package_category_name,
-                                'page_url'              => $package_item->page_url,
-                                'image'                 => $package_item->image,
-                                'cdate'                 => date('Y-m-d'),
+                                'order_id' => $arrOrderId,
+                                'order_item_id' => $order_item_id,
+                                'user_info_id' => $user_id,
+                                'package_id' => $packageId,
+                                'package_item_name' => $package_item->name,
+                                'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                                'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                                'service_id' => $service_id,
+                                'service_name' => $service_name,
+                                'subservice_id' => $request->subservice_id,
+                                'subservice_name' => $subservice_name,
+                                'packagecategory_id' => $package_category_id,
+                                'packagecategory_name' => $package_category_name,
+                                'page_url' => $package_item->page_url,
+                                'image' => $package_item->image,
+                                'cdate' => date('Y-m-d'),
                             ];
 
                             // Insert data into the database
@@ -3771,17 +3990,17 @@ h3 {
                 }
             }
             $shipping_data = array(
-                'order_id'      => $arrOrderId,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $arrOrderId,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
@@ -3878,30 +4097,30 @@ h3 {
 
             // echo"here";exit;
             $content = array(
-                'user_id'               => $user_id,
-                'order_number'          => $intOrderNumber_new,
-                'order_total'           => $request->order_total,
-                'vatcharge'             => $request->vat_charge,
-                'front_wallet_amount'   => '0',
-                'order_currency'        => 'AED',
-                'order_status'          => 'BK',
-                'paymentmode'           => $mode,
-                'payment_status'        => 'Success',
-                'created_at'            => date('Y-m-d H:i:s'),
-                'list_order_status'     => '0',
-                'service_charge'     => $request->service_charge,
-                'timing_charge'     => $timing_date_charge,
+                'user_id' => $user_id,
+                'order_number' => $intOrderNumber_new,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
+                'front_wallet_amount' => '0',
+                'order_currency' => 'AED',
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'created_at' => date('Y-m-d H:i:s'),
+                'list_order_status' => '0',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
                 'additional_charge' => "",
-                'sub_total'     => $request->sub_total,
-                'cod_charge'     => $request->cod_charge,
-                'service_fee'     => $request->service_fee,
-                'send_notification'     => $request->send_notification,
-                'order_from'     => '1',
-                'subservice_code'       => $subserviceCode,
-                'city_code'             => $cityCode,
-                'order_year'            => $year,
-                'sequence_no'           => $nextSequence,
-                'format_order_id'           => $formatOrderId,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'service_fee' => $request->service_fee,
+                'send_notification' => $request->send_notification,
+                'order_from' => '1',
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
             );
 
             // echo"<pre>";print_r($content);echo"</pre>";exit;
@@ -3923,27 +4142,27 @@ h3 {
 
 
             $data = array(
-                'order_id'                             => $arrOrderId,
-                'user_info_id'                         => $user_id,
-                'cleaner_id'                           => $request->cleaner,
-                'service_id'                           => $service_id,
-                'subservice_id'                        => $request->subservice_id,
-                'how_many_cleaners_do_you_need'        => $request->how_many_cleaner,
-                'how_many_hours_should_they_stay'      => $request->hour_value,
-                'how_often_do_you_need_cleaning'       => $request->how_often_you_need,
-                'do_you_need_cleaning_material'        => $request->need_cleaning_material,
-                'any_special_instruction'              => $request->special_instruction,
-                'address_type'                         => $request->address_type,
-                'city'                                 => $request->city,
-                'area'                                 => $request->area,
-                'building_street_no'                   => $request->building_name,
-                'apartment_villa_no'                   => $request->apartment_villa_num,
-                'bookingdate'                          => $day,
-                'bookingyear'                          => $bookingyear,
-                'month'                                => $month,
-                'time_slot'                            => $request->time_slot,
+                'order_id' => $arrOrderId,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $request->subservice_id,
+                'how_many_cleaners_do_you_need' => $request->how_many_cleaner,
+                'how_many_hours_should_they_stay' => $request->hour_value,
+                'how_often_do_you_need_cleaning' => $request->how_often_you_need,
+                'do_you_need_cleaning_material' => $request->need_cleaning_material,
+                'any_special_instruction' => $request->special_instruction,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'time_slot' => $request->time_slot,
                 'which_day_of_the_week_do_you_want_the_service' => implode(',', $request->which_day_you_want ?? []),
-                'cdate'                                => date('Y-m-d'),
+                'cdate' => date('Y-m-d'),
             );
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($data);
@@ -3968,22 +4187,22 @@ h3 {
                         // Check if quantity and price exist
                         if (isset($request->$quantityKey) && isset($request->$priceKey)) {
                             $data = [
-                                'order_id'              => $arrOrderId,
-                                'order_item_id'         => $order_item_id,
-                                'user_info_id'          => $user_id,
-                                'package_id'            => $packageId,
-                                'package_item_name'     => $package_item->name,
-                                'package_quantity'      => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                                'package_item_price'    => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                                'service_id'            => $service_id,
-                                'service_name'          => $service_name,
-                                'subservice_id'         => $request->subservice_id,
-                                'subservice_name'       => $subservice_name,
-                                'packagecategory_id'    => $package_category_id,
-                                'packagecategory_name'  => $package_category_name,
-                                'page_url'              => $package_item->page_url,
-                                'image'                 => $package_item->image,
-                                'cdate'                 => date('Y-m-d'),
+                                'order_id' => $arrOrderId,
+                                'order_item_id' => $order_item_id,
+                                'user_info_id' => $user_id,
+                                'package_id' => $packageId,
+                                'package_item_name' => $package_item->name,
+                                'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                                'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                                'service_id' => $service_id,
+                                'service_name' => $service_name,
+                                'subservice_id' => $request->subservice_id,
+                                'subservice_name' => $subservice_name,
+                                'packagecategory_id' => $package_category_id,
+                                'packagecategory_name' => $package_category_name,
+                                'page_url' => $package_item->page_url,
+                                'image' => $package_item->image,
+                                'cdate' => date('Y-m-d'),
                             ];
 
                             // Insert data into the database
@@ -3993,17 +4212,17 @@ h3 {
                 }
             }
             $shipping_data = array(
-                'order_id'      => $arrOrderId,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $arrOrderId,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
@@ -4092,30 +4311,30 @@ h3 {
             );
 
             $content = array(
-                'user_id'               => $user_id,
-                'order_number'          => $intOrderNumber_new,
-                'order_total'           => $request->order_total,
-                'vatcharge'             => $request->vat_charge,
-                'front_wallet_amount'   => '0',
-                'order_currency'        => 'AED',
-                'order_status'          => 'BK',
-                'paymentmode'           => $mode,
-                'payment_status'        => 'Success',
-                'created_at'            => date('Y-m-d H:i:s'),
-                'list_order_status'     => '0',
-                'service_charge'     => $request->service_charge,
-                'timing_charge'     => $timing_date_charge,
+                'user_id' => $user_id,
+                'order_number' => $intOrderNumber_new,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
+                'front_wallet_amount' => '0',
+                'order_currency' => 'AED',
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'created_at' => date('Y-m-d H:i:s'),
+                'list_order_status' => '0',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
                 'additional_charge' => "",
-                'sub_total'     => $request->sub_total,
-                'cod_charge'     => $request->cod_charge,
-                'service_fee'     => $request->service_fee,
-                'send_notification'     => $request->send_notification,
-                'order_from'     => '1',
-                'subservice_code'       => $subserviceCode,
-                'city_code'             => $cityCode,
-                'order_year'            => $year,
-                'sequence_no'           => $nextSequence,
-                'format_order_id'           => $formatOrderId,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'service_fee' => $request->service_fee,
+                'send_notification' => $request->send_notification,
+                'order_from' => '1',
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
             );
 
             $arrOrderId = DB::table('ci_orders')->insertGetId($content);
@@ -4128,39 +4347,46 @@ h3 {
 
             $bookingdate = $request->service_date;
             $bookingyear = date('Y', strtotime($request->service_date));
-            $month       = date('F', strtotime($request->service_date));
-            $day         = date('j', strtotime($request->service_date));
+            $month = date('F', strtotime($request->service_date));
+            $day = date('j', strtotime($request->service_date));
 
             $formatted_date = date('Y-m-d', strtotime($bookingdate));
 
             $end_date = $formatted_date;
 
             $data = array(
-                'order_id'                             => $arrOrderId,
-                'user_info_id'                         => $user_id,
-                'cleaner_id'                           => $request->cleaner,
-                'service_id'                           => $service_id,
-                'subservice_id'                        => $request->subservice_id,
-                'how_many_cleaners_do_you_need'        => $request->how_many_cleaner,
-                'how_many_hours_should_they_stay'      => $request->hour_value,
-                'how_often_do_you_need_cleaning'       => $request->how_often_you_need,
-                'do_you_need_cleaning_material'        => $request->need_cleaning_material,
-                'any_special_instruction'              => $request->special_instruction,
-                'address_type'                         => $request->address_type,
-                'city'                                 => $request->city,
-                'area'                                 => $request->area,
-                'building_street_no'                   => $request->building_name,
-                'apartment_villa_no'                   => $request->apartment_villa_num,
-                'bookingdate'                          => $day,
-                'bookingyear'                          => $bookingyear,
-                'month'                                => $month,
-                'end_date'                                => $end_date,
-                'time_slot'                            => $request->time_slot,
-                'charger_type'                         => $request->charger_type,
-                'installation_location_type'           => $request->installation_location_type,
-                'installation_charge'                   => $request->installation_charge,
+                'order_id' => $arrOrderId,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $request->subservice_id,
+                'how_many_cleaners_do_you_need' => $request->how_many_cleaner,
+                'how_many_hours_should_they_stay' => $request->hour_value,
+                'how_often_do_you_need_cleaning' => $request->how_often_you_need,
+                'do_you_need_cleaning_material' => $request->need_cleaning_material,
+                'any_special_instruction' => $request->special_instruction,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'end_date' => $end_date,
+                'time_slot' => $request->time_slot,
+                'charger_type' => $request->charger_type,
+                'installation_location_type' => $request->installation_location_type,
+                'installation_charge' => $request->installation_charge,
                 'which_day_of_the_week_do_you_want_the_service' => implode(',', $request->which_day_you_want ?? []),
-                'cdate'                                => date('Y-m-d'),
+                'cdate' => date('Y-m-d'),
+                'manpower_service_required' => $request->manpower_service_required,
+                'manpower_workers_required' => $request->manpower_workers_required,
+                'manpower_start_date' => $request->manpower_start_date,
+                'manpower_end_date' => $request->manpower_end_date,
+                'manpower_duration' => $request->manpower_duration,
+                'manpower_job_description' => $request->manpower_job_description,
+                'manpower_additional_notes' => $request->manpower_additional_notes,
             );
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($data);
@@ -4185,22 +4411,22 @@ h3 {
                         // Check if quantity and price exist
                         if (isset($request->$quantityKey) && isset($request->$priceKey)) {
                             $data = [
-                                'order_id'              => $arrOrderId,
-                                'order_item_id'         => $order_item_id,
-                                'user_info_id'          => $user_id,
-                                'package_id'            => $packageId,
-                                'package_item_name'     => $package_item->name,
-                                'package_quantity'      => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                                'package_item_price'    => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                                'service_id'            => $service_id,
-                                'service_name'          => $service_name,
-                                'subservice_id'         => $request->subservice_id,
-                                'subservice_name'       => $subservice_name,
-                                'packagecategory_id'    => $package_category_id,
-                                'packagecategory_name'  => $package_category_name,
-                                'page_url'              => $package_item->page_url,
-                                'image'                 => $package_item->image,
-                                'cdate'                 => date('Y-m-d'),
+                                'order_id' => $arrOrderId,
+                                'order_item_id' => $order_item_id,
+                                'user_info_id' => $user_id,
+                                'package_id' => $packageId,
+                                'package_item_name' => $package_item->name,
+                                'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                                'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                                'service_id' => $service_id,
+                                'service_name' => $service_name,
+                                'subservice_id' => $request->subservice_id,
+                                'subservice_name' => $subservice_name,
+                                'packagecategory_id' => $package_category_id,
+                                'packagecategory_name' => $package_category_name,
+                                'page_url' => $package_item->page_url,
+                                'image' => $package_item->image,
+                                'cdate' => date('Y-m-d'),
                             ];
 
                             DB::table('ci_order_item_packages')->insertGetId($data);
@@ -4210,17 +4436,17 @@ h3 {
             }
 
             $shipping_data = array(
-                'order_id'      => $arrOrderId,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $arrOrderId,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
@@ -4234,6 +4460,224 @@ h3 {
 
 
         return redirect()->route('handyman-service-order')->with('success', 'Order has been added successfully');
+    }
+    function healthcare_at_home_service_order_store(Request $request)
+    {
+        // echo"<pre>";print_r($request->all());exit;
+        $intOrderNumber = DB::table('ci_orders')
+            ->select(DB::raw('MAX(order_id) as lastOrderNumber'))
+            ->first();
+
+        $nextOrderNumber = 0;
+        if ($intOrderNumber) {
+            $intOrderNumber = $intOrderNumber->lastOrderNumber + 1;
+
+            $intOrderNumber_new = $intOrderNumber;
+            $nextOrderNumber;
+        } else {
+            $intOrderNumber_new = 1;
+        }
+        $user_id = $request->customer_id;
+
+
+        if ($request->subservice_id != '') {
+
+            $timing_date_charge = $request->timing_charge + $request->date_charge;
+            if ($request->payment_method == 'ONLINE') {
+                $mode = 2;
+            } else {
+                $mode = 1;
+            }
+
+            $subservice_id = $request->subservice_id;
+            $cityData = DB::table('cities')->whereRaw('name LIKE ?', ['%' . strtolower($request->city) . '%'])->first();
+            $subserviceData = DB::table('subservices')->where('id', $subservice_id)->first();
+
+            if (isset($subserviceData)) {
+                if (isset($subserviceData->subservice_code)) {
+                    $subserviceCode = $subserviceData->subservice_code;
+                } else {
+                    $subserviceCode = 'OT';
+                }
+            } else {
+                $subserviceCode = 'OT';
+            }
+
+            $cityCode = 'DU';
+            if (isset($cityData)) {
+                if (isset($cityData->city_code)) {
+                    $cityCode = $cityData->city_code;
+                } else {
+                    $cityCode = 'OT';
+                }
+            }
+
+            $year = date('y');
+
+            /* ---------------- SEQUENCE LOGIC ---------------- */
+            $lastSequence = DB::table('ci_orders')
+                ->where('subservice_code', $subserviceCode)
+                ->where('city_code', $cityCode)
+                ->where('order_year', $year)
+                ->selectRaw('MAX(CAST(sequence_no AS UNSIGNED)) as seq')
+                ->lockForUpdate()
+                ->value('seq');
+
+            $nextSequence = $lastSequence ? $lastSequence + 1 : 1;
+
+            $formatOrderId = sprintf(
+                "%s-%s-%s-%06d",
+                $subserviceCode,
+                $year,
+                $cityCode,
+                $nextSequence
+            );
+
+            $content = array(
+                'user_id' => $user_id,
+                'order_number' => $intOrderNumber_new,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
+                'front_wallet_amount' => '0',
+                'order_currency' => 'AED',
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'created_at' => date('Y-m-d H:i:s'),
+                'list_order_status' => '0',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
+                'additional_charge' => "",
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'service_fee' => $request->service_fee,
+                'send_notification' => $request->send_notification,
+                'order_from' => '1',
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
+            );
+
+            $arrOrderId = DB::table('ci_orders')->insertGetId($content);
+
+            // $year = date('y');
+            // $data_u['format_order_id'] = "VC-" . $year ."-UAE-". sprintf("%06d", $arrOrderId);
+            // DB::table('ci_orders')->where('order_id', $arrOrderId)->update($data_u);
+
+            $service_id = DB::table('subservices')->where('id', $request->subservice_id)->pluck('serviceid')->first();
+
+            $bookingdate = $request->service_date;
+            $bookingyear = date('Y', strtotime($request->service_date));
+            $month = date('F', strtotime($request->service_date));
+            $day = date('j', strtotime($request->service_date));
+
+            $formatted_date = date('Y-m-d', strtotime($bookingdate));
+
+            $end_date = $formatted_date;
+
+            $data = array(
+                'order_id' => $arrOrderId,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $request->subservice_id,
+                'how_many_cleaners_do_you_need' => $request->how_many_cleaner,
+                'how_many_hours_should_they_stay' => $request->hour_value,
+                'how_often_do_you_need_cleaning' => $request->how_often_you_need,
+                'do_you_need_cleaning_material' => $request->need_cleaning_material,
+                'any_special_instruction' => $request->special_instruction,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'end_date' => $end_date,
+                'time_slot' => $request->time_slot,
+                'charger_type' => $request->charger_type,
+                'installation_location_type' => $request->installation_location_type,
+                'installation_charge' => $request->installation_charge,
+                'which_day_of_the_week_do_you_want_the_service' => implode(',', $request->which_day_you_want ?? []),
+                'cdate' => date('Y-m-d'),
+                'emirates_id_number' => ($service_id == 54) ? $request->emirates_id_number : '',
+                'passport_number' => ($service_id == 54) ? $request->passport_number : '',
+            );
+
+            $order_item_id = DB::table('ci_order_item')->insertGetId($data);
+
+
+            if (!empty($request->package) && is_array($request->package)) {
+                $service_name = DB::table('services')->where('id', $service_id)->value('servicename');
+                $subservice_name = DB::table('subservices')->where('id', $request->subservice_id)->value('subservicename');
+
+                foreach ($request->package as $packageId) {
+                    $quantityKey = $packageId . '_quantity';
+                    $priceKey = $packageId . '_price';
+
+                    // Fetch package item details
+                    $package_item = DB::table('packages')->where('id', $packageId)->first();
+
+                    if ($package_item) {
+                        // Fetch the category details for this specific package
+                        $package_category_id = $package_item->packagecategory_id;
+                        $package_category_name = DB::table('package_categories')->where('id', $package_category_id)->value('name');
+
+                        // Check if quantity and price exist
+                        if (isset($request->$quantityKey) && isset($request->$priceKey)) {
+                            $data = [
+                                'order_id' => $arrOrderId,
+                                'order_item_id' => $order_item_id,
+                                'user_info_id' => $user_id,
+                                'package_id' => $packageId,
+                                'package_item_name' => $package_item->name,
+                                'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                                'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                                'service_id' => $service_id,
+                                'service_name' => $service_name,
+                                'subservice_id' => $request->subservice_id,
+                                'subservice_name' => $subservice_name,
+                                'packagecategory_id' => $package_category_id,
+                                'packagecategory_name' => $package_category_name,
+                                'page_url' => $package_item->page_url,
+                                'image' => $package_item->image,
+                                'cdate' => date('Y-m-d'),
+                            ];
+
+                            DB::table('ci_order_item_packages')->insertGetId($data);
+                        }
+                    }
+                }
+            }
+
+            $shipping_data = array(
+                'order_id' => $arrOrderId,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
+                'email_address' => "",
+            );
+
+            DB::table('ci_shipping_address')->insert($shipping_data);
+        }
+
+        if ($request->send_notification == 'yes') {
+            $this->success_book_now_mail($user_id, $arrOrderId);
+            $this->success_whatsapp_message($user_id, $arrOrderId);
+        }
+
+
+        return redirect()->route('healthcare_at_home_package_order')->with('success', 'Order has been added successfully');
     }
     function automobile_order_store(Request $request)
     {
@@ -4314,30 +4758,30 @@ h3 {
             );
             // echo"here";exit;
             $content = array(
-                'user_id'               => $user_id,
-                'order_number'          => $intOrderNumber_new,
-                'order_total'           => $request->order_total,
-                'vatcharge'             => $request->vat_charge,
-                'front_wallet_amount'   => '0',
-                'order_currency'        => 'AED',
-                'order_status'          => 'BK',
-                'paymentmode'           => $mode,
-                'payment_status'        => 'Success',
-                'created_at'            => date('Y-m-d H:i:s'),
-                'list_order_status'     => '0',
-                'service_charge'     => $request->service_charge,
-                'timing_charge'     => $timing_date_charge,
+                'user_id' => $user_id,
+                'order_number' => $intOrderNumber_new,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
+                'front_wallet_amount' => '0',
+                'order_currency' => 'AED',
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'created_at' => date('Y-m-d H:i:s'),
+                'list_order_status' => '0',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
                 'additional_charge' => "",
-                'sub_total'     => $request->sub_total,
-                'cod_charge'     => $request->cod_charge,
-                'service_fee'     => $request->service_fee,
-                'send_notification'     => $request->send_notification,
-                'order_from'     => '1',
-                'subservice_code'       => $subserviceCode,
-                'city_code'             => $cityCode,
-                'order_year'            => $year,
-                'sequence_no'           => $nextSequence,
-                'format_order_id'           => $formatOrderId,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'service_fee' => $request->service_fee,
+                'send_notification' => $request->send_notification,
+                'order_from' => '1',
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
             );
 
             // echo"<pre>";print_r($content);echo"</pre>";exit;
@@ -4359,27 +4803,27 @@ h3 {
 
 
             $data = array(
-                'order_id'                             => $arrOrderId,
-                'user_info_id'                         => $user_id,
-                'cleaner_id'                           => $request->cleaner,
-                'service_id'                           => $service_id,
-                'subservice_id'                        => $request->subservice_id,
-                'how_many_cleaners_do_you_need'        => $request->how_many_cleaner,
-                'how_many_hours_should_they_stay'      => $request->hour_value,
-                'how_often_do_you_need_cleaning'       => $request->how_often_you_need,
-                'do_you_need_cleaning_material'        => $request->need_cleaning_material,
-                'any_special_instruction'              => $request->special_instruction,
-                'address_type'                         => $request->address_type,
-                'city'                                 => $request->city,
-                'area'                                 => $request->area,
-                'building_street_no'                   => $request->building_name,
-                'apartment_villa_no'                   => $request->apartment_villa_num,
-                'bookingdate'                          => $day,
-                'bookingyear'                          => $bookingyear,
-                'month'                                => $month,
-                'time_slot'                            => $request->time_slot,
+                'order_id' => $arrOrderId,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $request->subservice_id,
+                'how_many_cleaners_do_you_need' => $request->how_many_cleaner,
+                'how_many_hours_should_they_stay' => $request->hour_value,
+                'how_often_do_you_need_cleaning' => $request->how_often_you_need,
+                'do_you_need_cleaning_material' => $request->need_cleaning_material,
+                'any_special_instruction' => $request->special_instruction,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'time_slot' => $request->time_slot,
                 'which_day_of_the_week_do_you_want_the_service' => implode(',', $request->which_day_you_want ?? []),
-                'cdate'                                => date('Y-m-d'),
+                'cdate' => date('Y-m-d'),
             );
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($data);
@@ -4404,22 +4848,22 @@ h3 {
                         // Check if quantity and price exist
                         if (isset($request->$quantityKey) && isset($request->$priceKey)) {
                             $data = [
-                                'order_id'              => $arrOrderId,
-                                'order_item_id'         => $order_item_id,
-                                'user_info_id'          => $user_id,
-                                'package_id'            => $packageId,
-                                'package_item_name'     => $package_item->name,
-                                'package_quantity'      => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                                'package_item_price'    => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                                'service_id'            => $service_id,
-                                'service_name'          => $service_name,
-                                'subservice_id'         => $request->subservice_id,
-                                'subservice_name'       => $subservice_name,
-                                'packagecategory_id'    => $package_category_id,
-                                'packagecategory_name'  => $package_category_name,
-                                'page_url'              => $package_item->page_url,
-                                'image'                 => $package_item->image,
-                                'cdate'                 => date('Y-m-d'),
+                                'order_id' => $arrOrderId,
+                                'order_item_id' => $order_item_id,
+                                'user_info_id' => $user_id,
+                                'package_id' => $packageId,
+                                'package_item_name' => $package_item->name,
+                                'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                                'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                                'service_id' => $service_id,
+                                'service_name' => $service_name,
+                                'subservice_id' => $request->subservice_id,
+                                'subservice_name' => $subservice_name,
+                                'packagecategory_id' => $package_category_id,
+                                'packagecategory_name' => $package_category_name,
+                                'page_url' => $package_item->page_url,
+                                'image' => $package_item->image,
+                                'cdate' => date('Y-m-d'),
                             ];
 
                             // Insert data into the database
@@ -4429,17 +4873,17 @@ h3 {
                 }
             }
             $shipping_data = array(
-                'order_id'      => $arrOrderId,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $arrOrderId,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
@@ -4546,33 +4990,33 @@ h3 {
 
 
             $content = array(
-                'user_id'               => $userid,
-                'order_number'          => $order_number,
-                'front_wallet_amount'   => '0',
-                'order_total'           => $request->order_total,
-                'vatcharge'             => $vat_total,
-                'order_currency'        => 'AED',
-                'order_status'          => $order_status,
-                'paymentmode'           => $paymentmode,
-                'payment_status'        => $payment_status,
-                'created_at'            => date('Y-m-d H:i:s'),
+                'user_id' => $userid,
+                'order_number' => $order_number,
+                'front_wallet_amount' => '0',
+                'order_total' => $request->order_total,
+                'vatcharge' => $vat_total,
+                'order_currency' => 'AED',
+                'order_status' => $order_status,
+                'paymentmode' => $paymentmode,
+                'payment_status' => $payment_status,
+                'created_at' => date('Y-m-d H:i:s'),
                 //'ip_address'            => $_SERVER['REMOTE_ADDR'],
-                'list_order_status'     => $list_order_status,
-                'service_charge'     => $request->size_of_home_price,
-                'promo_discount'     => '0',
-                'cleaning_discount_additional'     => '',
-                'timing_charge'     => $timing_date_charge,
-                'additional_charge'     => $request->additionalCharge,
-                'sub_total'     => $request->sub_total,
-                'cod_charge'     => $request->cod_charge ?: "",
-                'service_fee'     => $request->service_fee ?: "",
-                'send_notification'     => $request->send_notification ?: "",
-                'order_from'     => $order_from,
-                'subservice_code'       => $subserviceCode,
-                'city_code'             => $cityCode,
-                'order_year'            => $year,
-                'sequence_no'           => $nextSequence,
-                'format_order_id'           => $formatOrderId,
+                'list_order_status' => $list_order_status,
+                'service_charge' => $request->size_of_home_price,
+                'promo_discount' => '0',
+                'cleaning_discount_additional' => '',
+                'timing_charge' => $timing_date_charge,
+                'additional_charge' => $request->additionalCharge,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge ?: "",
+                'service_fee' => $request->service_fee ?: "",
+                'send_notification' => $request->send_notification ?: "",
+                'order_from' => $order_from,
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
             );
 
 
@@ -4598,31 +5042,31 @@ h3 {
             $month = date('F', strtotime($request->service_date));
 
             $arrData = array(
-                'order_id'                             => $arrOrderId,
-                'user_info_id'                         => $userid,
-                'service_id'                           => '34',
-                'subservice_id'                        => $request->subservice_id,
-                'address_type'                         => $request->address_type,
-                'city'                                 => $request->city,
-                'area'                                 => $request->area,
-                'building_street_no'                   => $request->building_name,
-                'apartment_villa_no'                   => $request->apartment_villa_num,
-                'bookingdate'                          => $day,
-                'bookingyear'                          => $bookingyear,
-                'month'                                => $month,
-                'time_slot'                            => $request->time_slot,
-                'type_of_painting'                     => $request->type_of_painting,
-                'selected_type_home'                   => $request->selected_type_home,
-                'selected_size_home'                   => $request->selected_size_home,
-                'service_charge_price'                 => $request->size_of_home_price,
-                'color_you_want_painted_price'         => $request->color_you_want_painted_price,
-                'walls_now_price'                      => $request->color_your_walls_now_price,
-                'you_want_paint_color'                 => $request->selected_you_want_color_name,
-                'your_walls_now_color'                 => $request->selected_your_walls_now_name,
-                'is_home_furnished'                    => $isYourHomeFurnished,
-                'no_of_ceilings'                       => $request->no_of_ceilings ?: "",
-                'describe_painting_service'            => "",
-                'cdate'                                => date('Y-m-d'),
+                'order_id' => $arrOrderId,
+                'user_info_id' => $userid,
+                'service_id' => '34',
+                'subservice_id' => $request->subservice_id,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'time_slot' => $request->time_slot,
+                'type_of_painting' => $request->type_of_painting,
+                'selected_type_home' => $request->selected_type_home,
+                'selected_size_home' => $request->selected_size_home,
+                'service_charge_price' => $request->size_of_home_price,
+                'color_you_want_painted_price' => $request->color_you_want_painted_price,
+                'walls_now_price' => $request->color_your_walls_now_price,
+                'you_want_paint_color' => $request->selected_you_want_color_name,
+                'your_walls_now_color' => $request->selected_your_walls_now_name,
+                'is_home_furnished' => $isYourHomeFurnished,
+                'no_of_ceilings' => $request->no_of_ceilings ?: "",
+                'describe_painting_service' => "",
+                'cdate' => date('Y-m-d'),
             );
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($arrData);
@@ -4818,7 +5262,7 @@ h3 {
 
         $message_bodyy .= '<p>Your service provider will contact you soon to confirm the details and make any necessary arrangements. If you do not hear from them within 2 business days, please email us at <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a> or call us at 056 VENDORS (836 3677).</p>
 
-                     <p>If you have any questions or need to make changes to your booking, please do not hesitate to   <a href="' . url("/contact") . '">Contact Us</a>.
+                     <p>If you have any questions or need to make changes to your booking, please do not hesitate to   <a href="' . \App\Helpers\Helper::get_front_url("contact") . '">Contact Us</a>.
                      </p>
                      <p>Thank you for choosing VendorsCity. We look forward to providing you with exceptional service.</p>
                     </div>
@@ -4837,9 +5281,9 @@ h3 {
                                     <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a></p>
                                     <p  style="margin:0;">VendorsCity Portal LLC</p>
                                     <div class="footer_links" style=" margin:10px 0;">
-                                <a href="' . url("/terms-of-service") . '"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                                <a href="' . url("/privacy-policy") . '"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                                <a href="' . url("/contact") . '"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("terms-of-service") . '"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("privacy-policy") . '"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("contact") . '"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                                 </div>
                                    
                                 </div>
@@ -5020,7 +5464,7 @@ h3 {
 
         $message_bodyy .= '<p>Your service provider will contact you soon to confirm the details and make any necessary arrangements. If you do not hear from them within 2 business days, please email us at <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a> or call us at 056 VENDORS (836 3677).</p>
 
-                     <p>If you have any questions or need to make changes to your booking, please do not hesitate to   <a href="' . url("/contact") . '">Contact Us</a>.
+                     <p>If you have any questions or need to make changes to your booking, please do not hesitate to   <a href="' . \App\Helpers\Helper::get_front_url("contact") . '">Contact Us</a>.
                      </p>
                      <p>Thank you for choosing VendorsCity. We look forward to providing you with exceptional service.</p>
                     </div>
@@ -5039,9 +5483,9 @@ h3 {
                                     <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a></p>
                                     <p  style="margin:0;">VendorsCity Portal LLC</p>
                                     <div class="footer_links" style=" margin:10px 0;">
-                                <a href="' . url("/terms-of-service") . '"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                                <a href="' . url("/privacy-policy") . '"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                                <a href="' . url("/contact") . '"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("terms-of-service") . '"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("privacy-policy") . '"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("contact") . '"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                                 </div>
                                    
                                 </div>
@@ -5224,7 +5668,7 @@ h3 {
 
         $message_bodyy .= '<p>Your service has been successfully renewed. If any further coordination is required, our team or service provider will get in touch with you.</p>
 
-                     <p>If you have any questions or need to make changes to your booking, please do not hesitate to   <a href="' . url("/contact") . '">Contact Us</a>.
+                     <p>If you have any questions or need to make changes to your booking, please do not hesitate to   <a href="' . \App\Helpers\Helper::get_front_url("contact") . '">Contact Us</a>.
                      </p>
                      <p>Thank you for continuing with VendorsCity. We appreciate your trust and look forward to serving you again.</p>
                     </div>
@@ -5243,9 +5687,9 @@ h3 {
                                     <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a></p>
                                     <p  style="margin:0;">VendorsCity Portal LLC</p>
                                     <div class="footer_links" style=" margin:10px 0;">
-                                <a href="' . url("/terms-of-service") . '"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                                <a href="' . url("/privacy-policy") . '"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                                <a href="' . url("/contact") . '"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("terms-of-service") . '"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("privacy-policy") . '"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("contact") . '"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                                 </div>
                                    
                                 </div>
@@ -5537,9 +5981,9 @@ h3 {
                                         <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a></p>
                                         <p style="margin:0;">VendorsCity Portal LLC</p>
                                         <div class="footer_links" style=" margin:10px 0;">
-                                    <a href="' . url("/terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                                    <a href="' . url("/privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                                    <a href="' . url("/contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                                    <a href="' . \App\Helpers\Helper::get_front_url("terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                                    <a href="' . \App\Helpers\Helper::get_front_url("privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                                    <a href="' . \App\Helpers\Helper::get_front_url("contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                                     </div>
                                             
                                     </div>
@@ -5548,6 +5992,33 @@ h3 {
                         </div>
                     </body>
         </html>';
+
+            // $itemList = DB::table('ci_order_item')->where('order_id', $orderdata->order_id)->get();
+            // $visit_date = $order_item_data->bookingdate . ' ' . $order_item_data->month . ' ' . $order_item_data->bookingyear;
+
+            // $data_pdf['orders'] = $orderdata;
+            // $data_pdf['items'] = $itemList;
+            // $data_pdf['visit_date'] = $visit_date;
+
+            // request()->merge(['download' => 'pdf']);
+            // $html = view('front.view_receipts', $data_pdf)->render();
+
+            // $mpdf = new \Mpdf\Mpdf([
+            //     //'tempDir' => $tempDir,
+            //     'margin_left' => 10,
+            //     'margin_right' => 10,
+            //     'margin_top' => 10,
+            //     'margin_bottom' => 10,
+            // ]);
+            // $mpdf->autoScriptToLang = true;
+            // $mpdf->autoLangToFont = true;
+            // $mpdf->showWatermarkImage = true;
+            // $mpdf->watermarkImgBehind = true;
+            // $mpdf->SetWatermarkImage(public_path('site/images/VC-BLACK-SHORT.png'), 0.025, 'D', 'C');
+            // $mpdf->WriteHTML($html);
+
+            // $fileName = $orderdata->format_order_id . '.pdf';
+            // $pdfOutput = $mpdf->Output('', 'S');
 
             $subject = " Confirmation of Your $service_name Service Booking ";
             $to = $user_data->email;
@@ -5560,6 +6031,17 @@ h3 {
                 }
                 $message->html($message_bodyy);
             });
+            // Mail::send([], [], function ($message) use ($message_bodyy, $to, $subject, $pdfOutput, $fileName, $ccRecipients) {
+            //     $message->to($to);
+            //     $message->subject($subject);
+            //     foreach ($ccRecipients as $ccRecipient) {
+            //         $message->bcc($ccRecipient);
+            //     }
+            //     $message->html($message_bodyy);
+            //     $message->attachData($pdfOutput, $fileName, [
+            //         'mime' => 'application/pdf',
+            //     ]);
+            // });
 
             return true;
         } elseif ($orderdata->order_from == 2) {
@@ -5842,9 +6324,9 @@ h3 {
                                 <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a></p>
                                 <p style="margin:0;">VendorsCity Portal LLC</p>
                                 <div class="footer_links" style=" margin:10px 0;">
-                            <a href="' . url("/terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                            <a href="' . url("/privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                            <a href="' . url("/contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                            <a href="' . \App\Helpers\Helper::get_front_url("terms-of-service") . '" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                            <a href="' . \App\Helpers\Helper::get_front_url("privacy-policy") . '" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                            <a href="' . \App\Helpers\Helper::get_front_url("contact") . '" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                             </div>
                                     
                             </div>
@@ -5854,12 +6336,42 @@ h3 {
             </body>
         </html>';
 
+            // $itemList = DB::table('ci_order_item')->where('order_id', $orderdata->order_id)->get();
+            // $visit_date = $order_item_data->bookingdate . ' ' . $order_item_data->month . ' ' . $order_item_data->bookingyear;
+
+            // $data_pdf['orders'] = $orderdata;
+            // $data_pdf['items'] = $itemList;
+            // $data_pdf['visit_date'] = $visit_date;
+
+            // request()->merge(['download' => 'pdf']);
+            // $html = view('front.view_receipts', $data_pdf)->render();
+
+            // $mpdf = new \Mpdf\Mpdf([
+            //     //'tempDir' => $tempDir,
+            //     'margin_left' => 10,
+            //     'margin_right' => 10,
+            //     'margin_top' => 10,
+            //     'margin_bottom' => 10,
+            // ]);
+            // $mpdf->autoScriptToLang = true;
+            // $mpdf->autoLangToFont = true;
+            // $mpdf->showWatermarkImage = true;
+            // $mpdf->watermarkImgBehind = true;
+            // $mpdf->SetWatermarkImage(public_path('site/images/VC-BLACK-SHORT.png'), 0.025, 'D', 'C');
+            // $mpdf->WriteHTML($html);
+
+            // $fileName = $orderdata->format_order_id . '.pdf';
+            // $pdfOutput = $mpdf->Output('', 'S');
+
+
+
             $subject = " Confirmation of Your $service_name Booking .'$orderdata->format_order_id'. ";
 
             //$to = $user_data->email;
             $to = 'devang.hnrtechnologies@gmail.com';
             $ccRecipients = ['hello@vendorscity.com', 'zafar@quickserverelo.com'];
             // $ccRecipients = array();
+            // Mail::send([], [], function ($message) use ($message_bodyy, $to, $subject, $pdfOutput, $fileName, $ccRecipients) {
             Mail::send([], [], function ($message) use ($message_bodyy, $to, $subject, $ccRecipients) {
                 $message->to($to);
                 $message->subject($subject);
@@ -5867,6 +6379,9 @@ h3 {
                     $message->bcc($ccRecipient);
                 }
                 $message->html($message_bodyy);
+                // $message->attachData($pdfOutput, $fileName, [
+                //     'mime' => 'application/pdf',
+                // ]);
             });
 
             return true;
@@ -5901,19 +6416,19 @@ h3 {
         $order_from = 3;
 
         $order_update = [
-            'user_id'               => $userid,
-            'order_total'           => $order_total_new,
-            'front_wallet_amount'   => $front_wallet_amount_new,
-            'shippingcost'          => '',
-            'vatcharge'             => '',
-            'order_currency'        => 'AED',
-            'order_status'          => $order_status,
-            'paymentmode'           => $mode,
-            'payment_status'        => $payment_status,
-            'moving_date'           => $request->inspection_date,
-            'list_order_status'     => $list_order_status,
-            'order_from'            => $order_from,
-            'created_at'            => date('Y-m-d H:i:s')
+            'user_id' => $userid,
+            'order_total' => $order_total_new,
+            'front_wallet_amount' => $front_wallet_amount_new,
+            'shippingcost' => '',
+            'vatcharge' => '',
+            'order_currency' => 'AED',
+            'order_status' => $order_status,
+            'paymentmode' => $mode,
+            'payment_status' => $payment_status,
+            'moving_date' => $request->inspection_date,
+            'list_order_status' => $list_order_status,
+            'order_from' => $order_from,
+            'created_at' => date('Y-m-d H:i:s')
         ];
 
         DB::table('ci_orders')->where('order_id', $order_id)->update($order_update);
@@ -5938,22 +6453,22 @@ h3 {
         }
 
         $arrData = [
-            'bookingdate'                      => $booking_date,
-            'bookingyear'                      => $yearFull,
-            'month'                            => $monthName,
-            'time_slot'                        => $request->inspection_time,
-            'end_date'                         => $request->inspection_date,
-            'verifybuy_package_id'             => $request->package_id,
-            'verifybuy_mobile'                 => $request->mobile,
-            'verifybuy_location'               => $request->location,
-            'verifybuy_address'                => $request->address,
-            'verifybuy_additional_details'     => $request->additional_details,
-            'verifybuy_where_is_car_parked'    => $request->where_is_car_parked,
-            'verifybuy_vehicle'                => $vehicle_make,
-            'verifybuy_model'                  => $request->other_vehicle_model,
-            'verifybuy_category'               => $request->category,
-            'verifybuy_others'                 => $others,
-            'cdate'                            => date('Y-m-d'),
+            'bookingdate' => $booking_date,
+            'bookingyear' => $yearFull,
+            'month' => $monthName,
+            'time_slot' => $request->inspection_time,
+            'end_date' => $request->inspection_date,
+            'verifybuy_package_id' => $request->package_id,
+            'verifybuy_mobile' => $request->mobile,
+            'verifybuy_location' => $request->location,
+            'verifybuy_address' => $request->address,
+            'verifybuy_additional_details' => $request->additional_details,
+            'verifybuy_where_is_car_parked' => $request->where_is_car_parked,
+            'verifybuy_vehicle' => $vehicle_make,
+            'verifybuy_model' => $request->other_vehicle_model,
+            'verifybuy_category' => $request->category,
+            'verifybuy_others' => $others,
+            'cdate' => date('Y-m-d'),
         ];
 
         DB::table('ci_order_item')
@@ -5963,9 +6478,9 @@ h3 {
 
 
         $shippingData = [
-            'address1'            => $request->address,
-            'phone_number'        => $request->mobile,
-            'additional_message'  => $request->additional_details,
+            'address1' => $request->address,
+            'phone_number' => $request->mobile,
+            'additional_message' => $request->additional_details,
         ];
 
         DB::table('ci_shipping_address')
@@ -6200,7 +6715,7 @@ h3 {
         $response = curl_exec($curl);
 
         curl_close($curl);      
-        
+
         $response = json_decode($response, true); */
 
         if (isset($vendorData->country_code) && isset($vendorData->mobile)) {
@@ -6519,29 +7034,29 @@ h3 {
 
 
             $content = array(
-                'user_id'               => $request->customer_id,
-                'order_number'          => $intOrderNumber_new,
-                'order_total'           => $request->order_total,
-                'front_wallet_amount'   => "0",
-                'shippingcost'          => "0",
-                'vatcharge'             => $request->vat_charge,
-                'cod_charge'             => $request->cod_charge,
-                'order_currency'        => 'AED',
-                'order_status'          => 'BK',
-                'paymentmode'           => $mode,
-                'payment_status'        => 'Success',
-                'created_at'            => date('Y-m-d H:i:s'),
-                'coupan_to_wallet'      => "0",
-                'coupondiscount'        => "0",
-                'moving_date'           => $request->moving_date,
-                'send_notification'     => $request->send_notification,
-                'order_from'            => '0',
-                'subservice_code'       => $subserviceCode,
-                'city_code'             => $cityCode,
-                'order_year'            => $year,
-                'sequence_no'           => $nextSequence,
-                'format_order_id'       => $formatOrderId,
-                'sub_total'             => $request->sub_total,
+                'user_id' => $request->customer_id,
+                'order_number' => $intOrderNumber_new,
+                'order_total' => $request->order_total,
+                'front_wallet_amount' => "0",
+                'shippingcost' => "0",
+                'vatcharge' => $request->vat_charge,
+                'cod_charge' => $request->cod_charge,
+                'order_currency' => 'AED',
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'created_at' => date('Y-m-d H:i:s'),
+                'coupan_to_wallet' => "0",
+                'coupondiscount' => "0",
+                'moving_date' => $request->moving_date,
+                'send_notification' => $request->send_notification,
+                'order_from' => '0',
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'format_order_id' => $formatOrderId,
+                'sub_total' => $request->sub_total,
             );
 
             $arrOrderId = DB::table('ci_orders')->insertGetId($content);
@@ -6577,37 +7092,37 @@ h3 {
                         // Check if quantity and price exist
                         if (isset($request->$quantityKey) && isset($request->$priceKey)) {
                             $data = [
-                                'order_id'                        => $arrOrderId,
-                                'user_info_id'                    => $request->customer_id,
-                                'package_id'                      => $package_item->id,
-                                'package_item_name'               => $package_item->name,
-                                'package_quantity'                => is_array($request->$quantityKey) ? implode(',',                    $request->$quantityKey) : $request->$quantityKey,
-                                'package_item_price'            => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                                'service_id'                      => $service_id,
-                                'service_name'                    => $service_name,
-                                'subservice_id'                   => $request->subservice_id,
-                                'subservice_name'                 => $subservice_name,
-                                'packagecategory_id'              => $package_category_id,
-                                'packagecategory_name'            => $package_category_name,
-                                'page_url'                        => "",
-                                'cdate'                           => date('Y-m-d'),
-                                'bookingdate'   => $booking_date,
-                                'month'   => $monthName,
-                                'bookingyear'   => $year,
-                                'time_slot'   => $request->time_slot,
-                                'origin_add'   => $request->origin_add,
-                                'origin_country'   => $request->origin_country,
-                                'origin_state'   => $request->origin_state,
-                                'origin_city'   => $request->origin_city,
-                                'origin_location'   => $request->origin_location,
-                                'origin_zip_post'   => $request->origin_zip_post,
-                                'desti_add'   => $request->desti_add,
-                                'desti_country'   => $request->desti_country,
-                                'desti_state'   => $request->desti_state,
-                                'desti_city'   => $request->desti_city,
-                                'desti_location'   => $request->desti_location,
-                                'desti_zip_post'   => $request->desti_zip_post,
-                                'any_special_instruction'   => $request->additional_message,
+                                'order_id' => $arrOrderId,
+                                'user_info_id' => $request->customer_id,
+                                'package_id' => $package_item->id,
+                                'package_item_name' => $package_item->name,
+                                'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                                'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                                'service_id' => $service_id,
+                                'service_name' => $service_name,
+                                'subservice_id' => $request->subservice_id,
+                                'subservice_name' => $subservice_name,
+                                'packagecategory_id' => $package_category_id,
+                                'packagecategory_name' => $package_category_name,
+                                'page_url' => "",
+                                'cdate' => date('Y-m-d'),
+                                'bookingdate' => $booking_date,
+                                'month' => $monthName,
+                                'bookingyear' => $year,
+                                'time_slot' => $request->time_slot,
+                                'origin_add' => $request->origin_add,
+                                'origin_country' => $request->origin_country,
+                                'origin_state' => $request->origin_state,
+                                'origin_city' => $request->origin_city,
+                                'origin_location' => $request->origin_location,
+                                'origin_zip_post' => $request->origin_zip_post,
+                                'desti_add' => $request->desti_add,
+                                'desti_country' => $request->desti_country,
+                                'desti_state' => $request->desti_state,
+                                'desti_city' => $request->desti_city,
+                                'desti_location' => $request->desti_location,
+                                'desti_zip_post' => $request->desti_zip_post,
+                                'any_special_instruction' => $request->additional_message,
                             ];
 
                             DB::table('ci_order_item')->insertGetId($data);
@@ -6714,13 +7229,13 @@ h3 {
         $data['order'] = $order;
 
         $data['emiratesList'] = [
-            ['name' => 'Dubai',          'id' => 17],
-            ['name' => 'Abu Dhabi',      'id' => 20],
-            ['name' => 'Sharjah',        'id' => 22],
-            ['name' => 'Ajman',          'id' => 23],
-            ['name' => 'Umm Al Quwain',  'id' => 24],
+            ['name' => 'Dubai', 'id' => 17],
+            ['name' => 'Abu Dhabi', 'id' => 20],
+            ['name' => 'Sharjah', 'id' => 22],
+            ['name' => 'Ajman', 'id' => 23],
+            ['name' => 'Umm Al Quwain', 'id' => 24],
             ['name' => 'Ras Al Khaimah', 'id' => 25],
-            ['name' => 'Fujairah',       'id' => 26],
+            ['name' => 'Fujairah', 'id' => 26],
         ];
 
         $data['customer_data'] = DB::table('frontloginregisters')->orderBy('id', 'DESC')->get();
@@ -6741,21 +7256,22 @@ h3 {
             $mode = ($request->payment_method == 'ONLINE') ? 2 : 1;
 
             $content = [
-                'user_id'             => $request->customer_id,
-                'order_total'         => $request->order_total,
-                'front_wallet_amount'   => "0",
-                'shippingcost'          => "0",
-                'paymentmode'           => $mode,
-                'vatcharge'             => $request->vat_charge,
-                'cod_charge'             => $request->cod_charge,
-                'sub_total'             => $request->sub_total,
-                'order_status'          => 'BK',
-                'payment_status'        => 'Success',
-                'coupan_to_wallet'      => "0",
-                'coupondiscount'        => "0",
-                'moving_date'           => $request->moving_date,
-                'order_from'            => '0',
-                'created_at'            => $ci_order->created_at ?? date('Y-m-d H:i:s'),
+                'user_id' => $request->customer_id,
+                'payment_method' => $request->payment_method,
+                'order_total' => $request->order_total,
+                'front_wallet_amount' => "0",
+                'shippingcost' => "0",
+                'paymentmode' => $mode,
+                'vatcharge' => $request->vat_charge,
+                'cod_charge' => $request->cod_charge,
+                'sub_total' => $request->sub_total,
+                'order_status' => 'BK',
+                'payment_status' => 'Success',
+                'coupan_to_wallet' => "0",
+                'coupondiscount' => "0",
+                'moving_date' => $request->moving_date,
+                'order_from' => '0',
+                'created_at' => $ci_order->created_at ?? date('Y-m-d H:i:s'),
             ];
 
             $ci_order->update($content);
@@ -6788,37 +7304,37 @@ h3 {
                         $package_category_name = DB::table('package_categories')->where('id', $package_category_id)->value('name');
 
                         CiorderItem::create([
-                            'order_id'             => $order_id,
-                            'user_info_id'         => $request->customer_id,
-                            'package_id'           => $package_item->id,
-                            'package_item_name'    => $package_item->name,
-                            'package_quantity'     => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                            'package_item_price'   => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                            'service_id'           => $service_id,
-                            'service_name'         => $service_name,
-                            'subservice_id'        => $request->subservice_id,
-                            'subservice_name'      => $subservice_name,
-                            'packagecategory_id'   => $package_category_id,
+                            'order_id' => $order_id,
+                            'user_info_id' => $request->customer_id,
+                            'package_id' => $package_item->id,
+                            'package_item_name' => $package_item->name,
+                            'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                            'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                            'service_id' => $service_id,
+                            'service_name' => $service_name,
+                            'subservice_id' => $request->subservice_id,
+                            'subservice_name' => $subservice_name,
+                            'packagecategory_id' => $package_category_id,
                             'packagecategory_name' => $package_category_name,
-                            'page_url'             => "",
-                            'cdate'                => date('Y-m-d'),
-                            'bookingdate'          => $booking_date,
-                            'month'                => $monthName,
-                            'bookingyear'          => $yearValue,
-                            'time_slot'            => $request->time_slot,
-                            'origin_add'   => $request->origin_add,
-                            'origin_country'   => $request->origin_country,
-                            'origin_state'   => $request->origin_state,
-                            'origin_city'   => $request->origin_city,
-                            'origin_location'   => $request->origin_location,
-                            'origin_zip_post'   => $request->origin_zip_post,
-                            'desti_add'   => $request->desti_add,
-                            'desti_country'   => $request->desti_country,
-                            'desti_state'   => $request->desti_state,
-                            'desti_city'   => $request->desti_city,
-                            'desti_location'   => $request->desti_location,
-                            'desti_zip_post'   => $request->desti_zip_post,
-                            'any_special_instruction'   => $request->additional_message,
+                            'page_url' => "",
+                            'cdate' => date('Y-m-d'),
+                            'bookingdate' => $booking_date,
+                            'month' => $monthName,
+                            'bookingyear' => $yearValue,
+                            'time_slot' => $request->time_slot,
+                            'origin_add' => $request->origin_add,
+                            'origin_country' => $request->origin_country,
+                            'origin_state' => $request->origin_state,
+                            'origin_city' => $request->origin_city,
+                            'origin_location' => $request->origin_location,
+                            'origin_zip_post' => $request->origin_zip_post,
+                            'desti_add' => $request->desti_add,
+                            'desti_country' => $request->desti_country,
+                            'desti_state' => $request->desti_state,
+                            'desti_city' => $request->desti_city,
+                            'desti_location' => $request->desti_location,
+                            'desti_zip_post' => $request->desti_zip_post,
+                            'any_special_instruction' => $request->additional_message,
                         ]);
                     }
                 }
@@ -6826,22 +7342,22 @@ h3 {
 
             if ($request->first_name != '') {
                 $shippingData = [
-                    'first_name'         => $request->first_name,
-                    'last_name'          => $request->last_name,
-                    'country'            => $request->country,
-                    'emirate'            => $request->emirates,
-                    'area'               => $request->area,
-                    'address1'           => $request->street,
-                    'state'              => $request->state_name,
-                    'city'               => $request->city,
-                    'zipcode'            => $request->zipcode,
-                    'address2'           => $request->apartment_villa,
-                    'phone_number'       => $request->phone,
-                    'email_address'      => $request->email,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'country' => $request->country,
+                    'emirate' => $request->emirates,
+                    'area' => $request->area,
+                    'address1' => $request->street,
+                    'state' => $request->state_name,
+                    'city' => $request->city,
+                    'zipcode' => $request->zipcode,
+                    'address2' => $request->apartment_villa,
+                    'phone_number' => $request->phone,
+                    'email_address' => $request->email,
                     'additional_message' => $request->additional_message,
-                    'payment_method'     => "1",
-                    'user_id'            => $request->customer_id,
-                    'order_id'           => $order_id,
+                    'payment_method' => "1",
+                    'user_id' => $request->customer_id,
+                    'order_id' => $order_id,
                 ];
 
                 CiShippingAddress::orderId($order_id)->update($shippingData);
@@ -6898,17 +7414,27 @@ h3 {
         $data['order'] = $ci_order;
 
         $data['emiratesList'] = [
-            ['name' => 'Dubai',          'id' => 17],
-            ['name' => 'Abu Dhabi',      'id' => 20],
-            ['name' => 'Sharjah',        'id' => 22],
-            ['name' => 'Ajman',          'id' => 23],
-            ['name' => 'Umm Al Quwain',  'id' => 24],
+            ['name' => 'Dubai', 'id' => 17],
+            ['name' => 'Abu Dhabi', 'id' => 20],
+            ['name' => 'Sharjah', 'id' => 22],
+            ['name' => 'Ajman', 'id' => 23],
+            ['name' => 'Umm Al Quwain', 'id' => 24],
             ['name' => 'Ras Al Khaimah', 'id' => 25],
-            ['name' => 'Fujairah',       'id' => 26],
+            ['name' => 'Fujairah', 'id' => 26],
         ];
 
         $data['customer_data'] = DB::table('frontloginregisters')->orderBy('id', 'DESC')->get();
-        $data['subservice_data'] = DB::table('subservices')->where('serviceid', '34')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        // $data['subservice_data'] = DB::table('subservices')->where('serviceid', '34')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+
+
+        $data['subservice_data'] = DB::table('subservices')
+            ->where('serviceid', 34)
+            ->where(function ($query) {
+                $query->where('id', 102)
+                    ->orWhere('is_active', 0);
+            })
+            ->orderBy('id', 'DESC')
+            ->get();
 
         $data['country_data'] = DB::table('countries')->get();
         $data['selectedPackages'] = $itemList->pluck('package_id')->toArray();
@@ -6931,20 +7457,20 @@ h3 {
 
             // 2. Update the main Order record (Ciorder)
             $content = [
-                'user_id'             => $user_id,
-                'order_total'         => $request->order_total,
-                'vatcharge'           => $request->vat_charge,
+                'user_id' => $user_id,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
                 'front_wallet_amount' => '0',
-                'order_status'        => 'BK',
-                'paymentmode'         => $mode,
-                'payment_status'      => 'Success',
-                'service_charge'      => $request->service_charge,
-                'timing_charge'       => $timing_date_charge,
-                'sub_total'           => $request->sub_total,
-                'cod_charge'          => $request->cod_charge,
-                'list_order_status'     => '0',
-                'service_fee'         => $request->service_fee,
-                'created_at'          => $ci_order->created_at ?? date('Y-m-d H:i:s'),
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'list_order_status' => '0',
+                'service_fee' => $request->service_fee,
+                'created_at' => $ci_order->created_at ?? date('Y-m-d H:i:s'),
             ];
 
             $ci_order->update($content);
@@ -6961,8 +7487,8 @@ h3 {
             // Consistent Date Formatting (Store Logic)
             $bookingdate_input = $request->service_date; // Using service_date as per store function
             $bookingyear = date('Y', strtotime($bookingdate_input));
-            $month       = date('F', strtotime($bookingdate_input));
-            $day         = date('j', strtotime($bookingdate_input));
+            $month = date('F', strtotime($bookingdate_input));
+            $day = date('j', strtotime($bookingdate_input));
 
 
             $formatted_date = date('Y-m-d', strtotime($bookingdate_input));
@@ -6971,25 +7497,32 @@ h3 {
 
             // 5. Insert into ci_order_item
             $item_data = [
-                'order_id'                          => $order_id,
-                'user_info_id'                      => $user_id,
-                'cleaner_id'                        => $request->cleaner,
-                'service_id'                        => $service_id,
-                'subservice_id'                     => $subservice_id,
-                'address_type'                      => $request->address_type,
-                'city'                              => $request->city,
-                'area'                              => $request->area,
-                'building_street_no'                => $request->building_name,
-                'apartment_villa_no'                => $request->apartment_villa_num,
-                'bookingdate'                       => $day,
-                'bookingyear'                       => $bookingyear,
-                'month'                             => $month,
-                'end_date'                          => $end_date,
-                'time_slot'                         => $request->time_slot,
-                'charger_type'                      => $request->charger_type,
-                'installation_location_type'        => $request->installation_location_type,
-                'installation_charge'               => $request->installation_charge,
-                'cdate'                             => date('Y-m-d'),
+                'order_id' => $order_id,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $subservice_id,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'end_date' => $end_date,
+                'time_slot' => $request->time_slot,
+                'charger_type' => $request->charger_type,
+                'installation_location_type' => $request->installation_location_type,
+                'installation_charge' => $request->installation_charge,
+                'cdate' => date('Y-m-d'),
+                'manpower_service_required' => $request->manpower_service_required,
+                'manpower_workers_required' => $request->manpower_workers_required,
+                'manpower_start_date' => $request->manpower_start_date,
+                'manpower_end_date' => $request->manpower_end_date,
+                'manpower_duration' => $request->manpower_duration,
+                'manpower_job_description' => $request->manpower_job_description,
+                'manpower_additional_notes' => $request->manpower_additional_notes,
             ];
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($item_data);
@@ -7010,38 +7543,38 @@ h3 {
                         $package_category_name = DB::table('package_categories')->where('id', $package_category_id)->value('name');
 
                         DB::table('ci_order_item_packages')->insert([
-                            'order_id'             => $order_id,
-                            'order_item_id'        => $order_item_id,
-                            'user_info_id'         => $user_id,
-                            'package_id'           => $packageId,
-                            'package_item_name'    => $package_item->name,
-                            'package_quantity'     => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                            'package_item_price'   => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                            'service_id'           => $service_id,
-                            'service_name'         => $service_name,
-                            'subservice_id'        => $subservice_id,
-                            'subservice_name'      => $subservice_name,
-                            'packagecategory_id'   => $package_category_id,
+                            'order_id' => $order_id,
+                            'order_item_id' => $order_item_id,
+                            'user_info_id' => $user_id,
+                            'package_id' => $packageId,
+                            'package_item_name' => $package_item->name,
+                            'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                            'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                            'service_id' => $service_id,
+                            'service_name' => $service_name,
+                            'subservice_id' => $subservice_id,
+                            'subservice_name' => $subservice_name,
+                            'packagecategory_id' => $package_category_id,
                             'packagecategory_name' => $package_category_name,
-                            'image'                => $package_item->image,
-                            'cdate'                => date('Y-m-d'),
+                            'image' => $package_item->image,
+                            'cdate' => date('Y-m-d'),
                         ]);
                     }
                 }
             }
 
             $shipping_data = array(
-                'order_id'      => $order_id,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $order_id,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
@@ -7050,6 +7583,145 @@ h3 {
             DB::commit();
 
             return redirect()->route('handyman-service-order')->with('success', 'Order has been updated successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Handyman Order update failed: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Update failed: ' . $e->getMessage())->withInput();
+        }
+    }
+    public function healthcare_at_home_order_update(Request $request, Ciorder $ci_order)
+    {
+        //echo"<pre>";print_r($request->all());exit;
+        DB::beginTransaction();
+        try {
+            $user_id = $request->customer_id;
+            $order_id = $ci_order->order_id;
+
+            // 1. Calculate Charges Logic (From Handyman Store)
+            $timing_date_charge = $request->date_time_charge;
+            $mode = ($request->payment_method == 'ONLINE') ? 2 : 1;
+
+            // 2. Update the main Order record (Ciorder)
+            $content = [
+                'user_id' => $user_id,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
+                'front_wallet_amount' => '0',
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'list_order_status' => '0',
+                'service_fee' => $request->service_fee,
+                'created_at' => $ci_order->created_at ?? date('Y-m-d H:i:s'),
+            ];
+
+            $ci_order->update($content);
+
+            // 3. Clear existing items and package records to prevent duplicates
+            CiorderItem::orderId($order_id)->delete();
+            DB::table('ci_order_item_packages')->where('order_id', $order_id)->delete();
+
+            // 4. Handle Service and Date Logic
+            $subservice_id = $request->subservice_id;
+            $subserviceData = DB::table('subservices')->where('id', $subservice_id)->first();
+            $service_id = $subserviceData->serviceid ?? null;
+
+            // Consistent Date Formatting (Store Logic)
+            $bookingdate_input = $request->service_date; // Using service_date as per store function
+            $bookingyear = date('Y', strtotime($bookingdate_input));
+            $month = date('F', strtotime($bookingdate_input));
+            $day = date('j', strtotime($bookingdate_input));
+
+
+            $formatted_date = date('Y-m-d', strtotime($bookingdate_input));
+
+            $end_date = $formatted_date;
+
+            // 5. Insert into ci_order_item
+            $item_data = [
+                'order_id' => $order_id,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $subservice_id,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'end_date' => $end_date,
+                'time_slot' => $request->time_slot,
+                'charger_type' => $request->charger_type,
+                'installation_location_type' => $request->installation_location_type,
+                'installation_charge' => $request->installation_charge,
+                'cdate' => date('Y-m-d'),
+            ];
+
+            $order_item_id = DB::table('ci_order_item')->insertGetId($item_data);
+
+            // 6. Handle Packages (Loop Logic)
+            if (!empty($request->package) && is_array($request->package)) {
+                $service_name = DB::table('services')->where('id', $service_id)->value('servicename');
+                $subservice_name = $subserviceData->subservicename ?? '';
+
+                foreach ($request->package as $packageId) {
+                    $quantityKey = $packageId . '_quantity';
+                    $priceKey = $packageId . '_price';
+
+                    $package_item = DB::table('packages')->where('id', $packageId)->first();
+
+                    if ($package_item && isset($request->$quantityKey)) {
+                        $package_category_id = $package_item->packagecategory_id;
+                        $package_category_name = DB::table('package_categories')->where('id', $package_category_id)->value('name');
+
+                        DB::table('ci_order_item_packages')->insert([
+                            'order_id' => $order_id,
+                            'order_item_id' => $order_item_id,
+                            'user_info_id' => $user_id,
+                            'package_id' => $packageId,
+                            'package_item_name' => $package_item->name,
+                            'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                            'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                            'service_id' => $service_id,
+                            'service_name' => $service_name,
+                            'subservice_id' => $subservice_id,
+                            'subservice_name' => $subservice_name,
+                            'packagecategory_id' => $package_category_id,
+                            'packagecategory_name' => $package_category_name,
+                            'image' => $package_item->image,
+                            'cdate' => date('Y-m-d'),
+                        ]);
+                    }
+                }
+            }
+
+            $shipping_data = array(
+                'order_id' => $order_id,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
+                'email_address' => "",
+            );
+
+            CiShippingAddress::orderId($order_id)->update($shipping_data);
+
+            DB::commit();
+
+            return redirect()->route('healthcare_at_home_package_order')->with('success', 'Order has been updated successfully');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Handyman Order update failed: " . $e->getMessage());
@@ -7099,13 +7771,13 @@ h3 {
         $data['order'] = $ci_order;
 
         $data['emiratesList'] = [
-            ['name' => 'Dubai',          'id' => 17],
-            ['name' => 'Abu Dhabi',      'id' => 20],
-            ['name' => 'Sharjah',        'id' => 22],
-            ['name' => 'Ajman',          'id' => 23],
-            ['name' => 'Umm Al Quwain',  'id' => 24],
+            ['name' => 'Dubai', 'id' => 17],
+            ['name' => 'Abu Dhabi', 'id' => 20],
+            ['name' => 'Sharjah', 'id' => 22],
+            ['name' => 'Ajman', 'id' => 23],
+            ['name' => 'Umm Al Quwain', 'id' => 24],
             ['name' => 'Ras Al Khaimah', 'id' => 25],
-            ['name' => 'Fujairah',       'id' => 26],
+            ['name' => 'Fujairah', 'id' => 26],
         ];
 
         $data['customer_data'] = DB::table('frontloginregisters')->orderBy('id', 'DESC')->get();
@@ -7129,20 +7801,20 @@ h3 {
 
             // 2. Update the main Order record (Ciorder)
             $content = [
-                'user_id'             => $user_id,
-                'order_total'         => $request->order_total,
-                'vatcharge'           => $request->vat_charge,
+                'user_id' => $user_id,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
                 'front_wallet_amount' => '0',
-                'order_status'        => 'BK',
-                'paymentmode'         => $mode,
-                'payment_status'      => 'Success',
-                'service_charge'      => $request->service_charge,
-                'timing_charge'       => $timing_date_charge,
-                'sub_total'           => $request->sub_total,
-                'cod_charge'          => $request->cod_charge,
-                'list_order_status'     => '0',
-                'service_fee'         => $request->service_fee,
-                'created_at'          => $ci_order->created_at ?? date('Y-m-d H:i:s'),
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'list_order_status' => '0',
+                'service_fee' => $request->service_fee,
+                'created_at' => $ci_order->created_at ?? date('Y-m-d H:i:s'),
             ];
 
             $ci_order->update($content);
@@ -7159,26 +7831,26 @@ h3 {
             // Consistent Date Formatting (Store Logic)
             $bookingdate_input = $request->service_date; // Using service_date as per store function
             $bookingyear = date('Y', strtotime($bookingdate_input));
-            $month       = date('F', strtotime($bookingdate_input));
-            $day         = date('j', strtotime($bookingdate_input));
+            $month = date('F', strtotime($bookingdate_input));
+            $day = date('j', strtotime($bookingdate_input));
 
             // 5. Insert into ci_order_item
             $item_data = [
-                'order_id'                          => $order_id,
-                'user_info_id'                      => $user_id,
-                'cleaner_id'                        => $request->cleaner,
-                'service_id'                        => $service_id,
-                'subservice_id'                     => $subservice_id,
-                'address_type'                      => $request->address_type,
-                'city'                              => $request->city,
-                'area'                              => $request->area,
-                'building_street_no'                => $request->building_name,
-                'apartment_villa_no'                => $request->apartment_villa_num,
-                'bookingdate'                       => $day,
-                'bookingyear'                       => $bookingyear,
-                'month'                             => $month,
-                'time_slot'                         => $request->time_slot,
-                'cdate'                             => date('Y-m-d'),
+                'order_id' => $order_id,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $subservice_id,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'time_slot' => $request->time_slot,
+                'cdate' => date('Y-m-d'),
             ];
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($item_data);
@@ -7199,38 +7871,38 @@ h3 {
                         $package_category_name = DB::table('package_categories')->where('id', $package_category_id)->value('name');
 
                         DB::table('ci_order_item_packages')->insert([
-                            'order_id'             => $order_id,
-                            'order_item_id'        => $order_item_id,
-                            'user_info_id'         => $user_id,
-                            'package_id'           => $packageId,
-                            'package_item_name'    => $package_item->name,
-                            'package_quantity'     => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                            'package_item_price'   => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                            'service_id'           => $service_id,
-                            'service_name'         => $service_name,
-                            'subservice_id'        => $subservice_id,
-                            'subservice_name'      => $subservice_name,
-                            'packagecategory_id'   => $package_category_id,
+                            'order_id' => $order_id,
+                            'order_item_id' => $order_item_id,
+                            'user_info_id' => $user_id,
+                            'package_id' => $packageId,
+                            'package_item_name' => $package_item->name,
+                            'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                            'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                            'service_id' => $service_id,
+                            'service_name' => $service_name,
+                            'subservice_id' => $subservice_id,
+                            'subservice_name' => $subservice_name,
+                            'packagecategory_id' => $package_category_id,
                             'packagecategory_name' => $package_category_name,
-                            'image'                => $package_item->image,
-                            'cdate'                => date('Y-m-d'),
+                            'image' => $package_item->image,
+                            'cdate' => date('Y-m-d'),
                         ]);
                     }
                 }
             }
 
             $shipping_data = array(
-                'order_id'      => $order_id,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $order_id,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
@@ -7289,13 +7961,13 @@ h3 {
         $data['order'] = $ci_order;
 
         $data['emiratesList'] = [
-            ['name' => 'Dubai',          'id' => 17],
-            ['name' => 'Abu Dhabi',      'id' => 20],
-            ['name' => 'Sharjah',        'id' => 22],
-            ['name' => 'Ajman',          'id' => 23],
-            ['name' => 'Umm Al Quwain',  'id' => 24],
+            ['name' => 'Dubai', 'id' => 17],
+            ['name' => 'Abu Dhabi', 'id' => 20],
+            ['name' => 'Sharjah', 'id' => 22],
+            ['name' => 'Ajman', 'id' => 23],
+            ['name' => 'Umm Al Quwain', 'id' => 24],
             ['name' => 'Ras Al Khaimah', 'id' => 25],
-            ['name' => 'Fujairah',       'id' => 26],
+            ['name' => 'Fujairah', 'id' => 26],
         ];
 
         $data['customer_data'] = DB::table('frontloginregisters')->orderBy('id', 'DESC')->get();
@@ -7319,20 +7991,20 @@ h3 {
 
             // 2. Update the main Order record (Ciorder)
             $content = [
-                'user_id'             => $user_id,
-                'order_total'         => $request->order_total,
-                'vatcharge'           => $request->vat_charge,
+                'user_id' => $user_id,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
                 'front_wallet_amount' => '0',
-                'order_status'        => 'BK',
-                'paymentmode'         => $mode,
-                'payment_status'      => 'Success',
-                'service_charge'      => $request->service_charge,
-                'timing_charge'       => $timing_date_charge,
-                'sub_total'           => $request->sub_total,
-                'cod_charge'          => $request->cod_charge,
-                'list_order_status'     => '0',
-                'service_fee'         => $request->service_fee,
-                'created_at'          => $ci_order->created_at ?? date('Y-m-d H:i:s'),
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'list_order_status' => '0',
+                'service_fee' => $request->service_fee,
+                'created_at' => $ci_order->created_at ?? date('Y-m-d H:i:s'),
             ];
 
             $ci_order->update($content);
@@ -7349,26 +8021,26 @@ h3 {
             // Consistent Date Formatting (Store Logic)
             $bookingdate_input = $request->service_date; // Using service_date as per store function
             $bookingyear = date('Y', strtotime($bookingdate_input));
-            $month       = date('F', strtotime($bookingdate_input));
-            $day         = date('j', strtotime($bookingdate_input));
+            $month = date('F', strtotime($bookingdate_input));
+            $day = date('j', strtotime($bookingdate_input));
 
             // 5. Insert into ci_order_item
             $item_data = [
-                'order_id'                          => $order_id,
-                'user_info_id'                      => $user_id,
-                'cleaner_id'                        => $request->cleaner,
-                'service_id'                        => $service_id,
-                'subservice_id'                     => $subservice_id,
-                'address_type'                      => $request->address_type,
-                'city'                              => $request->city,
-                'area'                              => $request->area,
-                'building_street_no'                => $request->building_name,
-                'apartment_villa_no'                => $request->apartment_villa_num,
-                'bookingdate'                       => $day,
-                'bookingyear'                       => $bookingyear,
-                'month'                             => $month,
-                'time_slot'                         => $request->time_slot,
-                'cdate'                             => date('Y-m-d'),
+                'order_id' => $order_id,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $subservice_id,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'time_slot' => $request->time_slot,
+                'cdate' => date('Y-m-d'),
             ];
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($item_data);
@@ -7389,38 +8061,38 @@ h3 {
                         $package_category_name = DB::table('package_categories')->where('id', $package_category_id)->value('name');
 
                         DB::table('ci_order_item_packages')->insert([
-                            'order_id'             => $order_id,
-                            'order_item_id'        => $order_item_id,
-                            'user_info_id'         => $user_id,
-                            'package_id'           => $packageId,
-                            'package_item_name'    => $package_item->name,
-                            'package_quantity'     => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                            'package_item_price'   => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                            'service_id'           => $service_id,
-                            'service_name'         => $service_name,
-                            'subservice_id'        => $subservice_id,
-                            'subservice_name'      => $subservice_name,
-                            'packagecategory_id'   => $package_category_id,
+                            'order_id' => $order_id,
+                            'order_item_id' => $order_item_id,
+                            'user_info_id' => $user_id,
+                            'package_id' => $packageId,
+                            'package_item_name' => $package_item->name,
+                            'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                            'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                            'service_id' => $service_id,
+                            'service_name' => $service_name,
+                            'subservice_id' => $subservice_id,
+                            'subservice_name' => $subservice_name,
+                            'packagecategory_id' => $package_category_id,
                             'packagecategory_name' => $package_category_name,
-                            'image'                => $package_item->image,
-                            'cdate'                => date('Y-m-d'),
+                            'image' => $package_item->image,
+                            'cdate' => date('Y-m-d'),
                         ]);
                     }
                 }
             }
 
             $shipping_data = array(
-                'order_id'      => $order_id,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $order_id,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
@@ -7478,13 +8150,13 @@ h3 {
         $data['order'] = $ci_order;
 
         $data['emiratesList'] = [
-            ['name' => 'Dubai',          'id' => 17],
-            ['name' => 'Abu Dhabi',      'id' => 20],
-            ['name' => 'Sharjah',        'id' => 22],
-            ['name' => 'Ajman',          'id' => 23],
-            ['name' => 'Umm Al Quwain',  'id' => 24],
+            ['name' => 'Dubai', 'id' => 17],
+            ['name' => 'Abu Dhabi', 'id' => 20],
+            ['name' => 'Sharjah', 'id' => 22],
+            ['name' => 'Ajman', 'id' => 23],
+            ['name' => 'Umm Al Quwain', 'id' => 24],
             ['name' => 'Ras Al Khaimah', 'id' => 25],
-            ['name' => 'Fujairah',       'id' => 26],
+            ['name' => 'Fujairah', 'id' => 26],
         ];
 
         $data['customer_data'] = DB::table('frontloginregisters')->orderBy('id', 'DESC')->get();
@@ -7508,20 +8180,20 @@ h3 {
 
             // 2. Update the main Order record (Ciorder)
             $content = [
-                'user_id'             => $user_id,
-                'order_total'         => $request->order_total,
-                'vatcharge'           => $request->vat_charge,
+                'user_id' => $user_id,
+                'order_total' => $request->order_total,
+                'vatcharge' => $request->vat_charge,
                 'front_wallet_amount' => '0',
-                'order_status'        => 'BK',
-                'paymentmode'         => $mode,
-                'payment_status'      => 'Success',
-                'service_charge'      => $request->service_charge,
-                'timing_charge'       => $timing_date_charge,
-                'sub_total'           => $request->sub_total,
-                'cod_charge'          => $request->cod_charge,
-                'list_order_status'     => '0',
-                'service_fee'         => $request->service_fee,
-                'created_at'          => $ci_order->created_at ?? date('Y-m-d H:i:s'),
+                'order_status' => 'BK',
+                'paymentmode' => $mode,
+                'payment_status' => 'Success',
+                'service_charge' => $request->service_charge,
+                'timing_charge' => $timing_date_charge,
+                'sub_total' => $request->sub_total,
+                'cod_charge' => $request->cod_charge,
+                'list_order_status' => '0',
+                'service_fee' => $request->service_fee,
+                'created_at' => $ci_order->created_at ?? date('Y-m-d H:i:s'),
             ];
 
             $ci_order->update($content);
@@ -7538,26 +8210,26 @@ h3 {
             // Consistent Date Formatting (Store Logic)
             $bookingdate_input = $request->service_date; // Using service_date as per store function
             $bookingyear = date('Y', strtotime($bookingdate_input));
-            $month       = date('F', strtotime($bookingdate_input));
-            $day         = date('j', strtotime($bookingdate_input));
+            $month = date('F', strtotime($bookingdate_input));
+            $day = date('j', strtotime($bookingdate_input));
 
             // 5. Insert into ci_order_item
             $item_data = [
-                'order_id'                          => $order_id,
-                'user_info_id'                      => $user_id,
-                'cleaner_id'                        => $request->cleaner,
-                'service_id'                        => $service_id,
-                'subservice_id'                     => $subservice_id,
-                'address_type'                      => $request->address_type,
-                'city'                              => $request->city,
-                'area'                              => $request->area,
-                'building_street_no'                => $request->building_name,
-                'apartment_villa_no'                => $request->apartment_villa_num,
-                'bookingdate'                       => $day,
-                'bookingyear'                       => $bookingyear,
-                'month'                             => $month,
-                'time_slot'                         => $request->time_slot,
-                'cdate'                             => date('Y-m-d'),
+                'order_id' => $order_id,
+                'user_info_id' => $user_id,
+                'cleaner_id' => $request->cleaner,
+                'service_id' => $service_id,
+                'subservice_id' => $subservice_id,
+                'address_type' => $request->address_type,
+                'city' => $request->city,
+                'area' => $request->area,
+                'building_street_no' => $request->building_name,
+                'apartment_villa_no' => $request->apartment_villa_num,
+                'bookingdate' => $day,
+                'bookingyear' => $bookingyear,
+                'month' => $month,
+                'time_slot' => $request->time_slot,
+                'cdate' => date('Y-m-d'),
             ];
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($item_data);
@@ -7578,38 +8250,38 @@ h3 {
                         $package_category_name = DB::table('package_categories')->where('id', $package_category_id)->value('name');
 
                         DB::table('ci_order_item_packages')->insert([
-                            'order_id'             => $order_id,
-                            'order_item_id'        => $order_item_id,
-                            'user_info_id'         => $user_id,
-                            'package_id'           => $packageId,
-                            'package_item_name'    => $package_item->name,
-                            'package_quantity'     => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
-                            'package_item_price'   => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
-                            'service_id'           => $service_id,
-                            'service_name'         => $service_name,
-                            'subservice_id'        => $subservice_id,
-                            'subservice_name'      => $subservice_name,
-                            'packagecategory_id'   => $package_category_id,
+                            'order_id' => $order_id,
+                            'order_item_id' => $order_item_id,
+                            'user_info_id' => $user_id,
+                            'package_id' => $packageId,
+                            'package_item_name' => $package_item->name,
+                            'package_quantity' => is_array($request->$quantityKey) ? implode(',', $request->$quantityKey) : $request->$quantityKey,
+                            'package_item_price' => is_array($request->$priceKey) ? implode(',', $request->$priceKey) : $request->$priceKey,
+                            'service_id' => $service_id,
+                            'service_name' => $service_name,
+                            'subservice_id' => $subservice_id,
+                            'subservice_name' => $subservice_name,
+                            'packagecategory_id' => $package_category_id,
                             'packagecategory_name' => $package_category_name,
-                            'image'                => $package_item->image,
-                            'cdate'                => date('Y-m-d'),
+                            'image' => $package_item->image,
+                            'cdate' => date('Y-m-d'),
                         ]);
                     }
                 }
             }
 
             $shipping_data = array(
-                'order_id'      => $order_id,
-                'user_id'       => $user_id,
-                'first_name'    => "",
-                'last_name'     => "",
-                'country'       => "",
-                'address1'      => "",
-                'state'         => "",
-                'city'          => "",
-                'zipcode'       => "",
-                'address2'      => "",
-                'phone_number'  => "",
+                'order_id' => $order_id,
+                'user_id' => $user_id,
+                'first_name' => "",
+                'last_name' => "",
+                'country' => "",
+                'address1' => "",
+                'state' => "",
+                'city' => "",
+                'zipcode' => "",
+                'address2' => "",
+                'phone_number' => "",
                 'email_address' => "",
             );
 
@@ -7695,10 +8367,10 @@ h3 {
         $dates = [];
 
         $current_start = strtotime(date('Y-m-01'));
-        $current_end   = strtotime(date('Y-m-t'));
+        $current_end = strtotime(date('Y-m-t'));
 
         $start = strtotime($item->bookingdate . ' ' . $item->month . ' ' . $item->bookingyear);
-        $end   = !empty($item->end_date) ? strtotime($item->end_date) : $start;
+        $end = !empty($item->end_date) ? strtotime($item->end_date) : $start;
 
         $days = [];
 
@@ -7743,7 +8415,7 @@ h3 {
         $month = $request->month ?? $defaultMonth;
 
         $start_month = date('Y-m-01', strtotime($month));
-        $end_month   = date('Y-m-t', strtotime($month));
+        $end_month = date('Y-m-t', strtotime($month));
 
         $all_dates = [];
         $crew_ids = [];
@@ -7788,7 +8460,7 @@ h3 {
                 $day = $item->which_day_of_the_week_do_you_want_the_service;
 
                 $current = strtotime($start_month);
-                $end     = strtotime($end_month);
+                $end = strtotime($end_month);
 
                 while ($current <= $end) {
 
@@ -7809,7 +8481,7 @@ h3 {
                 $days = array_map('trim', $days);
 
                 $current = strtotime($start_month);
-                $end     = strtotime($end_month);
+                $end = strtotime($end_month);
 
                 while ($current <= $end) {
 
@@ -8090,13 +8762,13 @@ h3 {
 
 
         $data['emiratesList'] = [
-            ['name' => 'Dubai',          'id' => 17],
-            ['name' => 'Abu Dhabi',      'id' => 20],
-            ['name' => 'Sharjah',        'id' => 22],
-            ['name' => 'Ajman',          'id' => 23],
-            ['name' => 'Umm Al Quwain',  'id' => 24],
+            ['name' => 'Dubai', 'id' => 17],
+            ['name' => 'Abu Dhabi', 'id' => 20],
+            ['name' => 'Sharjah', 'id' => 22],
+            ['name' => 'Ajman', 'id' => 23],
+            ['name' => 'Umm Al Quwain', 'id' => 24],
             ['name' => 'Ras Al Khaimah', 'id' => 25],
-            ['name' => 'Fujairah',       'id' => 26],
+            ['name' => 'Fujairah', 'id' => 26],
         ];
 
 
@@ -8134,7 +8806,7 @@ h3 {
 
 
             $subservice_id = $request->subservice_id;
-            $cityData = DB::table('cities')->whereRaw('name LIKE ?', ['%' . strtolower($request->emirates) . '%'])->first();
+            $cityData = DB::table('cities')->whereRaw('name LIKE ?', ['%' . strtolower($request->storage_location ?? '') . '%'])->first();
             $subserviceData = DB::table('subservices')->where('id', $subservice_id)->first();
 
             if (isset($subserviceData)) {
@@ -8269,7 +8941,7 @@ h3 {
 
 
 
-            $enqid = $request->enquiry_id;
+            $enqid = $request->enquiry_id ?: 0;
             // Handle pre-filled/updated items
             if ($request->has('descriptionu')) {
                 foreach ($request->descriptionu as $key => $desc) {
@@ -8314,7 +8986,7 @@ h3 {
                 $data_new['first_name'] = $request->first_name;
                 $data_new['last_name'] = $request->last_name;
                 $data_new['country'] = $request->country;
-                $data_new['emirate'] = $request->emirates;
+                $data_new['emirate'] = $request->storage_location ?? '';
                 $data_new['area'] = $request->area;
                 $data_new['address1'] = $request->street;
                 $data_new['state'] = $request->state_name;
@@ -8445,6 +9117,7 @@ h3 {
                 'moving_date' => $request->moving_date,
                 'send_notification' => $request->send_notification,
                 'sub_total' => $request->sub_total,
+                'paymentmode' => $request->payment_mode,
             );
 
             DB::table('ci_orders')->where('order_id', $order_id)->update($content);
@@ -8583,7 +9256,7 @@ h3 {
 
         $order_id = base64_encode($order_id);
 
-        $payment_link = URL::to('/paymentstorageorder') . '/' . $order_id;
+        $payment_link = \App\Helpers\Helper::get_front_url('paymentstorageorder/' . $order_id);
 
 
 
@@ -8693,7 +9366,7 @@ h3 {
         $message_bodyy .= ' <div class="box">
             <strong>Order No:</strong> ' . $invoice_no . '<br>
             <strong>From Date:</strong> ' . $order_item_data[0]->storage_from_date . '<br>
-            <strong>To Date:</strong> ' .  $order_item_data[0]->storage_to_date . '<br>
+            <strong>To Date:</strong> ' . $order_item_data[0]->storage_to_date . '<br>
            
         </div>';
 
@@ -8739,7 +9412,7 @@ h3 {
 
         $message_bodyy .= '<p>Your service provider will contact you soon to confirm the details and make any necessary arrangements. If you do not hear from them within 2 business days, please email us at <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a> or call us at 056 VENDORS (836 3677).</p>
 
-                     <p>If you have any questions or need to make changes to your booking, please do not hesitate to   <a href="' . url("/contact") . '">Contact Us</a>.
+                     <p>If you have any questions or need to make changes to your booking, please do not hesitate to   <a href="' . \App\Helpers\Helper::get_front_url("contact") . '">Contact Us</a>.
                      </p>
                      <p>Thank you for choosing VendorsCity. We look forward to providing you with exceptional service.</p>
                     </div>
@@ -8758,9 +9431,9 @@ h3 {
                                     <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:support@vendorscity.com">support@vendorscity.com</a></p>
                                     <p  style="margin:0;">VendorsCity Portal LLC</p>
                                     <div class="footer_links" style=" margin:10px 0;">
-                                <a href="' . url("/terms-of-service") . '"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                                <a href="' . url("/privacy-policy") . '"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                                <a href="' . url("/contact") . '"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("terms-of-service") . '"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("privacy-policy") . '"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                                <a href="' . \App\Helpers\Helper::get_front_url("contact") . '"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                                 </div>
                                    
                                 </div>
@@ -8805,5 +9478,91 @@ h3 {
 
             'message' => 'Commission Saved Successfully'
         ]);
+    }
+
+    public function cancel_recurring_visit(Request $request)
+    {
+        $visit_date = $request->input('visit_date');
+        $order_id = $request->input('order_id');
+
+        if ($visit_date && $order_id) {
+            $existing_visit = DB::table('ci_order_visits')
+                ->where('order_id', $order_id)
+                ->where('visit_date', $visit_date)
+                ->first();
+
+            if ($existing_visit) {
+                DB::table('ci_order_visits')
+                    ->where('id', $existing_visit->id)
+                    ->update(['visit_status' => 'cancelled']);
+            } else {
+                DB::table('ci_order_visits')->insert([
+                    'order_id' => $order_id,
+                    'visit_date' => $visit_date,
+                    'visit_status' => 'cancelled',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'Visit Cancelled Successfully'
+            ]);
+        }
+
+        return response()->json(['status' => 0, 'message' => 'Visit date or Order ID missing']);
+    }
+    public function mark_visit_paid(Request $request)
+    {
+        $visit_id = $request->input('visit_id');
+        if ($visit_id) {
+            DB::table('ci_order_visits')
+                ->where('id', $visit_id)
+                ->update(['payment_status' => 'paid']);
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'Visit Marked as Paid Successfully'
+            ]);
+        }
+
+        return response()->json(['status' => 0, 'message' => 'Visit ID missing']);
+    }
+
+    public function assign_visit_cleaner(Request $request)
+    {
+        $visit_date = $request->input('visit_date');
+        $order_id = $request->input('order_id');
+        $cleaner_id = $request->input('cleaner_id');
+
+        if ($visit_date && $order_id && $cleaner_id) {
+            $existing_visit = DB::table('ci_order_visits')
+                ->where('order_id', $order_id)
+                ->where('visit_date', $visit_date)
+                ->first();
+
+            if ($existing_visit) {
+                DB::table('ci_order_visits')
+                    ->where('id', $existing_visit->id)
+                    ->update(['cleaner_id' => $cleaner_id]);
+            } else {
+                DB::table('ci_order_visits')->insert([
+                    'order_id' => $order_id,
+                    'visit_date' => $visit_date,
+                    'cleaner_id' => $cleaner_id,
+                    'visit_status' => 'upcoming',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'Cleaner Assigned Successfully'
+            ]);
+        }
+
+        return response()->json(['status' => 0, 'message' => 'Visit date, Order ID or Cleaner ID missing']);
     }
 }

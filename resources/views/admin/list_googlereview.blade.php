@@ -14,25 +14,25 @@
         // }
         $roleIds = explode(',', $get_user_data->role_id);
 
-			$edit_perm = [];
+        $edit_perm = [];
 
-			foreach ($roleIds as $roleId) {
-				$roleId = trim($roleId); // Clean any spaces
-				
-				$get_permission_data = Helper::get_permission_data($roleId);
+        foreach ($roleIds as $roleId) {
+            $roleId = trim($roleId); // Clean any spaces
 
-				if (
-					is_object($get_permission_data) &&
-					property_exists($get_permission_data, 'editperm') &&
-					$get_permission_data->editperm != ''
-				) {
-					$perms = explode(',', $get_permission_data->editperm);
-					$edit_perm = array_merge($edit_perm, $perms); // Combine permissions
-				}
-			}
+            $get_permission_data = Helper::get_permission_data($roleId);
 
-			// Optional: remove duplicates and reset array keys
-			$edit_perm = array_values(array_unique($edit_perm));
+            if (
+                is_object($get_permission_data) &&
+                property_exists($get_permission_data, 'editperm') &&
+                $get_permission_data->editperm != ''
+            ) {
+                $perms = explode(',', $get_permission_data->editperm);
+                $edit_perm = array_merge($edit_perm, $perms); // Combine permissions
+            }
+        }
+
+        // Optional: remove duplicates and reset array keys
+        $edit_perm = array_values(array_unique($edit_perm));
 
     @endphp
 
@@ -118,6 +118,8 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th>Select</th>
+                                            <th>Service</th>
+                                            <th>Sub Service</th>
                                             <th>Review</th>
                                             <th>Name</th>
                                             @if (in_array('1', $edit_perm))
@@ -131,6 +133,32 @@
                                                 <td><input name="selected[]" id="selected[]" value="{{ $data->id }}"
                                                         type="checkbox" class="minimal-red"
                                                         style="height: 20px;width: 20px;border-radius: 0px;color: red;">
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $service_names = [];
+                                                        if (!empty($data->services)) {
+                                                            $service_ids = explode(',', $data->services);
+                                                            $service_names = DB::table('services')
+                                                                ->whereIn('id', $service_ids)
+                                                                ->pluck('servicename')
+                                                                ->toArray();
+                                                        }
+                                                        echo implode(', ', $service_names);
+                                                    @endphp
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $subservice_names = [];
+                                                        if (!empty($data->subservice_id)) {
+                                                            $subservice_ids = explode(',', $data->subservice_id);
+                                                            $subservice_names = DB::table('subservices')
+                                                                ->whereIn('id', $subservice_ids)
+                                                                ->pluck('subservicename')
+                                                                ->toArray();
+                                                        }
+                                                        echo implode(', ', $subservice_names);
+                                                    @endphp
                                                 </td>
                                                 <td>
                                                     {{ $data->label }}

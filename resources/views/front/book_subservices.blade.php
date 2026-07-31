@@ -305,13 +305,13 @@
                                                     href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $subservice->page_url]) }}"> --}}
                                                 @if ($subservice->is_bookable == 1)
                                                     <a
-                                                        href="{{ route('enquiry', ['service_id' => $service_data->id, 'subservice_id' => $subservice->id]) }}">
+                                                        href="{{ route('enquiry', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id]) }}">
                                                     @else
                                                         @php
                                                             $category_id = $_GET['category'] ?? '';
                                                         @endphp
                                                         <a
-                                                            href="{{ route('booknow', ['service_id' => $service_data->id, 'subservice_id' => $subservice->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}">
+                                                            href="{{ route('booknow', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}">
                                                 @endif
                                         @endif
 
@@ -403,7 +403,7 @@
                                 </div> --}}
 
                                 {{-- ✅ Description second --}}
-                                <div class="col-12 col-md-12 p-4 booking_desc">
+                                <div class="col-12 col-md-12 booking_desc">
                                     <h3 class="mb-4 font-weight-bold">{{ $package_attribut->title_addmore }}</h3>
                                     {!! html_entity_decode($package_attribut->description_addmore) !!}
                                 </div>

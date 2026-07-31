@@ -259,19 +259,28 @@ class Salespersonreportcontroller extends Controller
         foreach ($final_data as $row) {
             $sName = Helper::servicename($row->service_id);
             if (!isset($service_wise_sales[$sName])) {
-                $service_wise_sales[$sName] = 0;
+                $service_wise_sales[$sName] = [
+                    'invoice_amount' => 0,
+                    'profit' => 0,
+                    'jobs' => 0
+                ];
             }
-            $service_wise_sales[$sName] += $row->order_total;
+            $service_wise_sales[$sName]['invoice_amount'] += $row->order_total;
+            $service_wise_sales[$sName]['jobs'] += 1;
 
             $total_invoice_amt += $row->order_total;
             $total_service_charge += $row->service_charge;
             $total_vat += $row->vatcharge;
 
             // Vendor Charge Logic
+            $order_vendor_payout = 0;
             if ($row->vendor_id != 0 && $row->subservice_booking_percentage > 0) {
                 $commission = ($row->sub_total * $row->subservice_booking_percentage) / 100;
-                $total_vendor_charges += ($row->sub_total - $commission);
+                $order_vendor_payout = $row->sub_total - $commission;
+                $total_vendor_charges += $order_vendor_payout;
             }
+                    $order_profit = $row->service_charge - $order_vendor_payout;
+            $service_wise_sales[$sName]['profit'] += $order_profit;
         }
 
         // Profit calculation
@@ -283,67 +292,92 @@ class Salespersonreportcontroller extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header: Sales Report Summary
-        $sheet->mergeCells("A{$row_num}:H{$row_num}");
+        // 1st Table: Sales Report Summary
+        $sheet->mergeCells("A{$row_num}:B{$row_num}");
         $sheet->setCellValue("A{$row_num}", 'Sales Report Summary');
         $sheet->getStyle("A{$row_num}")->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle("A{$row_num}:B{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312'); // Yellow
         $sheet->getStyle("A{$row_num}")->getAlignment()->setHorizontal('center');
-
+        
         $row_num++;
+        
+        $sheet->setCellValue("A{$row_num}", "Charges");
+        $sheet->setCellValue("B{$row_num}", "Total (AED)");
+        $sheet->getStyle("A{$row_num}:B{$row_num}")->getFont()->setBold(true);
+        $row_num++;
+        
+        $sheet->setCellValue("A{$row_num}", "Invoice Amount");
+        $sheet->setCellValue("B{$row_num}", number_format($total_invoice_amt, 2));
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Service Charge");
+        $sheet->setCellValue("B{$row_num}", number_format($total_service_charge, 2));
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Agent Commission");
+        $sheet->setCellValue("B{$row_num}", "0.00");
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Vendor Charges");
+        $sheet->setCellValue("B{$row_num}", number_format($total_vendor_charges, 2));
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Other Expenses");
+        $sheet->setCellValue("B{$row_num}", "0.00");
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Vat");
+        $sheet->setCellValue("B{$row_num}", number_format($total_vat, 2));
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Total Profit");
+        $sheet->setCellValue("B{$row_num}", number_format($total_profit, 2));
+        $sheet->getStyle("A{$row_num}:B{$row_num}")->getFont()->getColor()->setARGB('FFFFFFFF');
+        $sheet->getStyle("A{$row_num}:B{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF0040E6'); // Blue
+        
+        $row_num += 2; // Leave a blank row
 
-        // Sub Headers
-        $sheet->mergeCells("A{$row_num}:B{$row_num}");
+        // 2nd Table: Service wise Sales
+        $sheet->mergeCells("A{$row_num}:E{$row_num}");
         $sheet->setCellValue("A{$row_num}", 'Service wise Sales');
-        $sheet->mergeCells("E{$row_num}:H{$row_num}");
-        $sheet->setCellValue("E{$row_num}", 'Sales Report');
-        $sheet->getStyle("A{$row_num}:H{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312'); // Your Yellow
-
+        $sheet->getStyle("A{$row_num}")->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312'); // Yellow
+        $sheet->getStyle("A{$row_num}")->getAlignment()->setHorizontal('center');
+        
         $row_num++;
 
-        // Column Labels
         $sheet->setCellValue("A{$row_num}", 'Services');
-        $sheet->setCellValue("B{$row_num}", 'Sales');
-        $sheet->setCellValue("E{$row_num}", 'Charges');
-        $sheet->setCellValue("H{$row_num}", 'Total');
+        $sheet->setCellValue("B{$row_num}", 'Invoice Amount');
+        $sheet->setCellValue("C{$row_num}", 'Profit');
+        $sheet->setCellValue("D{$row_num}", 'Percentage %');
+        $sheet->setCellValue("E{$row_num}", 'No. of Jobs');
+        $sheet->getStyle("A{$row_num}:E{$row_num}")->getFont()->setBold(true);
         $row_num++;
 
-        // Populate Left (Service Wise) and Right (Charges) simultaneously
-        $current_left_row = $row_num;
-        foreach ($service_wise_sales as $name => $sale) {
-            $sheet->setCellValue("A{$current_left_row}", $name);
-            $sheet->setCellValue("B{$current_left_row}", number_format($sale, 2));
-            $current_left_row++;
+        foreach ($service_wise_sales as $name => $data) {
+            $percentage = 0;
+            if($data['invoice_amount'] > 0){
+                $percentage = ($data['profit'] / $data['invoice_amount']) * 100;
+            }
+            $sheet->setCellValue("A{$row_num}", $name);
+            $sheet->setCellValue("B{$row_num}", number_format($data['invoice_amount'], 2));
+            $sheet->setCellValue("C{$row_num}", number_format($data['profit'], 2));
+            $sheet->setCellValue("D{$row_num}", number_format($percentage, 2) . '%');
+            $sheet->setCellValue("E{$row_num}", $data['jobs']);
+            $row_num++;
         }
 
-        // Static Charges Table on the Right
-        $sheet->setCellValue("E{$row_num}", "Invoice Amount");
-        $sheet->setCellValue("H{$row_num}", number_format($total_invoice_amt, 2));
-        $sheet->setCellValue("E" . ($row_num + 1), "Service Charge");
-        $sheet->setCellValue("H" . ($row_num + 1), number_format($total_service_charge, 2));
-        $sheet->setCellValue("E" . ($row_num + 2), "Agent Commission");
-        $sheet->setCellValue("H" . ($row_num + 2), "0.00");
-        $sheet->setCellValue("E" . ($row_num + 3), "Vendor Charges");
-        $sheet->setCellValue("H" . ($row_num + 3), number_format($total_vendor_charges, 2));
-        $sheet->setCellValue("E" . ($row_num + 4), "Other Expenses");
-        $sheet->setCellValue("H" . ($row_num + 4), "0.00");
-        $sheet->setCellValue("E" . ($row_num + 5), "Vat");
-        $sheet->setCellValue("H" . ($row_num + 5), number_format($total_vat, 2));
+        $total_percentage = 0;
+        if($total_invoice_amt > 0){
+            $total_percentage = ($total_profit / $total_invoice_amt) * 100;
+        }
 
-        // Footer of summary tables
-        $summary_end_row = max($current_left_row, $row_num + 6);
+        $sheet->setCellValue("A{$row_num}", "Total Sales");
+        $sheet->setCellValue("B{$row_num}", number_format($total_invoice_amt, 2));
+        $sheet->setCellValue("C{$row_num}", number_format($total_profit, 2));
+        $sheet->setCellValue("D{$row_num}", number_format($total_percentage, 2) . '%');
+        $sheet->setCellValue("E{$row_num}", count($final_data));
+        
+        $sheet->getStyle("A{$row_num}:E{$row_num}")->getFont()->setBold(true);
+        $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312');
 
-        $sheet->setCellValue("A{$summary_end_row}", "Total Sales");
-        $sheet->setCellValue("B{$summary_end_row}", number_format($total_invoice_amt, 2));
-        $sheet->getStyle("A{$summary_end_row}:B{$summary_end_row}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312');
-
-        $sheet->setCellValue("E{$summary_end_row}", "Total Profit");
-        $sheet->setCellValue("H{$summary_end_row}", number_format($total_profit, 2));
-        $sheet->getStyle("E{$summary_end_row}:H{$summary_end_row}")->getFont()->getColor()->setARGB('FFFFFFFF');
-        $sheet->getStyle("E{$summary_end_row}:H{$summary_end_row}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF0040E6'); // Your Blue
-
+        $row_num += 2; // Leave a blank row
+        
         // ✅ 3. START ORDER LISTING BELOW SUMMARY
-        $row_num = $summary_end_row + 2;
-
         // Table Header for Orders
         $order_headers = ['Booking Date', 'Service Type', 'Order Id', 'Sales Person', 'Customer', 'Vendor', 'Vendor Charge', 'Profit'];
         $column = 'A';

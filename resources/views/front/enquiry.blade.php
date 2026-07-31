@@ -453,7 +453,7 @@
                             <button type="button" class="ud-btn btn-thm default-box-shadow2"
                                 onclick="javascript:category_validation()" id="submit_button">Submit</button>
 
-                          <!--   <div class="or-seperator"><i>or</i></div>
+                            <!--   <div class="or-seperator"><i>or</i></div>
                             <p class="text-center">Login with your social media account</p>
                             <div class="text-center social-btn">
                                 <a href="#" class="btn btn-secondary"><i class="fa fa-facebook"></i>&nbsp; Facebook</a>
@@ -563,10 +563,15 @@
                                                     ->where('id', '=', $att_data_new->form_field_id)
                                                     ->first();
 
-                                                // echo '<pre>';
-                                                // print_r($form_label);
-                                                // echo '</pre>';
-
+                                                $displayValue = $att_data_new->formfield_value;
+                                                if (is_numeric($displayValue)) {
+                                                    $option = DB::table('form_attributes')
+                                                        ->where('id', $displayValue)
+                                                        ->first();
+                                                    if ($option) {
+                                                        $displayValue = $option->form_option;
+                                                    }
+                                                }
                                             @endphp
                                             <div class="d-flex justify-content-between my-2">
                                                 <div>
@@ -575,7 +580,7 @@
                                                     @endif
 
                                                 </div>
-                                                <div class="font-weight-bold">{{ $att_data_new->formfield_value }}
+                                                <div class="font-weight-bold">{{ $displayValue }}
                                                 </div>
                                             </div>
                                         @endforeach
@@ -715,7 +720,7 @@
             var mobile_new = $('#mobile_new').val();
             var email_new = jQuery("#email_new").val();
 
-            var url = '{{ url('package_inquiry_new') }}';
+            var url = '{{ url(session('search_city_name') . '/package_inquiry_new') }}';
 
             $.ajax({
                 url: url,

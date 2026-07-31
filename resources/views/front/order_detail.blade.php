@@ -1340,7 +1340,7 @@
                         <div class="mt-4">
                             @if ($isPastVisit)
                                 <hr>
-                                <a href="{{ $orders->items[0]->service_id == 50 ? url('/automobile/vehicles-inspection') : url('/booknow/' . $orders->items[0]->service_id . '/' . $orders->items[0]->subservice_id) }}"
+                                <a href="{{ $orders->items[0]->service_id == 50 ? route('automobile.listing', ['page_url' => 'vehicles-inspection']) : route('booknow', [\App\Models\Admin\Service::find($orders->items[0]->service_id)->page_url ?? $orders->items[0]->service_id, \App\Models\Admin\Subservice::find($orders->items[0]->subservice_id)->page_url ?? $orders->items[0]->subservice_id]) }}"
                                     class="btn-classic-action">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="action-icon-frame"
@@ -1367,7 +1367,7 @@
                                     </a>
                                 @endif
 
-                                <a href="{{ url('view-receipts/' . $orders->order_id . '?visit_date=' . $orders->visit_date) }}"
+                                <a href="{{ route('view-receipts', ['id' => $orders->order_id, 'visit_date' => $orders->visit_date]) }}"
                                     class="btn-classic-action">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="action-icon-frame"
@@ -1410,6 +1410,104 @@
                             @endif
                         </div>
                     </div>
+                    
+                    @php
+                        $recurring_visits = \App\Helpers\Helper::getUpcomingVisits($orders->order_id, 5);
+                    @endphp
+
+                    @if($recurring_visits->count() > 0)
+                        <div class="classic-card mt-3">
+                            <div class="classic-section-title mb-3">
+                                <i class="bi bi-calendar-event me-2"></i>Upcoming Schedule
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($recurring_visits as $visit)
+                                        <tr>
+                                            <td><strong>{{ date('d M Y', strtotime($visit->visit_date)) }}</strong></td>
+                                            <td>
+                                                @if($visit->visit_status == 'cancelled')
+                                                    <span class="badge bg-danger">Skipped</span>
+                                                @elseif($visit->visit_status == 'completed')
+                                                    <span class="badge bg-success">Completed</span>
+                                                @else
+                                                    <span class="badge bg-info">Upcoming</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-end">
+                                                @if($visit->visit_status != 'cancelled' && $visit->visit_status != 'completed')
+                                                    <button class="btn btn-sm btn-outline-danger user-cancel-visit" data-date="{{ $visit->visit_date }}" data-order="{{ $orders->order_id }}">
+                                                        Skip Visit
+                                                    </button>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                $('.user-cancel-visit').on('click', function() {
+                                    let visitDate = $(this).data('date');
+                                    let orderId = $(this).data('order');
+                                    
+                                    Swal.fire({
+                                        title: 'Are you sure?',
+                                        text: "Do you want to skip this visit?",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Yes, skip it!',
+                                        showLoaderOnConfirm: true,
+                                        preConfirm: () => {
+                                            return $.ajax({
+                                                url: "{{ route('front.cancel_recurring_visit') }}",
+                                                type: "POST",
+                                                data: {
+                                                    _token: "{{ csrf_token() }}",
+                                                    visit_date: visitDate,
+                                                    order_id: orderId
+                                                }
+                                            }).catch(error => {
+                                                Swal.showValidationMessage(`Request failed: ${error}`);
+                                            });
+                                        },
+                                        allowOutsideClick: () => !Swal.isLoading()
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            if(result.value.status == 1) {
+                                                Swal.fire(
+                                                    'Skipped!',
+                                                    result.value.message,
+                                                    'success'
+                                                ).then(() => {
+                                                    location.reload();
+                                                });
+                                            } else {
+                                                Swal.fire(
+                                                    'Error!',
+                                                    result.value.message,
+                                                    'error'
+                                                );
+                                            }
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                    @endif
 
                     @if (!empty($pastVisits) && !request()->get('visit_date'))
                         <div class="classic-card mt-3">
@@ -2582,7 +2680,7 @@
 
                         <div class="text-center mt-3 mb-3">
                             @if ($data->appointment == 1)
-                                <a href="{{ url('/order-detail/' . $orders->order_id) }}"
+                                <a href="{{ route('order-detail', $orders->order_id) }}"
                                     class="btn px-5 py-2 rounded-pill" id="edit_instruction_btn">APPOINTMENT
                                     DETAILS</a>
                             @endif

@@ -87,6 +87,10 @@ use App\Http\Controllers\admin\Addonscontroller;
 use App\Http\Controllers\admin\Erpdescriptionofgoods;
 use App\Http\Controllers\admin\EvcharginginstallationLeads;
 use App\Http\Controllers\admin\GoogleCalendarController;
+use App\Http\Controllers\admin\CleaningSubscriptionDurationController;
+use App\Http\Controllers\admin\CleaningSubscriptionPackageController;
+use App\Http\Controllers\admin\CleaningSubscriptionFrequencyController;
+use App\Http\Controllers\admin\CleaningSubscriptionPricingController;
 
 
 
@@ -103,6 +107,7 @@ use App\Http\Controllers\front\PaymentfrontController;
 use App\Http\Controllers\front\TabbyController;
 use App\Http\Controllers\front\Croncontroller;
 use App\Http\Controllers\admin\Salespersonreportcontroller;
+use App\Http\Controllers\admin\ReportsDashboardController;
 
 
 
@@ -131,6 +136,7 @@ Route::get('/run-all-jobs', function () {
 
     return 'All jobs completed';
 });
+
 // Clear application cache:
 // Route::get('/clear-cache', function() {
 //     $exitCode = Artisan::call('cache:clear');
@@ -254,6 +260,46 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 
     Route::post('/calendar-sync', [GoogleCalendarController::class, 'sync'])
         ->name('admin.calendar.sync');
+
+    Route::resource('/cleaning-subscription-durations', CleaningSubscriptionDurationController::class)->names([
+        'index' => 'cleaning-subscription-durations.index',
+        'create' => 'cleaning-subscription-durations.create',
+        'store' => 'cleaning-subscription-durations.store',
+        'edit' => 'cleaning-subscription-durations.edit',
+        'update' => 'cleaning-subscription-durations.update',
+        'destroy' => 'cleaning-subscription-durations.destroy',
+    ]);
+
+    Route::resource('/cleaning-subscription-packages', CleaningSubscriptionPackageController::class)->names([
+        'index' => 'cleaning-subscription-packages.index',
+        'create' => 'cleaning-subscription-packages.create',
+        'store' => 'cleaning-subscription-packages.store',
+        'edit' => 'cleaning-subscription-packages.edit',
+        'update' => 'cleaning-subscription-packages.update',
+        'destroy' => 'cleaning-subscription-packages.destroy',
+    ]);
+
+    Route::resource('/cleaning-subscription-frequencies', CleaningSubscriptionFrequencyController::class)->names([
+        'index' => 'cleaning-subscription-frequencies.index',
+        'create' => 'cleaning-subscription-frequencies.create',
+        'store' => 'cleaning-subscription-frequencies.store',
+        'edit' => 'cleaning-subscription-frequencies.edit',
+        'update' => 'cleaning-subscription-frequencies.update',
+        'destroy' => 'cleaning-subscription-frequencies.destroy',
+    ]);
+
+    Route::resource('/cleaning-subscription-pricing', CleaningSubscriptionPricingController::class)->names([
+        'index' => 'cleaning-subscription-pricing.index',
+        'create' => 'cleaning-subscription-pricing.create',
+        'store' => 'cleaning-subscription-pricing.store',
+        'edit' => 'cleaning-subscription-pricing.edit',
+        'update' => 'cleaning-subscription-pricing.update',
+        'destroy' => 'cleaning-subscription-pricing.destroy',
+    ]);
+});
+
+Route::get('/debug-pricing-rules', function () {
+    return response()->json(DB::table('cleaning_subscription_pricing')->get());
 });
 
 Route::middleware('auth')->group(function () {
@@ -329,6 +375,10 @@ Route::middleware('auth')->group(function () {
     Route::get('removed_subservice_banner_addmore_att/{pid}/{id}', [SubserviceController::class, 'removed_subservice_banner_addmore_att'])->name('removed_subservice_banner_addmore_att');
     Route::get('removed_subservice_contain_att/{pid}/{id}', [SubserviceController::class, 'removed_subservice_contain_att'])->name('removed_subservice_contain_att');
     Route::get('removed_addmore_att/{pid}/{id}', [SubserviceController::class, 'removed_addmore_att'])->name('removed_addmore_att');
+    Route::get('removed_why_choose_att/{pid}/{id}', [SubserviceController::class, 'removed_why_choose_att'])->name('removed_why_choose_att');
+    Route::get('removed_description_att/{pid}/{id}', [SubserviceController::class, 'removed_description_att'])->name('removed_description_att');
+    Route::get('removed_more_service_att/{pid}/{id}', [SubserviceController::class, 'removed_more_service_att'])->name('removed_more_service_att');
+    Route::get('removed_what_else_att/{pid}/{id}', [SubserviceController::class, 'removed_what_else_att'])->name('removed_what_else_att');
     Route::post('change_status_subservice', 'App\Http\Controllers\admin\SubserviceController@change_status_subservice');
     Route::get('subservice_removed_top_descatt/{pid}/{id}', [SubserviceController::class, 'subservice_removed_top_descatt'])->name('subservice_removed_top_descatt');
 
@@ -614,6 +664,28 @@ Route::middleware('auth')->group(function () {
     Route::get('cleaning_package_order_edit/{id}', '\App\Http\Controllers\admin\Ordercontroller@cleaning_package_order_edit')
         ->name('cleaning_package_order_edit');
 
+    Route::get('admin/healthcare-at-home-package-order', '\App\Http\Controllers\admin\Ordercontroller@healthcare_at_home_package_order')
+        ->name('healthcare_at_home_package_order');
+
+    Route::get('admin/healthcare_at_home_admin_order/add', '\App\Http\Controllers\admin\Ordercontroller@healthcare_at_home_admin_order')
+        ->name('healthcare_at_home_admin_order');
+
+    // Route::get('admin/healthcare-at-home-service-order-service-order', '\App\Http\Controllers\admin\Ordercontroller@healthcare_at_home_service_order')
+    //     ->name('healthcare_at_home_service_order');
+
+    Route::get('admin/order/healthcare-at-home-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('healthcare_at_home_detail');
+
+    Route::get('admin/healthcare-at-home-package-order/edit/{ci_order}', '\App\Http\Controllers\admin\Ordercontroller@healthcare_at_home_order_edit')
+        ->name('healthcare_at_home_order_edit');
+
+    Route::post('admin/healthcare-at-home-service-order-store', '\App\Http\Controllers\admin\Ordercontroller@healthcare_at_home_service_order_store')
+        ->name('healthcare_at_home_service_order_store');
+
+    Route::put('admin/healthcare-at-home-package-order/update/{ci_order}', '\App\Http\Controllers\admin\Ordercontroller@healthcare_at_home_order_update')
+        ->name('healthcare_at_home_order_update');
+
+    Route::get('admin/order/vendor-healthcare-at-home-detail/{vendororder_id}', [VendorOrderController::class, 'vendordetail'])->name('vendor-healthcare-at-home-detail');
+
 
     Route::post('set-end-date', '\App\Http\Controllers\admin\Ordercontroller@set_end_date')
         ->name('set-end-date');
@@ -794,6 +866,9 @@ Route::middleware('auth')->group(function () {
     Route::get('vendor/cleaning-listing', '\App\Http\Controllers\admin\VendorOrderController@cleaning_listing')
         ->name('cleaning-listing');
 
+    Route::get('vendor/healthcare-at-home-listing', '\App\Http\Controllers\admin\VendorOrderController@healthcare_at_home_listing')
+        ->name('healthcare_at_home_listing');
+
     Route::post('vendor-cleaner-assign-form', '\App\Http\Controllers\admin\VendorOrderController@vendor_cleaner_assign_form');
     Route::post('vendor-multi-cleaner-time-slot', '\App\Http\Controllers\admin\VendorOrderController@vendor_multi_cleaner_time_slot');
     Route::post('vendor-multi-cleaner-assign-form', '\App\Http\Controllers\admin\VendorOrderController@vendor_multi_cleaner_assign_form');
@@ -860,6 +935,9 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('admin/google_review', 'App\Http\Controllers\admin\GooglereviewController');
     Route::get('delete_google_review', [GooglereviewController::class, 'destroy'])->name('delete_google_review');
+    Route::get('admin/get-subservices-by-service/{service_id}', [GooglereviewController::class, 'getSubservicesByService'])->name('google_review.get_subservices');
+
+
 
     Route::resource('system', 'App\Http\Controllers\admin\SystemController');
     Route::get('removed_system_att/{pid}/{id}', [SystemController::class, 'removed_system_att'])->name('removed_system_att');
@@ -898,6 +976,8 @@ Route::controller(Salespersonreportcontroller::class)->prefix('admin')->middlewa
     Route::match(['get', 'post'], 'salesperson-report', 'index')->name('salesperson_report');
     Route::post('filter-data-salesperson', 'filter_data_salesperson')->name('filter_data_salesperson');
 });
+
+Route::get('admin/reports-dashboard', [ReportsDashboardController::class, 'index'])->name('reports_dashboard')->middleware('auth');
 
 
 Route::controller(ERP_EnquiryController::class)->prefix('admin')->middleware('auth')->group(function () {
@@ -1027,337 +1107,376 @@ Route::get('/request-accept/{enquiry_id}/{format_type}', [ErpQuotecontroller::cl
 Route::get('/', '\App\Http\Controllers\front\Homecontroller@redirectToCity')
     ->name('default.city');
 
-//Route::get('/', '\App\Http\Controllers\front\Homecontroller@index')->name('fronthome');
+Route::prefix('{city}')
+    ->where(['city' => '^(?!admin|login|logout|config-cache|accept-quotation|request-accept).*$'])
+    ->middleware('front.city')
+    ->group(function () {
 
-Route::get('/payment_success_automobile', '\App\Http\Controllers\front\Automobilecontroller@payment_success')->name('payment_success_automobile');
-Route::get('/payment_fail_automobile', '\App\Http\Controllers\front\Automobilecontroller@payment_fail')->name('payment_fail_automobile');
+        Route::get('/payment_success_automobile', '\App\Http\Controllers\front\Automobilecontroller@payment_success')->name('payment_success_automobile');
+        Route::get('/payment_fail_automobile', '\App\Http\Controllers\front\Automobilecontroller@payment_fail')->name('payment_fail_automobile');
 
-Route::get('/automobile/thank-you', '\App\Http\Controllers\front\Automobilecontroller@thankyou')->name('automobile.thank-you');
-Route::get('/automobile/book-inspection/{id}', '\App\Http\Controllers\front\Automobilecontroller@book_inspection')->name('automobile.bookinspection');
-Route::get('/automobile/packages', '\App\Http\Controllers\front\Automobilecontroller@packages')->name('automobile.packages');
-Route::get('/automobile/{page_url}', '\App\Http\Controllers\front\Automobilecontroller@listing')->name('automobile.listing');
-Route::post('change_model', 'App\Http\Controllers\front\Automobilecontroller@change_model');
+        Route::get('/automobile/thank-you', '\App\Http\Controllers\front\Automobilecontroller@thankyou')->name('automobile.thank-you');
+        Route::get('/automobile/book-inspection/{id}', '\App\Http\Controllers\front\Automobilecontroller@book_inspection')->name('automobile.bookinspection');
+        Route::get('/automobile/packages', '\App\Http\Controllers\front\Automobilecontroller@packages')->name('automobile.packages');
+        Route::get('/automobile/{page_url}', '\App\Http\Controllers\front\Automobilecontroller@listing')->name('automobile.listing');
+        Route::post('change_model', 'App\Http\Controllers\front\Automobilecontroller@change_model');
 
 
-Route::post('show_category', 'App\Http\Controllers\front\Automobilecontroller@show_category');
-Route::post('book-inspection-form', 'App\Http\Controllers\front\Automobilecontroller@book_inspection_form')->name('book-inspection-form');
+        Route::post('show_category', 'App\Http\Controllers\front\Automobilecontroller@show_category');
+        Route::post('book-inspection-form', 'App\Http\Controllers\front\Automobilecontroller@book_inspection_form')->name('book-inspection-form');
 
-Route::get('/vendor-registration-succesful', '\App\Http\Controllers\front\Homecontroller@become_vendors')->name('vendor-registration-succesful');
-Route::post('facebook-login', '\App\Http\Controllers\front\FrontloginregisterController@facebook')->name('facebook-login');
+        Route::get('/vendor-registration-succesful', '\App\Http\Controllers\front\Homecontroller@become_vendors')->name('vendor-registration-succesful');
+        Route::post('facebook-login', '\App\Http\Controllers\front\FrontloginregisterController@facebook')->name('facebook-login');
 
-Route::get('auth/google', '\App\Http\Controllers\front\FrontloginregisterController@redirectToGoogle');
-Route::get('gmail-login', '\App\Http\Controllers\front\FrontloginregisterController@gmail');
-Route::post('booknow-user-otp-login', 'App\Http\Controllers\front\FrontloginregisterController@booknow_user_otp_login')->name('booknow-user-otp-login');
-Route::post('booknow-otp-sent', '\App\Http\Controllers\front\FrontloginregisterController@booknow_otp_sent')->name('booknow-otp-sent');
+        Route::get('auth/google', '\App\Http\Controllers\front\FrontloginregisterController@redirectToGoogle');
+        Route::get('gmail-login', '\App\Http\Controllers\front\FrontloginregisterController@gmail');
+        Route::post('booknow-user-otp-login', 'App\Http\Controllers\front\FrontloginregisterController@booknow_user_otp_login')->name('booknow-user-otp-login');
+        Route::post('booknow-otp-sent', '\App\Http\Controllers\front\FrontloginregisterController@booknow_otp_sent')->name('booknow-otp-sent');
 
 
-Route::post('book-email-otp-login', 'App\Http\Controllers\front\FrontloginregisterController@book_user_otp_login')->name('home.book-email-otp-login');
-Route::post('book-email-otp-sent', '\App\Http\Controllers\front\FrontloginregisterController@book_email_otp_sent')->name('home.book-email-otp-sent');
+        Route::post('book-email-otp-login', 'App\Http\Controllers\front\FrontloginregisterController@book_user_otp_login')->name('home.book-email-otp-login');
+        Route::post('book-email-otp-sent', '\App\Http\Controllers\front\FrontloginregisterController@book_email_otp_sent')->name('home.book-email-otp-sent');
 
 
-Route::post('search', '\App\Http\Controllers\front\Homecontroller@search')->name('search');
+        Route::post('search', '\App\Http\Controllers\front\Homecontroller@search')->name('search');
 
-Route::get('/privacy-policy', '\App\Http\Controllers\front\Homecontroller@privacy_policy')->name('privacy_policy');
-Route::get('/terms-of-service', '\App\Http\Controllers\front\Homecontroller@term_condition')->name('term_condition');
-Route::get('/payment-and-refund-policy', '\App\Http\Controllers\front\Homecontroller@payment_refund_policy')->name('payment_refund_policy');
-Route::get('/contact', '\App\Http\Controllers\front\Homecontroller@contact')->name('contact');
-Route::post('/contact_us_data', '\App\Http\Controllers\front\Homecontroller@contact_us_data');
-Route::get('/careers', '\App\Http\Controllers\front\Homecontroller@careers')->name('careers');
-Route::get('/about-us', '\App\Http\Controllers\front\Homecontroller@about_us')->name('about_us');
+        Route::get('/privacy-policy', '\App\Http\Controllers\front\Homecontroller@privacy_policy')->name('privacy_policy');
+        Route::get('/terms-of-service', '\App\Http\Controllers\front\Homecontroller@term_condition')->name('term_condition');
+        Route::get('/payment-and-refund-policy', '\App\Http\Controllers\front\Homecontroller@payment_refund_policy')->name('payment_refund_policy');
+        Route::get('/contact', '\App\Http\Controllers\front\Homecontroller@contact')->name('contact');
+        Route::post('/contact_us_data', '\App\Http\Controllers\front\Homecontroller@contact_us_data');
+        Route::get('/careers', '\App\Http\Controllers\front\Homecontroller@careers')->name('careers');
+        Route::get('/about-us', '\App\Http\Controllers\front\Homecontroller@about_us')->name('about_us');
 
-Route::get('/services', '\App\Http\Controllers\front\Homecontroller@book_services');
-// Route::get('/book-services', '\App\Http\Controllers\front\Homecontroller@book_services');
-Route::get('/become-a-vendor', '\App\Http\Controllers\front\Homecontroller@become_vendor');
-Route::post('/front-get-subservices', '\App\Http\Controllers\front\Homecontroller@getSubservices')->name('front.getSubservices');
+        Route::get('/services', '\App\Http\Controllers\front\Homecontroller@book_services');
+        // Route::get('/book-services', '\App\Http\Controllers\front\Homecontroller@book_services');
+        Route::get('/become-a-vendor', '\App\Http\Controllers\front\Homecontroller@become_vendor');
+        Route::post('/front-get-subservices', '\App\Http\Controllers\front\Homecontroller@getSubservices')->name('front.getSubservices');
 
-Route::get('/blog', '\App\Http\Controllers\front\Homecontroller@blog');
-Route::get('/blog/{blog_url}', '\App\Http\Controllers\front\Homecontroller@blog_detail')->name('blog_detail');
-Route::post('email-otp-sent', '\App\Http\Controllers\front\Homecontroller@email_otp_sent')->name('home.email-otp-sent');
-Route::post('user-email-otp-login', 'App\Http\Controllers\front\Homecontroller@user_email_otp_login')->name('home.user-email-otp-login');
-Route::post('user-otp-login', 'App\Http\Controllers\front\Homecontroller@user_otp_login')->name('user-otp-login');
-Route::post('otp-sent', '\App\Http\Controllers\front\Homecontroller@otp_sent')->name('otp-sent');
-Route::get('Sign-Up/{id?}', '\App\Http\Controllers\front\FrontloginregisterController@test');
-Route::resource('Sign-Up', '\App\Http\Controllers\front\FrontloginregisterController');
-Route::get('Sign-in', '\App\Http\Controllers\front\FrontloginregisterController@Sign_in')->name('Sign-in');
+        Route::get('/blog', '\App\Http\Controllers\front\Homecontroller@blog');
+        Route::get('/blog/{blog_url}', '\App\Http\Controllers\front\Homecontroller@blog_detail')->name('blog_detail');
+        Route::post('email-otp-sent', '\App\Http\Controllers\front\Homecontroller@email_otp_sent')->name('home.email-otp-sent');
+        Route::post('user-email-otp-login', 'App\Http\Controllers\front\Homecontroller@user_email_otp_login')->name('home.user-email-otp-login');
+        Route::post('user-otp-login', 'App\Http\Controllers\front\Homecontroller@user_otp_login')->name('user-otp-login');
+        Route::post('otp-sent', '\App\Http\Controllers\front\Homecontroller@otp_sent')->name('otp-sent');
+        Route::get('Sign-Up/{id?}', '\App\Http\Controllers\front\FrontloginregisterController@test');
+        Route::resource('Sign-Up', '\App\Http\Controllers\front\FrontloginregisterController');
+        Route::get('Sign-in', '\App\Http\Controllers\front\FrontloginregisterController@Sign_in')->name('Sign-in');
 
-Route::post('user-detail-login', 'App\Http\Controllers\front\FrontloginregisterController@user_detail_login')->name('user-detail-login');
+        Route::post('user-detail-login', 'App\Http\Controllers\front\FrontloginregisterController@user_detail_login')->name('user-detail-login');
 
-// Handle both GET and POST requests
-// Route::match(['get', 'post'], 'sign-in-form', '\App\Http\Controllers\front\FrontloginregisterController@sign_in_form')->name('sign-in-form');
+        // Handle both GET and POST requests
+        // Route::match(['get', 'post'], 'sign-in-form', '\App\Http\Controllers\front\FrontloginregisterController@sign_in_form')->name('sign-in-form');
 
-Route::get('user_signout', 'App\Http\Controllers\front\FrontloginregisterController@user_signout')->name('user_signout');
+        Route::get('user_signout', 'App\Http\Controllers\front\FrontloginregisterController@user_signout')->name('user_signout');
 
 
-Route::get('test_mail', 'App\Http\Controllers\front\FrontloginregisterController@test_mail')->name('test_mail');
+        Route::get('test_mail', 'App\Http\Controllers\front\FrontloginregisterController@test_mail')->name('test_mail');
 
-Route::post('check_login', 'App\Http\Controllers\front\FrontloginregisterController@check_login');
+        Route::post('check_login', 'App\Http\Controllers\front\FrontloginregisterController@check_login');
 
-Route::get('search-package', 'App\Http\Controllers\front\FrontloginregisterController@search_package')->name('search_package');
-// Route::post('search-package', 'App\Http\Controllers\front\Homecontroller@search_package');
+        Route::get('search-package', 'App\Http\Controllers\front\FrontloginregisterController@search_package')->name('search_package');
+        // Route::post('search-package', 'App\Http\Controllers\front\Homecontroller@search_package');
 
-// Route::match(['get', 'post'], 'search-package', [FrontloginregisterController::class, 'search_package'])->name('search_package');
+        // Route::match(['get', 'post'], 'search-package', [FrontloginregisterController::class, 'search_package'])->name('search_package');
 
-Route::post('user_login', 'App\Http\Controllers\front\FrontloginregisterController@user_login')->name('user_login');
+        Route::post('user_login', 'App\Http\Controllers\front\FrontloginregisterController@user_login')->name('user_login');
 
-Route::post('registration_mail_check', '\App\Http\Controllers\front\FrontloginregisterController@registration_mail_check');
+        Route::post('registration_mail_check', '\App\Http\Controllers\front\FrontloginregisterController@registration_mail_check');
 
 
-Route::get('forget-password', '\App\Http\Controllers\front\FrontloginregisterController@lost_password');
-Route::post('email-check-login', '\App\Http\Controllers\front\FrontloginregisterController@emailCheck');
-Route::post('resetpassword', '\App\Http\Controllers\front\FrontloginregisterController@get_password')->name('reset-password');
-Route::get('reset-password/{uid}', '\App\Http\Controllers\front\FrontloginregisterController@reset_password')->name('reset_password');
+        Route::get('forget-password', '\App\Http\Controllers\front\FrontloginregisterController@lost_password');
+        Route::post('email-check-login', '\App\Http\Controllers\front\FrontloginregisterController@emailCheck');
+        Route::post('resetpassword', '\App\Http\Controllers\front\FrontloginregisterController@get_password')->name('reset-password');
+        Route::get('reset-password/{uid}', '\App\Http\Controllers\front\FrontloginregisterController@reset_password')->name('reset_password');
 
 
-Route::post('check_email', '\App\Http\Controllers\front\FrontloginregisterController@check_email');
-Route::post('news_letter_email', '\App\Http\Controllers\front\FrontloginregisterController@news_letter_email');
+        Route::post('check_email', '\App\Http\Controllers\front\FrontloginregisterController@check_email');
+        Route::post('news_letter_email', '\App\Http\Controllers\front\FrontloginregisterController@news_letter_email');
 
 
-Route::post('set_password/{uid}', '\App\Http\Controllers\front\FrontloginregisterController@set_password')->name('set_password');
+        Route::post('set_password/{uid}', '\App\Http\Controllers\front\FrontloginregisterController@set_password')->name('set_password');
 
-Route::match(['get', 'post'], 'lost-password', [AdminpassController::class, 'lost_password'])->name('lost_password');
-Route::post('email-check-login-admin', '\App\Http\Controllers\admin\AdminpassController@emailCheck');
-Route::get('reset-password-vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@reset_password')->name('reset_password');
-Route::post('set_password_vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@set_password_vendor')->name('set_password_vendor');
+        Route::match(['get', 'post'], 'lost-password', [AdminpassController::class, 'lost_password'])->name('lost_password');
+        Route::post('email-check-login-admin', '\App\Http\Controllers\admin\AdminpassController@emailCheck');
+        Route::get('reset-password-vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@reset_password')->name('reset_password');
+        Route::post('set_password_vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@set_password_vendor')->name('set_password_vendor');
 
 
 
-Route::match(['get', 'post'], 'our-vendors', [FrontvendorController::class, 'vendor_database'])->name('vendor_database');
+        Route::match(['get', 'post'], 'our-vendors', [FrontvendorController::class, 'vendor_database'])->name('vendor_database');
 
-// Route::get('/package-lists/{page_url}', '\App\Http\Controllers\front\Packagecontroller@package_lists')->name('package-lists');
-Route::get('/package-detail/{page_url}', '\App\Http\Controllers\front\Packagecontroller@package_detail');
+        // Route::get('/package-lists/{page_url}', '\App\Http\Controllers\front\Packagecontroller@package_lists')->name('package-lists');
+        Route::get('/package-detail/{page_url}', '\App\Http\Controllers\front\Packagecontroller@package_detail')->name('front.package_detail');
 
-Route::get('enquiry/{id}/', '\App\Http\Controllers\front\Packagecontroller@enquiry')->name('enquiry');
-Route::get('enquiry/{id}/{service_id}/', '\App\Http\Controllers\front\Packagecontroller@enquiry')->name('enquiry');
+        Route::get('enquiry/{id}/', '\App\Http\Controllers\front\Packagecontroller@enquiry')->name('enquiry');
+        Route::get('enquiry/{id}/{service_id}/', '\App\Http\Controllers\front\Packagecontroller@enquiry')->name('enquiry');
 
-Route::get('enquiry/{id}/', '\App\Http\Controllers\front\Packagecontroller@enquiry');
+        Route::get('enquiry/{id}/', '\App\Http\Controllers\front\Packagecontroller@enquiry');
 
-Route::get('enquiry/{id}/{service_id}/', '\App\Http\Controllers\front\Packagecontroller@enquiry_sub')->name('enquiry');
+        Route::get('enquiry/{id}/{service_id}/', '\App\Http\Controllers\front\Packagecontroller@enquiry_sub')->name('enquiry');
 
 
 
-Route::get('enquiry/{service_id}/{subservice_id}', 'Packagecontroller@enquiry_sub')->name('enquiry');
+        Route::get('enquiry/{service_id}/{subservice_id}', 'Packagecontroller@enquiry_sub')->name('enquiry');
 
-Route::get('enquiry-thankyou', '\App\Http\Controllers\front\Packagecontroller@enquiry_thankyou')->name('enquiry.thankyou');
+        Route::get('enquiry-thankyou', '\App\Http\Controllers\front\Packagecontroller@enquiry_thankyou')->name('enquiry.thankyou');
 
-Route::get('booknow/{service_id}/{subservice_id}', '\App\Http\Controllers\front\Packagecontroller@booknow')->name('booknow');
+        Route::get('booknow/{service_id}/{subservice_id}', '\App\Http\Controllers\front\Packagecontroller@booknow')->name('booknow');
 
-Route::post('get_price_cleaning', '\App\Http\Controllers\front\Packagecontroller@get_price_cleaning');
-Route::post('cleaner-time-check', '\App\Http\Controllers\front\Packagecontroller@cleaner_time_check');
-Route::post('homecleaner-time-check', '\App\Http\Controllers\front\Packagecontroller@homecleaner_time_check');
+        Route::post('get_price_cleaning', '\App\Http\Controllers\front\Packagecontroller@get_price_cleaning');
+        Route::post('cleaner-time-check', '\App\Http\Controllers\front\Packagecontroller@cleaner_time_check');
+        Route::post('homecleaner-time-check', '\App\Http\Controllers\front\Packagecontroller@homecleaner_time_check');
 
-Route::post('/get-cleaners-by-city', '\App\Http\Controllers\front\Packagecontroller@getCleanersByCity')
-    ->name('get.cleaners.by.city');
+        Route::post('/get-cleaners-by-city', '\App\Http\Controllers\front\Packagecontroller@getCleanersByCity')
+            ->name('get.cleaners.by.city');
 
-Route::post('painting-time-check', '\App\Http\Controllers\front\Packagecontroller@painting_time_check');
+        Route::post('painting-time-check', '\App\Http\Controllers\front\Packagecontroller@painting_time_check');
 
 
 
-Route::post('hours-check', '\App\Http\Controllers\front\Packagecontroller@hours_check');
+        Route::post('hours-check', '\App\Http\Controllers\front\Packagecontroller@hours_check');
 
-Route::post('apply-wallet-discount-book_now', '\App\Http\Controllers\front\Packagecontroller@apply_wallet_discount_book_now');
-Route::post('cancel-wallet-discount-book-now', '\App\Http\Controllers\front\Packagecontroller@cancel_wallet_discount_book_now');
+        Route::post('apply-wallet-discount-book_now', '\App\Http\Controllers\front\Packagecontroller@apply_wallet_discount_book_now');
+        Route::post('cancel-wallet-discount-book-now', '\App\Http\Controllers\front\Packagecontroller@cancel_wallet_discount_book_now');
 
 
-Route::post('change_drop_down', '\App\Http\Controllers\front\Packagecontroller@change_drop_down');
+        Route::post('change_drop_down', '\App\Http\Controllers\front\Packagecontroller@change_drop_down');
 
-Route::post('change_drop_down_two', '\App\Http\Controllers\front\Packagecontroller@change_drop_down_two');
+        Route::post('change_drop_down_two', '\App\Http\Controllers\front\Packagecontroller@change_drop_down_two');
 
 
-// Route::get('service/{page_url}', '\App\Http\Controllers\front\Homecontroller@subservices')->name('subservices');
+        // Route::get('service/{page_url}', '\App\Http\Controllers\front\Homecontroller@subservices')->name('subservices');
 
 
 
 
-// Route::post('package_inquiry', '\App\Http\Controllers\front\Packagecontroller@package_inquiry')->name('package_inquiry');
+        // Route::post('package_inquiry', '\App\Http\Controllers\front\Packagecontroller@package_inquiry')->name('package_inquiry');
 
-Route::match(['get', 'post'], 'package_inquiry', '\App\Http\Controllers\front\Packagecontroller@package_inquiry')->name('package_inquiry');
+        Route::match(['get', 'post'], 'package_inquiry', '\App\Http\Controllers\front\Packagecontroller@package_inquiry')->name('package_inquiry');
 
-Route::post('package_inquiry_new', '\App\Http\Controllers\front\Packagecontroller@package_inquiry_new')->name('package_inquiry_new');
+        Route::post('package_inquiry_new', '\App\Http\Controllers\front\Packagecontroller@package_inquiry_new')->name('package_inquiry_new');
 
 
 
 
-Route::post('vendors_check_mail', '\App\Http\Controllers\front\Homecontroller@vendors_check_mail');
-Route::post('/vendors_data', '\App\Http\Controllers\front\Homecontroller@vendors_data');
+        Route::post('vendors_check_mail', '\App\Http\Controllers\front\Homecontroller@vendors_check_mail');
+        Route::post('/vendors_data', '\App\Http\Controllers\front\Homecontroller@vendors_data');
 
-Route::get('/cart/package_cart', '\App\Http\Controllers\front\Cartcontroller@package_cart')->name('cart.package_cart');
-Route::post('/cart/package_cart_store', '\App\Http\Controllers\front\Cartcontroller@package_cart_store')->name('cart.package_cart_store');
+        Route::get('/cart/package_cart', '\App\Http\Controllers\front\Cartcontroller@package_cart')->name('cart.package_cart');
+        Route::post('/cart/package_cart_store', '\App\Http\Controllers\front\Cartcontroller@package_cart_store')->name('cart.package_cart_store');
 
-Route::get('/cart/get-coupon', '\App\Http\Controllers\front\Cartcontroller@getCouponData')->name('package.get_coupon');
-Route::post('/cart/package-remove-coupon', '\App\Http\Controllers\front\Cartcontroller@package_remove_coupon')->name('package.remove_coupon');
+        Route::get('/cart/get-coupon', '\App\Http\Controllers\front\Cartcontroller@getCouponData')->name('package.get_coupon');
+        Route::post('/cart/package-remove-coupon', '\App\Http\Controllers\front\Cartcontroller@package_remove_coupon')->name('package.remove_coupon');
 
-Route::get('/cart/get-coupon-home', '\App\Http\Controllers\front\Cartcontroller@homecleaning_getCouponData')->name('homecleaning.get_coupon');
-Route::post('/cart/homecleaning-remove-coupon', '\App\Http\Controllers\front\Cartcontroller@homecleaning_remove_coupon')->name('homecleaning.remove_coupon');
+        Route::get('/cart/get-coupon-home', '\App\Http\Controllers\front\Cartcontroller@homecleaning_getCouponData')->name('homecleaning.get_coupon');
+        Route::post('/cart/homecleaning-remove-coupon', '\App\Http\Controllers\front\Cartcontroller@homecleaning_remove_coupon')->name('homecleaning.remove_coupon');
 
-Route::post('/homeaddons/store', '\App\Http\Controllers\front\Cartcontroller@homecleaningaddons_store')->name('homecleaningaddons_store');
-Route::get('/homeaddons/cart', '\App\Http\Controllers\front\Cartcontroller@homecleaningaddons_get')->name('homecleaningaddons_get');
+        Route::post('/homeaddons/store', '\App\Http\Controllers\front\Cartcontroller@homecleaningaddons_store')->name('homecleaningaddons_store');
+        Route::get('/homeaddons/cart', '\App\Http\Controllers\front\Cartcontroller@homecleaningaddons_get')->name('homecleaningaddons_get');
 
-Route::post('/package-get-timeslots', '\App\Http\Controllers\front\Packagecontroller@package_get_timeslots')
-    ->name('package.package_get_timeslots');
+        Route::post('/package-get-timeslots', '\App\Http\Controllers\front\Packagecontroller@package_get_timeslots')
+            ->name('package.package_get_timeslots');
 
 
-Route::get('/cart', '\App\Http\Controllers\front\Cartcontroller@cart')->name('cart');
-Route::post('add_to_cart', '\App\Http\Controllers\front\Cartcontroller@add_to_cart');
-Route::post('cart_remove', '\App\Http\Controllers\front\Cartcontroller@cart_remove');
-Route::post('update_cart', '\App\Http\Controllers\front\Cartcontroller@update_cart');
-Route::post('update_cart_book_now', '\App\Http\Controllers\front\Cartcontroller@update_cart_book_now');
+        Route::get('/cart', '\App\Http\Controllers\front\Cartcontroller@cart')->name('cart');
+        Route::post('add_to_cart', '\App\Http\Controllers\front\Cartcontroller@add_to_cart');
+        Route::post('cart_remove', '\App\Http\Controllers\front\Cartcontroller@cart_remove');
+        Route::post('update_cart', '\App\Http\Controllers\front\Cartcontroller@update_cart');
+        Route::post('update_cart_book_now', '\App\Http\Controllers\front\Cartcontroller@update_cart_book_now');
 
-Route::post('add_to_cart_book', '\App\Http\Controllers\front\Cartcontroller@add_to_cart_book');
-Route::post('cart_remove_book_now', '\App\Http\Controllers\front\Cartcontroller@cart_remove_book_now');
-Route::post('minus-quantity-cart-remove-book-now', '\App\Http\Controllers\front\Cartcontroller@minus_quantity_cart_remove_book_now');
-Route::post('promo_codecheck', '\App\Http\Controllers\front\Cartcontroller@promo_codecheck');
-Route::post('remove_coupon', '\App\Http\Controllers\front\Cartcontroller@remove_coupon');
-Route::post('lat_summary_promo_codecheck', '\App\Http\Controllers\front\Cartcontroller@lat_summary_promo_codecheck');
-Route::post('last_summary_remove_coupon', '\App\Http\Controllers\front\Cartcontroller@last_summary_remove_coupon');
-Route::post('promo_codecheck_home_cleaning', '\App\Http\Controllers\front\Cartcontroller@promo_codecheck_home_cleaning');
-Route::post('home_cleaning_remove_coupon', '\App\Http\Controllers\front\Cartcontroller@home_cleaning_remove_coupon');
-Route::post('lat_summary_home_cleaning_promo_codecheck', '\App\Http\Controllers\front\Cartcontroller@lat_summary_home_cleaning_promo_codecheck');
-Route::post('last_summary_home_cleaning_remove_coupon', '\App\Http\Controllers\front\Cartcontroller@last_summary_home_cleaning_remove_coupon');
+        Route::post('add_to_cart_book', '\App\Http\Controllers\front\Cartcontroller@add_to_cart_book');
+        Route::post('cart_remove_book_now', '\App\Http\Controllers\front\Cartcontroller@cart_remove_book_now');
+        Route::post('minus-quantity-cart-remove-book-now', '\App\Http\Controllers\front\Cartcontroller@minus_quantity_cart_remove_book_now');
+        Route::post('promo_codecheck', '\App\Http\Controllers\front\Cartcontroller@promo_codecheck');
+        Route::post('remove_coupon', '\App\Http\Controllers\front\Cartcontroller@remove_coupon');
+        Route::post('lat_summary_promo_codecheck', '\App\Http\Controllers\front\Cartcontroller@lat_summary_promo_codecheck');
+        Route::post('last_summary_remove_coupon', '\App\Http\Controllers\front\Cartcontroller@last_summary_remove_coupon');
+        Route::post('promo_codecheck_home_cleaning', '\App\Http\Controllers\front\Cartcontroller@promo_codecheck_home_cleaning');
+        Route::post('home_cleaning_remove_coupon', '\App\Http\Controllers\front\Cartcontroller@home_cleaning_remove_coupon');
+        Route::post('lat_summary_home_cleaning_promo_codecheck', '\App\Http\Controllers\front\Cartcontroller@lat_summary_home_cleaning_promo_codecheck');
+        Route::post('last_summary_home_cleaning_remove_coupon', '\App\Http\Controllers\front\Cartcontroller@last_summary_home_cleaning_remove_coupon');
 
-Route::post('package_promo_check', '\App\Http\Controllers\front\Cartcontroller@package_promo_check')->name('package_promo_check');
-Route::post('home_promo_check', '\App\Http\Controllers\front\Cartcontroller@home_promo_check')->name('home_promo_check');
+        Route::post('package_promo_check', '\App\Http\Controllers\front\Cartcontroller@package_promo_check')->name('package_promo_check');
+        Route::post('home_promo_check', '\App\Http\Controllers\front\Cartcontroller@home_promo_check')->name('home_promo_check');
 
-Route::post('checkout_promo_codecheck', '\App\Http\Controllers\front\Cartcontroller@checkout_promo_codecheck');
-Route::post('checkout_remove_coupon', '\App\Http\Controllers\front\Cartcontroller@checkout_remove_coupon');
+        Route::post('checkout_promo_codecheck', '\App\Http\Controllers\front\Cartcontroller@checkout_promo_codecheck');
+        Route::post('checkout_remove_coupon', '\App\Http\Controllers\front\Cartcontroller@checkout_remove_coupon');
 
-Route::post('promo_codecheck_painting', '\App\Http\Controllers\front\Cartcontroller@promo_codecheck_painting');
+        Route::post('promo_codecheck_painting', '\App\Http\Controllers\front\Cartcontroller@promo_codecheck_painting');
 
 
 
 
 
-Route::get('/checkout', '\App\Http\Controllers\front\checkoutcontroller@checkout');
-Route::post('/order_place', '\App\Http\Controllers\front\checkoutcontroller@order_place')->name('order_place');
-Route::get('thankyou', [checkoutcontroller::class, 'thankyou'])->name("thankyou");
-Route::get('thankyou_book_now', [checkoutcontroller::class, 'thankyou_book_now'])->name("thankyou_book_now");
-Route::get('cleaning/thankyou', [checkoutcontroller::class, 'thankyou_book_now'])->name("cleaning.thankyou_book_now");
-Route::get('salon-spa-at-home/thankyou', [checkoutcontroller::class, 'thankyou_book_now'])->name("saloon_spa.thankyou_book_now");
-Route::get('handyman-maintainence/thankyou', [checkoutcontroller::class, 'thankyou_book_now'])->name("hanyman.thankyou_book_now");
-Route::get('pest-control-gardening/thankyou', [checkoutcontroller::class, 'thankyou_book_now'])->name("pest_control.thankyou_book_now");
+        Route::get('/checkout', '\App\Http\Controllers\front\checkoutcontroller@checkout');
+        Route::post('/order_place', '\App\Http\Controllers\front\checkoutcontroller@order_place')->name('order_place');
 
-Route::get('thankyou-book-now', [checkoutcontroller::class, 'thankyou_painting'])->name("thankyou-book-now");
-Route::get('success_mail_book_now', [checkoutcontroller::class, 'success_mail_book_now'])->name("success_mail_book_now");
+        Route::get('cleaning/thankyou', [checkoutcontroller::class, 'thankyou_book_now'])->name("cleaning.thankyou_book_now");
+        Route::get('salon-spa-at-home/thankyou', [checkoutcontroller::class, 'thankyou_book_now'])->name("saloon_spa.thankyou_book_now");
+        Route::get('handyman-maintainence/thankyou', [checkoutcontroller::class, 'thankyou_book_now'])->name("hanyman.thankyou_book_now");
+        Route::get('pest-control-gardening/thankyou', [checkoutcontroller::class, 'thankyou_book_now'])->name("pest_control.thankyou_book_now");
 
-Route::post('/book_now_order', '\App\Http\Controllers\front\checkoutcontroller@book_now_order')->name('book_now_order');
-Route::post('/book_now_package', '\App\Http\Controllers\front\checkoutcontroller@book_now_package')->name('book_now_package');
+        Route::get('thankyou-book-now', [checkoutcontroller::class, 'thankyou_painting'])->name("thankyou-book-now");
+        Route::get('success_mail_book_now', [checkoutcontroller::class, 'success_mail_book_now'])->name("success_mail_book_now");
 
-Route::post('/book_now_homecleaning', '\App\Http\Controllers\front\checkoutcontroller@book_now_homecleaning')->name('book_now_homecleaning');
+        Route::get('thankyou', [checkoutcontroller::class, 'thankyou'])->name("thankyou");
+        Route::get('thankyou_book_now', [checkoutcontroller::class, 'thankyou_book_now'])->name("thankyou_book_now");
 
-Route::get('success_mail_book_now_allvendor', [checkoutcontroller::class, 'success_mail_book_now_allvendor'])->name("success_mail_book_now_allvendor");
+        Route::post('/book_now_order', '\App\Http\Controllers\front\checkoutcontroller@book_now_order')->name('book_now_order');
+        Route::post('/book_now_package', '\App\Http\Controllers\front\checkoutcontroller@book_now_package')->name('book_now_package');
 
+        Route::post('/book_now_homecleaning', '\App\Http\Controllers\front\checkoutcontroller@book_now_homecleaning')->name('book_now_homecleaning');
+        Route::post('/book_now_subscription', '\App\Http\Controllers\front\checkoutcontroller@book_now_subscription')->name('book_now_subscription');
 
+        Route::get('success_mail_book_now_allvendor', [checkoutcontroller::class, 'success_mail_book_now_allvendor'])->name("success_mail_book_now_allvendor");
 
-Route::post('/book-now-garden-order', '\App\Http\Controllers\front\checkoutcontroller@book_now_garden_order')->name('book-now-garden-order');
 
-Route::get('/payment_success', '\App\Http\Controllers\front\checkoutcontroller@payment_success')->name('payment_success');
-Route::get('/payment_fail', '\App\Http\Controllers\front\checkoutcontroller@payment_fail')->name('payment_fail');
 
-// Tabby Routes
-Route::get('/tabby/success', '\App\Http\Controllers\front\TabbyController@success')->name('tabby.success');
-Route::get('/tabby/cancel', '\App\Http\Controllers\front\TabbyController@cancel')->name('tabby.cancel');
-Route::post('/tabby/webhook', '\App\Http\Controllers\front\TabbyController@webhook')->name('tabby.webhook');
+        Route::post('/book-now-garden-order', '\App\Http\Controllers\front\checkoutcontroller@book_now_garden_order')->name('book-now-garden-order');
 
-Route::post('/bill_state_change', '\App\Http\Controllers\front\checkoutcontroller@bill_state_change');
-Route::post('/ship_state_change', '\App\Http\Controllers\front\checkoutcontroller@ship_state_change');
+        Route::get('/payment_success', '\App\Http\Controllers\front\checkoutcontroller@payment_success')->name('payment_success');
+        Route::get('/payment_fail', '\App\Http\Controllers\front\checkoutcontroller@payment_fail')->name('payment_fail');
 
+        // Tabby Routes
+        Route::get('/tabby/success', '\App\Http\Controllers\front\TabbyController@success')->name('tabby.success');
+        Route::get('/tabby/cancel', '\App\Http\Controllers\front\TabbyController@cancel')->name('tabby.cancel');
+        Route::post('/tabby/webhook', '\App\Http\Controllers\front\TabbyController@webhook')->name('tabby.webhook');
 
-Route::get('/my-account', '\App\Http\Controllers\front\MyaccountController@my_account')->name('front.myaccount');
-Route::get('/my-order', '\App\Http\Controllers\front\MyaccountController@my_order')->name('front.myorder');
-Route::get('/my-profile', '\App\Http\Controllers\front\MyaccountController@my_profile')->name('front.myprofile');
-Route::get('my-wallet', '\App\Http\Controllers\front\MyaccountController@my_wallet')->name('front.mywallet');
-// Route::get('/order-detail', '\App\Http\Controllers\front\MyaccountController@order_detail');
-Route::get('/order-detail/{id}', '\App\Http\Controllers\front\MyaccountController@order_details')->name('order-detail');
-Route::get('/view-receipts/{id}', '\App\Http\Controllers\front\MyaccountController@view_receipts')->name('view-receipts');
-Route::post('/submit-review', '\App\Http\Controllers\front\MyaccountController@submitreview')->name('submit.review');
-Route::post('/update-instruction', '\App\Http\Controllers\front\MyaccountController@update_instruction')->name('update-instruction');
-Route::post('/update-address', '\App\Http\Controllers\front\MyaccountController@update_address')->name('update-address');
-Route::post('/cancel-order', '\App\Http\Controllers\front\MyaccountController@cancel_order')->name('cancel-order');
-Route::get('refer&earn', '\App\Http\Controllers\front\MyaccountController@refer_earn')->name('front.refer_earn');
-Route::get('refral', '\App\Http\Controllers\front\MyaccountController@refral')->name('front.refral');;
-Route::get('refer_and_earn/{userid}', '\App\Http\Controllers\front\MyaccountController@refer_earn_frend');
-Route::get('cancelpackage/{id}/', '\App\Http\Controllers\front\MyaccountController@cancelpackage')->name('cancelpackage');
-Route::post('/reschedule-from/{id}', '\App\Http\Controllers\front\MyaccountController@reschedule_from')->name('reschedule-from');
-Route::get('/reschedule/{id}', '\App\Http\Controllers\front\MyaccountController@reschedule')->name('reschedule');
+        Route::post('/bill_state_change', '\App\Http\Controllers\front\checkoutcontroller@bill_state_change');
+        Route::post('/ship_state_change', '\App\Http\Controllers\front\checkoutcontroller@ship_state_change');
 
-Route::get('/my-quotes', '\App\Http\Controllers\front\MyaccountController@myleads')->name('front.myleads');
-Route::get('/my-quote-detail/{type}/{id}', [\App\Http\Controllers\front\MyaccountController::class, 'myLeadDetail'])->name('front.mylead_detail');
 
-// Route::get('/my-lead-service/{id}', '\App\Http\Controllers\front\MyaccountController@myleads_service')->name('front.myleads_service');
-// Route::get('/my-lead-subservice/{serviceid}/{subserviceid}', '\App\Http\Controllers\front\MyaccountController@myleads_subservice')->name('front.myleads_subservice');
+        Route::get('/my-account', '\App\Http\Controllers\front\MyaccountController@my_account')->name('front.myaccount');
+        Route::get('/my-order', '\App\Http\Controllers\front\MyaccountController@my_order')->name('front.myorder');
+        Route::get('/my-profile', '\App\Http\Controllers\front\MyaccountController@my_profile')->name('front.myprofile');
+        Route::get('my-wallet', '\App\Http\Controllers\front\MyaccountController@my_wallet')->name('front.mywallet');
+        // Route::get('/order-detail', '\App\Http\Controllers\front\MyaccountController@order_detail');
+        Route::get('/order-detail/{id}', '\App\Http\Controllers\front\MyaccountController@order_details')->name('order-detail');
+        Route::get('/view-receipts/{id}', '\App\Http\Controllers\front\MyaccountController@view_receipts')->name('view-receipts');
+        Route::post('/submit-review', '\App\Http\Controllers\front\MyaccountController@submitreview')->name('submit.review');
+        Route::post('/update-instruction', '\App\Http\Controllers\front\MyaccountController@update_instruction')->name('update-instruction');
+        Route::post('/update-address', '\App\Http\Controllers\front\MyaccountController@update_address')->name('update-address');
+        Route::post('/cancel-order', '\App\Http\Controllers\front\MyaccountController@cancel_order')->name('cancel-order');
+        Route::post('/skip-visit', '\App\Http\Controllers\front\MyaccountController@skip_visit')->name('skip-visit');
+        Route::get('refer&earn', '\App\Http\Controllers\front\MyaccountController@refer_earn')->name('front.refer_earn');
+        Route::get('refral', '\App\Http\Controllers\front\MyaccountController@refral')->name('front.refral');;
+        Route::get('refer_and_earn/{userid}', '\App\Http\Controllers\front\MyaccountController@refer_earn_frend');
+        Route::get('cancelpackage/{id}/', '\App\Http\Controllers\front\MyaccountController@cancelpackage')->name('cancelpackage');
+        Route::post('/reschedule-from/{id}', '\App\Http\Controllers\front\MyaccountController@reschedule_from')->name('reschedule-from');
+        Route::get('/reschedule/{id}', '\App\Http\Controllers\front\MyaccountController@reschedule')->name('reschedule');
 
-Route::match(['get', 'post'], 'edit-profile', [MyaccountController::class, 'edit_profile'])->name('edit_profile');
+        Route::get('/my-quotes', '\App\Http\Controllers\front\MyaccountController@myleads')->name('front.myleads');
+        Route::get('/my-quote-detail/{type}/{id}', [\App\Http\Controllers\front\MyaccountController::class, 'myLeadDetail'])->name('front.mylead_detail');
 
-Route::get('download/{filepath}', [Packagecontroller::class, 'download']);
+        // Route::get('/my-lead-service/{id}', '\App\Http\Controllers\front\MyaccountController@myleads_service')->name('front.myleads_service');
+        // Route::get('/my-lead-subservice/{serviceid}/{subserviceid}', '\App\Http\Controllers\front\MyaccountController@myleads_subservice')->name('front.myleads_subservice');
 
+        Route::match(['get', 'post'], 'edit-profile', [MyaccountController::class, 'edit_profile'])->name('edit_profile');
 
+        Route::get('download/{filepath}', [Packagecontroller::class, 'download']);
 
-Route::get('downloads/{filename}', '\App\Http\Controllers\front\Homecontroller@downloads')->name('downloads');
 
-Route::post('/apply-wallet-dicount', '\App\Http\Controllers\front\checkoutcontroller@apply_wallet_dicount');
-Route::post('/cancel-wallet-dicount', '\App\Http\Controllers\front\checkoutcontroller@cancel_wallet_dicount');
 
-/* Pating Price Routes and Urls */
-Route::post('get-size-home-price', '\App\Http\Controllers\front\Packagecontroller@get_size_home_price');
-Route::post('get-color-painted-price', '\App\Http\Controllers\front\Packagecontroller@get_color_painted_price');
-Route::post('get-colornow-paint-price', '\App\Http\Controllers\front\Packagecontroller@get_colornow_paint_price');
-Route::post('get-home-furnished-price', '\App\Http\Controllers\front\Packagecontroller@get_home_furnished_price');
+        Route::get('downloads/{filename}', '\App\Http\Controllers\front\Homecontroller@downloads')->name('downloads');
 
-Route::get('thank-you', function () {
+        Route::post('/apply-wallet-dicount', '\App\Http\Controllers\front\checkoutcontroller@apply_wallet_dicount');
+        Route::post('/cancel-wallet-dicount', '\App\Http\Controllers\front\checkoutcontroller@cancel_wallet_dicount');
 
-    return view('front.enquiry-thankyou');
-})->name('thank-you');
+        /* Pating Price Routes and Urls */
+        Route::post('get-size-home-price', '\App\Http\Controllers\front\Packagecontroller@get_size_home_price');
+        Route::post('get-color-painted-price', '\App\Http\Controllers\front\Packagecontroller@get_color_painted_price');
+        Route::post('get-colornow-paint-price', '\App\Http\Controllers\front\Packagecontroller@get_colornow_paint_price');
+        Route::post('get-home-furnished-price', '\App\Http\Controllers\front\Packagecontroller@get_home_furnished_price');
 
+        Route::get('thank-you', function () {
 
-Route::get('auto_accept_package', 'App\Http\Controllers\admin\CronController@auto_accept_package');
+            return view('front.enquiry-thankyou');
+        })->name('thank-you');
 
-Route::get('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth')
-    ->name('logout');
 
+        Route::get('auto_accept_package', 'App\Http\Controllers\admin\CronController@auto_accept_package');
 
-Route::controller(PaymentfrontController::class)->group(function () {
-    Route::get('paymentstripe/already', 'paymentalready')->name('quotepayment.already');
-    Route::get('paymentstripe/success', 'paymentsuccess')->name('quotepayment.success');
-    Route::get('paymentstripe/cancel', 'paymentcancel')->name('quotepayment.cancel');
-    Route::get('paymentstripe/{inquiry_id}', 'paymentstripe')->name('front.paymentstripe');
+        Route::get('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
+            ->middleware('auth')
+            ->name('logout');
 
-    Route::get('paymentstorageorder/success', 'paymentstorageorder_success')->name('paymentstorageorder.success');
-    Route::get('paymentstorageorder/cancel', 'paymentstorageorder_cancel')->name('paymentstorageorder.cancel');
-    Route::get('paymentstorageorder/{order_id}', 'paymentstorageorder')->name('front.paymentstripe');
+
+        Route::controller(PaymentfrontController::class)->group(function () {
+            Route::get('paymentstripe/already', 'paymentalready')->name('quotepayment.already');
+            Route::get('paymentstripe/success', 'paymentsuccess')->name('quotepayment.success');
+            Route::get('paymentstripe/cancel', 'paymentcancel')->name('quotepayment.cancel');
+            Route::get('paymentstripe/{inquiry_id}', 'paymentstripe')->name('front.paymentstripe');
+
+            Route::get('paymentstorageorder/success', 'paymentstorageorder_success')->name('paymentstorageorder.success');
+            Route::get('paymentstorageorder/cancel', 'paymentstorageorder_cancel')->name('paymentstorageorder.cancel');
+            Route::get('paymentstorageorder/{order_id}', 'paymentstorageorder')->name('front.paymentstripe');
+        });
+
+        // Tabby dynamic installment AJAX
+        Route::post('/tabby/check-installments', [TabbyController::class, 'fetchInstallments'])->name('tabby.check_installments');
+
+        Route::controller(Croncontroller::class)->group(function () {
+
+            Route::get('/package_inquiry_vendormailcron', 'package_inquiry_vendormailcron')->name('package_inquiry_vendormailcron');
+        });
+
+        // Route::get('/testapi/{id}/{order_id}', '\App\Http\Controllers\front\checkoutcontroller@success_msg_whatsapp_allVendor')->name('package-lists');
+
+        Route::controller(Packagecontroller::class)->group(function () {
+
+            Route::get('package-lists/{page_url}', 'package_lists')->name('front.package_lists');
+        });
+
+        Route::controller(Fronthomecontroller::class)->group(function () {
+            Route::get('/debug-visits', function () {
+                return response()->json(DB::table('ci_order_visits')->orderBy('id', 'desc')->take(20)->get());
+            });
+
+            Route::get('/schema-update', function () {
+                if (!\Illuminate\Support\Facades\Schema::hasColumn('ci_order_visits', 'cleaner_id')) {
+                    \Illuminate\Support\Facades\Schema::table('ci_order_visits', function ($table) {
+                        $table->integer('cleaner_id')->nullable()->after('visit_status');
+                    });
+                    return "Column cleaner_id added.";
+                }
+                return "Column cleaner_id already exists.";
+            });
+
+            // Route::get('/package-lists/{page_url}', '\App\Http\Controllers\front\Packagecontroller@package_lists')->name('package-lists');
+
+            Route::get('/testapi', 'testwhatsapptemplate')->name('testapi');
+
+
+            Route::get('service/{page_url}', 'subservices')->name('front.subservices');
+
+
+            Route::get('/', 'index')->name('city.home');
+        });
+    });
+
+
+
+Route::post('admin/cancel_recurring_visit', '\App\Http\Controllers\admin\Ordercontroller@cancel_recurring_visit')->name('admin.cancel_recurring_visit');
+Route::post('admin/assign_visit_cleaner', '\App\Http\Controllers\admin\Ordercontroller@assign_visit_cleaner')->name('admin.assign_visit_cleaner');
+Route::post('admin/mark_visit_paid', '\App\Http\Controllers\admin\Ordercontroller@mark_visit_paid')->name('admin.mark_visit_paid');
+Route::post('cancel_recurring_visit', '\App\Http\Controllers\front\MyaccountController@cancel_recurring_visit')->name('front.cancel_recurring_visit');
+
+Route::get('/schema-update-now', function () {
+    if (!\Illuminate\Support\Facades\Schema::hasColumn('ci_order_visits', 'cleaner_id')) {
+        \Illuminate\Support\Facades\Schema::table('ci_order_visits', function ($table) {
+            $table->integer('cleaner_id')->nullable()->after('visit_status');
+        });
+        return "Column cleaner_id added.";
+    }
+    return "Column cleaner_id already exists.";
 });
 
-// Tabby dynamic installment AJAX
-Route::post('/tabby/check-installments', [TabbyController::class, 'fetchInstallments'])->name('tabby.check_installments');
-
-Route::controller(Croncontroller::class)->group(function () {
-
-    Route::get('/package_inquiry_vendormailcron', 'package_inquiry_vendormailcron')->name('package_inquiry_vendormailcron');
-});
-
-// Route::get('/testapi/{id}/{order_id}', '\App\Http\Controllers\front\checkoutcontroller@success_msg_whatsapp_allVendor')->name('package-lists');
-
-Route::controller(Packagecontroller::class)->group(function () {
-
-    Route::get('{city}/package-lists/{page_url}', 'package_lists')
-        ->where('city', '^(?!admin|login|logout).*$') // exclude reserved slugs
-        ->name('front.package_lists');
-});
-
-Route::controller(Fronthomecontroller::class)->group(function () {
-
-    // Route::get('/package-lists/{page_url}', '\App\Http\Controllers\front\Packagecontroller@package_lists')->name('package-lists');
-
-    Route::get('/testapi', 'testwhatsapptemplate')->name('testapi');
-
-
-    Route::get('{city}/service/{page_url}', 'subservices')
-        ->where('city', '^(?!admin|login|logout).*$') // exclude reserved slugs
-        ->name('front.subservices');
-
-
-    Route::get('/{city}', 'index')
-        ->where('city', '^(?!admin|login|logout).*$') // exclude "admin" from matching
-        ->name('city.home');
-});
+// General Enquiry Module
+Route::resource('admin/general-enquiries', 'App\Http\Controllers\admin\GeneralEnquiryController');
+Route::post('admin/general-enquiries/get-customer-details', 'App\Http\Controllers\admin\GeneralEnquiryController@getCustomerDetails')->name('general-enquiries.get-customer-details');
+Route::post('admin/general-enquiries/get-subservices', 'App\Http\Controllers\admin\GeneralEnquiryController@getSubServices')->name('general-enquiries.get-subservices');
+Route::post('admin/general-enquiries/check-customer-exist', 'App\Http\Controllers\admin\GeneralEnquiryController@checkCustomerExist')->name('general-enquiries.check-customer-exist');
+Route::post('admin/general-enquiries/assign', 'App\Http\Controllers\admin\GeneralEnquiryController@assignSalesperson')->name('general-enquiries.assign');
 
 require __DIR__ . '/auth.php';

@@ -71,36 +71,34 @@
 
                                 {{-- <div class="form-group">
 
-                                    <label for="name">Group</label>
+                                <label for="name">Group</label>
 
-                                    <select name="group_id" id="group_id" class="form-control">
+                                <select name="group_id" id="group_id" class="form-control">
 
-                                        <option value=""> Select Group</option>
+                                    <option value=""> Select Group</option>
 
-                                        @foreach ($all_group as $all_group_data)
+                                    @foreach ($all_group as $all_group_data)
 
-                                            <option value="{{ $all_group_data['id'] }}"
+                                    <option value="{{ $all_group_data['id'] }}" @if ($all_group_data['id'] == $service->group_id) {{ 'selected' }} @endif>
 
-                                                @if ($all_group_data['id'] == $service->group_id) {{ 'selected' }} @endif>
+                                        {{ $all_group_data['name'] }}</option>
 
-                                                {{ $all_group_data['name'] }}</option>
+                                    @endforeach
 
-                                        @endforeach
+                                </select>
 
-                                    </select>
-
-                                </div> --}}
+                            </div> --}}
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="country">Country</label>
                                         <select class="form-control" id="country" name="country[]"
                                             onchange="city_change($(this).val())" multiple="multiple">
                                             <option value="">Select Country</option>
-                                            @php $countryArray = explode(',',$service->country); @endphp
-                                            @foreach ($country_data as $country)
+                                            @php $countryArray = explode(',', $service->country); @endphp@foreach ($country_data as $country)
                                                 <option value="{{ $country->id }}"
                                                     {{ in_array($country->id, $countryArray) ? 'selected' : '' }}>
-                                                    {{ $country->country }}</option>
+                                                    {{ $country->country }}
+                                                </option>
                                             @endforeach
                                         </select>
                                         <p class="form-error-text" id="country_error" style="color: red; margin-top: 10px;">
@@ -114,12 +112,13 @@
                                             <select class="form-control" id="city" name="city[]" multiple="multiple">
                                                 <option value="">Select City</option>
                                                 @if ($allcity != '' && count($allcity) > 0)
-                                                    @php $cityname = explode(',',$service->city); @endphp
+                                                    @php $cityname = explode(',', $service->city); @endphp
 
                                                     @foreach ($allcity as $city)
                                                         <option value="{{ $city->id }}"
                                                             {{ in_array($city->id, $cityname) ? 'selected' : '' }}>
-                                                            {{ $city->name }}</option>
+                                                            {{ $city->name }}
+                                                        </option>
                                                     @endforeach
                                                 @endif
                                             </select>
@@ -218,7 +217,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
                                     <div class="form-group">
 
                                         <label for="name">Home Icon </label>
@@ -235,42 +234,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4">
-
-                                    <div class="form-group">
-
-                                        <label for="name">Home Banner (1350px x 440px)</label>
-
-                                        <input id="image" name="image" type="file" class="form-control"
-                                            value="" />
-                                        @if ($service->image != '')
-                                            <img src="{{ asset('public/upload/service/large/' . $service->image) }}"
-                                                style=" width: 10%;margin-top: 10px;" />
-                                        @endif
-                                        <p class="form-error-text" id="image_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-
-                                        <label for="banner">Home Mobile Banner (400px x 475px)</label>
-
-                                        <input id="banner" name="banner" type="file" class="form-control"
-                                            value="" />
-                                        @if ($service->banner != '')
-                                            <img src="{{ asset('public/upload/service/banner/large/' . $service->banner) }}"
-                                                style=" width: 10%;margin-top: 10px;" />
-                                        @endif
-                                        <p class="form-error-text" id="banner_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
                                     <div class="form-group">
 
                                         <label for="name">Home Icon Alt tag</label>
@@ -284,7 +248,26 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
+
+                                    <div class="form-group">
+
+                                        <label for="name">Home Banner (1350px x 440px)</label>
+
+                                        <input id="image" name="image" type="file" class="form-control"
+                                            value="" />
+                                        @if ($service->image != '')
+                                            <img src="{{ asset('public/upload/service/large/' . $service->image) }}"
+                                                style=" width: 10%;margin-top: 10px;" />
+                                        @endif
+                                        <p class="form-error-text" id="image_error"
+                                            style="color: red; margin-top: 10px;">
+                                        </p>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
                                     <div class="form-group">
 
                                         <label for="name">Home Banner Alt tag</label>
@@ -298,7 +281,29 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+
+                                        <label for="banner">Home Mobile Banner (400px x 475px)</label>
+
+                                        <input id="banner" name="banner" type="file" class="form-control"
+                                            value="" />
+                                        @if ($service->banner != '')
+                                            <img src="{{ asset('public/upload/service/banner/large/' . $service->banner) }}"
+                                                style=" width: 10%;margin-top: 10px;" />
+                                        @endif
+                                        <p class="form-error-text" id="banner_error"
+                                            style="color: red; margin-top: 10px;">
+                                        </p>
+
+                                    </div>
+                                </div>
+
+
+
+
+
+                                <div class="col-lg-6">
                                     <div class="form-group">
 
                                         <label for="name">Home Mobile Banner Alt tag</label>
@@ -313,15 +318,48 @@
                                     </div>
                                 </div>
 
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+
+                                        <label for="name">App Icon </label>
+
+                                        <input id="app_icon" name="app_icon" type="file" class="form-control"
+                                            value="" />
+                                        @if ($service->app_icon != '')
+                                            <img src="{{ asset('public/upload/service/' . $service->app_icon) }}"
+                                                style=" width: 10%;margin-top: 10px;" />
+                                        @endif
+                                        <p class="form-error-text" id="app_icon_error"
+                                            style="color: red; margin-top: 10px;"></p>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+
+                                        <label for="name">App Icon Alt tag</label>
+
+                                        <input id="appicon_alt_tag" name="appicon_alt_tag" type="text"
+                                            class="form-control" value="{{ $service->appicon_alt_tag }}"
+                                            placeholder="App Icon Alt tag" />
+                                        <p class="form-error-text" id="appicon_alt_tag_error"
+                                            style="color: red; margin-top: 10px;"></p>
+
+                                    </div>
+                                </div>
+
                                 {{-- <div class="form-group">
 
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Top Description</label>
+                                <label for="description" style="margin:15px 0 5px 0px; width:100%;">Top
+                                    Description</label>
 
-                                    <textarea id="top_description" name="top_description" class="form-control" placeholder="Enter Top Description">
+                                <textarea id="top_description" name="top_description" class="form-control"
+                                    placeholder="Enter Top Description">
                                         {{$service->top_description}}
                                     </textarea>
 
-                                </div> --}}
+                            </div> --}}
 
                                 <div class="col-lg-6">
                                     <div class="form-group">
@@ -362,7 +400,7 @@
                                             multiple="multiple">
                                             <option value="">Select Form Fields</option>
                                             @if ($form_field_data != '' && count($form_field_data) > 0)
-                                                @php $mucraft = explode(',',$service->form_fields); @endphp
+                                                @php $mucraft = explode(',', $service->form_fields); @endphp
                                                 @foreach ($form_field_data as $form_field)
                                                     <option value="{{ $form_field->id }}"
                                                         {{ in_array($form_field->id, $mucraft) ? 'selected' : '' }}>
@@ -383,7 +421,7 @@
                                             multiple="multiple">
                                             <option value="">Select Form Fields</option>
                                             @if ($form_field_data != '' && count($form_field_data) > 0)
-                                                @php $mucraft = explode(',',$service->form_fields_two); @endphp
+                                                @php $mucraft = explode(',', $service->form_fields_two); @endphp
                                                 @foreach ($form_field_data as $form_field)
                                                     <option value="{{ $form_field->id }}"
                                                         {{ in_array($form_field->id, $mucraft) ? 'selected' : '' }}>
@@ -476,8 +514,8 @@
                                                         name="city_addmore_top_descriptionu[]">
                                                         <option value="">Select City</option>
                                                         @foreach ($allcity as $data)
-                                                            <option
-                                                                value="{{ $data->id }}"@if ($data->id == $service_top_description_attr[$i]->city) selected @endif>
+                                                            <option value="{{ $data->id }}"
+                                                                @if ($data->id == $service_top_description_attr[$i]->city) selected @endif>
                                                                 {{ $data->name }}
                                                             </option>
                                                         @endforeach
@@ -634,7 +672,7 @@
 
                                                     <input id="mobile_banner_image_addmore"
                                                         name="mobile_banner_image_addmoreu[]" type="file"
-                                                        class="form-control"value="" />
+                                                        class="form-control" value="" />
                                                     <img src="{{ url('public/upload/service/banner_attr/large/' . $banner_attribute_data[$i]->mobile_banner_image) }}"
                                                         style="width:35%;">
                                                     <p class="form-error-text" id="mobile_banner_image_error"
@@ -644,9 +682,8 @@
                                             </div>
                                             <div class="col-md-5">
                                                 <div class="form-group"> <label for="categoryname">Description</label>
-                                                    {{-- <input type="text" id="description_addmore1"
-                                                    name="description_addmore1[]" class="form-control"
-                                                    placeholder="Enter Description"> --}}
+                                                    {{-- <input type="text" id="description_addmore1" name="description_addmore1[]"
+                                                    class="form-control" placeholder="Enter Description"> --}}
                                                     <textarea id="description_addmoreu_{{ $banner_attribute_data[$i]->id }}" name="description_addmore_banneru[]"
                                                         class="form-control" placeholder="Enter Description">{{ $banner_attribute_data[$i]->short_description }}</textarea>
 
@@ -732,7 +769,8 @@
                                         <button
                                             style="border: medium none;margin-right: 0px;line-height: 25px;margin-top: -62px;"
                                             class="submit btn bg-purple pull-right" type="button"
-                                            id="add_field_button">Add More </button>
+                                            id="add_field_button">Add
+                                            More </button>
                                     </div>
                                 </div>
 
@@ -805,9 +843,8 @@
                                             </div>
                                             <div class="col-md-5">
                                                 <div class="form-group"> <label for="categoryname">Description</label>
-                                                    {{-- <input type="text" id="description_addmore1"
-                                                    name="description_addmore1[]" class="form-control"
-                                                    placeholder="Enter Description"> --}}
+                                                    {{-- <input type="text" id="description_addmore1" name="description_addmore1[]"
+                                                    class="form-control" placeholder="Enter Description"> --}}
                                                     <textarea id="description_addmoreu_{{ $package_attribute_data[$i]->id }}" name="description_addmoreu[]"
                                                         class="form-control" placeholder="Enter Description">{{ $package_attribute_data[$i]->description_addmore }}</textarea>
 
@@ -866,9 +903,8 @@
                                         </div>
                                         <div class="col-md-5">
                                             <div class="form-group"> <label for="categoryname">Description</label>
-                                                {{-- <input type="text" id="description_addmore1"
-                                                    name="description_addmore1[]" class="form-control"
-                                                    placeholder="Enter Description"> --}}
+                                                {{-- <input type="text" id="description_addmore1" name="description_addmore1[]"
+                                                class="form-control" placeholder="Enter Description"> --}}
                                                 <textarea id="description_addmore1" name="description_addmore1[]" class="form-control"
                                                     placeholder="Enter Description"></textarea>
 
@@ -943,8 +979,8 @@
                                                         name="city_addmore_thirdu[]">
                                                         <option value="">Select City</option>
                                                         @foreach ($allcity as $data)
-                                                            <option
-                                                                value="{{ $data->id }}"@if ($data->id == $service_contains_data[$i]->city) selected @endif>
+                                                            <option value="{{ $data->id }}"
+                                                                @if ($data->id == $service_contains_data[$i]->city) selected @endif>
                                                                 {{ $data->name }}
                                                             </option>
                                                         @endforeach

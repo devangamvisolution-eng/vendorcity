@@ -105,7 +105,7 @@ class checkoutcontroller extends Controller
 
         $front_wallet_amount = $wallet_plus_amount - $wallet_minus_amount;
 
-        $order_total =  session('order_total');
+        $order_total = session('order_total');
 
         if ($request->apply_button == 1) {
 
@@ -150,15 +150,15 @@ class checkoutcontroller extends Controller
                 }
 
                 $wallet_content = [
-                    'userid'              => $userid,
-                    'refer_id'             => $userid,
-                    'order_currency'       => 'AED',
-                    'order_total'          => $order_total_new,
-                    'system_percentage'    => '',
-                    'wallet_amount'        => $coupon_discounted,
-                    'added_from'           => 0,
-                    'order_id'             => $order_number,
-                    'added_date'           => date('Y-m-d'),
+                    'userid' => $userid,
+                    'refer_id' => $userid,
+                    'order_currency' => 'AED',
+                    'order_total' => $order_total_new,
+                    'system_percentage' => '',
+                    'wallet_amount' => $coupon_discounted,
+                    'added_from' => 0,
+                    'order_id' => $order_number,
+                    'added_date' => date('Y-m-d'),
                 ];
                 DB::table('front_user_wallet')->insertGetId($wallet_content);
 
@@ -220,29 +220,29 @@ class checkoutcontroller extends Controller
         );
 
         $content = array(
-            'user_id'               => $userid,
-            'order_number'          => $order_number,
-            'order_total'           => $order_total_new,
-            'front_wallet_amount'   => $front_wallet_amount_new,
-            'shippingcost'          => session('shippingcahrge'),
-            'vatcharge'             => session('vatcharge'),
-            'order_currency'        => 'AED',
-            'order_status'          => $order_status,
-            'paymentmode'           => $paymentmode,
-            'payment_status'        => $payment_status,
-            'created_at'            => date('Y-m-d H:i:s'),
-            'coupan_to_wallet'      => $coupan_to_wallet,
-            'coupondiscount'        => $coupon_discounted,
-            'coupon_code'           => $coupan_code_name,
-            'moving_date'           => $request->moving_date,
+            'user_id' => $userid,
+            'order_number' => $order_number,
+            'order_total' => $order_total_new,
+            'front_wallet_amount' => $front_wallet_amount_new,
+            'shippingcost' => session('shippingcahrge'),
+            'vatcharge' => session('vatcharge'),
+            'order_currency' => 'AED',
+            'order_status' => $order_status,
+            'paymentmode' => $paymentmode,
+            'payment_status' => $payment_status,
+            'created_at' => date('Y-m-d H:i:s'),
+            'coupan_to_wallet' => $coupan_to_wallet,
+            'coupondiscount' => $coupon_discounted,
+            'coupon_code' => $coupan_code_name,
+            'moving_date' => $request->moving_date,
             //'ip_address'            => $_SERVER['REMOTE_ADDR'],
-            'list_order_status'     => $list_order_status,
-            'sub_total'             => $subtotal,
-            'format_order_id'       => $formatOrderId,
-            'subservice_code'       => $subserviceCode,
-            'city_code'             => $cityCode,
-            'order_year'            => $year,
-            'sequence_no'           => $nextSequence,
+            'list_order_status' => $list_order_status,
+            'sub_total' => $subtotal,
+            'format_order_id' => $formatOrderId,
+            'subservice_code' => $subserviceCode,
+            'city_code' => $cityCode,
+            'order_year' => $year,
+            'sequence_no' => $nextSequence,
         );
 
         $arrOrderId = DB::table('ci_orders')->insertGetId($content);
@@ -264,48 +264,160 @@ class checkoutcontroller extends Controller
         foreach (\Cart::content() as $arrRowDeailts) {
 
             $arrData = array(
-                'order_id'                        => $arrOrderId,
-                'user_info_id'                    => $userid,
-                'package_id'                      => $arrRowDeailts->id,
-                'package_item_name'               => $arrRowDeailts->name,
-                'package_quantity'                => $arrRowDeailts->qty,
-                'package_item_price'              => $arrRowDeailts->price,
-                'service_id'                      => $arrRowDeailts->options->service_id,
-                'service_name'                    => $arrRowDeailts->options->service_name,
-                'subservice_id'                   => $arrRowDeailts->options->subservice_id,
-                'subservice_name'                 => $arrRowDeailts->options->subservice_name,
-                'packagecategory_id'              => $arrRowDeailts->options->packagecategory_id,
-                'packagecategory_name'            => $arrRowDeailts->options->packagecategory_name,
-                'page_url'                        => $arrRowDeailts->options->page_url,
-                'image'                           => $arrRowDeailts->options->image,
-                'discount'                        => $arrRowDeailts->options->discount,
-                'discount_type'                   => $arrRowDeailts->options->discount_type,
-                'product_discount_amount'         => round($arrRowDeailts->options->product_discount_amount),
-                'cdate'                           => date('Y-m-d'),
-                'subservice_booking_percentage'   => $arrRowDeailts->options->subservice_booking_percentage,
-                'bookingdate'   => $booking_date,
-                'month'   => $monthName,
-                'bookingyear'   => $year,
-                'time_slot'   => $request->time_slot,
-                'origin_add'   => $request->origin_add,
-                'origin_country'   => $request->origin_country,
-                'origin_state'   => $request->origin_state,
-                'origin_city'   => $request->origin_city,
-                'origin_location'   => $request->origin_location,
-                'origin_zip_post'   => $request->origin_zip_post,
-                'desti_add'   => $request->desti_add,
-                'desti_country'   => $request->desti_country,
-                'desti_state'   => $request->desti_state,
-                'desti_city'   => $request->desti_city,
-                'desti_location'   => $request->desti_location,
-                'desti_zip_post'   => $request->desti_zip_post,
-                'any_special_instruction'   => $request->additional_message,
+                'order_id' => $arrOrderId,
+                'user_info_id' => $userid,
+                'package_id' => $arrRowDeailts->id,
+                'package_item_name' => $arrRowDeailts->name,
+                'package_quantity' => $arrRowDeailts->qty,
+                'package_item_price' => $arrRowDeailts->price,
+                'service_id' => $arrRowDeailts->options->service_id,
+                'service_name' => $arrRowDeailts->options->service_name,
+                'subservice_id' => $arrRowDeailts->options->subservice_id,
+                'subservice_name' => $arrRowDeailts->options->subservice_name,
+                'packagecategory_id' => $arrRowDeailts->options->packagecategory_id,
+                'packagecategory_name' => $arrRowDeailts->options->packagecategory_name,
+                'page_url' => $arrRowDeailts->options->page_url,
+                'image' => $arrRowDeailts->options->image,
+                'discount' => $arrRowDeailts->options->discount,
+                'discount_type' => $arrRowDeailts->options->discount_type,
+                'product_discount_amount' => round($arrRowDeailts->options->product_discount_amount),
+                'cdate' => date('Y-m-d'),
+                'subservice_booking_percentage' => $arrRowDeailts->options->subservice_booking_percentage,
+                'bookingdate' => $booking_date,
+                'month' => $monthName,
+                'bookingyear' => $year,
+                'time_slot' => $request->time_slot,
+                'origin_add' => $request->origin_add,
+                'origin_country' => $request->origin_country,
+                'origin_state' => $request->origin_state,
+                'origin_city' => $request->origin_city,
+                'origin_location' => $request->origin_location,
+                'origin_zip_post' => $request->origin_zip_post,
+                'desti_add' => $request->desti_add,
+                'desti_country' => $request->desti_country,
+                'desti_state' => $request->desti_state,
+                'desti_city' => $request->desti_city,
+                'desti_location' => $request->desti_location,
+                'desti_zip_post' => $request->desti_zip_post,
+                'any_special_instruction' => $request->additional_message,
 
             );
 
 
             DB::table('ci_order_item')->insertGetId($arrData);
+
+            $pendingLeadId = Session::get('booknow_pending_lead_id');
+            if ($pendingLeadId) {
+                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                    'status' => 'Booked',
+                    'updated_at' => now(),
+                ]);
+                Session::forget('booknow_pending_lead_id');
+            } else {
+                $pendingLeadId = Session::get('booknow_pending_lead_id');
+                if ($pendingLeadId) {
+                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                        'status' => 'Booked',
+                        'updated_at' => now(),
+                    ]);
+                    Session::forget('booknow_pending_lead_id');
+                } else {
+                    $pendingLeadId = Session::get('booknow_pending_lead_id');
+                    if ($pendingLeadId) {
+                        DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                            'status' => 'Booked',
+                            'updated_at' => now(),
+                        ]);
+                        Session::forget('booknow_pending_lead_id');
+                    } else {
+                        $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                        $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
+
+                        $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
+                        $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
+                        $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
+                        $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
+                        if ($pastOrders > 0 && $repeatedSourceId) {
+                            $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+                        } else {
+                            $sourceLeadId = $sourceWebsiteId;
+                        }
+
+                        $salespersonId = null;
+                        if ($pastOrders > 0) {
+                            $lastOrder = DB::table('ci_orders')
+                                ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+                                ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
+                                ->whereNotNull('ci_order_item.salesperson_id')
+                                ->orderBy('ci_orders.order_id', 'desc')
+                                ->select('ci_order_item.salesperson_id')
+                                ->first();
+                            if ($lastOrder) {
+                                $salespersonId = $lastOrder->salesperson_id;
+                            }
+                        }
+
+                        DB::table('general_enquiries')->insert([
+                            'salesperson_id' => $salespersonId,
+                            'customer_id' => $arrData['user_info_id'] ?? null,
+                            'customer_name' => $customerInfo ? $customerInfo->name : null,
+                            'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
+                            'customer_email' => $customerInfo ? $customerInfo->email : null,
+                            'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                            'service_id' => $arrData['service_id'] ?? null,
+                            'subservice_id' => $arrData['subservice_id'] ?? null,
+                            'source_lead_id' => $sourceLeadId,
+                            'status' => 'Booked',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
         }
+
+        // --- START: RECURRING BOOKING GENERATION LOGIC ---
+        // Assuming $request->frequency contains 'weekly', 'multiple' etc.
+        $frequency = $request->frequency ?? 'weekly'; // TODO: Update to actual frontend frequency field
+
+        if (!empty($frequency) && $frequency != 'one-time') {
+            $visits = [];
+            $currentDate = \Carbon\Carbon::parse($request->moving_date);
+
+            for ($i = 0; $i < 4; $i++) { // Generates first 4 visits
+                if ($frequency == 'weekly') {
+                    $visitDate = $currentDate->copy()->addWeeks($i)->format('Y-m-d');
+                } elseif ($frequency == 'bi-weekly') {
+                    $visitDate = $currentDate->copy()->addWeeks($i * 2)->format('Y-m-d');
+                } else {
+                    $visitDate = $currentDate->copy()->addDays($i * 7)->format('Y-m-d');
+                }
+
+                // Payment status logic
+                if ($paymentmode == 3) {
+                    $v_payment_status = 'paid'; // Tabby
+                } elseif ($paymentmode == 1) {
+                    $v_payment_status = 'pending'; // COD
+                } else {
+                    $v_payment_status = ($i == 0) ? 'paid' : 'pending'; // Stripe
+                }
+
+                $visits[] = [
+                    'order_id' => $formatOrderId,
+                    'visit_date' => $visitDate,
+                    'visit_time' => $request->time_slot ?? null,
+                    'payment_status' => $v_payment_status,
+                    'visit_status' => 'upcoming',
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+
+            if (count($visits) > 0) {
+                DB::table('ci_order_visits')->insert($visits);
+            }
+        }
+        // --- END: RECURRING BOOKING GENERATION LOGIC ---
 
         if ($request->fname != '') {
             $data['first_name'] = $request->fname;
@@ -338,28 +450,28 @@ class checkoutcontroller extends Controller
                     // $Pending_data = $userWalletamount - $walletdiscount;
 
                     $walletData = array(
-                        'userid'          => 0,
-                        'refer_id'        => $userid,
-                        'order_currency'  => 'AED',
-                        'order_total'     => session('order_total'),
-                        'wallet_amount'   => $walletdiscount,
-                        'added_from'      => 1,
-                        'order_id'        => $arrOrderId,
-                        'added_date'      => date('Y-m-d'),
+                        'userid' => 0,
+                        'refer_id' => $userid,
+                        'order_currency' => 'AED',
+                        'order_total' => session('order_total'),
+                        'wallet_amount' => $walletdiscount,
+                        'added_from' => 1,
+                        'order_id' => $arrOrderId,
+                        'added_date' => date('Y-m-d'),
                     );
 
                     DB::table('front_user_wallet')->insertGetId($walletData);
                 } else {
 
                     $walletData = array(
-                        'userid'          => 0,
-                        'refer_id'        => $userid,
-                        'order_currency'  => 'AED',
-                        'order_total'     => session('order_total'),
-                        'wallet_amount'   => $userWalletamount,
-                        'added_from'      => 1,
-                        'order_id'        => $arrOrderId,
-                        'added_date'      => date('Y-m-d'),
+                        'userid' => 0,
+                        'refer_id' => $userid,
+                        'order_currency' => 'AED',
+                        'order_total' => session('order_total'),
+                        'wallet_amount' => $userWalletamount,
+                        'added_from' => 1,
+                        'order_id' => $arrOrderId,
+                        'added_date' => date('Y-m-d'),
                     );
 
                     DB::table('front_user_wallet')->insertGetId($walletData);
@@ -371,7 +483,7 @@ class checkoutcontroller extends Controller
             $success = $this->success_mail();
             if ($success) {
                 // Redirect to the 'thankyou' route
-                return redirect('thankyou');
+                return redirect(route('thankyou_book_now'));
             }
         } else {
 
@@ -541,15 +653,15 @@ class checkoutcontroller extends Controller
                         }
 
                         $wallet_content = [
-                            'userid'              => $userid,
-                            'refer_id'             => $userid,
-                            'order_currency'       => 'AED',
-                            'order_total'          => $order_total_new,
-                            'system_percentage'    => '',
-                            'wallet_amount'        => $coupon_discounted,
-                            'added_from'           => 0,
-                            'order_id'             => $order_number,
-                            'added_date'           => date('Y-m-d'),
+                            'userid' => $userid,
+                            'refer_id' => $userid,
+                            'order_currency' => 'AED',
+                            'order_total' => $order_total_new,
+                            'system_percentage' => '',
+                            'wallet_amount' => $coupon_discounted,
+                            'added_from' => 0,
+                            'order_id' => $order_number,
+                            'added_date' => date('Y-m-d'),
                         ];
                         DB::table('front_user_wallet')->insertGetId($wallet_content);
 
@@ -570,29 +682,29 @@ class checkoutcontroller extends Controller
                 $timing_charger = $request->timing_charge + $request->weekly_off_charge;
 
                 $content = array(
-                    'user_id'               => $userid,
-                    'order_number'          => $order_number,
-                    'order_total'           => $order_total_new,
-                    'front_wallet_amount'   => $front_wallet_amount_new,
-                    'vatcharge'             => $vat_total,
-                    'order_currency'        => 'AED',
-                    'order_status'          => $order_status,
-                    'paymentmode'           => $paymentmode,
-                    'payment_status'        => $payment_status,
-                    'created_at'            => date('Y-m-d H:i:s'),
-                    'coupan_to_wallet'     => $coupan_to_wallet,
-                    'coupondiscount'     => $coupon_discounted,
-                    'coupon_code'     => $coupan_code_name,
-                    'list_order_status'     => $list_order_status,
-                    'service_charge'     => $request->service_charge,
-                    'promo_discount'     => $request->promo_discount,
-                    'cleaning_discount_additional'     => $request->cleaning_discount_additional,
-                    'timing_charge'     => $timing_charger,
-                    'additional_charge'     => $request->additional_charge,
-                    'sub_total'     => $request->sub_total,
-                    'cod_charge'     => $request->cod_charge,
-                    'service_fee'     => $request->service_fee,
-                    'order_from'     => $order_from,
+                    'user_id' => $userid,
+                    'order_number' => $order_number,
+                    'order_total' => $order_total_new,
+                    'front_wallet_amount' => $front_wallet_amount_new,
+                    'vatcharge' => $vat_total,
+                    'order_currency' => 'AED',
+                    'order_status' => $order_status,
+                    'paymentmode' => $paymentmode,
+                    'payment_status' => $payment_status,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'coupan_to_wallet' => $coupan_to_wallet,
+                    'coupondiscount' => $coupon_discounted,
+                    'coupon_code' => $coupan_code_name,
+                    'list_order_status' => $list_order_status,
+                    'service_charge' => $request->service_charge,
+                    'promo_discount' => $request->promo_discount,
+                    'cleaning_discount_additional' => $request->cleaning_discount_additional,
+                    'timing_charge' => $timing_charger,
+                    'additional_charge' => $request->additional_charge,
+                    'sub_total' => $request->sub_total,
+                    'cod_charge' => $request->cod_charge,
+                    'service_fee' => $request->service_fee,
+                    'order_from' => $order_from,
                 );
             }
 
@@ -638,27 +750,27 @@ class checkoutcontroller extends Controller
                 $order_from = 2; // booking form data
 
                 $content = array(
-                    'user_id'               => $userid,
-                    'order_number'          => $order_number,
-                    'front_wallet_amount'   => $front_wallet_amount_new,
-                    'order_total'           => $order_total_new,
-                    'vatcharge'             => $vat_total,
-                    'order_currency'        => 'AED',
-                    'order_status'          => $order_status,
-                    'paymentmode'           => $paymentmode,
-                    'payment_status'        => $payment_status,
-                    'created_at'            => date('Y-m-d H:i:s'),
+                    'user_id' => $userid,
+                    'order_number' => $order_number,
+                    'front_wallet_amount' => $front_wallet_amount_new,
+                    'order_total' => $order_total_new,
+                    'vatcharge' => $vat_total,
+                    'order_currency' => 'AED',
+                    'order_status' => $order_status,
+                    'paymentmode' => $paymentmode,
+                    'payment_status' => $payment_status,
+                    'created_at' => date('Y-m-d H:i:s'),
                     //'ip_address'            => $_SERVER['REMOTE_ADDR'],
-                    'list_order_status'     => $list_order_status,
-                    'service_charge'     => $request->size_of_home_price,
-                    'promo_discount'     => $request->hidden_discount_price,
-                    'cleaning_discount_additional'     => '',
-                    'timing_charge'     => $request->timing_charge,
-                    'additional_charge'     => $request->additional_charge_price,
-                    'sub_total'     => $request->hidden_subtotal_price,
-                    'cod_charge'     => $request->cod_charge_new ?: "",
-                    'service_fee'     => $request->service_fee,
-                    'order_from'     => $order_from,
+                    'list_order_status' => $list_order_status,
+                    'service_charge' => $request->size_of_home_price,
+                    'promo_discount' => $request->hidden_discount_price,
+                    'cleaning_discount_additional' => '',
+                    'timing_charge' => $request->timing_charge,
+                    'additional_charge' => $request->additional_charge_price,
+                    'sub_total' => $request->hidden_subtotal_price,
+                    'cod_charge' => $request->cod_charge_new ?: "",
+                    'service_fee' => $request->service_fee,
+                    'order_from' => $order_from,
                 );
             }
 
@@ -760,28 +872,28 @@ class checkoutcontroller extends Controller
                 }
 
                 $arrData = array(
-                    'order_id'                             => $arrOrderId,
-                    'user_info_id'                         => $userid,
-                    'cleaner_id'                           => $request->cleaner_id,
-                    'service_id'                           => $request->service_id,
-                    'subservice_id'                        => $request->subservice_id,
-                    'how_many_cleaners_do_you_need'        => $request->how_many_cleaners_do_you_need,
-                    'how_many_hours_should_they_stay'      => $request->how_many_hours_should_they_stay,
-                    'how_often_do_you_need_cleaning'       => $request->how_often_do_you_need_cleaning,
-                    'do_you_need_cleaning_material'        => $request->do_you_need_cleaning_material,
-                    'any_special_instruction'              => $request->any_special_instruction,
-                    'address_type'                         => $request->address_type,
-                    'city'                                 => $request->city,
-                    'area'                                 => $request->area,
-                    'building_street_no'                   => $request->building_street_no,
-                    'apartment_villa_no'                   => $request->apartment_villa_no,
-                    'bookingdate'                          => $request->date,
-                    'bookingyear'                          => date('Y'),
-                    'month'                                => $request->month,
-                    'time_slot'                            => $request->time_slot,
-                    'end_date'                            => $end_date,
+                    'order_id' => $arrOrderId,
+                    'user_info_id' => $userid,
+                    'cleaner_id' => $request->cleaner_id,
+                    'service_id' => $request->service_id,
+                    'subservice_id' => $request->subservice_id,
+                    'how_many_cleaners_do_you_need' => $request->how_many_cleaners_do_you_need,
+                    'how_many_hours_should_they_stay' => $request->how_many_hours_should_they_stay,
+                    'how_often_do_you_need_cleaning' => $request->how_often_do_you_need_cleaning,
+                    'do_you_need_cleaning_material' => $request->do_you_need_cleaning_material,
+                    'any_special_instruction' => $request->any_special_instruction,
+                    'address_type' => $request->address_type,
+                    'city' => $request->city,
+                    'area' => $request->area,
+                    'building_street_no' => $request->building_street_no,
+                    'apartment_villa_no' => $request->apartment_villa_no,
+                    'bookingdate' => $request->date,
+                    'bookingyear' => date('Y'),
+                    'month' => $request->month,
+                    'time_slot' => $request->time_slot,
+                    'end_date' => $end_date,
                     'which_day_of_the_week_do_you_want_the_service' => $which_day_of_the_week_do_you_want_the_service,
-                    'cdate'                                => date('Y-m-d'),
+                    'cdate' => date('Y-m-d'),
                 );
             }
 
@@ -799,38 +911,196 @@ class checkoutcontroller extends Controller
 
                 $formatted_date = sprintf('%04d-%02d-%02d', date('Y'), $monthNumber, $request->date);
                 $arrData = array(
-                    'order_id'                             => $arrOrderId,
-                    'user_info_id'                         => $userid,
-                    'service_id'                           => $request->service_id,
-                    'subservice_id'                        => $request->subservice_id,
-                    'address_type'                         => $request->address_type,
-                    'city'                                 => $request->city,
-                    'area'                                 => $request->area,
-                    'building_street_no'                   => $request->building_street_no,
-                    'apartment_villa_no'                   => $request->apartment_villa_no,
-                    'bookingdate'                          => $request->date,
-                    'bookingyear'                          => date('Y'),
-                    'month'                                => $request->month,
-                    'end_date'                            => $formatted_date,
-                    'time_slot'                            => $request->time_slot,
-                    'type_of_painting'                     => $request->type_of_painting,
-                    'selected_type_home'                   => $request->selected_type_home,
-                    'selected_size_home'                   => $request->selected_size_home,
-                    'service_charge_price'                 => $request->size_of_home_price,
-                    'color_you_want_painted_price'         => $request->color_you_want_painted_price,
-                    'walls_now_price'                      => $request->color_your_walls_now_price,
-                    'you_want_paint_color'                 => $request->selected_you_want_color_name,
-                    'your_walls_now_color'                 => $request->selected_your_walls_now_name,
-                    'is_home_furnished'                    => $isYourHomeFurnished,
-                    'no_of_ceilings'                       => $request->no_of_ceilings ?: "",
-                    'describe_painting_service'            => $request->describe_painting_service ?: "",
-                    'cdate'                                => date('Y-m-d'),
+                    'order_id' => $arrOrderId,
+                    'user_info_id' => $userid,
+                    'service_id' => $request->service_id,
+                    'subservice_id' => $request->subservice_id,
+                    'address_type' => $request->address_type,
+                    'city' => $request->city,
+                    'area' => $request->area,
+                    'building_street_no' => $request->building_street_no,
+                    'apartment_villa_no' => $request->apartment_villa_no,
+                    'bookingdate' => $request->date,
+                    'bookingyear' => date('Y'),
+                    'month' => $request->month,
+                    'end_date' => $formatted_date,
+                    'time_slot' => $request->time_slot,
+                    'type_of_painting' => $request->type_of_painting,
+                    'selected_type_home' => $request->selected_type_home,
+                    'selected_size_home' => $request->selected_size_home,
+                    'service_charge_price' => $request->size_of_home_price,
+                    'color_you_want_painted_price' => $request->color_you_want_painted_price,
+                    'walls_now_price' => $request->color_your_walls_now_price,
+                    'you_want_paint_color' => $request->selected_you_want_color_name,
+                    'your_walls_now_color' => $request->selected_your_walls_now_name,
+                    'is_home_furnished' => $isYourHomeFurnished,
+                    'no_of_ceilings' => $request->no_of_ceilings ?: "",
+                    'describe_painting_service' => $request->describe_painting_service ?: "",
+                    'cdate' => date('Y-m-d'),
                 );
             }
 
             $order_item_id = DB::table('ci_order_item')->insertGetId($arrData);
 
+            $pendingLeadId = Session::get('booknow_pending_lead_id');
+            if ($pendingLeadId) {
+                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                    'status' => 'Booked',
+                    'updated_at' => now(),
+                ]);
+                Session::forget('booknow_pending_lead_id');
+            } else {
+                $pendingLeadId = Session::get('booknow_pending_lead_id');
+                if ($pendingLeadId) {
+                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                        'status' => 'Booked',
+                        'updated_at' => now(),
+                    ]);
+                    Session::forget('booknow_pending_lead_id');
+                } else {
+                    $pendingLeadId = Session::get('booknow_pending_lead_id');
+                    if ($pendingLeadId) {
+                        DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                            'status' => 'Booked',
+                            'updated_at' => now(),
+                        ]);
+                        Session::forget('booknow_pending_lead_id');
+                    } else {
+                        $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                        $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
 
+                        $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
+                        $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
+                        $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
+                        $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
+                        if ($pastOrders > 0 && $repeatedSourceId) {
+                            $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+                        } else {
+                            $sourceLeadId = $sourceWebsiteId;
+                        }
+
+                        $salespersonId = null;
+                        if ($pastOrders > 0) {
+                            $lastOrder = DB::table('ci_orders')
+                                ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+                                ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
+                                ->whereNotNull('ci_order_item.salesperson_id')
+                                ->orderBy('ci_orders.order_id', 'desc')
+                                ->select('ci_order_item.salesperson_id')
+                                ->first();
+                            if ($lastOrder) {
+                                $salespersonId = $lastOrder->salesperson_id;
+                            }
+                        }
+
+                        DB::table('general_enquiries')->insert([
+                            'salesperson_id' => $salespersonId,
+                            'customer_id' => $arrData['user_info_id'] ?? null,
+                            'customer_name' => $customerInfo ? $customerInfo->name : null,
+                            'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
+                            'customer_email' => $customerInfo ? $customerInfo->email : null,
+                            'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                            'service_id' => $arrData['service_id'] ?? null,
+                            'subservice_id' => $arrData['subservice_id'] ?? null,
+                            'source_lead_id' => $sourceLeadId,
+                            'status' => 'Booked',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
+
+            // --- START: RECURRING BOOKING GENERATION LOGIC ---
+            $frequency = $request->how_often_do_you_need_cleaning ?? 'Once';
+
+            if (!empty($frequency) && $frequency != 'Once') {
+                $visits = [];
+                $currentDate = \Carbon\Carbon::parse($request->date . ' ' . $request->month . ' ' . date('Y'));
+
+                $orderRecord = DB::table('ci_orders')->where('order_id', $arrOrderId)->first();
+
+                $endDateCarbon = \Carbon\Carbon::parse($end_date);
+
+                if ($frequency == 'Multiple times a week' && !empty($request->which_day_of_the_week_do_you_want_the_service)) {
+                    $selectedDays = array_map('trim', explode(',', $request->which_day_of_the_week_do_you_want_the_service));
+
+                    $period = new \DatePeriod(
+                        $currentDate,
+                        new \DateInterval('P1D'),
+                        $endDateCarbon->copy()->addDay() // Include the end date
+                    );
+
+                    $visitCount = 0;
+                    foreach ($period as $date) {
+                        if (in_array($date->format('l'), $selectedDays)) {
+                            // Payment status logic
+                            if ($paymentmode == 3) {
+                                $v_payment_status = 'paid'; // Tabby
+                            } elseif ($paymentmode == 1) {
+                                $v_payment_status = 'pending'; // COD
+                            } else {
+                                $v_payment_status = ($visitCount == 0) ? 'paid' : 'pending'; // Stripe
+                            }
+
+                            $visits[] = [
+                                'order_id' => $arrOrderId,
+                                'visit_date' => $date->format('Y-m-d'),
+                                'visit_time' => $request->time_slot ?? null,
+                                'payment_status' => $v_payment_status,
+                                'visit_status' => 'upcoming',
+                                'created_at' => now(),
+                                'updated_at' => now()
+                            ];
+                            $visitCount++;
+                        }
+                    }
+                } else {
+                    $i = 0;
+                    while (true) {
+                        if ($frequency == 'Weekly') {
+                            $visitDateObj = $currentDate->copy()->addWeeks($i);
+                        } elseif ($frequency == 'Every 2 Weeks') {
+                            $visitDateObj = $currentDate->copy()->addWeeks($i * 2);
+                        } else {
+                            // Default fallback
+                            $visitDateObj = $currentDate->copy()->addDays($i * 7);
+                        }
+
+                        if ($visitDateObj->gt($endDateCarbon)) {
+                            break;
+                        }
+
+                        $visitDate = $visitDateObj->format('Y-m-d');
+
+                        // Payment status logic
+                        if ($paymentmode == 3) {
+                            $v_payment_status = 'paid'; // Tabby
+                        } elseif ($paymentmode == 1) {
+                            $v_payment_status = 'pending'; // COD
+                        } else {
+                            $v_payment_status = ($i == 0) ? 'paid' : 'pending'; // Stripe
+                        }
+
+                        $visits[] = [
+                            'order_id' => $arrOrderId,
+                            'visit_date' => $visitDate,
+                            'visit_time' => $request->time_slot ?? null,
+                            'payment_status' => $v_payment_status,
+                            'visit_status' => 'upcoming',
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ];
+
+                        $i++;
+                    }
+                }
+
+                if (count($visits) > 0) {
+                    DB::table('ci_order_visits')->insert($visits);
+                }
+            }
+            // --- END: RECURRING BOOKING GENERATION LOGIC ---
 
 
             if ($isPaintingData == "" && empty($isPaintingData) && $request->subservice_id == 70 || $request->subservice_id == 29 || $request->subservice_id == 71 || $request->subservice_id == 72 || $request->subservice_id == 73 || $request->subservice_id == 79 || $request->subservice_id == 80 || $request->subservice_id == 81 || $request->subservice_id == 82 || $request->subservice_id == 83 || $request->subservice_id == 84 || $request->subservice_id == 85 || $request->subservice_id == 86 || $request->subservice_id == 87 || $request->subservice_id == 88 || $request->subservice_id == 93) {
@@ -840,26 +1110,26 @@ class checkoutcontroller extends Controller
                     foreach (\Cart::content() as $arrRowDeailts) {
 
                         $arrData_package = array(
-                            'order_id'                        => $arrOrderId,
-                            'order_item_id'                   => $order_item_id,
-                            'user_info_id'                    => $userid,
-                            'package_id'                      => $arrRowDeailts->id,
-                            'package_item_name'               => $arrRowDeailts->name,
-                            'package_quantity'                => $arrRowDeailts->qty,
-                            'package_item_price'              => $arrRowDeailts->price,
-                            'service_id'                      => $arrRowDeailts->options->service_id,
-                            'service_name'                    => $arrRowDeailts->options->service_name,
-                            'subservice_id'                   => $arrRowDeailts->options->subservice_id,
-                            'subservice_name'                 => $arrRowDeailts->options->subservice_name,
-                            'packagecategory_id'              => $arrRowDeailts->options->packagecategory_id,
-                            'packagecategory_name'            => $arrRowDeailts->options->packagecategory_name,
-                            'page_url'                        => $arrRowDeailts->options->page_url,
-                            'image'                           => $arrRowDeailts->options->image,
-                            'discount'                        => $arrRowDeailts->options->discount,
-                            'discount_type'                   => $arrRowDeailts->options->discount_type,
-                            'product_discount_amount'         => round($arrRowDeailts->options->product_discount_amount),
-                            'cdate'                           => date('Y-m-d'),
-                            'subservice_booking_percentage'   => $arrRowDeailts->options->subservice_booking_percentage,
+                            'order_id' => $arrOrderId,
+                            'order_item_id' => $order_item_id,
+                            'user_info_id' => $userid,
+                            'package_id' => $arrRowDeailts->id,
+                            'package_item_name' => $arrRowDeailts->name,
+                            'package_quantity' => $arrRowDeailts->qty,
+                            'package_item_price' => $arrRowDeailts->price,
+                            'service_id' => $arrRowDeailts->options->service_id,
+                            'service_name' => $arrRowDeailts->options->service_name,
+                            'subservice_id' => $arrRowDeailts->options->subservice_id,
+                            'subservice_name' => $arrRowDeailts->options->subservice_name,
+                            'packagecategory_id' => $arrRowDeailts->options->packagecategory_id,
+                            'packagecategory_name' => $arrRowDeailts->options->packagecategory_name,
+                            'page_url' => $arrRowDeailts->options->page_url,
+                            'image' => $arrRowDeailts->options->image,
+                            'discount' => $arrRowDeailts->options->discount,
+                            'discount_type' => $arrRowDeailts->options->discount_type,
+                            'product_discount_amount' => round($arrRowDeailts->options->product_discount_amount),
+                            'cdate' => date('Y-m-d'),
+                            'subservice_booking_percentage' => $arrRowDeailts->options->subservice_booking_percentage,
 
                         );
 
@@ -904,28 +1174,28 @@ class checkoutcontroller extends Controller
                             $order_total = round((float) $order_total, 2);
 
                             $walletData = array(
-                                'userid'          => 0,
-                                'refer_id'        => $userid,
-                                'order_currency'  => 'AED',
-                                'order_total'     => $order_total,
-                                'wallet_amount'   => $walletdiscount,
-                                'added_from'      => 1,
-                                'order_id'        => $arrOrderId,
-                                'added_date'      => date('Y-m-d'),
+                                'userid' => 0,
+                                'refer_id' => $userid,
+                                'order_currency' => 'AED',
+                                'order_total' => $order_total,
+                                'wallet_amount' => $walletdiscount,
+                                'added_from' => 1,
+                                'order_id' => $arrOrderId,
+                                'added_date' => date('Y-m-d'),
                             );
 
                             DB::table('front_user_wallet')->insertGetId($walletData);
                         } else {
 
                             $walletData = array(
-                                'userid'          => 0,
-                                'refer_id'        => $userid,
-                                'order_currency'  => 'AED',
-                                'order_total'     => $order_total,
-                                'wallet_amount'   => $userWalletamount,
-                                'added_from'      => 1,
-                                'order_id'        => $arrOrderId,
-                                'added_date'      => date('Y-m-d'),
+                                'userid' => 0,
+                                'refer_id' => $userid,
+                                'order_currency' => 'AED',
+                                'order_total' => $order_total,
+                                'wallet_amount' => $userWalletamount,
+                                'added_from' => 1,
+                                'order_id' => $arrOrderId,
+                                'added_date' => date('Y-m-d'),
                             );
 
                             DB::table('front_user_wallet')->insertGetId($walletData);
@@ -948,14 +1218,14 @@ class checkoutcontroller extends Controller
                             $order_total = round((float) $order_total, 2);
 
                             $walletData = array(
-                                'userid'          => 0,
-                                'refer_id'        => $userid,
-                                'order_currency'  => 'AED',
-                                'order_total'     => $order_total,
-                                'wallet_amount'   => $walletdiscount,
-                                'added_from'      => 1,
-                                'order_id'        => $arrOrderId,
-                                'added_date'      => date('Y-m-d'),
+                                'userid' => 0,
+                                'refer_id' => $userid,
+                                'order_currency' => 'AED',
+                                'order_total' => $order_total,
+                                'wallet_amount' => $walletdiscount,
+                                'added_from' => 1,
+                                'order_id' => $arrOrderId,
+                                'added_date' => date('Y-m-d'),
                             );
 
                             DB::table('front_user_wallet')->insertGetId($walletData);
@@ -965,14 +1235,14 @@ class checkoutcontroller extends Controller
                             // echo"<pre>";print_r($userWalletamount);echo"</pre>";exit;
 
                             $walletData = array(
-                                'userid'          => 0,
-                                'refer_id'        => $userid,
-                                'order_currency'  => 'AED',
-                                'order_total'     => $order_total,
-                                'wallet_amount'   => $userWalletamount,
-                                'added_from'      => 1,
-                                'order_id'        => $arrOrderId,
-                                'added_date'      => date('Y-m-d'),
+                                'userid' => 0,
+                                'refer_id' => $userid,
+                                'order_currency' => 'AED',
+                                'order_total' => $order_total,
+                                'wallet_amount' => $userWalletamount,
+                                'added_from' => 1,
+                                'order_id' => $arrOrderId,
+                                'added_date' => date('Y-m-d'),
                             );
 
                             DB::table('front_user_wallet')->insertGetId($walletData);
@@ -991,9 +1261,9 @@ class checkoutcontroller extends Controller
 
                     if ($isPaintingData == "" && empty($isPaintingData)) {
 
-                        return redirect('thankyou_book_now');
+                        return redirect(route('thankyou_book_now'));
                     } else {
-                        return redirect('thankyou-book-now');
+                        return redirect(route('thankyou-book-now'));
                     }
                 }
             } elseif ($payment_type == 'TABBY') {
@@ -1128,37 +1398,63 @@ class checkoutcontroller extends Controller
             );
 
             $arrayOfWoodenEnquiry = array(
-                'service_id'                => $service_id,
-                'subservice_id'             => $subservice_id,
-                'name'                      => $name,
-                'email'                     => $email,
-                'mobile'                    => $mobile,
-                'property_type'             => $property_type,
-                'area_of_floor'             => $area_of_floor,
-                'condition_of_floor'        => $condition_of_floor,
-                'service_required'          => $service_required,
-                'schedule_site_survey'      => $schedule_site_survey,
+                'service_id' => $service_id,
+                'subservice_id' => $subservice_id,
+                'name' => $name,
+                'email' => $email,
+                'mobile' => $mobile,
+                'property_type' => $property_type,
+                'area_of_floor' => $area_of_floor,
+                'condition_of_floor' => $condition_of_floor,
+                'service_required' => $service_required,
+                'schedule_site_survey' => $schedule_site_survey,
                 'describe_your_requirements' => $describe_your_requirements ?? "",
-                'video'                     => $filename ?? "",
-                'enquiry_date'              => $enquiry_date,
-                'enquiry_month'             => $enquiry_month,
-                'enquiry_year'              => $enquiry_year,
-                'time_slot'                 => $time_slot,
-                'addressType'               => $addressType,
-                'city'                      => $city,
-                'area'                      => $area,
-                'building_street_no'        => $building_street_no,
-                'added_date'                => date("Y-m-d"),
-                'subservice_code'           => $subserviceCode,
-                'city_code'                 => $cityCode,
-                'order_year'                => $year,
-                'sequence_no'               => $nextSequence,
-                'inquiry_id'                => $formatOrderId,
+                'video' => $filename ?? "",
+                'enquiry_date' => $enquiry_date,
+                'enquiry_month' => $enquiry_month,
+                'enquiry_year' => $enquiry_year,
+                'time_slot' => $time_slot,
+                'addressType' => $addressType,
+                'city' => $city,
+                'area' => $area,
+                'building_street_no' => $building_street_no,
+                'added_date' => date("Y-m-d"),
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'inquiry_id' => $formatOrderId,
             );
+
 
             // echo "<pre>";print_r($arrayOfWoodenEnquiry);echo"</pre>";exit;
 
-            $enquiryInsertId =  DB::table('wooden_floor_enquiry')->insertGetId($arrayOfWoodenEnquiry);
+            $enquiryInsertId = DB::table('wooden_floor_enquiry')->insertGetId($arrayOfWoodenEnquiry);
+
+            $pendingLeadId = Session::get('booknow_pending_lead_id');
+            if ($pendingLeadId) {
+                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                    'status' => 'Booked',
+                    'updated_at' => now(),
+                ]);
+                Session::forget('booknow_pending_lead_id');
+            } else {
+                $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                $customerInfo = DB::table('frontloginregisters')->where('id', $userdata['userid'] ?? 0)->first();
+                DB::table('general_enquiries')->insert([
+                    'customer_id' => $userdata['userid'] ?? null,
+                    'customer_name' => $customerInfo ? $customerInfo->name : ($arrayOfWoodenEnquiry['name'] ?? null),
+                    'customer_phone' => $customerInfo ? $customerInfo->mobile : ($arrayOfWoodenEnquiry['mobile'] ?? null),
+                    'customer_email' => $customerInfo ? $customerInfo->email : ($arrayOfWoodenEnquiry['email'] ?? null),
+                    'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                    'service_id' => $arrayOfWoodenEnquiry['service_id'] ?? null,
+                    'subservice_id' => $arrayOfWoodenEnquiry['subservice_id'] ?? null,
+                    'source_lead_id' => $sourceWebsite ? $sourceWebsite->id : null,
+                    'status' => 'Booked',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
             // $processed_text = "WoodenFloor";
             // $yearForId =date('y');
             // $data_u['inquiry_id'] = "IQ-".$processed_text."-" . $yearForId ."-". sprintf("%06d", $enquiryInsertId);
@@ -1190,14 +1486,14 @@ class checkoutcontroller extends Controller
 
             if ($request->formfield_value == "Paint individual rooms") {
                 $no_of_rooms_paint = $request->how_many_rooms_painted ?? '';
-                $noRoomsPaint =  $no_of_rooms_paint;
+                $noRoomsPaint = $no_of_rooms_paint;
             } else {
                 $noRoomsPaint = 0;
             }
 
             if ($request->formfield_value == "Paint individual walls") {
                 $no_of_walls_paint = $request->how_many_walls_painted ?? '';
-                $noWallsPaint =  $no_of_walls_paint;
+                $noWallsPaint = $no_of_walls_paint;
             } else {
                 $noWallsPaint = 0;
             }
@@ -1247,34 +1543,59 @@ class checkoutcontroller extends Controller
             );
 
             $arrayOfEnquiry = array(
-                'type_of_painting'          => $type_of_painting,
-                'name'                      => $name,
-                'service_id'                => $service_id,
-                'subservice_id'             => $subservice_id,
-                'email'                     => $email,
-                'mobile'                    => $mobile,
-                'addressType'               => $addressType,
-                'city'                      => $city,
-                'area'                      => $area,
-                'building_street_no'        => $building_street_no,
-                'enquiry_date'              => $enquiry_date,
-                'enquiry_month'             => $enquiry_month,
-                'enquiry_year'              => $enquiry_year,
-                'time_slot'                 => $time_slot,
-                'no_of_rooms_painted'       => $noRoomsPaint,
-                'no_of_walls_painted'       => $noWallsPaint,
+                'type_of_painting' => $type_of_painting,
+                'name' => $name,
+                'service_id' => $service_id,
+                'subservice_id' => $subservice_id,
+                'email' => $email,
+                'mobile' => $mobile,
+                'addressType' => $addressType,
+                'city' => $city,
+                'area' => $area,
+                'building_street_no' => $building_street_no,
+                'enquiry_date' => $enquiry_date,
+                'enquiry_month' => $enquiry_month,
+                'enquiry_year' => $enquiry_year,
+                'time_slot' => $time_slot,
+                'no_of_rooms_painted' => $noRoomsPaint,
+                'no_of_walls_painted' => $noWallsPaint,
                 'describe_painting_service' => $description ?? "",
-                'added_date'                => date("Y-m-d"),
-                'subservice_code'           => $subserviceCode,
-                'city_code'                 => $cityCode,
-                'order_year'                => $year,
-                'sequence_no'               => $nextSequence,
-                'inquiry_id'                => $formatOrderId,
+                'added_date' => date("Y-m-d"),
+                'subservice_code' => $subserviceCode,
+                'city_code' => $cityCode,
+                'order_year' => $year,
+                'sequence_no' => $nextSequence,
+                'inquiry_id' => $formatOrderId,
             );
 
             //echo "<pre>";print_r($arrayOfEnquiry);echo"</pre>";exit;
 
-            $enquiryInsertId =  DB::table('painting_enquiry')->insertGetId($arrayOfEnquiry);
+            $enquiryInsertId = DB::table('painting_enquiry')->insertGetId($arrayOfEnquiry);
+
+            $pendingLeadId = Session::get('booknow_pending_lead_id');
+            if ($pendingLeadId) {
+                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                    'status' => 'Booked',
+                    'updated_at' => now(),
+                ]);
+                Session::forget('booknow_pending_lead_id');
+            } else {
+                $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                $customerInfo = DB::table('frontloginregisters')->where('id', $userdata['userid'] ?? 0)->first();
+                DB::table('general_enquiries')->insert([
+                    'customer_id' => $userdata['userid'] ?? null,
+                    'customer_name' => $customerInfo ? $customerInfo->name : ($arrayOfEnquiry['name'] ?? null),
+                    'customer_phone' => $customerInfo ? $customerInfo->mobile : ($arrayOfEnquiry['mobile'] ?? null),
+                    'customer_email' => $customerInfo ? $customerInfo->email : ($arrayOfEnquiry['email'] ?? null),
+                    'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                    'service_id' => $arrayOfEnquiry['service_id'] ?? null,
+                    'subservice_id' => $arrayOfEnquiry['subservice_id'] ?? null,
+                    'source_lead_id' => $sourceWebsite ? $sourceWebsite->id : null,
+                    'status' => 'Booked',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
             //   $processed_text = "Painting";
             //   $yearForId =date('y');
             //   $data_u['inquiry_id'] = "IQ-".$processed_text."-" . $yearForId ."-". sprintf("%06d", $enquiryInsertId);
@@ -1285,9 +1606,9 @@ class checkoutcontroller extends Controller
             $success = $this->success_mail_painting_enquiry();
             /*  if ($success) {
                     if($isPaintingData == "" && empty($isPaintingData)){
-                        return redirect('thankyou_book_now');
+                        return redirect(route('thankyou_book_now'));
                     }else{
-                        return redirect('thankyou-book-now');
+                        return redirect(route('thankyou-book-now'));
                     }
                 }  */
 
@@ -1382,7 +1703,30 @@ class checkoutcontroller extends Controller
 
             $package_inquiry = DB::table('packages_enquiry',)->insertGetId($data);
 
-            // $package_data_n = DB::table('packages_enquiry',)->where('id',$package_inquiry)->first();
+            $pendingLeadId = Session::get('booknow_pending_lead_id');
+            if ($pendingLeadId) {
+                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                    'status' => 'Booked',
+                    'updated_at' => now(),
+                ]);
+                Session::forget('booknow_pending_lead_id');
+            } else {
+                $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                $customerInfo = DB::table('frontloginregisters')->where('id', $userdata['userid'] ?? 0)->first();
+                DB::table('general_enquiries')->insert([
+                    'customer_id' => $userdata['userid'] ?? null,
+                    'customer_name' => $customerInfo ? $customerInfo->name : ($data['name'] ?? null),
+                    'customer_phone' => $customerInfo ? $customerInfo->mobile : ($data['mobile'] ?? null),
+                    'customer_email' => $customerInfo ? $customerInfo->email : ($data['email'] ?? null),
+                    'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                    'service_id' => $data['service_id'] ?? null,
+                    'subservice_id' => $data['subservice_id'] ?? null,
+                    'source_lead_id' => $sourceWebsite ? $sourceWebsite->id : null,
+                    'status' => 'Booked',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
             // $service_name = \Helper::servicename($package_data_n->service_id);
 
@@ -1401,12 +1745,12 @@ class checkoutcontroller extends Controller
                 $name = $userdata['name'];
                 $email = $userdata['email'];
                 $mobile = $userdata['mobile'];
-                $service      = $request->service;
-                $subservice   = $request->subservice;
+                $service = $request->service;
+                $subservice = $request->subservice;
                 $service_type = $request->service_type;
                 $service_date = date('Y-m-d', strtotime($request->service_date));
-                $address      = $request->address;
-                $city      = $request->city;
+                $address = $request->address;
+                $city = $request->city;
                 $type_of_home = $request->type_of_home;
                 $size_of_home = $request->size_of_home_1;
                 $size_of_home_id = $request->size_of_home_id;
@@ -1414,31 +1758,31 @@ class checkoutcontroller extends Controller
 
 
                 $arrayOfGardenEnquiry = array(
-                    'inquiry_id'            => $inquiry_id,
-                    'user_name'             => $name,
-                    'user_email'            => $email,
-                    'user_mobile'           => $mobile,
-                    'service'               => $service,
-                    'subservice'            => $subservice,
-                    'service_type'          => $service_type,
-                    'service_date'          => $service_date,
-                    'city'                  => $city,
-                    'address'               => $address,
-                    'type_of_home'          => $type_of_home,
-                    'size_of_home_id'       => $size_of_home_id,
-                    'size_of_home'          => $size_of_home,
+                    'inquiry_id' => $inquiry_id,
+                    'user_name' => $name,
+                    'user_email' => $email,
+                    'user_mobile' => $mobile,
+                    'service' => $service,
+                    'subservice' => $subservice,
+                    'service_type' => $service_type,
+                    'service_date' => $service_date,
+                    'city' => $city,
+                    'address' => $address,
+                    'type_of_home' => $type_of_home,
+                    'size_of_home_id' => $size_of_home_id,
+                    'size_of_home' => $size_of_home,
                     'describe_your_requirements' => $describe_your_requirements,
                     'subservice_code' => $subserviceCode,
                     'city_code' => $cityCode,
                     'order_year' => $year,
                     'sequence_no' => $nextSequence,
                     //'inquiry_id' => $formatOrderId,
-                    'added_date'            => date("Y-m-d"),
+                    'added_date' => date("Y-m-d"),
                 );
 
                 //echo "<pre>";print_r($arrayOfEnquiry);echo"</pre>";exit;
 
-                $enquiryInsertId =  DB::table('garden_enquiry')->insertGetId($arrayOfGardenEnquiry);
+                $enquiryInsertId = DB::table('garden_enquiry')->insertGetId($arrayOfGardenEnquiry);
 
                 if ($request->subservice == 77) {
                     $arrayData = array('name' => $name, 'type_of_painting' => Helper::subservicename(strval($request->subservice)));
@@ -1684,7 +2028,7 @@ class checkoutcontroller extends Controller
                     $bccRecipients = explode(',', $cc);
                 }
 
-                Mail::send([], [], function ($message) use ($html, $to,  $subject, $ccRecipients, $bccRecipients) {
+                Mail::send([], [], function ($message) use ($html, $to, $subject, $ccRecipients, $bccRecipients) {
                     $message->to($to, 'VendorsCity');
                     $message->subject($subject);
                     foreach ($ccRecipients as $ccRecipient) {
@@ -1735,7 +2079,7 @@ class checkoutcontroller extends Controller
                     } elseif ($item->service_id == 47) {
                         return redirect()->route('pest_control.thankyou_book_now');
                     } else {
-                        return redirect('thankyou_book_now');
+                        return redirect(route('thankyou_book_now'));
                     }
                     // Redirect to the 'thankyou' route
 
@@ -1760,15 +2104,15 @@ class checkoutcontroller extends Controller
                 ->exists();
             if (!$exists) {
                 $wallet_content = [
-                    'userid'              => $order->user_id,
-                    'refer_id'             => $order->user_id,
-                    'order_currency'       => $order->order_currency ?? 'AED',
-                    'order_total'          => $order->order_total,
-                    'system_percentage'    => '',
-                    'wallet_amount'        => $order->coupondiscount,
-                    'added_from'           => 0,
-                    'order_id'             => $order->order_number,
-                    'added_date'           => date('Y-m-d'),
+                    'userid' => $order->user_id,
+                    'refer_id' => $order->user_id,
+                    'order_currency' => $order->order_currency ?? 'AED',
+                    'order_total' => $order->order_total,
+                    'system_percentage' => '',
+                    'wallet_amount' => $order->coupondiscount,
+                    'added_from' => 0,
+                    'order_id' => $order->order_number,
+                    'added_date' => date('Y-m-d'),
                 ];
                 DB::table('front_user_wallet')->insert($wallet_content);
             }
@@ -1793,7 +2137,7 @@ class checkoutcontroller extends Controller
         $data['meta_keyword'] = "";
         $data['meta_description'] = "";
 
-        $data['message'] =  "Payment Fail";
+        $data['message'] = "Payment Fail";
 
         return view('front.payment_fail', $data);
     }
@@ -1923,7 +2267,7 @@ class checkoutcontroller extends Controller
 
             $i++;
 
-            $pvalue = ($pvalue +  (($product_discount_amount) * $arrRowDeailts->package_quantity));
+            $pvalue = ($pvalue + (($product_discount_amount) * $arrRowDeailts->package_quantity));
         }
 
         $message_body .= '<tr style="border-bottom: 2px solid #CCCECF;color: #808080;">
@@ -3147,8 +3491,8 @@ class checkoutcontroller extends Controller
 
     function success_mail_book_now_allvendor()
     {
-        $userdata        = Session::get('user');
-        $order_number    = Session::get('order_number');
+        $userdata = Session::get('user');
+        $order_number = Session::get('order_number');
         $format_order_id = Session::get('format_order_id');
 
         // ===================== FETCH ORDER =====================
@@ -3179,9 +3523,9 @@ class checkoutcontroller extends Controller
         }
 
         // ===================== EXTRACT SERVICE / SUBSERVICE / CITY =====================
-        $serviceIds     = [];
-        $subserviceIds  = [];
-        $orderCities    = [];
+        $serviceIds = [];
+        $subserviceIds = [];
+        $orderCities = [];
 
         foreach ($orders as $order) {
             foreach ($order->items as $item) {
@@ -3198,9 +3542,9 @@ class checkoutcontroller extends Controller
             }
         }
 
-        $serviceIds    = array_unique($serviceIds);
+        $serviceIds = array_unique($serviceIds);
         $subserviceIds = array_unique($subserviceIds);
-        $orderCities   = array_unique($orderCities);
+        $orderCities = array_unique($orderCities);
 
         if (empty($serviceIds) && empty($subserviceIds)) {
             return "No service/subservice IDs found.";
@@ -3223,10 +3567,10 @@ class checkoutcontroller extends Controller
                 }
 
                 // -------- SERVICE & SUBSERVICE CHECK --------
-                $vendorServices     = explode(',', $vendor->serviceList);
-                $vendorSubservices  = explode(',', $vendor->subserviceList);
+                $vendorServices = explode(',', $vendor->serviceList);
+                $vendorSubservices = explode(',', $vendor->subserviceList);
 
-                $hasServiceMatch    = count(array_intersect($serviceIds, $vendorServices)) > 0;
+                $hasServiceMatch = count(array_intersect($serviceIds, $vendorServices)) > 0;
                 $hasSubserviceMatch = count(array_intersect($subserviceIds, $vendorSubservices)) > 0;
 
 
@@ -3254,7 +3598,7 @@ class checkoutcontroller extends Controller
         }
 
         // ===================== SUBJECT =====================
-        $firstItem    = $orders->flatMap->items->first();
+        $firstItem = $orders->flatMap->items->first();
         $service_name = $firstItem ? \Helper::subservicename($firstItem->subservice_id) : '';
 
         $subject = "You got New Booking for $service_name | Order Number $format_order_id";
@@ -3281,10 +3625,10 @@ class checkoutcontroller extends Controller
                     if (!empty($allVendorEmails)) {
 
                         Mail::send('emails.vendor_booking_order_notification', [
-                            'user'         => $userdata,
-                            'orders'       => $orders,
+                            'user' => $userdata,
+                            'orders' => $orders,
                             'order_number' => $order_number,
-                            'vendor'       => $vendor,
+                            'vendor' => $vendor,
                         ], function ($message) use ($allVendorEmails, $vendor, $subject, $vendor_bcc_emails) {
 
                             $message->to($allVendorEmails, $vendor->name ?? 'Vendor')
@@ -3338,7 +3682,7 @@ class checkoutcontroller extends Controller
 
         $firstItem = $orders->flatMap->items->first();
 
-        $subservice  = \Helper::subservicename($firstItem->subservice_id);
+        $subservice = \Helper::subservicename($firstItem->subservice_id);
 
         // echo"<pre>";print_r($vendors);echo"";
         // echo"<pre>";print_r($subservice);echo"";
@@ -3419,7 +3763,7 @@ class checkoutcontroller extends Controller
 
         if (isset($vendors_attribute) && count($vendors_attribute) > 0) {
 
-            foreach ($vendors_attribute as  $vendorAtt) {
+            foreach ($vendors_attribute as $vendorAtt) {
 
                 $vendorAttphone = $vendorAtt->country_code . '' . $vendorAtt->telephone;
                 if (isset($vendorAtt->country_code) && isset($vendorAtt->telephone)) {
@@ -3528,7 +3872,7 @@ class checkoutcontroller extends Controller
 
         $firstItem = $orders->flatMap->items->first();
 
-        $subservice  = \Helper::subservicename($firstItem->subservice_id);
+        $subservice = \Helper::subservicename($firstItem->subservice_id);
         // echo"<pre>";print_r($userdata);echo"";
         // echo"<pre>";print_r($subservice);echo"";
         // exit;
@@ -3972,7 +4316,8 @@ class checkoutcontroller extends Controller
 
     function thankyou_book_now()
     {
-
+        // echo "dfsd";
+        // exit;
         \Cart::destroy();
         session()->forget('coupan_data');
         session()->forget('shippingcahrge');
@@ -3984,8 +4329,8 @@ class checkoutcontroller extends Controller
 
         $order_number = Session::get('order_number');
 
-        $data['thank_order_data'] = $orderData =  DB::table('ci_orders')->where('order_id', $order_number)->first();
-        $data['thank_ci_order_data'] = $orderitemData =  DB::table('ci_order_item')->where('order_id', $order_number)->first();
+        $data['thank_order_data'] = $orderData = DB::table('ci_orders')->where('order_id', $order_number)->first();
+        $data['thank_ci_order_data'] = $orderitemData = DB::table('ci_order_item')->where('order_id', $order_number)->first();
 
 
 
@@ -4057,7 +4402,7 @@ class checkoutcontroller extends Controller
         $data['meta_keyword'] = "";
         $data['meta_description'] = "";
 
-        $data['message'] =  "Book Now";
+        $data['message'] = "Book Now";
         return view('front.thank_you_book_now', $data);
     }
     function thankyou_painting()
@@ -4074,8 +4419,8 @@ class checkoutcontroller extends Controller
 
         $order_number = Session::get('order_number');
 
-        $data['thank_order_data'] = $orderData =  DB::table('ci_orders')->where('order_id', $order_number)->first();
-        $data['thank_ci_order_data'] = $orderitemData =  DB::table('ci_order_item')->where('order_id', $order_number)->first();
+        $data['thank_order_data'] = $orderData = DB::table('ci_orders')->where('order_id', $order_number)->first();
+        $data['thank_ci_order_data'] = $orderitemData = DB::table('ci_order_item')->where('order_id', $order_number)->first();
 
 
 
@@ -4195,7 +4540,7 @@ class checkoutcontroller extends Controller
         $data['meta_keyword'] = "";
         $data['meta_description'] = "";
 
-        $data['message'] =  "Book Now";
+        $data['message'] = "Book Now";
         return view('front.thank_you_painting', $data);
     }
 
@@ -4215,7 +4560,7 @@ class checkoutcontroller extends Controller
         $data['meta_keyword'] = "";
         $data['meta_description'] = "";
 
-        $data['message'] =  "Thank you for choosing VendorsCity! Your order has been successfully processed. A detailed confirmation email has been sent to your registered email address. If you need any assistance or have questions, please don't hesitate to contact us at support@vendorscity.com or call us at 056 VENDORS (056 836 3677). We're here to help!";
+        $data['message'] = "Thank you for choosing VendorsCity! Your order has been successfully processed. A detailed confirmation email has been sent to your registered email address. If you need any assistance or have questions, please don't hesitate to contact us at support@vendorscity.com or call us at 056 VENDORS (056 836 3677). We're here to help!";
 
         return view('front.thank_you', $data);
     }
@@ -4232,16 +4577,16 @@ class checkoutcontroller extends Controller
 
         $result_new = $result->toArray();
         // echo"<pre>";print_r($result_new);echo"</pre>";exit;
-        $html  = "<select name='state_name' id='state_name' class='form-control' onchange='ship_state_change(this.value);'>";
+        $html = "<select name='state_name' id='state_name' class='form-control' onchange='ship_state_change(this.value);'>";
         $html .= "<option value=''>Select State</option>";
-        if ($result != '' &&  count($result) > 0) {
+        if ($result != '' && count($result) > 0) {
 
             for ($i = 0; $i < count($result); $i++) {
 
                 $html .= "<option value='" . $result[$i]->id . "'>" . $result[$i]->state . "</option>";
             }
         }
-        $html  .= "<select>";
+        $html .= "<select>";
         echo $html;
     }
 
@@ -4259,16 +4604,16 @@ class checkoutcontroller extends Controller
 
         $result_new = $result->toArray();
         // echo"<pre>";print_r($result_new);echo"</pre>";exit;
-        $html  = "<select name='city' id='city' class='form-control'>";
+        $html = "<select name='city' id='city' class='form-control'>";
         $html .= "<option value=''>Select Town / City</option>";
-        if ($result != '' &&  count($result) > 0) {
+        if ($result != '' && count($result) > 0) {
 
             for ($i = 0; $i < count($result); $i++) {
 
                 $html .= "<option value='" . $result[$i]->id . "'>" . $result[$i]->name . "</option>";
             }
         }
-        $html  .= "<select>";
+        $html .= "<select>";
         echo $html;
     }
 
@@ -4297,6 +4642,387 @@ class checkoutcontroller extends Controller
         echo $sessionuserWalletamount;
     }
 
+    function book_now_subscription(Request $request)
+    {
+        $coupan_data = session('coupan_data');
+        $userdata = Session::get('user');
+        $userid = $userdata['userid'];
+        $payment_type = $request->payment_type;
+
+        if ($payment_type == 'COD') {
+            $order_status = 'P';
+            $paymentmode = 1;
+            $list_order_status = '0';
+            $payment_status = 'Success';
+            $payment_mode = "COD";
+        } else {
+            $order_status = 'P';
+            $paymentmode = 2;
+            $list_order_status = '0';
+            $payment_status = 'FAILED';
+            $payment_mode = "ONLINE PAYMENT";
+        }
+
+        $intOrderNumber = DB::table('ci_orders')
+            ->select(DB::raw('MAX(order_id) as lastOrderNumber'))
+            ->first();
+
+        if ($intOrderNumber) {
+            $intOrderNumber = $intOrderNumber->lastOrderNumber + 1;
+            $intOrderNumber_new = $intOrderNumber;
+        } else {
+            $intOrderNumber_new = 1;
+        }
+
+        Session::put('order_number', $intOrderNumber_new);
+        $order_number = Session::get('order_number');
+
+        $order_from = 1;
+
+        $order_total = $request->total_to_pay;
+        $order_total_new = $request->total_to_pay;
+
+        $front_wallet_amount_new = 0;
+        $vat_total = 0; // Currently VAT is 0 for subscription
+
+        $cleaning_discount_additional = $request->package_discount ?? "";
+
+        $timing_charger = 0;
+
+        $coupan_to_wallet = '';
+        $coupon_discounted = 0;
+        $coupan_code_name = "";
+
+        if (Session::has('coupan_data')) {
+            $coupan_code_name = $coupan_data['coupancode'];
+
+            if ($coupan_data['discount'] != '' && $coupan_data['coupanvalue'] == 0) {
+                // Subscription subtotal is passed
+                $coupon_discounted = ($request->sub_total * $coupan_data['discount']) / 100;
+            }
+            if ($coupan_data['discount'] != '' && $coupan_data['coupanvalue'] == 1) {
+                $coupon_discounted = $coupan_data['discount'];
+            }
+
+            if ($coupan_data['coupan_apply_wallet'] == 0) {
+                $coupan_to_wallet = '1';
+
+                // Credit customer's wallet immediately if COD booking is completed successfully
+                if ($payment_type == 'COD') {
+                    $wallet_content = [
+                        'userid' => $userid,
+                        'refer_id' => $userid,
+                        'order_currency' => 'AED',
+                        'order_total' => $order_total,
+                        'system_percentage' => '',
+                        'wallet_amount' => $coupon_discounted,
+                        'added_from' => 0, // credit
+                        'order_id' => $order_number,
+                        'added_date' => date('Y-m-d'),
+                    ];
+                    DB::table('front_user_wallet')->insertGetId($wallet_content);
+                }
+            } else {
+                $coupan_to_wallet = '0';
+            }
+        }
+
+        $walletAmount = 0;
+        if ($request->wallet_used != '' && $request->wallet_used > 0) {
+
+            $wallet_content = [
+                'userid' => $userid,
+                'refer_id' => $userid,
+                'order_currency' => 'AED',
+                'order_total' => $order_total_new,
+                'system_percentage' => '',
+                'wallet_amount' => $request->wallet_used,
+                'added_from' => 1,
+                'order_id' => $order_number,
+                'added_date' => date('Y-m-d'),
+            ];
+            DB::table('front_user_wallet')->insertGetId($wallet_content);
+
+            $walletAmount = $request->wallet_used;
+        }
+
+        /* ---------------- SERVICE & CITY CODE ---------------- */
+
+        $subservice_id = $request->subservice_id;
+        $cityData = DB::table('cities')->whereRaw('name LIKE ?', ['%' . strtolower($request->city) . '%'])->first();
+        $subserviceData = DB::table('subservices')->where('id', $subservice_id)->first();
+
+        if (isset($subserviceData) && isset($subserviceData->subservice_code)) {
+            $subserviceCode = $subserviceData->subservice_code;
+        } else {
+            $subserviceCode = 'OT';
+        }
+
+        $cityCode = 'DU';
+        if (isset($cityData) && isset($cityData->city_code)) {
+            $cityCode = $cityData->city_code;
+        }
+
+        $year = date('y');
+
+        /* ---------------- SEQUENCE LOGIC ---------------- */
+        $lastSequence = DB::table('ci_orders')
+            ->where('subservice_code', $subserviceCode)
+            ->where('city_code', $cityCode)
+            ->where('order_year', $year)
+            ->selectRaw('MAX(CAST(sequence_no AS UNSIGNED)) as seq')
+            ->lockForUpdate()
+            ->value('seq');
+
+        $nextSequence = $lastSequence ? $lastSequence + 1 : 1;
+
+        $formatOrderId = sprintf(
+            "%s-%s-%s-%06d",
+            $subserviceCode,
+            $year,
+            $cityCode,
+            $nextSequence
+        );
+
+        $content = array(
+            'user_id' => $userid,
+            'order_number' => $order_number,
+            'order_total' => $order_total,
+            'front_wallet_amount' => $front_wallet_amount_new,
+            'vatcharge' => $vat_total,
+            'order_currency' => 'AED',
+            'order_status' => $order_status,
+            'paymentmode' => $paymentmode,
+            'payment_status' => $payment_status,
+            'created_at' => date('Y-m-d H:i:s'),
+            'coupan_to_wallet' => $coupan_to_wallet,
+            'coupondiscount' => $coupon_discounted,
+            'coupon_code' => $coupan_code_name,
+            'list_order_status' => $list_order_status,
+            'service_charge' => 0,
+            'promo_discount' => $request->promo_discount,
+            'cleaning_discount_additional' => $cleaning_discount_additional,
+            'timing_charge' => 0,
+            'additional_charge' => "",
+            'sub_total' => $request->sub_total,
+            'cod_charge' => $request->cod_charge,
+            'service_fee' => 0,
+            'order_from' => $order_from,
+            'front_wallet_amount' => $walletAmount,
+            'subservice_code' => $subserviceCode,
+            'city_code' => $cityCode,
+            'order_year' => $year,
+            'sequence_no' => $nextSequence,
+            'format_order_id' => $formatOrderId,
+        );
+
+        $arrOrderId = DB::table('ci_orders')->insertGetId($content);
+        Session::put('format_order_id', $formatOrderId);
+
+        // Date calculations
+        if (empty($request->date) || empty($request->month)) {
+            $daysArray = array_map('trim', explode(',', $request->selectedDays));
+            if (!empty($daysArray) && !empty($daysArray[0])) {
+                $minDiff = 999;
+                $closestDate = null;
+                $today = \Carbon\Carbon::now('Asia/Dubai')->startOfDay();
+                foreach ($daysArray as $dayStr) {
+                    try {
+                        $date = \Carbon\Carbon::parse($dayStr, 'Asia/Dubai');
+                        if ($date->lt($today)) {
+                            $date->addWeek();
+                        }
+                        $diff = $today->diffInDays($date);
+                        if ($diff < $minDiff) {
+                            $minDiff = $diff;
+                            $closestDate = $date;
+                        }
+                    } catch (\Exception $e) {
+                    }
+                }
+                if ($closestDate) {
+                    $request->merge([
+                        'date' => $closestDate->format('d'),
+                        'month' => $closestDate->format('F'),
+                        'year' => $closestDate->format('Y')
+                    ]);
+                }
+            }
+            // Absolute fallback
+            if (empty($request->date) || empty($request->month)) {
+                $request->merge([
+                    'date' => date('d'),
+                    'month' => date('F'),
+                    'year' => date('Y')
+                ]);
+            }
+        }
+
+        $monthName = $request->month;
+        $dateObj = DateTime::createFromFormat('F', ucfirst(strtolower($monthName)));
+        $monthNumber = $dateObj ? $dateObj->format('m') : date('m');
+        $bookingYear = $request->year ?? date('Y');
+
+        $formatted_date = sprintf('%04d-%02d-%02d', $bookingYear, $monthNumber, $request->date);
+
+        // Add package duration to end_date
+        $package_duration_months = (int) $request->package_duration_months;
+        if ($package_duration_months < 1) $package_duration_months = 1;
+        $end_date = date('Y-m-d', strtotime($formatted_date . " +{$package_duration_months} months"));
+
+        $arrData = array(
+            'order_id' => $arrOrderId,
+            'user_info_id' => $userid,
+            'cleaner_id' => 0,
+            'service_id' => $request->service_id,
+            'subservice_id' => $subservice_id,
+            'how_many_cleaners_do_you_need' => 1,
+            'how_many_hours_should_they_stay' => $request->hours,
+            'how_often_do_you_need_cleaning' => $request->how_often_do_you_need_cleaning, // 'Weekly' or 'Multiple times a week'
+            'do_you_need_cleaning_material' => $request->materials,
+            'any_special_instruction' => $request->instructions,
+            'address_type' => $request->address_type,
+            'city' => $request->city,
+            'area' => $request->area,
+            'building_street_no' => $request->building_street_no,
+            'apartment_villa_no' => $request->apartment_villa_no,
+            'bookingdate' => $request->date,
+            'bookingyear' => $bookingYear,
+            'month' => $request->month,
+            'time_slot' => $request->time,
+            'end_date' => $end_date,
+            'which_day_of_the_week_do_you_want_the_service' => $request->selectedDays,
+            'cdate' => date('Y-m-d'),
+        );
+
+        $order_item_id = DB::table('ci_order_item')->insertGetId($arrData);
+
+        $pendingLeadId = Session::get('booknow_pending_lead_id');
+        if ($pendingLeadId) {
+            DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                'status' => 'Booked',
+                'updated_at' => now(),
+            ]);
+            Session::forget('booknow_pending_lead_id');
+        } else {
+            $pendingLeadId = Session::get('booknow_pending_lead_id');
+            if ($pendingLeadId) {
+                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                    'status' => 'Booked',
+                    'updated_at' => now(),
+                ]);
+                Session::forget('booknow_pending_lead_id');
+            } else {
+                $pendingLeadId = Session::get('booknow_pending_lead_id');
+                if ($pendingLeadId) {
+                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                        'status' => 'Booked',
+                        'updated_at' => now(),
+                    ]);
+                    Session::forget('booknow_pending_lead_id');
+                } else {
+                    $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                    $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
+
+                    $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
+                    $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
+                    $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
+                    $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
+                    if ($pastOrders > 0 && $repeatedSourceId) {
+                        $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+                    } else {
+                        $sourceLeadId = $sourceWebsiteId;
+                    }
+
+                    $salespersonId = null;
+                    if ($pastOrders > 0) {
+                        $lastOrder = DB::table('ci_orders')
+                            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+                            ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
+                            ->whereNotNull('ci_order_item.salesperson_id')
+                            ->orderBy('ci_orders.order_id', 'desc')
+                            ->select('ci_order_item.salesperson_id')
+                            ->first();
+                        if ($lastOrder) {
+                            $salespersonId = $lastOrder->salesperson_id;
+                        }
+                    }
+
+                    DB::table('general_enquiries')->insert([
+                        'salesperson_id' => $salespersonId,
+                        'customer_id' => $arrData['user_info_id'] ?? null,
+                        'customer_name' => $customerInfo ? $customerInfo->name : null,
+                        'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
+                        'customer_email' => $customerInfo ? $customerInfo->email : null,
+                        'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                        'service_id' => $arrData['service_id'] ?? null,
+                        'subservice_id' => $arrData['subservice_id'] ?? null,
+                        'source_lead_id' => $sourceLeadId,
+                        'status' => 'Booked',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        }
+
+        $data = [];
+        $data['first_name'] = "";
+        $data['last_name'] = "";
+        $data['country'] = "";
+        $data['address1'] = "";
+        $data['state'] = "";
+        $data['city'] = "";
+        $data['zipcode'] = "";
+        $data['address2'] = "";
+        $data['phone_number'] = "";
+        $data['email_address'] = "";
+        $data['additional_message'] = "";
+        $data['payment_method'] = "";
+        $data['order_id'] = $arrOrderId;
+        $data['user_id'] = $userid;
+
+        DB::table('ci_shipping_address')->insert($data);
+
+        session()->forget('coupan_data');
+
+        if ($payment_type == 'COD') {
+            $success = $this->success_mail_book_now();
+            $success_vendor = $this->success_mail_book_now_allvendor();
+            if ($success) {
+                return response()->json(['status' => 'success', 'redirect' => route('cleaning.thankyou_book_now')]);
+            }
+            return response()->json(['status' => 'success', 'redirect' => route('cleaning.thankyou_book_now')]);
+        } else {
+            $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
+
+            $response = $stripe->checkout->sessions->create([
+                'line_items' => [
+                    [
+                        'price_data' => [
+                            'currency' => 'aed',
+                            'product_data' => [
+                                'name' => 'Your Total'
+                            ],
+                            'unit_amount' => $order_total_new * 100,
+                        ],
+                        'quantity' => 1,
+                    ],
+                ],
+                'mode' => 'payment',
+                'success_url' => route('payment_success'),
+                'cancel_url' => route('payment_fail'),
+            ]);
+
+            if (isset($response->id) && $response->id != '') {
+                Session::put('stripe_session_id', $response->id);
+                return response()->json(['status' => 'success', 'redirect' => $response->url]);
+            } else {
+                return response()->json(['status' => 'error', 'redirect' => route('payment_fail')]);
+            }
+        }
+    }
+
     function book_now_homecleaning(Request $request)
     {
 
@@ -4310,13 +5036,13 @@ class checkoutcontroller extends Controller
         $payment_type = $request->payment_type;
 
         if ($payment_type == 'COD') {
-            $order_status = 'BK';
+            $order_status = 'P';
             $paymentmode = 1;
             $list_order_status = '0';
             $payment_status = 'Success';
             $payment_mode = "COD";
         } else {
-            $order_status = 'BK';
+            $order_status = 'P';
             $paymentmode = 2;
             $list_order_status = '0';
             $payment_status = 'FAILED';
@@ -4370,15 +5096,15 @@ class checkoutcontroller extends Controller
                 // Credit customer's wallet immediately if COD booking is completed successfully
                 if ($payment_type == 'COD') {
                     $wallet_content = [
-                        'userid'              => $userid,
-                        'refer_id'             => $userid,
-                        'order_currency'       => 'AED',
-                        'order_total'          => $order_total,
-                        'system_percentage'    => '',
-                        'wallet_amount'        => $coupon_discounted,
-                        'added_from'           => 0, // credit
-                        'order_id'             => $order_number,
-                        'added_date'           => date('Y-m-d'),
+                        'userid' => $userid,
+                        'refer_id' => $userid,
+                        'order_currency' => 'AED',
+                        'order_total' => $order_total,
+                        'system_percentage' => '',
+                        'wallet_amount' => $coupon_discounted,
+                        'added_from' => 0, // credit
+                        'order_id' => $order_number,
+                        'added_date' => date('Y-m-d'),
                     ];
                     DB::table('front_user_wallet')->insertGetId($wallet_content);
                 }
@@ -4391,15 +5117,15 @@ class checkoutcontroller extends Controller
         if ($request->wallet_used != '' && $request->wallet_used > 0) {
 
             $wallet_content = [
-                'userid'              => $userid,
-                'refer_id'             => $userid,
-                'order_currency'       => 'AED',
-                'order_total'          => $order_total_new,
-                'system_percentage'    => '',
-                'wallet_amount'        => $request->wallet_used,
-                'added_from'           => 1,
-                'order_id'             => $order_number,
-                'added_date'           => date('Y-m-d'),
+                'userid' => $userid,
+                'refer_id' => $userid,
+                'order_currency' => 'AED',
+                'order_total' => $order_total_new,
+                'system_percentage' => '',
+                'wallet_amount' => $request->wallet_used,
+                'added_from' => 1,
+                'order_id' => $order_number,
+                'added_date' => date('Y-m-d'),
             ];
             DB::table('front_user_wallet')->insertGetId($wallet_content);
 
@@ -4456,36 +5182,36 @@ class checkoutcontroller extends Controller
 
 
         $content = array(
-            'user_id'               => $userid,
-            'order_number'          => $order_number,
-            'order_total'           => $order_total,
-            'front_wallet_amount'   => $front_wallet_amount_new,
-            'vatcharge'             => $vat_total,
-            'order_currency'        => 'AED',
-            'order_status'          => $order_status,
-            'paymentmode'           => $paymentmode,
-            'payment_status'        => $payment_status,
-            'created_at'            => date('Y-m-d H:i:s'),
-            'coupan_to_wallet'     => $coupan_to_wallet,
-            'coupondiscount'     => $coupon_discounted,
-            'coupon_code'     => $coupan_code_name,
-            'list_order_status'     => $list_order_status,
-            'service_charge'     => $request->service_charge,
-            'promo_discount'     => $request->promo_discount,
-            'cleaning_discount_additional'     => $cleaning_discount_additional,
-            'timing_charge'     => $timing_charger,
-            'additional_charge'     => "",
-            'sub_total'     => $request->sub_total,
-            'cod_charge'     => $request->cod_charge,
-            'service_fee'     => $request->service_fee,
-            'order_from'     => $order_from,
-            'front_wallet_amount'  => $walletAmount,
+            'user_id' => $userid,
+            'order_number' => $order_number,
+            'order_total' => $order_total,
+            'front_wallet_amount' => $front_wallet_amount_new,
+            'vatcharge' => $vat_total,
+            'order_currency' => 'AED',
+            'order_status' => $order_status,
+            'paymentmode' => $paymentmode,
+            'payment_status' => $payment_status,
+            'created_at' => date('Y-m-d H:i:s'),
+            'coupan_to_wallet' => $coupan_to_wallet,
+            'coupondiscount' => $coupon_discounted,
+            'coupon_code' => $coupan_code_name,
+            'list_order_status' => $list_order_status,
+            'service_charge' => $request->service_charge,
+            'promo_discount' => $request->promo_discount,
+            'cleaning_discount_additional' => $cleaning_discount_additional,
+            'timing_charge' => $timing_charger,
+            'additional_charge' => "",
+            'sub_total' => $request->sub_total,
+            'cod_charge' => $request->cod_charge,
+            'service_fee' => $request->service_fee,
+            'order_from' => $order_from,
+            'front_wallet_amount' => $walletAmount,
             // 🔥 NEW FIELDS
-            'subservice_code'       => $subserviceCode,
-            'city_code'             => $cityCode,
-            'order_year'            => $year,
-            'sequence_no'           => $nextSequence,
-            'format_order_id'           => $formatOrderId,
+            'subservice_code' => $subserviceCode,
+            'city_code' => $cityCode,
+            'order_year' => $year,
+            'sequence_no' => $nextSequence,
+            'format_order_id' => $formatOrderId,
         );
 
         $arrOrderId = DB::table('ci_orders')->insertGetId($content);
@@ -4522,31 +5248,109 @@ class checkoutcontroller extends Controller
         }
 
         $arrData = array(
-            'order_id'                             => $arrOrderId,
-            'user_info_id'                         => $userid,
-            'cleaner_id'                           => $request->cleaner_id,
-            'service_id'                           => $request->service_id,
-            'subservice_id'                        => $request->subservice_id,
-            'how_many_cleaners_do_you_need'        => $request->how_many_cleaners_do_you_need,
-            'how_many_hours_should_they_stay'      => $request->how_many_hours_should_they_stay,
-            'how_often_do_you_need_cleaning'       => $request->how_often_do_you_need_cleaning,
-            'do_you_need_cleaning_material'        => $request->do_you_need_cleaning_material,
-            'any_special_instruction'              => $request->any_special_instruction,
-            'address_type'                         => $request->address_type,
-            'city'                                 => $request->city,
-            'area'                                 => $request->area,
-            'building_street_no'                   => $request->building_street_no,
-            'apartment_villa_no'                   => $request->apartment_villa_no,
-            'bookingdate'                          => $request->date,
-            'bookingyear'                          => date('Y'),
-            'month'                                => $request->month,
-            'time_slot'                            => $request->time_slot,
-            'end_date'                            => $end_date,
+            'order_id' => $arrOrderId,
+            'user_info_id' => $userid,
+            'cleaner_id' => $request->cleaner_id,
+            'service_id' => $request->service_id,
+            'subservice_id' => $request->subservice_id,
+            'how_many_cleaners_do_you_need' => $request->how_many_cleaners_do_you_need,
+            'how_many_hours_should_they_stay' => $request->how_many_hours_should_they_stay,
+            'how_often_do_you_need_cleaning' => $request->how_often_do_you_need_cleaning,
+            'do_you_need_cleaning_material' => $request->do_you_need_cleaning_material,
+            'any_special_instruction' => $request->any_special_instruction,
+            'address_type' => $request->address_type,
+            'city' => $request->city,
+            'area' => $request->area,
+            'building_street_no' => $request->building_street_no,
+            'apartment_villa_no' => $request->apartment_villa_no,
+            'bookingdate' => $request->date,
+            'bookingyear' => date('Y'),
+            'month' => $request->month,
+            'time_slot' => $request->time_slot,
+            'end_date' => $end_date,
             'which_day_of_the_week_do_you_want_the_service' => $which_day_of_the_week_do_you_want_the_service,
-            'cdate'                                => date('Y-m-d'),
+            'cdate' => date('Y-m-d'),
         );
 
         $order_item_id = DB::table('ci_order_item')->insertGetId($arrData);
+
+        $pendingLeadId = Session::get('booknow_pending_lead_id');
+        if ($pendingLeadId) {
+            DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                'status' => 'Booked',
+                'updated_at' => now(),
+            ]);
+            Session::forget('booknow_pending_lead_id');
+        } else {
+            $pendingLeadId = Session::get('booknow_pending_lead_id');
+            if ($pendingLeadId) {
+                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                    'status' => 'Booked',
+                    'updated_at' => now(),
+                ]);
+                Session::forget('booknow_pending_lead_id');
+            } else {
+                $pendingLeadId = Session::get('booknow_pending_lead_id');
+                if ($pendingLeadId) {
+                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                        'status' => 'Booked',
+                        'updated_at' => now(),
+                    ]);
+                    Session::forget('booknow_pending_lead_id');
+                } else {
+                    $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                    $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
+
+                    $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
+                    $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
+                    $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
+                    $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
+                    if ($pastOrders > 0 && $repeatedSourceId) {
+                        $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+                    } else {
+                        $sourceLeadId = $sourceWebsiteId;
+                    }
+
+                    $salespersonId = null;
+                    if ($pastOrders > 0) {
+                        $lastOrder = DB::table('ci_orders')
+                            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+                            ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
+                            ->whereNotNull('ci_order_item.salesperson_id')
+                            ->orderBy('ci_orders.order_id', 'desc')
+                            ->select('ci_order_item.salesperson_id')
+                            ->first();
+                        if ($lastOrder) {
+                            $salespersonId = $lastOrder->salesperson_id;
+                        }
+                    }
+
+                    DB::table('general_enquiries')->insert([
+                        'salesperson_id' => $salespersonId,
+                        'customer_id' => $arrData['user_info_id'] ?? null,
+                        'customer_name' => $customerInfo ? $customerInfo->name : null,
+                        'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
+                        'customer_email' => $customerInfo ? $customerInfo->email : null,
+                        'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                        'service_id' => $arrData['service_id'] ?? null,
+                        'subservice_id' => $arrData['subservice_id'] ?? null,
+                        'source_lead_id' => $sourceLeadId,
+                        'status' => 'Booked',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        }
+
+        // --- START: RECURRING BOOKING GENERATION LOGIC ---
+        $frequency = $request->how_often_do_you_need_cleaning ?? 'Once';
+
+        if (!empty($frequency) && $frequency != 'Once') {
+            // Visits are no longer pre-generated here to improve checkout performance.
+            // Future visits will be dynamically calculated when viewed in order details.
+        }
+        // --- END: RECURRING BOOKING GENERATION LOGIC ---
 
         $cart_data = Session::get('addons_cart', []);
 
@@ -4554,23 +5358,23 @@ class checkoutcontroller extends Controller
             foreach ($cart_data as $cart) {
 
                 $arrData_addons = array(
-                    'order_id'                        => $arrOrderId,
-                    'order_item_id'                   => $order_item_id,
-                    'user_info_id'                    => $userid,
-                    'package_id'                      => $cart['options']['addon_id'],
-                    'package_item_name'               => $cart['name'],
-                    'package_quantity'                => $cart['qty'],
-                    'package_item_price'              => $cart['price'],
-                    'service_id'                      => $cart['options']['service_id'],
-                    'service_name'                    => $cart['options']['service_name'],
-                    'subservice_id'                   => $cart['options']['subservice_id'],
-                    'subservice_name'                 => $cart['options']['subservice_name'],
+                    'order_id' => $arrOrderId,
+                    'order_item_id' => $order_item_id,
+                    'user_info_id' => $userid,
+                    'package_id' => $cart['options']['addon_id'],
+                    'package_item_name' => $cart['name'],
+                    'package_quantity' => $cart['qty'],
+                    'package_item_price' => $cart['price'],
+                    'service_id' => $cart['options']['service_id'],
+                    'service_name' => $cart['options']['service_name'],
+                    'subservice_id' => $cart['options']['subservice_id'],
+                    'subservice_name' => $cart['options']['subservice_name'],
                     //'page_url'                        => $arrRowDeailts->options->page_url,
-                    'image'                           => $cart['options']['image'],
-                    'discount'                        => $cart['options']['discount'],
-                    'discount_type'                   => $cart['options']['discount_type'],
-                    'product_discount_amount'         => round($cart['options']['product_discount_amount']),
-                    'cdate'                           => date('Y-m-d'),
+                    'image' => $cart['options']['image'],
+                    'discount' => $cart['options']['discount'],
+                    'discount_type' => $cart['options']['discount_type'],
+                    'product_discount_amount' => round($cart['options']['product_discount_amount']),
+                    'cdate' => date('Y-m-d'),
                     //'subservice_booking_percentage'   => $arrRowDeailts->options->subservice_booking_percentage,
 
                 );
@@ -4723,15 +5527,15 @@ class checkoutcontroller extends Controller
                 }
 
                 $wallet_content = [
-                    'userid'              => $userid,
-                    'refer_id'             => $userid,
-                    'order_currency'       => 'AED',
-                    'order_total'          => $order_total_new,
-                    'system_percentage'    => '',
-                    'wallet_amount'        => $coupon_discounted,
-                    'added_from'           => 0,
-                    'order_id'             => $order_number,
-                    'added_date'           => date('Y-m-d'),
+                    'userid' => $userid,
+                    'refer_id' => $userid,
+                    'order_currency' => 'AED',
+                    'order_total' => $order_total_new,
+                    'system_percentage' => '',
+                    'wallet_amount' => $coupon_discounted,
+                    'added_from' => 0,
+                    'order_id' => $order_number,
+                    'added_date' => date('Y-m-d'),
                 ];
                 DB::table('front_user_wallet')->insertGetId($wallet_content);
 
@@ -4751,15 +5555,15 @@ class checkoutcontroller extends Controller
         if ($request->wallet_used != '' && $request->wallet_used > 0) {
 
             $wallet_content = [
-                'userid'              => $userid,
-                'refer_id'             => $userid,
-                'order_currency'       => 'AED',
-                'order_total'          => $order_total_new,
-                'system_percentage'    => '',
-                'wallet_amount'        => $request->wallet_used,
-                'added_from'           => 1,
-                'order_id'             => $order_number,
-                'added_date'           => date('Y-m-d'),
+                'userid' => $userid,
+                'refer_id' => $userid,
+                'order_currency' => 'AED',
+                'order_total' => $order_total_new,
+                'system_percentage' => '',
+                'wallet_amount' => $request->wallet_used,
+                'added_from' => 1,
+                'order_id' => $order_number,
+                'added_date' => date('Y-m-d'),
             ];
             DB::table('front_user_wallet')->insertGetId($wallet_content);
 
@@ -4822,35 +5626,35 @@ class checkoutcontroller extends Controller
 
 
         $content = array(
-            'user_id'               => $userid,
-            'order_number'          => $order_number,
-            'order_total'           => $order_total,
-            'front_wallet_amount'   => $front_wallet_amount_new,
-            'vatcharge'             => $vat_total,
-            'order_currency'        => 'AED',
-            'order_status'          => $order_status,
-            'paymentmode'           => $paymentmode,
-            'payment_status'        => $payment_status,
-            'created_at'            => date('Y-m-d H:i:s'),
-            'coupan_to_wallet'     => $coupan_to_wallet,
-            'coupondiscount'     => $coupon_discounted,
-            'coupon_code'     => $coupan_code_name,
-            'list_order_status'     => $list_order_status,
-            'service_charge'     => $request->service_charge,
-            'promo_discount'     => $request->promo_discount,
-            'cleaning_discount_additional'     => $cleaning_discount_additional,
-            'timing_charge'     => $timing_charger,
-            'additional_charge'     => "",
-            'sub_total'     => $request->sub_total,
-            'cod_charge'     => $request->cod_charge,
-            'service_fee'     => $request->service_fee,
-            'order_from'     => $order_from,
-            'front_wallet_amount'  => $walletAmount,
-            'subservice_code'       => $subserviceCode,
-            'city_code'             => $cityCode,
-            'order_year'            => $year,
-            'sequence_no'           => $nextSequence,
-            'format_order_id'           => $formatOrderId,
+            'user_id' => $userid,
+            'order_number' => $order_number,
+            'order_total' => $order_total,
+            'front_wallet_amount' => $front_wallet_amount_new,
+            'vatcharge' => $vat_total,
+            'order_currency' => 'AED',
+            'order_status' => $order_status,
+            'paymentmode' => $paymentmode,
+            'payment_status' => $payment_status,
+            'created_at' => date('Y-m-d H:i:s'),
+            'coupan_to_wallet' => $coupan_to_wallet,
+            'coupondiscount' => $coupon_discounted,
+            'coupon_code' => $coupan_code_name,
+            'list_order_status' => $list_order_status,
+            'service_charge' => $request->service_charge,
+            'promo_discount' => $request->promo_discount,
+            'cleaning_discount_additional' => $cleaning_discount_additional,
+            'timing_charge' => $timing_charger,
+            'additional_charge' => "",
+            'sub_total' => $request->sub_total,
+            'cod_charge' => $request->cod_charge,
+            'service_fee' => $request->service_fee,
+            'order_from' => $order_from,
+            'front_wallet_amount' => $walletAmount,
+            'subservice_code' => $subserviceCode,
+            'city_code' => $cityCode,
+            'order_year' => $year,
+            'sequence_no' => $nextSequence,
+            'format_order_id' => $formatOrderId,
         );
 
         $arrOrderId = DB::table('ci_orders')->insertGetId($content);
@@ -4870,26 +5674,95 @@ class checkoutcontroller extends Controller
         $end_date = sprintf('%04d-%02d-%02d', date('Y'), $monthNumber, $request->date);
 
         $arrData = array(
-            'order_id'                             => $arrOrderId,
-            'user_info_id'                         => $userid,
-            'service_id'                           => $request->service_id,
-            'subservice_id'                        => $request->subservice_id,
-            'address_type'                         => $request->address_type,
-            'city'                                 => $request->city,
-            'area'                                 => $request->area,
-            'building_street_no'                   => $request->building_street_no,
-            'apartment_villa_no'                   => $request->apartment_villa_no,
-            'emirates_id_number'                   => ($request->service_id == 54) ? $request->emirates_id_number : '',
-            'passport_number'                   => ($request->service_id == 54) ? $request->passport_number : '',
-            'bookingdate'                          => $request->date,
-            'bookingyear'                          => date('Y'),
-            'month'                                => $request->month,
-            'time_slot'                            => $request->time_slot,
-            'end_date'                            => $end_date,
-            'cdate'                                => date('Y-m-d'),
+            'order_id' => $arrOrderId,
+            'user_info_id' => $userid,
+            'service_id' => $request->service_id,
+            'subservice_id' => $request->subservice_id,
+            'address_type' => $request->address_type,
+            'city' => $request->city,
+            'area' => $request->area,
+            'building_street_no' => $request->building_street_no,
+            'apartment_villa_no' => $request->apartment_villa_no,
+            'emirates_id_number' => ($request->service_id == 54) ? $request->emirates_id_number : '',
+            'passport_number' => ($request->service_id == 54) ? $request->passport_number : '',
+            'bookingdate' => $request->date,
+            'bookingyear' => date('Y'),
+            'month' => $request->month,
+            'time_slot' => $request->time_slot,
+            'end_date' => $end_date,
+            'cdate' => date('Y-m-d'),
         );
 
         $order_item_id = DB::table('ci_order_item')->insertGetId($arrData);
+
+        $pendingLeadId = Session::get('booknow_pending_lead_id');
+        if ($pendingLeadId) {
+            DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                'status' => 'Booked',
+                'updated_at' => now(),
+            ]);
+            Session::forget('booknow_pending_lead_id');
+        } else {
+            $pendingLeadId = Session::get('booknow_pending_lead_id');
+            if ($pendingLeadId) {
+                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                    'status' => 'Booked',
+                    'updated_at' => now(),
+                ]);
+                Session::forget('booknow_pending_lead_id');
+            } else {
+                $pendingLeadId = Session::get('booknow_pending_lead_id');
+                if ($pendingLeadId) {
+                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                        'status' => 'Booked',
+                        'updated_at' => now(),
+                    ]);
+                    Session::forget('booknow_pending_lead_id');
+                } else {
+                    $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
+                    $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
+
+                    $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
+                    $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
+                    $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
+                    $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
+                    if ($pastOrders > 0 && $repeatedSourceId) {
+                        $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+                    } else {
+                        $sourceLeadId = $sourceWebsiteId;
+                    }
+
+                    $salespersonId = null;
+                    if ($pastOrders > 0) {
+                        $lastOrder = DB::table('ci_orders')
+                            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+                            ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
+                            ->whereNotNull('ci_order_item.salesperson_id')
+                            ->orderBy('ci_orders.order_id', 'desc')
+                            ->select('ci_order_item.salesperson_id')
+                            ->first();
+                        if ($lastOrder) {
+                            $salespersonId = $lastOrder->salesperson_id;
+                        }
+                    }
+
+                    DB::table('general_enquiries')->insert([
+                        'salesperson_id' => $salespersonId,
+                        'customer_id' => $arrData['user_info_id'] ?? null,
+                        'customer_name' => $customerInfo ? $customerInfo->name : null,
+                        'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
+                        'customer_email' => $customerInfo ? $customerInfo->email : null,
+                        'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                        'service_id' => $arrData['service_id'] ?? null,
+                        'subservice_id' => $arrData['subservice_id'] ?? null,
+                        'source_lead_id' => $sourceLeadId,
+                        'status' => 'Booked',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        }
         // echo"<pre>";print_r($cart_data);echo"</pre>";exit;
         if (count($cart_data) > 0) {
 
@@ -4897,25 +5770,25 @@ class checkoutcontroller extends Controller
 
                 if ($cart['type'] == 'package') {
                     $arrData_package = array(
-                        'order_id'                        => $arrOrderId,
-                        'order_item_id'                   => $order_item_id,
-                        'user_info_id'                    => $userid,
-                        'package_id'                      => $cart['id'],
-                        'package_item_name'               => $cart['name'],
-                        'package_quantity'                => $cart['qty'],
-                        'package_item_price'              => $cart['price'],
-                        'service_id'                      => $cart['options']['service_id'],
-                        'service_name'                    => $cart['options']['service_name'],
-                        'subservice_id'                   => $cart['options']['subservice_id'],
-                        'subservice_name'                 => $cart['options']['subservice_name'],
-                        'packagecategory_id'              => $cart['options']['packagecategory_id'],
-                        'packagecategory_name'            => $cart['options']['packagecategory_name'],
+                        'order_id' => $arrOrderId,
+                        'order_item_id' => $order_item_id,
+                        'user_info_id' => $userid,
+                        'package_id' => $cart['id'],
+                        'package_item_name' => $cart['name'],
+                        'package_quantity' => $cart['qty'],
+                        'package_item_price' => $cart['price'],
+                        'service_id' => $cart['options']['service_id'],
+                        'service_name' => $cart['options']['service_name'],
+                        'subservice_id' => $cart['options']['subservice_id'],
+                        'subservice_name' => $cart['options']['subservice_name'],
+                        'packagecategory_id' => $cart['options']['packagecategory_id'],
+                        'packagecategory_name' => $cart['options']['packagecategory_name'],
                         //'page_url'                        => $arrRowDeailts->options->page_url,
-                        'image'                           => $cart['options']['image'],
-                        'discount'                        => $cart['options']['discount'],
-                        'discount_type'                   => $cart['options']['discount_type'],
-                        'product_discount_amount'         => round($cart['options']['product_discount_amount']),
-                        'cdate'                           => date('Y-m-d'),
+                        'image' => $cart['options']['image'],
+                        'discount' => $cart['options']['discount'],
+                        'discount_type' => $cart['options']['discount_type'],
+                        'product_discount_amount' => round($cart['options']['product_discount_amount']),
+                        'cdate' => date('Y-m-d'),
                         //'subservice_booking_percentage'   => $arrRowDeailts->options->subservice_booking_percentage,
 
                     );
@@ -4923,25 +5796,25 @@ class checkoutcontroller extends Controller
                     DB::table('ci_order_item_packages')->insertGetId($arrData_package);
                 } else {
                     $arrData_addons = array(
-                        'order_id'                        => $arrOrderId,
-                        'order_item_id'                   => $order_item_id,
-                        'user_info_id'                    => $userid,
-                        'package_id'                      => $cart['id'],
-                        'package_item_name'               => $cart['name'],
-                        'package_quantity'                => $cart['qty'],
-                        'package_item_price'              => $cart['price'],
-                        'service_id'                      => $cart['options']['service_id'],
-                        'service_name'                    => $cart['options']['service_name'],
-                        'subservice_id'                   => $cart['options']['subservice_id'],
-                        'subservice_name'                 => $cart['options']['subservice_name'],
-                        'packagecategory_id'              => $cart['options']['packagecategory_id'],
-                        'packagecategory_name'            => $cart['options']['packagecategory_name'],
+                        'order_id' => $arrOrderId,
+                        'order_item_id' => $order_item_id,
+                        'user_info_id' => $userid,
+                        'package_id' => $cart['id'],
+                        'package_item_name' => $cart['name'],
+                        'package_quantity' => $cart['qty'],
+                        'package_item_price' => $cart['price'],
+                        'service_id' => $cart['options']['service_id'],
+                        'service_name' => $cart['options']['service_name'],
+                        'subservice_id' => $cart['options']['subservice_id'],
+                        'subservice_name' => $cart['options']['subservice_name'],
+                        'packagecategory_id' => $cart['options']['packagecategory_id'],
+                        'packagecategory_name' => $cart['options']['packagecategory_name'],
                         //'page_url'                        => $arrRowDeailts->options->page_url,
-                        'image'                           => $cart['options']['image'],
-                        'discount'                        => $cart['options']['discount'],
-                        'discount_type'                   => $cart['options']['discount_type'],
-                        'product_discount_amount'         => round($cart['options']['product_discount_amount']),
-                        'cdate'                           => date('Y-m-d'),
+                        'image' => $cart['options']['image'],
+                        'discount' => $cart['options']['discount'],
+                        'discount_type' => $cart['options']['discount_type'],
+                        'product_discount_amount' => round($cart['options']['product_discount_amount']),
+                        'cdate' => date('Y-m-d'),
                         //'subservice_booking_percentage'   => $arrRowDeailts->options->subservice_booking_percentage,
 
                     );
@@ -4986,7 +5859,7 @@ class checkoutcontroller extends Controller
                 } elseif ($request->service_id == 47) {
                     return redirect()->route('pest_control.thankyou_book_now');
                 } else {
-                    return redirect('thankyou_book_now');
+                    return redirect(route('thankyou_book_now'));
                 }
             }
         } elseif ($payment_type == 'TABBY') {

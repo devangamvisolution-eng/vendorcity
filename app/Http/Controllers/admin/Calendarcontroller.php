@@ -37,7 +37,15 @@ class Calendarcontroller extends Controller
         } elseif ($user->role_id == '15') { // Driver
             $query->where('ci_order_item.driver_id', $user->id);
         } elseif ($user->role_id == '16') { // Cleaner
-           $query->whereRaw("FIND_IN_SET(?, ci_order_item.cleaner_id)", [$user->id]);
+           $query->where(function($q) use ($user) {
+               $q->whereRaw("FIND_IN_SET(?, ci_order_item.cleaner_id)", [$user->id])
+                 ->orWhereExists(function ($subquery) use ($user) {
+                     $subquery->select(DB::raw(1))
+                              ->from('ci_order_visits')
+                              ->whereColumn('ci_order_visits.order_id', 'ci_order_item.order_id')
+                              ->whereRaw("FIND_IN_SET(?, ci_order_visits.cleaner_id)", [$user->id]);
+                 });
+           });
         } else { // Vendor
             $query->where('ci_orders.vendor_id', $user->id);
         }
@@ -195,13 +203,64 @@ class Calendarcontroller extends Controller
                             $startDateTime = Carbon::parse($dateStr . ' ' . $startTimeStr)->format('Y-m-d\TH:i:s');
                             $endDateTime = Carbon::parse($dateStr . ' ' . $End_endTimeStr)->format('Y-m-d\TH:i:s');
 
+                            $visitCheck = DB::table('ci_order_visits')
+                                ->where('order_id', $order->order_id)
+                                ->where('visit_date', $dateStr)
+                                ->first();
+
+                            $visitStatus = $visitCheck ? $visitCheck->visit_status : 'upcoming';
+                            $effectiveCleaners = ($visitCheck && !empty($visitCheck->cleaner_id)) ? $visitCheck->cleaner_id : $order->cleaner_id;
+
+                            // If logged in as cleaner, only show if they are assigned to THIS specific visit
+                            if ($user->role_id == '16') {
+                                if (empty($effectiveCleaners)) {
+                                    continue;
+                                }
+                                $cleanerIdsArray = explode(',', $effectiveCleaners);
+                                $cleanerIdsArray = array_map('trim', $cleanerIdsArray);
+                                if (!in_array($user->id, $cleanerIdsArray)) {
+                                    continue;
+                                }
+                            }
+
+                            $isCancelled = in_array($visitStatus, ['cancelled', 'skipped']);
+                            $backgroundColor = $isCancelled ? '#e74c3c' : '#3498db';
+                            $titlePrefix = $isCancelled ? 'Cancelled: ' : '';
+
+                            // Resolve cleaner names for this visit
+                            $visitCleanerNames = [];
+                            if (!empty($effectiveCleaners)) {
+                                $effCleanerIds = explode(',', $effectiveCleaners);
+                                foreach ($effCleanerIds as $id) {
+                                    if(trim($id)) {
+                                        $visitCleanerNames[] = Helper::cleanername_new(trim($id));
+                                    }
+                                }
+                            }
+                            $visitCleanerNameStr = !empty($visitCleanerNames) ? implode(', ', $visitCleanerNames) : 'N/A';
+
+                            $locationText = ($mapUrl == 'N/A') ? 'N/A' : "<a href=\"{$mapUrl}\" target=\"_blank\">View on Map</a>";
+                            $visitOrderDetails = "Order ID: {$orderIdText}<br><br>"
+                                          . "Customer Name: {$customerName}<br>"
+                                          . "Customer Address: {$fullAddress}<br>"
+                                          . "Location: {$locationText}<br><br>"
+                                          . "Vendor Name: {$VendorName}<br>"
+                                          . "Sales Person: {$salesPersonName}<br>"
+                                          . "Driver Name : {$DriverName}<br>"
+                                          . "Crew: {$visitCleanerNameStr}<br>"
+                                          . "No Of Hours: {$No_of_hours} hours<br>"
+                                          . "Time Slot: {$slotText}<br>"
+                                          . "Service: {$servicename}<br>"
+                                          . "Date: {$order->bookingdate}-{$order->month}-{$order->bookingyear}<br>"
+                                          . "OrderEndDate: {$order->end_date}<br>";
+
                             $events[] = [
-                                'title' => $subservicename . ' - ' . $orderIdText,
+                                'title' => $titlePrefix . $subservicename . ' - ' . $orderIdText,
                                 'start' => Carbon::parse($startDateTime, 'Asia/Dubai')->format('Y-m-d\TH:i:s'),
                                 'end' => Carbon::parse($endDateTime, 'Asia/Dubai')->format('Y-m-d\TH:i:s'),
-                                'backgroundColor' => '#3498db',
+                                'backgroundColor' => $backgroundColor,
                                 'extendedProps' => [
-                                    'details' => $orderDetails,
+                                    'details' => $visitOrderDetails,
                                 ],
                             ];
                         }

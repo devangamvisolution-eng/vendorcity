@@ -92,6 +92,12 @@
                                         class="form-control" placeholder="Enter Slider Image Alt tag" value="" />
                                 </div>
 
+                                <div class="form-group">
+                                    <label>App Slider Image (Optional, for category tabs)</label>
+                                    <input type="file" class="form-control" id="app_slider_image"
+                                        name="app_slider_image">
+                                </div>
+
 
 
                             </div>

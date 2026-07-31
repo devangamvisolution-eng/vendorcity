@@ -8,7 +8,7 @@ use DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
 use Route;
-use App\Models\Admin\Erpdescriptionofgoods;
+use App\Models\admin\Erpdescriptionofgoods;
 use Mpdf\Mpdf;
 
 class ErpAcceptedquotecontroller extends Controller

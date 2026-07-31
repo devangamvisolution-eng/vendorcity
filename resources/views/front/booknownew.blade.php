@@ -1,7 +1,7 @@
 @include('front.includes.header')
 
 
-<link rel="stylesheet" href="{{ asset('public/site/css/booknownew.css?v=8') }}">
+<link rel="stylesheet" href="{{ asset('public/site/css/booknownew.css?v=9') }}">
 <link rel="stylesheet" href="{{ asset('public/site/css/homedirham.css?v=8') }}">
 <script>
     window.isUserLoggedIn = {{ Session::has('user') ? 'true' : 'false' }};
@@ -342,8 +342,8 @@
         box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.14) !important;
         height: 88vh !important;
         height: 88dvh !important;
-        max-height: 88vh !important;
-        max-height: 88dvh !important;
+        max-height: 80vh !important;
+        max-height: 80dvh !important;
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important;
@@ -359,6 +359,10 @@
         flex: 0 0 auto !important;
         width: 100%;
         -webkit-tap-highlight-color: transparent;
+        position: sticky !important;
+        top: 0 !important;
+        background: #fff !important;
+        z-index: 1045 !important;
     }
 
     #mobilesummaryModal .modal-body {
@@ -375,6 +379,10 @@
         flex: 0 0 auto !important;
         width: 100%;
         padding-bottom: max(20px, calc(12px + env(safe-area-inset-bottom, 0px))) !important;
+    }
+
+    .customMt {
+        margin-top: 8%;
     }
 
     @media (min-width: 768px) {
@@ -397,10 +405,13 @@
         }
     }
 
-    .package-description-popup ul li{
+    .package-description-popup ul li {
         list-style-type: inherit;
     }
-    .package-description-popup p {color: #000000de;}
+
+    .package-description-popup p {
+        color: #000000de;
+    }
 </style>
 
 
@@ -453,14 +464,14 @@
                                                 </button>
                                             @endforeach
                                             {{-- <button data-target="mattress">Mattress</button>
-                                        <button data-target="carpet">Carpet</button>
-                                        <button data-target="curtain">Curtain</button>
-                                        <button data-target="combo">Combos</button>
-                                        <button data-target="combo1">Combos1</button>
-                                        <button data-target="combo2">Combos2</button>
-                                        <button data-target="combo3">Combos3</button>
-                                        <button data-target="combo4">Combos4</button>
-                                        <button data-target="combo5">Combos5</button> --}}
+                                            <button data-target="carpet">Carpet</button>
+                                            <button data-target="curtain">Curtain</button>
+                                            <button data-target="combo">Combos</button>
+                                            <button data-target="combo1">Combos1</button>
+                                            <button data-target="combo2">Combos2</button>
+                                            <button data-target="combo3">Combos3</button>
+                                            <button data-target="combo4">Combos4</button>
+                                            <button data-target="combo5">Combos5</button> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -469,22 +480,22 @@
                             <div class="section-packages">
                                 {{-- <div class="image">
                                     @if ($subservice_data->service_detail_image != '')
-                                        <img src="{{ url('public/upload/subservice/' . $subservice_data->service_detail_image) }}"
-                                            class="img-fluid subservice-image"
-                                            alt="{{ $subservice_data->image_alt_tag ?? $subservice_data->subservicename }}">
+                                    <img src="{{ url('public/upload/subservice/' . $subservice_data->service_detail_image) }}"
+                                        class="img-fluid subservice-image"
+                                        alt="{{ $subservice_data->image_alt_tag ?? $subservice_data->subservicename }}">
                                     @else
-                                        <img src="{{ asset('public/site/images/no-image.jpg') }}"
-                                            class="img-fluid subservice-image"
-                                            alt="{{ $subservice_data->image_alt_tag ?? $subservice_data->subservicename }}">
+                                    <img src="{{ asset('public/site/images/no-image.jpg') }}"
+                                        class="img-fluid subservice-image"
+                                        alt="{{ $subservice_data->image_alt_tag ?? $subservice_data->subservicename }}">
                                     @endif
-                                </div> 
+                                </div>
                                 <div class="subservice-desc">
                                     <h5 class="font-weight-bold h3 subservice-name">About our {{ $subservice_name }}
                                         Service </h5>
                                     @if (!empty($subservice_data->service_detail_short_description))
-                                        <p style="margin-bottom: 0;">
-                                            {{ $subservice_data->service_detail_short_description }}
-                                        </p>
+                                    <p style="margin-bottom: 0;">
+                                        {{ $subservice_data->service_detail_short_description }}
+                                    </p>
                                     @endif
                                     <a href="javascript:void(0)" class="custom-arrow" data-bs-toggle="modal"
                                         id="read_more"
@@ -496,7 +507,7 @@
                             @foreach ($package_cat as $package_cat_data)
                                 <div id="sofa{{ $package_cat_data->id }}" class="section-packages" style="">
                                     <!-- <div id="sofa{{ $package_cat_data->id }}" class="section-packages"
-                                    style="padding-top: 40px;"> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            style="padding-top: 40px;"> -->
 
                                     @php
                                         $package = DB::table('packages')
@@ -514,11 +525,12 @@
 
                                     @endphp
                                     <h4 class="packagecatHeading" style="">
-                                        {{ $package_cat_data->name }}</h4>
+                                        {{ $package_cat_data->name }}
+                                    </h4>
                                     @if ($package_cat_data->image != '')
                                         <img src="{{ url('public/upload/packagecategory/' . $package_cat_data->image) }}"
                                             alt="{{ $package_cat_data->name }}" class="w-100 rounded mb-4 bannerimage"
-                                            style="object-fit: cover; max-height: 200px;">
+                                            style="object-fit: cover; max-height: 200px;border-radius: 5px !important;">
                                     @endif
 
 
@@ -570,7 +582,8 @@
                                                         @endif
                                                         <div class="grouped-category-info">
                                                             <h3 class="grouped-category-title">
-                                                                {{ $package_cat_data->name }}</h3>
+                                                                {{ $package_cat_data->name }}
+                                                            </h3>
                                                             <p class="grouped-category-desc">Multiple customized options
                                                                 available for your specific needs.</p>
                                                             <div class="options-badge">{{ count($package) }} Options
@@ -579,8 +592,12 @@
                                                     </div>
                                                     <div class="grouped-category-footer">
                                                         <div class="grouped-category-price">
-                                                            Starts at <strong class="currency_dhiramnew">AED
-                                                                {{ number_format($lowest_price, 2) }}</strong>
+                                                            Starts at
+                                                            <span class="price-wrapper">
+                                                                <span class="currency_dhiramnew">AED</span>
+                                                                <strong>
+                                                                    {{ number_format($lowest_price, 2) }}</strong>
+                                                            </span>
                                                         </div>
                                                         <button type="button" class="btn select-options-btn"
                                                             onclick="event.stopPropagation();" data-bs-toggle="modal"
@@ -588,119 +605,11 @@
                                                             +</button>
                                                     </div>
                                                 </div>
-
-                                                <!-- Category Modal -->
-                                                <div class="modal fade subservice-read-more-model"
-                                                    id="category-modal-{{ $package_cat_data->id }}" tabindex="-1">
-                                                    <div
-                                                        class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                                                        <div class="modal-content">
-                                                            <div class="modal-drag-handle">
-                                                                <div
-                                                                    style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;">
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-header bn-modal-header">
-                                                                <h5 class="modal-title" style="font-weight: 700;">
-                                                                    {{ $package_cat_data->name }}</h5>
-                                                                <button type="button" class="btn-close"
-                                                                    data-bs-dismiss="modal"></button>
-                                                            </div>
-                                                            <div class="modal-body"
-                                                                style="padding: 15px; background: #f9f9f9;">
-                                                                <div class="package-list-container"
-                                                                    style="margin-top: 0;">
-                                                                    @foreach ($package as $package_data)
-                                                                        @php
-                                                                            $price = $package_data->price;
-                                                                            $discount_price = 0;
-
-                                                                            if (
-                                                                                !empty($package_data->discount) &&
-                                                                                isset($package_data->discount_type)
-                                                                            ) {
-                                                                                $discount_price =
-                                                                                    $package_data->discount_type == 0
-                                                                                        ? ($package_data->discount /
-                                                                                                100) *
-                                                                                            $package_data->price
-                                                                                        : $package_data->discount;
-                                                                                $price -= $discount_price;
-                                                                            }
-                                                                        @endphp
-                                                                        <div class="package-list-row entrance-anim">
-                                                                            @if (!empty($package_data->image))
-                                                                                <div class="package-list-img-wrapper">
-                                                                                    <img src="{{ asset('public/upload/packages/large/' . $package_data->image) }}"
-                                                                                        alt="{{ $package_data->name }}"
-                                                                                        class="package-list-img">
-                                                                                </div>
-                                                                            @else
-                                                                                <div class="package-list-no-img">
-                                                                                    <span>{{ $loop->iteration }}</span>
-                                                                                    Option
-                                                                                </div>
-                                                                            @endif
-
-                                                                            <div class="package-list-body">
-                                                                                <a href="javascript:void(0)"
-                                                                                    style="text-decoration: none;"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#package-detail-model_{{ $package_data->id }}">
-                                                                                    <h3 class="package-list-title">
-                                                                                        {{ $package_data->name }}</h3>
-                                                                                </a>
-                                                                                <p class="package-list-desc">
-                                                                                    {{ $package_data->short_description }}
-                                                                                </p>
-                                                                                <div class="package-list-price-wrap">
-                                                                                    <div class="price price-wrapper">
-                                                                                        <span
-                                                                                            class="currency_dhiramnew">AED</span>
-                                                                                        <span>{{ number_format($price, 2) }}</span>
-                                                                                    </div>
-                                                                                    @if ($discount_price > 0)
-                                                                                        <div
-                                                                                            class="old-price price-wrapper">
-                                                                                            <span
-                                                                                                class="currency_dhiramnew">AED</span>
-                                                                                            <span>{{ number_format($package_data->price, 2) }}</span>
-                                                                                        </div>
-                                                                                    @endif
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="package-list-action">
-                                                                                <button type="button"
-                                                                                    class="addbutton"
-                                                                                    data-id="{{ $package_data->id }}"
-                                                                                    data-name="{{ $package_data->name }}"
-                                                                                    data-price="{{ $price }}"
-                                                                                    data-oldprice="{{ $package_data->price }}"
-                                                                                    data-image="{{ !empty($package_data->image) ? asset('public/upload/packages/large/' . $package_data->image) : '' }}"
-                                                                                    data-service="{{ $service_id }}"
-                                                                                    data-subservice_id="{{ $subservice_id }}"
-                                                                                    data-type="package">Add +</button>
-                                                                                <div class="quantity-control"
-                                                                                    data-id="{{ $package_data->id }}"
-                                                                                    style="display:none;">
-                                                                                    <button class="minus-btn"
-                                                                                        type="button"><i
-                                                                                            class="fa-solid fa-minus"></i></button>
-                                                                                    <span class="quantity">1</span>
-                                                                                    <button class="plus-btn"
-                                                                                        type="button"><i
-                                                                                            class="fa-solid fa-plus"></i></button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    @endforeach
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             @else
+                                                @if (count($package) > 3)
+                                                @endif
+                                                @if (count($package) > 3)
+                                                @endif
                                                 @foreach ($package as $package_data)
                                                     @php
                                                         $price = $package_data->price;
@@ -739,47 +648,50 @@
                                                                 id="package_detail"
                                                                 data-bs-target="#package-detail-model_{{ $package_data->id }}">
                                                                 <h3 class="package-list-title">
-                                                                    {{ $package_data->name }}</h3>
+                                                                    {{ $package_data->name }}
+                                                                </h3>
                                                             </a>
                                                             <p class="package-list-desc">
                                                                 {{ $package_data->short_description }}
                                                             </p>
                                                             <div class="package-list-price-wrap">
-                                                                <div class="price price-wrapper">
-                                                                    <span class="currency_dhiramnew">AED</span>
-                                                                    <span>{{ number_format($price, 2) }}</span>
-                                                                </div>
-                                                                @if ($discount_price > 0)
-                                                                    <div class="old-price price-wrapper">
+                                                                <div>
+                                                                    <div class="price price-wrapper">
                                                                         <span class="currency_dhiramnew">AED</span>
-                                                                        <span>{{ number_format($package_data->price, 2) }}</span>
+                                                                        <span>{{ number_format($price, 2) }}</span>
                                                                     </div>
-                                                                @endif
+                                                                    @if ($discount_price > 0)
+                                                                        <div class="old-price price-wrapper">
+                                                                            <span class="currency_dhiramnew">AED</span>
+                                                                            <span>{{ number_format($package_data->price, 2) }}</span>
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
                                                                 <div class="package-list-action">
-                                                            <button type="button" class="addbutton"
-                                                                data-id="{{ $package_data->id }}"
-                                                                data-name="{{ $package_data->name }}"
-                                                                data-price="{{ $price }}"
-                                                                data-oldprice="{{ $package_data->price }}"
-                                                                data-image="{{ !empty($package_data->image) ? asset('public/upload/packages/large/' . $package_data->image) : '' }}"
-                                                                data-service="{{ $service_id }}"
-                                                                data-subservice_id="{{ $subservice_id }}"
-                                                                data-type="package">Add +</button>
+                                                                    <button type="button" class="addbutton"
+                                                                        data-id="{{ $package_data->id }}"
+                                                                        data-name="{{ $package_data->name }}"
+                                                                        data-price="{{ $price }}"
+                                                                        data-oldprice="{{ $package_data->price }}"
+                                                                        data-image="{{ !empty($package_data->image) ? asset('public/upload/packages/large/' . $package_data->image) : '' }}"
+                                                                        data-service="{{ $service_id }}"
+                                                                        data-subservice_id="{{ $subservice_id }}"
+                                                                        data-type="package">Add +</button>
 
-                                                            <div class="quantity-control"
-                                                                data-id="{{ $package_data->id }}"
-                                                                style="display:none;">
-                                                                <button class="minus-btn" type="button"><i
-                                                                        class="fa-solid fa-minus"></i></button>
-                                                                <span class="quantity">1</span>
-                                                                <button class="plus-btn" type="button"><i
-                                                                        class="fa-solid fa-plus"></i></button>
+                                                                    <div class="quantity-control"
+                                                                        data-id="{{ $package_data->id }}"
+                                                                        style="display:none;">
+                                                                        <button class="minus-btn" type="button"><i
+                                                                                class="fa-solid fa-minus"></i></button>
+                                                                        <span class="quantity">1</span>
+                                                                        <button class="plus-btn" type="button"><i
+                                                                                class="fa-solid fa-plus"></i></button>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                            </div>
-                                                        </div>
 
-                                                        
+
                                                     </div>
                                                 @endforeach
                                             @endif
@@ -1263,7 +1175,7 @@
                         <!-- Step 5: Payment Information -->
                         <div class="step-content" id="step5">
                             {{-- <h3>Payment Information</h3> --}}
-                            <div class="tabby-promo-box"
+                            {{-- <div class="tabby-promo-box"
                                 style="margin-top: 12px; margin-bottom: 8px; padding: 8px 14px; background: #fff; border: 1.5px solid #3DF2A7; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(61, 242, 167, 0.1);">
                                 <div
                                     style="font-size: 0.8rem; color: #111; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; line-height: 1.2;">
@@ -1275,7 +1187,7 @@
                                 </div>
                                 <img src="{{ asset('public/site/images/tabby-badge.png') }}"
                                     style="height: 20px; object-fit: contain; margin-left: 8px;">
-                            </div>
+                            </div> --}}
                             <div class="form-group mb-4 payment-selection-container">
                                 <label class="form-label fw500 dark-color"
                                     style="font-size: 1.1rem; margin-bottom: 4px;">How would you like to pay for your
@@ -1317,7 +1229,7 @@
                                         </div>
                                     </label>
 
-                                    <label class="payment-method-card" for="paymet_3" id="tabby_payment_option">
+                                    {{-- <label class="payment-method-card" for="paymet_3" id="tabby_payment_option">
                                         <input type="radio" id="paymet_3" name="payment_type" value="TABBY">
                                         <div class="payment-card-content">
                                             <div class="payment-card-header">
@@ -1331,7 +1243,7 @@
                                             <div class="cash_fee tabby-helper-text" id="tabby_helper_text"
                                                 style="display: none;"></div>
                                         </div>
-                                    </label>
+                                    </label> --}}
                                 </div>
 
                                 <p class="form-error-text" id="payment_type_error"
@@ -1443,8 +1355,8 @@
                                                                 <div id="wallet_amount" class="price-wrapper">
                                                                     <span class="currency_dhiramnew"
                                                                         style="
-    style=&quot;font-size: 0.95rem; font-weight:700; position:relative;
-">AED</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            style=&quot;font-size: 0.95rem; font-weight:700; position:relative;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ">AED</span>
                                                                     <span>{{ $wallet_amount }}</span>
                                                                 </div>
                                                             </div>
@@ -1581,7 +1493,7 @@
                             </div>
                             <div class="font-weight-bold sm-summary">
                                 <span id="frequency_left_summary_replace">
-                                    <span  class="currency_dhiramnew">AED</span>
+                                    <span class="currency_dhiramnew">AED</span>
                                     500
                                 </span>
                             </div>
@@ -1715,7 +1627,7 @@
                         </strong>
                     </div>
 
-                    <div class="tabbbyrightsummary">
+                    {{-- <div class="tabbbyrightsummary">
                         <div class="tabby-promo-box"
                             style="margin-top: 15px; margin-bottom: 10px; padding: 14px 18px; background: #ECFDF5; border: 1px solid #6EE7B7; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(110, 231, 183, 0.15); font-family: 'Inter', sans-serif; transition: all 0.3s ease;">
 
@@ -1744,7 +1656,7 @@
                             <img src="{{ asset('public/site/images/tabby-badge.png') }}"
                                 style="height: 24px; object-fit: contain; flex-shrink: 0; margin-left: 10px;">
                         </div>
-                    </div>
+                    </div> --}}
 
 
                     {{-- <div class="d-flex justify-content-between">
@@ -1763,8 +1675,452 @@
                 </div>
             </div>
         </div>
+
+        <div class="clearfix" style="clear: both; width: 100%;"></div>
+        <div id="step1-static-full-width" style="display: none; clear: both; width: 100%; float: none;">
+            <div class="step1-static-content mt-5 " style="clear: both; width: 100%;">
+                @php $firstSectionRendered = false; @endphp
+                <!-- Why Choose Us -->
+                @if (isset($subservice_why_choose) && count($subservice_why_choose) > 0)
+                    <div class=" wcSection custommb{{ !$firstSectionRendered ? ' customMt' : '' }}">
+                        <!-- <h2 class="section-title">Why Choose VendorCity?</h2> -->
+                        <div class="row ">
+                            <div class="col-md-12 mb-4">
+                                <div class="service-highlights">
+                                    @foreach ($subservice_why_choose as $why_choose)
+                                        {!! $why_choose->description !!}
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @php $firstSectionRendered = true; @endphp
+                @endif
+
+
+
+                <!-- What Customers Are Saying -->
+                @if (isset($google_reviews_data) && count($google_reviews_data) > 0)
+                    <div
+                        class="what_customer_are_saying_section custommb{{ !$firstSectionRendered ? ' customMt' : '' }}">
+                        <h2 class="section-title">What Customers Are Saying</h2>
+                        <div class="splide mt-4" id="testimonials-slider"
+                            data-splide='{"perPage":4,"breakpoints":{"1200":{"perPage":3},"992":{"perPage":2},"768":{"perPage":1}},"gap":"20px","pagination":false,"arrows":false}'
+                            style="padding: 20px 0;">
+                            <div class="splide__track">
+                                <ul class="splide__list">
+                                    @foreach ($google_reviews_data as $review)
+                                        <li class="splide__slide">
+                                            <div class="testimonial-box h-100"
+                                                style="background-color: #f8f9fa; border-radius: 12px; padding: 20px; text-align: left; border: none; box-shadow: none;">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa-solid fa-user me-2"
+                                                            style="font-size: 18px; color: #111;"></i>
+                                                        <strong
+                                                            style="color: #111; font-size: 18px;">{{ $review->name }}</strong>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa-solid fa-star text-dark me-1"
+                                                            style="font-size: 16px;"></i>
+                                                        <span class="text-dark fw-bold"
+                                                            style="font-size: 16px;">{{ $review->label }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="text-muted mb-3"
+                                                    style="font-size: 15px; font-weight: 500;">
+                                                    @if (!empty($review->review_date))
+                                                        {{ \Carbon\Carbon::parse($review->review_date)->format('F Y') }}
+                                                    @endif
+                                                </div>
+                                                <p class="mb-0 text-dark" style="line-height: 1.6; font-size: 15px;">
+                                                    {{ $review->description }}
+                                                </p>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                    @php $firstSectionRendered = true; @endphp
+                @endif
+
+                <!-- Frequently Asked Questions (Dynamic) -->
+                <style>
+                    .custom-faq-card {
+                        background: #fff;
+                        border: 1px solid #eaeaea;
+                        border-radius: 12px;
+                        padding: 30px;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+                    }
+
+                    .custom-faq-accordion .accordion-item {
+                        border: none;
+                        border-bottom: 1px solid #eaeaea;
+                        background: transparent;
+                    }
+
+                    .custom-faq-accordion .accordion-item:last-child {
+                        border-bottom: none;
+                    }
+
+                    .custom-faq-accordion .accordion-button {
+                        padding: 18px 0;
+                        font-weight: 500;
+                        color: #333;
+                        background: transparent;
+                        box-shadow: none !important;
+                        font-size: 15px;
+                    }
+
+                    .custom-faq-accordion .accordion-button:not(.collapsed) {
+                        color: #111;
+                        background: transparent;
+                        box-shadow: none;
+                    }
+
+                    .custom-faq-accordion .accordion-button::after {
+                        filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) opacity(70%);
+                        transform: scale(0.8);
+                    }
+
+                    .custom-faq-accordion .accordion-button:not(.collapsed)::after {
+                        transform: scale(0.8) rotate(-180deg);
+                    }
+
+                    .custom-faq-accordion .accordion-body {
+                        padding: 0 0 20px 0;
+                        color: #888;
+                        font-size: 14px;
+                        line-height: 1.7;
+                    }
+                </style>
+                @if (isset($faq_data) && count($faq_data) > 0)
+                    <div class="static-section custommb{{ !$firstSectionRendered ? ' customMt' : '' }}">
+                        <div class="custom-faq-card">
+                            <h3 class="mb-4" style="font-size: 20px; font-weight: 700; color: #111;">Frequently
+                                Asked
+                                Questions</h3>
+                            <div class="accordion custom-faq-accordion accordion-flush" id="faqAccordion">
+                                @foreach ($faq_data as $faq_index => $faq_item)
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="faqHeading{{ $faq_index }}">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#faqCollapse{{ $faq_index }}"
+                                                aria-expanded="false" aria-controls="faqCollapse{{ $faq_index }}">
+                                                {{ $faq_item->question }}
+                                            </button>
+                                        </h2>
+                                        <div id="faqCollapse{{ $faq_index }}" class="accordion-collapse collapse"
+                                            aria-labelledby="faqHeading{{ $faq_index }}"
+                                            data-bs-parent="#faqAccordion">
+                                            <div class="accordion-body">
+                                                {!! html_entity_decode($faq_item->answer) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    @php $firstSectionRendered = true; @endphp
+                @endif
+
+                <!-- Dynamic Subservice Descriptions -->
+
+                @if (isset($subservice_description_data) && count($subservice_description_data) > 0)
+                    <!-- Handyman & Maintenance Services -->
+                    <div class="static-section custommb{{ !$firstSectionRendered ? ' customMt' : '' }}">
+                        <div class="custom-faq-card" style="padding: 40px;">
+                            @foreach ($subservice_description_data as $desc)
+                                {!! $desc->description !!}
+                            @endforeach
+                        </div>
+                    </div>
+                    @php $firstSectionRendered = true; @endphp
+                @endif
+
+                <!-- How to Book -->
+                @if (isset($subservice_data) &&
+                        ($subservice_data->step_1_title ||
+                            $subservice_data->step_2_title ||
+                            $subservice_data->step_3_title ||
+                            $subservice_data->step_4_title))
+                    <style>
+                        .step-img-box {
+                            width: 100%;
+                            height: 140px;
+                            background: #f0f4f8;
+                            border-radius: 12px;
+                            margin-bottom: 15px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            overflow: hidden;
+                            border: 1px solid #eaeaea;
+                        }
+
+                        .step-img-box img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                    </style>
+                    <div class="static-section custommb{{ !$firstSectionRendered ? ' customMt' : '' }}">
+                        <div class="custom-faq-card" style="padding: 40px;">
+                            <h3 class="mb-4" style="font-size: 20px; font-weight: 700; color: #111;">How to Book
+                                VendorsCity
+                                Services</h3>
+                            <p class="text-muted mb-4" style="font-size: 14px;">Booking
+                                {{ $subservice_data->subservicename }} with VendorsCity is straightforward:
+                            </p>
+
+                            <div class="splide" id="how-to-book-slider"
+                                data-splide='{"perPage":4,"breakpoints":{"1024":{"perPage":3},"768":{"perPage":2},"576":{"perPage":1}},"gap":"20px","pagination":true,"arrows":false}'>
+                                <div class="splide__track">
+                                    <ul class="splide__list">
+                                        @for ($i = 1; $i <= 4; $i++)
+                                            @php
+                                                $stepTitle = 'step_' . $i . '_title';
+                                                $stepImage = 'step_' . $i . '_image';
+                                            @endphp
+                                            @if ($subservice_data->$stepTitle || $subservice_data->$stepImage)
+                                                <li class="splide__slide">
+                                                    <div class="step-img-box">
+                                                        @if ($subservice_data->$stepImage)
+                                                            <img src="{{ url('public/upload/subservice/' . $subservice_data->$stepImage) }}"
+                                                                alt="{{ $subservice_data->$stepTitle }}">
+                                                        @else
+                                                            <img src="{{ asset('public/site/images/no-image.jpg') }}"
+                                                                alt="No Image">
+                                                        @endif
+                                                    </div>
+                                                    <div style="font-size: 13px; color: #555; line-height: 1.6;">
+                                                        @if ($subservice_data->$stepTitle)
+                                                            <strong class="text-dark d-block mb-1">Step
+                                                                {{ $i }}:<br>{{ $subservice_data->$stepTitle }}</strong>
+                                                        @endif
+                                                    </div>
+                                                </li>
+                                            @endif
+                                        @endfor
+                                    </ul>
+                                </div>
+                            </div>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    var el2 = document.getElementById('how-to-book-slider');
+                                    if (el2 && !el2.classList.contains('is-initialized')) {
+                                        new Splide(el2, {
+                                            perPage: 4,
+                                            breakpoints: {
+                                                1024: {
+                                                    perPage: 3
+                                                },
+                                                768: {
+                                                    perPage: 2
+                                                },
+                                                576: {
+                                                    perPage: 1
+                                                }
+                                            },
+                                            gap: '20px',
+                                            pagination: true,
+                                            arrows: false
+                                        }).mount();
+                                    }
+                                });
+                            </script>
+                        </div>
+                    </div>
+                    @php $firstSectionRendered = true; @endphp
+                @endif
+
+                <!-- More Services You’ll Love -->
+                @if (isset($more_services_data) && count($more_services_data) > 0)
+                    <div class="static-section custommb{{ !$firstSectionRendered ? ' customMt' : '' }}">
+                        <div class="custom-faq-card" style="padding: 40px;">
+                            <h3 class="mb-4" style="font-size: 20px; font-weight: 700; color: #111;">More Services
+                                You'll
+                                Love</h3>
+                            <div class="row gy-4">
+                                @foreach ($more_services_data as $more_service)
+                                    <div class="col-md-6">
+                                        @php
+                                            $curr_service_id =
+                                                $more_service->serviceid ?? ($more_service->service_id ?? $service_id);
+                                        @endphp
+                                        @if ($curr_service_id == 50 && $more_service->id == 92)
+                                            <a href="{{ route('automobile.listing', ['page_url' => $more_service->page_url]) }}"
+                                                style="text-decoration: none;">
+                                            @else
+                                                @if (isset($more_service->is_bookable) && $more_service->is_bookable == 1)
+                                                    <a href="{{ route('enquiry', ['service_id' => \App\Models\Admin\Service::find($curr_service_id)->page_url ?? $curr_service_id, 'subservice_id' => \App\Models\Admin\Subservice::find($more_service->id)->page_url ?? $more_service->id]) }}"
+                                                        style="text-decoration: none;">
+                                                    @else
+                                                        @php
+                                                            $category_id = request()->query('category', '');
+                                                        @endphp
+                                                        <a href="{{ route('booknow', ['service_id' => \App\Models\Admin\Service::find($curr_service_id)->page_url ?? $curr_service_id, 'subservice_id' => \App\Models\Admin\Subservice::find($more_service->id)->page_url ?? $more_service->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}"
+                                                            style="text-decoration: none;">
+                                                @endif
+                                        @endif
+                                        <div class="d-flex align-items-center">
+                                            @php
+                                                $image_url = !empty($more_service->image)
+                                                    ? url('public/upload/subservice/' . $more_service->image)
+                                                    : asset('public/site/images/no-image.jpg');
+                                            @endphp
+                                            <img src="{{ $image_url }}"
+                                                alt="{{ $more_service->subservicename }}"
+                                                style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; flex-shrink: 0; margin-right: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                            <div>
+                                                <h5 class="mb-1 fw-bold" style="color: #222; font-size: 16px;">
+                                                    {{ $more_service->subservicename }}
+                                                </h5>
+                                                <p class="mb-0 text-muted" style="font-size: 14px;">
+                                                    {{ Str::limit(strip_tags($more_service->service_detail_short_description), 60) }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    @php $firstSectionRendered = true; @endphp
+                @endif
+
+                <!-- What Else Can We Help With? -->
+                <style>
+                    .help-link-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 16px 0;
+                        border-bottom: 1px solid #eaeaea;
+                        color: #333;
+                        text-decoration: none;
+                        font-size: 15px;
+                        transition: color 0.2s ease;
+                    }
+
+                    .help-link-item:hover {
+                        color: #150495;
+                    }
+
+                    .help-link-item:last-child {
+                        border-bottom: none;
+                        padding-bottom: 0;
+                    }
+
+                    .help-link-item i {
+                        font-size: 14px;
+                        color: #111;
+                    }
+                </style>
+                @if (isset($what_else_services_data) && count($what_else_services_data) > 0)
+                    <div class="static-section custommb{{ !$firstSectionRendered ? ' customMt' : '' }}">
+                        <div class="custom-faq-card" style="padding: 40px;">
+                            <h3 class="mb-4" style="font-size: 20px; font-weight: 700; color: #111;">What Else Can
+                                We Help
+                                With?</h3>
+
+                            <div class="d-flex flex-column">
+                                @foreach ($what_else_services_data as $what_else_service)
+                                    @if ($what_else_service->id == 92)
+                                        <a href="{{ route('automobile.listing', ['page_url' => $what_else_service->page_url]) }}"
+                                            class="help-link-item">
+                                        @else
+                                            <a href="{{ route('front.package_lists', ['city' => session('search_city_name') ?? 'dubai', 'page_url' => $what_else_service->page_url]) }}"
+                                                class="help-link-item">
+                                    @endif
+                                    <span>{{ $what_else_service->subservicename }}</span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+
+            </div>
+        </div>
+        <!-- END STATIC SECTIONS FOR STEP 1 (FULL WIDTH) -->
     </div>
 </section>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const step1 = document.getElementById('step1');
+        const staticContent = document.getElementById('step1-static-full-width');
+
+        function toggleStaticContent() {
+            if (step1 && staticContent) {
+                if (step1.classList.contains('active')) {
+                    staticContent.style.display = 'block';
+                } else {
+                    staticContent.style.display = 'none';
+                }
+            }
+        }
+
+        // Initial check
+        toggleStaticContent();
+
+        // Observe changes to the 'active' class on step1
+        if (step1) {
+            const observer = new MutationObserver(function() {
+                toggleStaticContent();
+            });
+            observer.observe(step1, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+
+        // Initialize Testimonials Slider
+        if (document.getElementById('testimonials-slider') && typeof Splide !== 'undefined') {
+            new Splide('#testimonials-slider', {
+                type: 'loop',
+                perPage: 4,
+                perMove: 1,
+                gap: '20px',
+
+                // Hide navigation
+                arrows: false,
+                pagination: false,
+
+                // Auto slide
+                autoplay: true,
+                interval: 3000, // Slide every 3 seconds
+                pauseOnHover: true, // Pause when mouse hovers
+                pauseOnFocus: false,
+                resetProgress: false,
+
+                breakpoints: {
+                    1200: {
+                        perPage: 4
+                    },
+                    991: {
+                        perPage: 2
+                    },
+                    767: {
+                        perPage: 1
+                    }
+                }
+            }).mount();
+        }
+    });
+</script>
 
 
 
@@ -1798,34 +2154,32 @@
     </div>
 </div>
 
-<div class="modal fade" id="mobilesummaryModal" tabindex="-1">
-    <div class="modal-dialog modal-summary-sheet"
+<div class="modal fade subservice-read-more-model" id="mobilesummaryModal" tabindex="-1">
+    <div class="modal-dialog modal-summary-sheet modal-dialog-scrollable"
         style="margin:0; position:fixed; bottom:0; left:0; right:0; width:100%; max-width:100%;">
-        <div class="modal-content border-0" style="border-radius:20px 20px 0 0; background:#fff;">
+        <div class="modal-content border-0" style="border-radius:20px 20px 0 0; background:#fff; max-height: 85vh;">
 
             {{-- ── Drag Handle ── --}}
-            <div class="modal-drag-handle" style="padding:10px 0 6px; text-align:center; cursor:grab;">
+            <div class="modal-drag-handle" style="padding:10px 0 6px; text-align:center; cursor:grab; flex-shrink:0;">
                 <div style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;"></div>
             </div>
 
             {{-- ── Header ── --}}
-            <div class="modal-sheet-header"
-                style="display:flex; align-items:center; justify-content:space-between; padding:8px 20px 14px; position:relative;">
+            <div class="modal-header bn-modal-header"
+                style="padding: 0.5rem 1.5rem 1rem; border-bottom: 1px solid #eee;">
                 <div>
                     <div
                         style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#aaa; margin-bottom:2px;">
                         Summary</div>
-                    <h5 style="margin:0; font-size:1.25rem; font-weight:900; color:#000; letter-spacing:-0.02em;">
+                    <h5 class="modal-title"
+                        style="margin:0; font-size:1.25rem; font-weight:900; color:#000; letter-spacing:-0.02em;">
                         Booking Summary</h5>
                 </div>
-                <button type="button" data-bs-dismiss="modal"
-                    style="width:36px; height:36px; border-radius:50%; border:1.5px solid #e0e0e0; background:#fff; display:flex; align-items:center; justify-content:center; color:#111; font-size:1.1rem; font-weight:700; line-height:1; cursor:pointer; flex-shrink:0; z-index:10;">
-                    &times;
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             {{-- ── Scrollable Body ── --}}
-            <div class="modal-body sidebar-summary" style="flex:1; overflow-y:auto; padding:0 20px 16px;">
+            <div class="modal-body sidebar-summary" style="padding: 1rem 1.5rem 16px;">
 
                 {{-- ─ Your Service Chip ─ --}}
                 <div style="background:#0040E6; border-radius:14px; padding:16px 18px; margin-bottom:16px;">
@@ -1972,7 +2326,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tabbbyrightsummary">
+                {{-- <div class="tabbbyrightsummary">
                     <div class="tabby-promo-box"
                         style="margin-top: 15px; margin-bottom: 10px; padding: 14px 18px; background: #ECFDF5; border: 1px solid #6EE7B7; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(110, 231, 183, 0.15); font-family: 'Inter', sans-serif; transition: all 0.3s ease;">
 
@@ -1990,8 +2344,7 @@
                             <div
                                 style="font-size: 0.8rem; color: #6B7280; font-weight: 500; display: flex; align-items: center; margin-top: 2px;">
                                 <span class="tabby_split_count">for 4 months</span> with
-                                <a href="javascript:void(0)" data-bs-toggle="modal"
-                                    data-bs-target="#tabby_info_popup"
+                                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#tabby_info_popup"
                                     style="color: #9CA3AF; display: inline-flex; align-items: center; margin-left: 6px; text-decoration: none;">
                                     <i class="fa-regular fa-circle-question"
                                         style="font-size: 13px; transition: color 0.2s ease;"></i>
@@ -2002,7 +2355,7 @@
                         <img src="{{ asset('public/site/images/tabby-badge.png') }}"
                             style="height: 24px; object-fit: contain; flex-shrink: 0; margin-left: 10px;">
                     </div>
-                </div>
+                </div> --}}
 
                 {{-- ─ Promo Code Input ─ --}}
                 <!-- <div id="mobile_promo_container" style="margin-top:14px; display:flex; gap:8px;">
@@ -2018,24 +2371,22 @@
             </div>
 
             {{-- ── Sticky Footer ── --}}
-            <div class="modal-sheet-footer"
-                style="padding:12px 20px 28px; background:#fff; border-top:1px solid #f0f0f0;">
-                <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <div>
-                        <div
-                            style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#bbb; margin-bottom:3px;">
-                            Total to Pay</div>
-                        <div style="display:flex; align-items:baseline; gap:4px;">
-                            <span style="font-size:0.82rem; color:#888; font-weight:600;">AED</span>
-                            <span class="total_to_pay"
-                                style="font-size:1.65rem; font-weight:900; color:#000; letter-spacing:-0.03em;">0.00</span>
-                        </div>
+            <div class="modal-footer"
+                style="padding:12px 20px; background:#fff; border-top:1px solid #f0f0f0; display:flex; align-items:center; justify-content:space-between; width:100%;">
+                <div>
+                    <div
+                        style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#bbb; margin-bottom:3px;">
+                        Total to Pay</div>
+                    <div style="display:flex; align-items:baseline; gap:4px;">
+                        <span style="font-size:0.82rem; color:#888; font-weight:600;">AED</span>
+                        <span class="total_to_pay"
+                            style="font-size:1.65rem; font-weight:900; color:#000; letter-spacing:-0.03em;">0.00</span>
                     </div>
-                    <button type="button" data-bs-dismiss="modal"
-                        style="background:transparent; border:none; color:#aaa; font-size:0.8rem; font-weight:600; padding:6px 0; letter-spacing:0.03em; text-decoration:underline; text-underline-offset:3px; cursor:pointer;">
-                        Close
-                    </button>
                 </div>
+                <button type="button" data-bs-dismiss="modal"
+                    style="background:transparent; border:none; color:#aaa; font-size:0.8rem; font-weight:600; padding:6px 0; letter-spacing:0.03em; text-decoration:underline; text-underline-offset:3px; cursor:pointer;">
+                    Close
+                </button>
             </div>
 
         </div>
@@ -2053,6 +2404,104 @@
     @endphp
 
 
+    @if (count($package) > 3)
+    @endif
+    @if (count($package) > 3)
+        <!-- Category Modal -->
+        <div class="modal fade subservice-read-more-model" id="category-modal-{{ $package_cat_data->id }}"
+            tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-drag-handle">
+                        <div style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;">
+                        </div>
+                    </div>
+                    <div class="modal-header bn-modal-header">
+                        <h5 class="modal-title" style="font-weight: 700;">
+                            {{ $package_cat_data->name }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="padding: 15px; background: #f9f9f9;">
+                        <div class="package-list-container" style="margin-top: 0;">
+                            @foreach ($package as $package_data)
+                                @php
+                                    $price = $package_data->price;
+                                    $discount_price = 0;
+
+                                    if (!empty($package_data->discount) && isset($package_data->discount_type)) {
+                                        $discount_price =
+                                            $package_data->discount_type == 0
+                                                ? ($package_data->discount / 100) * $package_data->price
+                                                : $package_data->discount;
+                                        $price -= $discount_price;
+                                    }
+                                @endphp
+                                <div class="package-list-row">
+                                    @if (!empty($package_data->image))
+                                        <div class="package-list-img-wrapper">
+                                            <img src="{{ asset('public/upload/packages/large/' . $package_data->image) }}"
+                                                alt="{{ $package_data->name }}" class="package-list-img">
+                                        </div>
+                                    @else
+                                        <div class="package-list-no-img">
+                                            <span>{{ $loop->iteration }}</span>
+                                            Option
+                                        </div>
+                                    @endif
+
+                                    <div class="package-list-body">
+                                        <a href="javascript:void(0)" style="text-decoration: none;"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#package-detail-model_{{ $package_data->id }}">
+                                            <h3 class="package-list-title">
+                                                {{ $package_data->name }}
+                                            </h3>
+                                        </a>
+                                        <p class="package-list-desc">
+                                            {{ $package_data->short_description }}
+                                        </p>
+                                        <div class="package-list-price-wrap">
+                                            <div class="price price-wrapper">
+                                                <span class="currency_dhiramnew">AED</span>
+                                                <span>{{ number_format($price, 2) }}</span>
+                                            </div>
+                                            @if ($discount_price > 0)
+                                                <div class="old-price price-wrapper">
+                                                    <span class="currency_dhiramnew">AED</span>
+                                                    <span>{{ number_format($package_data->price, 2) }}</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="package-list-action">
+                                        <button type="button" class="addbutton"
+                                            data-id="{{ $package_data->id }}"
+                                            data-name="{{ $package_data->name }}"
+                                            data-price="{{ $price }}"
+                                            data-oldprice="{{ $package_data->price }}"
+                                            data-image="{{ !empty($package_data->image) ? asset('public/upload/packages/large/' . $package_data->image) : '' }}"
+                                            data-service="{{ $service_id }}"
+                                            data-subservice_id="{{ $subservice_id }}" data-type="package">Add
+                                            +</button>
+                                        <div class="quantity-control" data-id="{{ $package_data->id }}"
+                                            style="display:none;">
+                                            <button class="minus-btn" type="button"><i
+                                                    class="fa-solid fa-minus"></i></button>
+                                            <span class="quantity">1</span>
+                                            <button class="plus-btn" type="button"><i
+                                                    class="fa-solid fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
     @foreach ($package as $package_data)
         @php
             $price = $package_data->price;
@@ -2085,26 +2534,28 @@
                         @endif
 
                         <div style="padding-left: 1.5rem;padding-right: 1.5rem;color: #000000de;">
-                            <div class="d-flex justify-content-between align-items-center" style="padding-top: 1rem;">
+                            <div class="d-flex justify-content-between align-items-center"
+                                style="padding-top: 1rem;">
                                 <div class="" style="line-height: normal;margin-bottom: 2%;">
                                     {{ $package_data->short_description }}
                                     <!-- <h5>{{ $package_data->name }}</h5> -->
                                 </div>
 
                             </div>
-                            <div class="" style="display: flex;align-items: center;gap: 13px;margin-bottom:2%">
+                            <div class=""
+                                style="display: flex;align-items: center;gap: 13px;margin-bottom:2%">
                                 <b class="popup-price price-wrapper">
+                                    <span class="currency_dhiramnew">AED</span>
+                                    <span>{{ $price }}</span>
+                                </b>
+                                @if ($discount_price > 0)
+                                    <span class="price-wrapper"
+                                        style="text-decoration: line-through; margin-right: 10px; color: #000;">
                                         <span class="currency_dhiramnew">AED</span>
-                                        <span>{{ $price }}</span>
-                                    </b>
-                                    @if ($discount_price > 0)
-                                        <span class="price-wrapper"
-                                            style="text-decoration: line-through; margin-right: 10px; color: #000;">
-                                            <span class="currency_dhiramnew">AED</span>
-                                            <span>{{ number_format($package_data->price, 2) }}</span>
-                                        </span>
-                                    @endif
-                                </div>
+                                        <span>{{ number_format($package_data->price, 2) }}</span>
+                                    </span>
+                                @endif
+                            </div>
                             <hr style="border: 1px solid #ddd; margin: 20px 0;">
                             <div class="package-description-popup">
                                 {!! html_entity_decode($package_data->description) !!}
@@ -2680,7 +3131,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
 
 <script>
-    var booknowOtpUrl = "{{ url('booknow-otp-sent') }}";
+    var booknowOtpUrl = "{{ url(session('search_city_name') . '/booknow-otp-sent') }}";
     var booknowOtpUrlEmail = "{{ route('home.book-email-otp-sent') }}";
     var package_promo_check = "{{ route('package_promo_check') }}";
     const dirhamBlack = "{{ asset('public/site/images/automobile/Dirhamblack.png') }}";
@@ -2691,7 +3142,7 @@
     let vatPercent = window.Enums.vcCharges.VAT_PERCENT.value;
 </script>
 
-<script src="{{ asset('public/site/js/booknownew.js') }}"></script>
+<script src="{{ asset('public/site/js/booknownew.js?v=10') }}"></script>
 
 <script>
     var emiratesShow = <?= isset($emiratesShow) && $emiratesShow ? 'true' : 'false' ?>;

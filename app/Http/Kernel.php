@@ -55,6 +55,7 @@ class Kernel extends HttpKernel
      * @var array<string, class-string|string>
      */
     protected $routeMiddleware = [
+        'front.city' => \App\Http\Middleware\FrontCityContext::class,
         'vendor' => \App\Http\Middleware\CheckVendor::class,
         'admin' => \App\Http\Middleware\CheckAdmin::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
@@ -66,6 +67,5 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'apitoken' => \App\Http\Middleware\ApiTokenMiddleware::class,
     ];
 }

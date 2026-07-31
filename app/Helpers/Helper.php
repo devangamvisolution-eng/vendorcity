@@ -195,10 +195,14 @@ class Helper
         return implode(', ', $result->toArray());
     }
 
-    public static function timeslotname(?int $id)
+    public static function timeslotname($id)
     {
-        if (is_null($id)) {
+        if (empty($id)) {
             return "-";
+        }
+
+        if (!is_numeric($id)) {
+            return $id;
         }
 
         $result = DB::table('time_slots')->where('id', $id)->first();
@@ -535,6 +539,14 @@ class Helper
     {
         try {
 
+            $ip = request()->ip();
+
+            Log::info("Cron hit from IP {$ip} → " . $_SERVER['REQUEST_URI']);
+
+            if (url()->current() == 'https://www.vendorscity.com/package_inquiry_vendormailcron') {
+                mail('devang.hnrtechnologies@gmail.com', 'Cron Mail package_inquiry_vendormailcron', "Cron hit from IP {$ip}");
+            }
+
             // If saved earlier → DO NOT CALL API AGAIN
             if (session()->has('user_geo_location')) {
                 $data = session('user_geo_location');
@@ -547,7 +559,7 @@ class Helper
             /**
              * Detect IP
              */
-            $ip = request()->ip();
+
 
             // Localhost fallback
             if ($ip == "127.0.0.1" || $ip == "::1") {
@@ -578,6 +590,8 @@ class Helper
                     // Log success
                     Log::info("Geo Success: IP {$ip} → " . $data['city']);
 
+
+
                     return $data;
                 }
             }
@@ -597,5 +611,182 @@ class Helper
             "latitude"     => null,
             "longitude"    => null
         ];
+    }
+
+    public static function getUpcomingVisits($order_id, $limit = 5)
+    {
+        $order = DB::table('ci_orders')->where('order_id', $order_id)->first();
+        if (!$order) {
+            return collect();
+        }
+
+        $order_item = DB::table('ci_order_item')->where('order_id', $order_id)->first();
+        if (!$order_item) {
+            return collect();
+        }
+
+        $frequency = $order_item->how_often_do_you_need_cleaning ?? 'Once';
+        if (empty($frequency) || $frequency == 'Once') {
+            return collect();
+        }
+
+        // Handle cases where bookingyear is unexpectedly formatted (e.g., empty or object)
+        $year = (is_string($order_item->bookingyear) && !empty($order_item->bookingyear)) ? $order_item->bookingyear : date('Y');
+        $currentDateStr = $order_item->bookingdate . ' ' . $order_item->month . ' ' . $year;
+
+        try {
+            $startDate = \Carbon\Carbon::parse($currentDateStr);
+        } catch (\Exception $e) {
+            $startDate = \Carbon\Carbon::today();
+        }
+
+        $endDateCarbon = \Carbon\Carbon::parse($order_item->end_date);
+
+        $allGeneratedVisits = [];
+
+        if ($frequency == 'Multiple times a week' && !empty($order_item->which_day_of_the_week_do_you_want_the_service)) {
+            $days = $order_item->which_day_of_the_week_do_you_want_the_service;
+            $selectedDays = is_array($days) ? array_map('trim', $days) : array_map('trim', explode(',', $days));
+
+            $period = new \DatePeriod(
+                $startDate,
+                new \DateInterval('P1D'),
+                $endDateCarbon->copy()->addDay()
+            );
+
+            $visitCount = 0;
+            foreach ($period as $date) {
+                if (in_array($date->format('l'), $selectedDays)) {
+                    $allGeneratedVisits[] = [
+                        'visit_date' => $date->format('Y-m-d'),
+                        'visit_time' => $order_item->time_slot ?? null,
+                        'payment_status' => static::getVisitPaymentStatus($order->paymentmode, $visitCount),
+                        'visit_status' => 'upcoming',
+                    ];
+                    $visitCount++;
+                }
+            }
+        } else {
+            $i = 0;
+            $visitCount = 0;
+            while (true) {
+                if ($frequency == 'Weekly') {
+                    $visitDateObj = $startDate->copy()->addWeeks($i);
+                } elseif ($frequency == 'Every 2 Weeks') {
+                    $visitDateObj = $startDate->copy()->addWeeks($i * 2);
+                } else {
+                    $visitDateObj = $startDate->copy()->addDays($i * 7);
+                }
+
+                if ($visitDateObj->gt($endDateCarbon)) {
+                    break;
+                }
+
+                $allGeneratedVisits[] = [
+                    'visit_date' => $visitDateObj->format('Y-m-d'),
+                    'visit_time' => $order_item->time_slot ?? null,
+                    'payment_status' => static::getVisitPaymentStatus($order->paymentmode, $visitCount),
+                    'visit_status' => 'upcoming',
+                ];
+                $visitCount++;
+                $i++;
+            }
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('ci_order_visits', 'cleaner_id')) {
+            \Illuminate\Support\Facades\Schema::table('ci_order_visits', function ($table) {
+                $table->integer('cleaner_id')->nullable()->after('visit_status');
+            });
+        }
+
+        // Fetch stored actions (skipped/cancelled/completed)
+        $storedVisits = [];
+        if (\Illuminate\Support\Facades\Schema::hasTable('ci_order_visits')) {
+            $storedRecords = DB::table('ci_order_visits')
+                ->leftJoin('users', 'ci_order_visits.cleaner_id', '=', 'users.id')
+                ->select('ci_order_visits.*', 'users.name as cleaner_name')
+                ->where('order_id', $order_id)
+                ->get();
+
+            foreach ($storedRecords as $rec) {
+                $storedVisits[$rec->visit_date] = (object)[
+                    'id' => $rec->id,
+                    'visit_status' => $rec->visit_status,
+                    'payment_status' => $rec->payment_status,
+                    'cleaner_id' => $rec->cleaner_id,
+                    'cleaner_name' => $rec->cleaner_name
+                ];
+            }
+        }
+
+        // Default cleaner from order item
+        $defaultCleanerId = null;
+        $defaultCleanerName = 'Not Assigned';
+        if (!empty($order_item->cleaner_id)) {
+            $defaultCleanerId = explode(',', $order_item->cleaner_id)[0];
+            $cleaner = DB::table('users')->where('id', $defaultCleanerId)->first();
+            if ($cleaner) {
+                $defaultCleanerName = $cleaner->name;
+            }
+        }
+
+        // Filter valid visits: >= today and apply stored status
+        $upcomingVisits = [];
+        $todayStr = date('Y-m-d');
+
+        foreach ($allGeneratedVisits as $gv) {
+            $dateStr = $gv['visit_date'];
+
+            if ($dateStr >= $todayStr) {
+                $status = 'upcoming';
+                $id = null;
+                $payment_status = $gv['payment_status'];
+                $assigned_cleaner_id = $defaultCleanerId;
+                $assigned_cleaner_name = $defaultCleanerName;
+
+                if (isset($storedVisits[$dateStr])) {
+                    $status = $storedVisits[$dateStr]->visit_status;
+                    $id = $storedVisits[$dateStr]->id;
+                    $payment_status = $storedVisits[$dateStr]->payment_status;
+                    if (!empty($storedVisits[$dateStr]->cleaner_id)) {
+                        $assigned_cleaner_id = $storedVisits[$dateStr]->cleaner_id;
+                        $assigned_cleaner_name = $storedVisits[$dateStr]->cleaner_name;
+                    }
+                }
+
+                $upcomingVisits[] = (object) [
+                    'id' => $id,
+                    'order_id' => $order_id,
+                    'visit_date' => $dateStr,
+                    'visit_time' => $gv['visit_time'],
+                    'payment_status' => $payment_status,
+                    'visit_status' => $status,
+                    'cleaner_id' => $assigned_cleaner_id,
+                    'cleaner_name' => $assigned_cleaner_name
+                ];
+
+                if (count($upcomingVisits) >= $limit) {
+                    break;
+                }
+            }
+        }
+
+        return collect($upcomingVisits);
+    }
+
+    private static function getVisitPaymentStatus($paymentmode, $index)
+    {
+        if ($paymentmode == 3) {
+            return 'paid'; // Tabby
+        } elseif ($paymentmode == 1) {
+            return 'pending'; // COD
+        } else {
+            return ($index == 0) ? 'paid' : 'pending'; // Stripe
+        }
+    }
+
+    public static function get_front_url($path, $city_slug = 'dubai')
+    {
+        return url("/" . $city_slug . "/" . ltrim($path, '/'));
     }
 }

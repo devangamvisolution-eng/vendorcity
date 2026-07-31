@@ -99,7 +99,7 @@ class CityResolver
 
     private function isReservedSlug($slug)
     {
-        return in_array(strtolower($slug), ['admin', 'login', 'logout']);
+        return in_array(strtolower($slug), ['admin', 'login', 'logout', 'config-cache', 'accept-quotation', 'request-accept']);
     }
 
     private function isHomepage($request, $baseFolders)

@@ -1,4 +1,19 @@
 <?php
+// --- MAINTENANCE MODE TOGGLE LOGIC ---
+$maintenance_file = __DIR__ . '/../storage/framework/down';
+
+if (strpos($_SERVER['REQUEST_URI'], '/secret-m-on') !== false) {
+    file_put_contents($maintenance_file, json_encode(['retry' => null, 'refresh' => null, 'secret' => null, 'status' => 503, 'template' => null]));
+    die('<h1>Maintenance mode is ON!</h1><br><a href="/">Go back to Home Page</a>');
+}
+
+if (strpos($_SERVER['REQUEST_URI'], '/secret-m-off') !== false) {
+    if (file_exists($maintenance_file)) {
+        unlink($maintenance_file);
+    }
+    die('<h1>Maintenance mode is OFF! Site is live.</h1><br><a href="/">Go back to Home Page</a>');
+}
+// ---------------------------------------
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;

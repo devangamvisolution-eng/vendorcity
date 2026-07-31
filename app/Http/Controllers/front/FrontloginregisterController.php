@@ -1834,7 +1834,7 @@ class FrontloginregisterController extends Controller
                 'error' => $response // already an array
             ], 500);
         } else {
-            if (isset($response['messages'][0]['status']) && $response['messages'][0]['status'] === 'SENT' || $response['messages'][0]['status'] === 'DELIVERED' || $response['messages'][0]['status'] === 'ENQUEUED') {
+            if (isset($response['messages'][0]['status']) && in_array($response['messages'][0]['status'], ['SENT', 'DELIVERED', 'ENQUEUED'])) {
 
                 session(['book-login-otp' => $otp]);
 

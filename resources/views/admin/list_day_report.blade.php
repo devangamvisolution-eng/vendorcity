@@ -37,6 +37,104 @@
 
          $userdata = Auth::user();
     @endphp
+    <style>
+        .premium-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            background: #fff;
+            margin-bottom: 24px;
+        }
+        .premium-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+        .premium-table thead th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #eef2f5;
+            padding: 16px;
+            white-space: nowrap;
+        }
+        .premium-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            color: #555;
+            border-bottom: 1px solid #f1f3f5;
+            font-size: 14px;
+        }
+        .premium-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        .premium-table tbody tr:hover {
+            background-color: #fcfcfc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+        .badge-status {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-block;
+            text-align: center;
+        }
+        .badge-completed { background-color: #e6f6ec; color: #2e8b57; }
+        .badge-pending { background-color: #fff8e5; color: #d4a305; }
+        .badge-cancelled { background-color: #fdeded; color: #c0392b; }
+        
+        .filter-card {
+            border-radius: 12px;
+            border: 1px solid #eef2f5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            background: #fafbfc;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 10px 15px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+        }
+        .btn-premium {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 10px 20px;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+        .page-title {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+    </style>
     <div class="content container-fluid">
         <!-- Page Header -->
         <div class="page-header">
@@ -58,11 +156,7 @@
 
                     <div class="col-auto">
 
-                    <a class="btn btn-primary me-1" href="javascript:void('0');" onclick="excel_download();">Excel Download</a>
-
-                    <a class="btn btn-primary filter-btn" href="javascript:void(0);" id="filter_search">
-                        <i class="fas fa-filter"></i>
-                    </a>
+                    <a class="btn btn-primary btn-premium me-1" href="javascript:void('0');" onclick="excel_download();"><i class="fas fa-file-excel"></i> Excel Download</a>
                     </div>
         
                 {{-- @endif --}}
@@ -82,17 +176,7 @@
             <input type="hidden" name="filter_salesperson_id_fil" id="filter_salesperson_id_fil" value="{{ $filter_salesperson_id ?: '' }}">
           
         </form>
-        @php
-
-        if(!empty($startdate) || !empty($enddate) || !empty($filter_service_id) || !empty($filter_salesperson_id) ){
-            $css = "display:block;";
-        }else{
-            $css = "display:none;";
-        }
-
-    @endphp 
-
-        <div id="filter_inputs" class="card filter-card" style="{{ $css }}">
+        <div id="filter_inputs" class="card filter-card" style="display: block !important;">
 
             <div class="card-body pb-0">
              <form id="filter_form" action="{{ route('day-report-filter') }}" method="POST">
@@ -155,10 +239,9 @@
                     </div>
                     </div>
                     <div class="col-sm-3 col-md-4">
-                     <div class="form-group">
-                         <a class="btn btn-primary filter-btn" href="javascript:void(0);" style="margin-top: 22px;" onclick="filter_validation()">Submit</a>
+                         <a class="btn btn-primary btn-premium filter-btn" href="javascript:void(0);" style="margin-top: 22px;" onclick="filter_validation()">Submit</a>
      
-                         <a class="btn btn-primary filter-btn" href="{{ url('admin/day-report') }}" style="margin-top: 22px;">Reset</a>
+                         <a class="btn btn-secondary btn-premium filter-btn" href="{{ url('admin/day-report') }}" style="margin-top: 22px; background: #6c757d; color: white;">Reset</a>
                          </div>
                     </div>
                 </div>
@@ -205,13 +288,13 @@
         <!-- /Search Filter -->
         <div class="row">
             <div class="col-sm-12">
-                <div class="card card-table">
+                <div class="card premium-card">
                     <div class="card-body">
                         <form id="form" action="{{ route('delete_order') }}" enctype="multipart/form-data">
                             <INPUT TYPE="hidden" NAME="hidPgRefRan" VALUE="<?php echo rand(); ?>">
                             @csrf
                             <div class="table-responsive">
-                                <table class="table table-center table-hover datatable" id="example">
+                                <table class="table premium-table datatable" id="example">
                                     <thead class="thead-light">
                                         <tr>
                                             <!-- <th>select</th> -->
@@ -302,11 +385,11 @@
                                                 
                                                 <td>
                                                 @if($orders->order_status === 'P')
-                                                     Pending
+                                                     <span class="badge-status badge-pending">Pending</span>
                                                 @elseif ($orders->order_status == 'CO')
-                                                    Completed
+                                                    <span class="badge-status badge-completed">Completed</span>
                                                 @elseif ($orders->order_status == 'CL')
-                                                    Cancelled
+                                                    <span class="badge-status badge-cancelled">Cancelled</span>
                                                 @endif
                                                 </td>
 

@@ -1,7 +1,7 @@
 @extends('admin.includes.Template')
 <link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}">
 
-   <script src="{{ asset('public/site/js/intlTelInput.min.js') }}"></script>
+<script src="{{ asset('public/site/js/intlTelInput.min.js') }}"></script>
 <style>
     .styledRadioLabel {
         position: relative;
@@ -29,7 +29,10 @@
         height: 0;
         width: 0;
     }
-    .mobile_div .iti{width: 100% !important;}
+
+    .mobile_div .iti {
+        width: 100% !important;
+    }
 </style>
 
 @section('content')
@@ -143,13 +146,14 @@
                                     <input type="hidden" name="poctitle1[]" value="">
                                     <input type="hidden" name="c_email1[]" value="">
                                     <input type="hidden" name="telephone1[]" value="">
-									<input type="hidden" name="country_code1[]" class="country_code_vendor">
+                                    <input type="hidden" name="country_code1[]" class="country_code_vendor">
 
 
                                     @for ($i = 0; $i < count($attribute_data); $i++)
                                         <div class="row">
 
-                                            <input type="hidden" name="updateid1xxx[]" id="updateid1xxx{{ $i + 1 }}"
+                                            <input type="hidden" name="updateid1xxx[]"
+                                                id="updateid1xxx{{ $i + 1 }}"
                                                 value="{{ $attribute_data[$i]->id }}">
 
                                             <div class="col-md-2">
@@ -171,14 +175,16 @@
                                                         class="form-control" placeholder="Enter Email"
                                                         value="{{ $attribute_data[$i]->c_email }}">
                                                 </div>
-                                            </div> 
+                                            </div>
                                             <div class="col-md-3 mobile_div">
                                                 <div class="form-group"> <label for="telephone">Phone</label>
                                                     <input type="text" id="telephoneu" name="telephoneu[]"
-                                                        onkeypress="return validateNumber(event)" class="form-control company-phone"
-                                                        placeholder="Enter Telephone"
+                                                        onkeypress="return validateNumber(event)"
+                                                        class="form-control company-phone" placeholder="Enter Telephone"
                                                         value="{{ $attribute_data[$i]->telephone }}">
-														<input type="hidden" name="country_codeu[]" class="country_code_vendor" value="{{ $attribute_data[$i]->country_code }}">
+                                                    <input type="hidden" name="country_codeu[]"
+                                                        class="country_code_vendor"
+                                                        value="{{ $attribute_data[$i]->country_code }}">
 
                                                 </div>
                                             </div>
@@ -223,9 +229,9 @@
                                         <div class="col-md-3">
                                             <div class="form-group mobile_div"> <label for="telephone">Phone</label>
                                                 <input type="text" id="telephone" name="telephone1[]"
-                                                    onkeypress="return validateNumber(event)" class="form-control company-phone"
-                                                    placeholder="Enter Telephone">
-													<input type="hidden" name="country_code1[]" class="country_code_vendor">
+                                                    onkeypress="return validateNumber(event)"
+                                                    class="form-control company-phone" placeholder="Enter Telephone">
+                                                <input type="hidden" name="country_code1[]" class="country_code_vendor">
                                             </div>
                                         </div>
                                     </div>
@@ -246,51 +252,57 @@
                                 @php
                                     $serviceListArray = explode(',', $vendors->serviceList);
                                 @endphp
-								
-								 <div class="col-md-6">
-									<div class="form-group">
-                                    <label class="form-label" for="category">What services do you
-                                        offer?
-                                        (Click all that apply)</label>
-										
-										<select class="form-control multiple" id="serviceList" name="serviceList[]" multiple="multiple">
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="category">What services do you
+                                            offer?
+                                            (Click all that apply)</label>
+
+                                        <select class="form-control multiple" id="serviceList" name="serviceList[]"
+                                            multiple="multiple">
                                             <option value="">Select Service</option>
                                             @foreach ($service_data as $service)
-                                            <option value="{{ $service->id }}" @if (in_array($service->id, $serviceListArray)) {{ 'selected' }} @endif>{{ $service->servicename }}</option>
-                                        @endforeach
+                                                <option value="{{ $service->id }}"
+                                                    @if (in_array($service->id, $serviceListArray)) {{ 'selected' }} @endif>
+                                                    {{ $service->servicename }}</option>
+                                            @endforeach
                                         </select>
-										
-										<p class="form-error-text" id="serviceList_error"
-                                style="color: red; margin-top: 10px;">
-										
+
+                                        <p class="form-error-text" id="serviceList_error"
+                                            style="color: red; margin-top: 10px;">
+
+                                    </div>
                                 </div>
-                                </div>
-								
-								@php
+
+                                @php
                                     $subserviceListArray = explode(',', $vendors->subserviceList);
                                 @endphp
-								
-								<div class="col-md-6">
-								<div class="form-group">
 
-                                    <label class="form-label" for="category">What Sub Services do you
-                                        offer?
-                                        (Click all that apply)</label>
-										
-										<select class="form-control multiple" id="subserviceList" name="subserviceList[]" multiple="multiple">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+
+                                        <label class="form-label" for="category">What Sub Services do you
+                                            offer?
+                                            (Click all that apply)</label>
+
+                                        <select class="form-control multiple" id="subserviceList" name="subserviceList[]"
+                                            multiple="multiple">
                                             <option value="">Select Sub Service</option>
-											@foreach ($subservice_data as $subservice)
-                                            <option value="{{ $subservice->id }}" @if (in_array($subservice->id, $subserviceListArray)) {{ 'selected' }} @endif>{{ $subservice->subservicename }}</option>
-                                        @endforeach
-                                            
+                                            @foreach ($subservice_data as $subservice)
+                                                <option value="{{ $subservice->id }}"
+                                                    @if (in_array($subservice->id, $subserviceListArray)) {{ 'selected' }} @endif>
+                                                    {{ $subservice->subservicename }}</option>
+                                            @endforeach
+
                                         </select>
-										<p class="form-error-text" id="subserviceList_error"
-                                style="color: red; margin-top: 10px;">
-										
+                                        <p class="form-error-text" id="subserviceList_error"
+                                            style="color: red; margin-top: 10px;">
+
+                                    </div>
                                 </div>
-                                </div>
-								
-                                
+
+
 
                                 <div class="col-lg-6">
                                     <div class="form-group">
@@ -302,17 +314,18 @@
                                 </div>
 
                                 @php
-                                $city_selected = explode(',',$vendors->city);
+                                    $city_selected = explode(',', $vendors->city);
                                 @endphp
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="vendors">Company City</label>
-                                        <select class="form-control multiple" id="city" name="city[]" multiple="multiple">
+                                        <select class="form-control multiple" id="city" name="city[]"
+                                            multiple="multiple">
                                             <option value="">Select Company City</option>
                                             @foreach ($city_data as $city)
                                                 <option value="{{ $city->id }}"
-                                                {{ in_array($city->id, $city_selected) ? 'selected' : '' }}>
-                                                   {{ $city->name }}</option>
+                                                    {{ in_array($city->id, $city_selected) ? 'selected' : '' }}>
+                                                    {{ $city->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -340,14 +353,14 @@
                                             value="{{ $vendors->establishment_date }}" />
                                     </div>
                                 </div>
-                                 <div class="col-lg-6">
+                                <div class="col-lg-6">
                                     <div class="form-group">
                                         <label for="name">Company Logo (90px * 90px)</label>
-                                        <input id="company_logo" name="company_logo" type="file"
-                                            class="form-control" placeholder="Select Company Logo" />
+                                        <input id="company_logo" name="company_logo" type="file" class="form-control"
+                                            placeholder="Select Company Logo" />
                                         @if ($vendors->company_logo != '')
-
-                                        <a href="{{ asset('public/upload/vendors/' . $vendors->company_logo) }}" class="btn btn-primary" target="_blank">View</a>
+                                            <a href="{{ asset('public/upload/vendors/' . $vendors->company_logo) }}"
+                                                class="btn btn-primary" target="_blank">View</a>
                                             {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->company_logo) }}"
                                                 style="width: 10%;margin-top: 10px;" /> --}}
                                         @endif
@@ -359,8 +372,8 @@
                                         <input id="vatcertificate" name="vatcertificate" type="file"
                                             class="form-control" placeholder="Select VAT Certificate" />
                                         @if ($vendors->vatcertificate != '')
-
-                                        <a href="{{ asset('public/upload/vendors/' . $vendors->vatcertificate) }}" class="btn btn-primary" target="_blank">View</a>
+                                            <a href="{{ asset('public/upload/vendors/' . $vendors->vatcertificate) }}"
+                                                class="btn btn-primary" target="_blank">View</a>
                                             {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->vatcertificate) }}"
                                                 style="width: 10%;margin-top: 10px;" /> --}}
                                         @endif
@@ -372,8 +385,8 @@
                                         <input id="trncertificate" name="trncertificate" type="file"
                                             class="form-control" placeholder="Select TRN Certificate" />
                                         @if ($vendors->trncertificate != '')
-
-                                        <a href="{{ asset('public/upload/vendors/' . $vendors->trncertificate) }}" class="btn btn-primary" target="_blank">View</a>
+                                            <a href="{{ asset('public/upload/vendors/' . $vendors->trncertificate) }}"
+                                                class="btn btn-primary" target="_blank">View</a>
                                             {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->trncertificate) }}"
                                                 style="width: 10%;margin-top: 10px;" /> --}}
                                         @endif
@@ -385,7 +398,8 @@
                                         <input id="tradelicense" name="tradelicense" type="file" class="form-control"
                                             placeholder="Select Trade License" />
                                         @if ($vendors->tradelicense != '')
-                                        <a href="{{ asset('public/upload/vendors/' . $vendors->tradelicense) }}" class="btn btn-primary" target="_blank">View</a>
+                                            <a href="{{ asset('public/upload/vendors/' . $vendors->tradelicense) }}"
+                                                class="btn btn-primary" target="_blank">View</a>
                                             {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->tradelicense) }}"
                                                 style="width: 10%;margin-top: 10px;" /> --}}
                                         @endif
@@ -397,7 +411,8 @@
                                         <input id="passport" name="passport" type="file" class="form-control"
                                             placeholder="Select Passport" />
                                         @if ($vendors->passport != '')
-                                        <a href="{{ asset('public/upload/vendors/' . $vendors->passport) }}" class="btn btn-primary" target="_blank">View</a>
+                                            <a href="{{ asset('public/upload/vendors/' . $vendors->passport) }}"
+                                                class="btn btn-primary" target="_blank">View</a>
                                             {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->tradelicense) }}"
                                                 style="width: 10%;margin-top: 10px;" /> --}}
                                         @endif
@@ -409,7 +424,8 @@
                                         <input id="emirates_id" name="emirates_id" type="file" class="form-control"
                                             placeholder="Select emirates_id" />
                                         @if ($vendors->emirates_id != '')
-                                        <a href="{{ asset('public/upload/vendors/' . $vendors->emirates_id) }}" class="btn btn-primary" target="_blank">View</a>
+                                            <a href="{{ asset('public/upload/vendors/' . $vendors->emirates_id) }}"
+                                                class="btn btn-primary" target="_blank">View</a>
                                             {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->tradelicense) }}"
                                                 style="width: 10%;margin-top: 10px;" /> --}}
                                         @endif
@@ -475,11 +491,12 @@
                                     <div class="form-group mobile_div">
 
                                         <label for="name">Mobile No.</label>
-                                        
-                                        <input id="mobile" name="mobile" type="text" class="form-control company-phone"
-                                            placeholder="Enter Mobile No." onkeypress="return validateNumber(event)"
-                                            value="{{ $vendors->mobile }}" />
-											<input type="hidden" name="country_code_vendor" id="country_code_vendor" class="country_code_vendor" value="{{ $vendors->country_code }}">
+
+                                        <input id="mobile" name="mobile" type="text"
+                                            class="form-control company-phone" placeholder="Enter Mobile No."
+                                            onkeypress="return validateNumber(event)" value="{{ $vendors->mobile }}" />
+                                        <input type="hidden" name="country_code_vendor" id="country_code_vendor"
+                                            class="country_code_vendor" value="{{ $vendors->country_code }}">
                                         <p class="form-error-text" id="mobile_error"
                                             style="color: red; margin-top: 10px;">
                                         </p>
@@ -487,11 +504,11 @@
                                     </div>
                                 </div>
 
-                                 <div class="col-md-6">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="name">Rating</label>
                                         <input id="rating" name="rating" type="number" class="form-control"
-                                            placeholder="Enter Rating" value="{{ $vendors->rating }}"/>
+                                            placeholder="Enter Rating" value="{{ $vendors->rating }}" />
                                         <p class="form-error-text" id="rating_error"
                                             style="color: red; margin-top: 10px;"></p>
                                     </div>
@@ -500,8 +517,9 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="name">Numbers Of Review</label>
-                                        <input id="number_of_review" name="number_of_review" type="number" class="form-control"
-                                            placeholder="Enter Numbers Of Review" value="{{ $vendors->number_of_review }}"/>
+                                        <input id="number_of_review" name="number_of_review" type="number"
+                                            class="form-control" placeholder="Enter Numbers Of Review"
+                                            value="{{ $vendors->number_of_review }}" />
                                         <p class="form-error-text" id="number_of_review_error"
                                             style="color: red; margin-top: 10px;"></p>
                                     </div>
@@ -517,7 +535,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-12" >
+                                <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="name"> Tell us a bit about your company</label>
                                         <textarea class="form-control" name="short_description" id="short_description">{{ $vendors->short_description }}</textarea>
@@ -570,16 +588,16 @@
 
 
     <script>
-           $("#city").select2({
-        placeholder: "Select a Cities" // Replace with your desired placeholder text
-    });
-	
-	$("#serviceList").select2({
-        placeholder: "Select a Service" // Replace with your desired placeholder text
-    });
-	$("#subserviceList").select2({
-        placeholder: "Select a Sub Service" // Replace with your desired placeholder text
-    });
+        $("#city").select2({
+            placeholder: "Select a Cities" // Replace with your desired placeholder text
+        });
+
+        $("#serviceList").select2({
+            placeholder: "Select a Service" // Replace with your desired placeholder text
+        });
+        $("#subserviceList").select2({
+            placeholder: "Select a Sub Service" // Replace with your desired placeholder text
+        });
 
         $(document).ready(function() {
             var role_id = jQuery("#role_id").val();
@@ -628,30 +646,30 @@
                 return false;
 
             }
-			
-			var serviceList = $('select[name="serviceList[]"]').val(); 
 
-			if (!serviceList || serviceList.length === 0) {
-				jQuery('#serviceList_error').html("Please select at least one service");
-				jQuery('#serviceList_error').show().delay(0).fadeIn('show');
-				jQuery('#serviceList_error').show().delay(2000).fadeOut('show');
-				$('html, body').animate({
-					scrollTop: $('#serviceList').offset().top - 150
-				}, 1000);
-				return false;
-			}
+            var serviceList = $('select[name="serviceList[]"]').val();
 
-			var subserviceList = $('select[name="subserviceList[]"]').val(); 
+            if (!serviceList || serviceList.length === 0) {
+                jQuery('#serviceList_error').html("Please select at least one service");
+                jQuery('#serviceList_error').show().delay(0).fadeIn('show');
+                jQuery('#serviceList_error').show().delay(2000).fadeOut('show');
+                $('html, body').animate({
+                    scrollTop: $('#serviceList').offset().top - 150
+                }, 1000);
+                return false;
+            }
 
-			if (!subserviceList || subserviceList.length === 0) {
-				jQuery('#subserviceList_error').html("Please select at least one subservice");
-				jQuery('#subserviceList_error').show().delay(0).fadeIn('show');
-				jQuery('#subserviceList_error').show().delay(2000).fadeOut('show');
-				$('html, body').animate({
-					scrollTop: $('#subserviceList').offset().top - 150
-				}, 1000);
-				return false;
-			}
+            var subserviceList = $('select[name="subserviceList[]"]').val();
+
+            if (!subserviceList || subserviceList.length === 0) {
+                jQuery('#subserviceList_error').html("Please select at least one subservice");
+                jQuery('#subserviceList_error').show().delay(0).fadeIn('show');
+                jQuery('#subserviceList_error').show().delay(2000).fadeOut('show');
+                $('html, body').animate({
+                    scrollTop: $('#subserviceList').offset().top - 150
+                }, 1000);
+                return false;
+            }
 
 
             var email = jQuery("#email").val();
@@ -790,29 +808,25 @@
             }
 
         }
-
-
-
-       
     </script>
-	
-	<script>
-$(document).ready(function() {
-    var max_fields = 50;
-    var wrapper = $(".input_fields_wrap12");
-    var add_button = $("#add_field_button12");
-    var b = $(".company-phone").length; // count existing rows
 
-    // ✅ Initialize intlTelInput for all existing telephone fields
-    initializeIntlTelInputs();
+    <script>
+        $(document).ready(function() {
+            var max_fields = 50;
+            var wrapper = $(".input_fields_wrap12");
+            var add_button = $("#add_field_button12");
+            var b = $(".company-phone").length; // count existing rows
 
-    // ✅ Add new field
-    $(document).on('click', '#add_field_button12', function(e) {
-        e.preventDefault();
-        if (b < max_fields) {
-            b++;
+            // ✅ Initialize intlTelInput for all existing telephone fields
+            initializeIntlTelInputs();
 
-            var newField = `
+            // ✅ Add new field
+            $(document).on('click', '#add_field_button12', function(e) {
+                e.preventDefault();
+                if (b < max_fields) {
+                    b++;
+
+                    var newField = `
                 <div class="row poc-row mt-2">
                     <div class="col-md-2">
                         <div class="form-group">
@@ -843,136 +857,136 @@ $(document).ready(function() {
                         <a href="#" class="btn btn-danger remove_field1 w-100">Remove</a>
                     </div>
                 </div>`;
-            
-            $(wrapper).append(newField);
 
-            // ✅ Apply intl-tel-input to the newly added phone field
-            var lastPhone = $(wrapper).find(".company-phone").last()[0];
-            initializeIntlTelInput(lastPhone);
-        }
-    });
+                    $(wrapper).append(newField);
 
-    // ✅ Remove POC row
-    $(wrapper).on("click", ".remove_field1", function(e) {
-        e.preventDefault();
-        $(this).closest(".poc-row").remove();
-        b--;
-    });
+                    // ✅ Apply intl-tel-input to the newly added phone field
+                    var lastPhone = $(wrapper).find(".company-phone").last()[0];
+                    initializeIntlTelInput(lastPhone);
+                }
+            });
 
-    // ========================
-    // Helper Functions
-    // ========================
+            // ✅ Remove POC row
+            $(wrapper).on("click", ".remove_field1", function(e) {
+                e.preventDefault();
+                $(this).closest(".poc-row").remove();
+                b--;
+            });
 
-    function initializeIntlTelInputs() {
-        $(".company-phone").each(function() {
-            initializeIntlTelInput(this);
-        });
-    }
+            // ========================
+            // Helper Functions
+            // ========================
 
-    function initializeIntlTelInput(input) {
-    if (!input || input.classList.contains('iti-initialized')) return;
-
-    const hiddenInput = input.closest(".mobile_div").querySelector(".country_code_vendor");
-    const savedDialCode = hiddenInput ? hiddenInput.value : null;
-
-    const iti = window.intlTelInput(input, {
-        initialCountry: savedDialCode ? getCountryCodeFromDialCode(savedDialCode) : "ae",
-        separateDialCode: true,
-        nationalMode: false,
-        preferredCountries: ["in", "ae", "us", "gb"],
-        autoPlaceholder: "off",
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-    });
-
-    input.classList.add("iti-initialized");
-
-    // Update hidden input when country changes
-    function updateDialCode() {
-        if (hiddenInput) hiddenInput.value = iti.getSelectedCountryData().dialCode;
-    }
-
-    updateDialCode(); // set initial value
-    input.addEventListener("countrychange", updateDialCode);
-}
-
-// Helper: convert dial code to ISO code
-function getCountryCodeFromDialCode(dialCode) {
-    const countryData = window.intlTelInputGlobals.getCountryData();
-    for (let i = 0; i < countryData.length; i++) {
-        if (countryData[i].dialCode == dialCode) return countryData[i].iso2;
-    }
-    return "ae"; // fallback
-}
-
-// Initialize all phone inputs on page load
-$(document).ready(function() {
-    $(".company-phone").each(function() {
-        initializeIntlTelInput(this);
-    });
-});
-
-});
-
-	$('#serviceList').on('change', function () {
-    var selectedServices = $(this).val(); // array of selected service IDs
-    var selectedSubservices = $('#subserviceList').val() || []; // keep currently selected subservices
-
-    if (selectedServices && selectedServices.length > 0) {
-        $.ajax({
-            url: "{{ route('front.getSubservices') }}",
-            type: "POST",
-            data: {
-                service_ids: selectedServices,
-                _token: "{{ csrf_token() }}"
-            },
-            success: function (response) {
-                $('#subserviceList').empty();
-
-                // Populate new options
-                $.each(response, function (index, subservice) {
-                    var option = $('<option>', {
-                        value: subservice.id,
-                        text: subservice.subservicename
-                    });
-
-                    // Retain previously selected subservices
-                    if (selectedSubservices.includes(subservice.id.toString())) {
-                        option.attr('selected', 'selected');
-                    }
-
-                    $('#subserviceList').append(option);
+            function initializeIntlTelInputs() {
+                $(".company-phone").each(function() {
+                    initializeIntlTelInput(this);
                 });
             }
+
+            function initializeIntlTelInput(input) {
+                if (!input || input.classList.contains('iti-initialized')) return;
+
+                const hiddenInput = input.closest(".mobile_div").querySelector(".country_code_vendor");
+                const savedDialCode = hiddenInput ? hiddenInput.value : null;
+
+                const iti = window.intlTelInput(input, {
+                    initialCountry: savedDialCode ? getCountryCodeFromDialCode(savedDialCode) : "ae",
+                    separateDialCode: true,
+                    nationalMode: false,
+                    preferredCountries: ["in", "ae", "us", "gb"],
+                    autoPlaceholder: "off",
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                });
+
+                input.classList.add("iti-initialized");
+
+                // Update hidden input when country changes
+                function updateDialCode() {
+                    if (hiddenInput) hiddenInput.value = iti.getSelectedCountryData().dialCode;
+                }
+
+                updateDialCode(); // set initial value
+                input.addEventListener("countrychange", updateDialCode);
+            }
+
+            // Helper: convert dial code to ISO code
+            function getCountryCodeFromDialCode(dialCode) {
+                const countryData = window.intlTelInputGlobals.getCountryData();
+                for (let i = 0; i < countryData.length; i++) {
+                    if (countryData[i].dialCode == dialCode) return countryData[i].iso2;
+                }
+                return "ae"; // fallback
+            }
+
+            // Initialize all phone inputs on page load
+            $(document).ready(function() {
+                $(".company-phone").each(function() {
+                    initializeIntlTelInput(this);
+                });
+            });
+
         });
-    } else {
-        $('#subserviceList').empty().append('<option value="">Select Subservice</option>');
-    }
-});
 
-// ✅ Company Mobile (Main vendor mobile)
-/* document.addEventListener("DOMContentLoaded", function () {
-    const mobileInput = document.querySelector("#mobile");
-    if (!mobileInput) return;
+        $('#serviceList').on('change', function() {
+            var selectedServices = $(this).val(); // array of selected service IDs
+            var selectedSubservices = $('#subserviceList').val() || []; // keep currently selected subservices
 
-    const iti = window.intlTelInput(mobileInput, {
-        initialCountry: "ae",
-        separateDialCode: true,
-        nationalMode: false,
-        preferredCountries: ["in", "ae", "us", "gb"],
-        autoPlaceholder: "off",
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-    });
+            if (selectedServices && selectedServices.length > 0) {
+                $.ajax({
+                    url: "{{ route('front.getSubservices', ['city' => 'dubai']) }}",
+                    type: "POST",
+                    data: {
+                        service_ids: selectedServices,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        $('#subserviceList').empty();
 
-    const codeInput = document.querySelector("#country_code_vendor");
+                        // Populate new options
+                        $.each(response, function(index, subservice) {
+                            var option = $('<option>', {
+                                value: subservice.id,
+                                text: subservice.subservicename
+                            });
 
-    function updateVendorCode() {
-        const data = iti.getSelectedCountryData();
-        if (codeInput) codeInput.value = data.dialCode;
-    }
+                            // Retain previously selected subservices
+                            if (selectedSubservices.includes(subservice.id.toString())) {
+                                option.attr('selected', 'selected');
+                            }
 
-    updateVendorCode();
-    mobileInput.addEventListener("countrychange", updateVendorCode);
-}); */
-</script>
+                            $('#subserviceList').append(option);
+                        });
+                    }
+                });
+            } else {
+                $('#subserviceList').empty().append('<option value="">Select Subservice</option>');
+            }
+        });
+
+        // ✅ Company Mobile (Main vendor mobile)
+        /* document.addEventListener("DOMContentLoaded", function () {
+            const mobileInput = document.querySelector("#mobile");
+            if (!mobileInput) return;
+
+            const iti = window.intlTelInput(mobileInput, {
+                initialCountry: "ae",
+                separateDialCode: true,
+                nationalMode: false,
+                preferredCountries: ["in", "ae", "us", "gb"],
+                autoPlaceholder: "off",
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+            });
+
+            const codeInput = document.querySelector("#country_code_vendor");
+
+            function updateVendorCode() {
+                const data = iti.getSelectedCountryData();
+                if (codeInput) codeInput.value = data.dialCode;
+            }
+
+            updateVendorCode();
+            mobileInput.addEventListener("countrychange", updateVendorCode);
+        }); */
+    </script>
 
 @stop

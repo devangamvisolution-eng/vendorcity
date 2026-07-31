@@ -69,6 +69,7 @@
             transform: scale(1);
             opacity: 0.6;
         }
+
         100% {
             transform: scale(1.6);
             opacity: 0;
@@ -132,8 +133,13 @@
         z-index: 1;
     }
 
-    .stepper-item:first-child::before { display: none; }
-    .stepper-item.completed::before { background-color: var(--primary-blue); }
+    .stepper-item:first-child::before {
+        display: none;
+    }
+
+    .stepper-item.completed::before {
+        background-color: var(--primary-blue);
+    }
 
     .step-counter {
         width: 48px;
@@ -147,7 +153,7 @@
         z-index: 2;
         position: relative;
         border: 4px solid #fff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .step-name {
@@ -229,7 +235,7 @@
         border: none;
         width: 100%;
         text-align: center;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .btn-return:hover {
@@ -242,12 +248,17 @@
             flex-direction: column;
             gap: 20px;
         }
-        .stepper-item::before { display: none; }
+
+        .stepper-item::before {
+            display: none;
+        }
+
         .detail-list li {
             flex-direction: column;
             align-items: flex-start;
             gap: 4px;
         }
+
         .order-success-header h2 {
             font-size: 26px;
         }
@@ -274,15 +285,17 @@
                     <div>
                         <span class="status-badge">Quote Requested</span>
                         <div class="detail-value mb-2" style="font-size: 18px;">
-                            Reference Code: <span class="text-primary text-uppercase">#{{ $enquiry->customer_id ?? 'VC-ENQ-' . $enquiry->id }}</span>
+                            Reference Code: <span
+                                class="text-primary text-uppercase">#{{ $enquiry->customer_id ?? 'VC-ENQ-' . $enquiry->id }}</span>
                         </div>
-                        <p class="text-muted small">We are matching your request with up to 5 of our top-rated, certified vendors.</p>
+                        <p class="text-muted small">We are matching your request with up to 5 of our top-rated,
+                            certified vendors.</p>
                     </div>
                 </div>
 
                 <!-- Stepper Progress Tracker -->
                 <div class="classic-card">
-                    <h5 class="fw-bold mb-3">Next Steps Tracker</h5>
+                    <h5 class="fw-bold mb-3">Next Steps</h5>
                     <div class="stepper-wrapper">
                         <div class="stepper-item completed">
                             <div class="step-counter" style="background-color: var(--primary-blue); color: #fff;">
@@ -290,8 +303,8 @@
                             </div>
                             <div class="step-name">Request<br>Received</div>
                         </div>
-                        <div class="stepper-item completed">
-                            <div class="step-counter" style="background-color: var(--primary-blue); color: #fff;">
+                        <div class="stepper-item">
+                            <div class="step-counter" style="background-color: #e2e8f0; color: #94a3b8;">
                                 <i class="fa-solid fa-file-invoice"></i>
                             </div>
                             <div class="step-name">Compare<br>Quotes</div>
@@ -327,8 +340,8 @@
                             <span class="detail-label">Move/Job Type</span>
                             <span class="detail-value">{{ $enquiry->form_type }}</span>
                         </li>
-                        @foreach($submittedFields as $field)
-                            @if($field->formfield_value != '')
+                        @foreach ($submittedFields as $field)
+                            @if ($field->formfield_value != '')
                                 @php
                                     $displayValue = $field->formfield_value;
                                     if (is_numeric($displayValue)) {
@@ -347,15 +360,17 @@
                                         ->where('form_id', '=', $field->form_field_id)
                                         ->where('package_inquiry_id', '=', $enquiry->id)
                                         ->get();
-                                        @endphp
-                                @if(count($subFields) > 0)
-                                    @foreach($subFields as $subField)
+                                @endphp
+                                @if (count($subFields) > 0)
+                                    @foreach ($subFields as $subField)
                                         @php
-                                            $subLabel = "What is the size of your home?";
+                                            $subLabel = 'What is the size of your home?';
                                             if ($field->form_field_id == 35) {
-                                                $subLabel = "What days of the week would you like the service";
+                                                $subLabel = 'What days of the week would you like the service';
                                             }
-                                            $subValue = \Helper::form_fields_attr_more($subField->more_form_attributes_id);
+                                            $subValue = \Helper::form_fields_attr_more(
+                                                $subField->more_form_attributes_id,
+                                            );
                                         @endphp
                                         <li>
                                             <span class="detail-label">{{ $subLabel }}</span>
@@ -372,7 +387,9 @@
                     <a href="{{ url('/') }}" class="btn-return">Return to Homepage</a>
                 </div>
 
-                <p class="text-center text-muted small">Need assistance? <a href="{{ route('contact') }}" style="color: var(--primary-blue); font-weight: 600; text-decoration: none;">Contact Support</a></p>
+                <p class="text-center text-muted small">Need assistance? <a href="{{ route('contact') }}"
+                        style="color: var(--primary-blue); font-weight: 600; text-decoration: none;">Contact Support</a>
+                </p>
 
             </div>
         </div>

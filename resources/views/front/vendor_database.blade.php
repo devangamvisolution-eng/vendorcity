@@ -18,28 +18,32 @@
     .banner_sec {
         margin-left: 9%;
     }
-	.we_cut_out_paragraph {
-    line-height: 35px;
-    border-left: 2px solid gray;
-    padding-left: 25px;
-}
+
+    .we_cut_out_paragraph {
+        line-height: 35px;
+        border-left: 2px solid gray;
+        padding-left: 25px;
+    }
 
     .cta-service-v3 {
         background-image: inherit;
         background-color: #eee;
     }
+
     .ticker-container {
-      overflow: hidden;
-      white-space: nowrap;
-      width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        width: 100%;
     }
+
     .ticker-items {
-      display: inline-block;
-      white-space: nowrap;
+        display: inline-block;
+        white-space: nowrap;
     }
+
     .ticker-item {
-      display: inline-block;
-      padding: 0 10px;
+        display: inline-block;
+        padding: 0 10px;
     }
 
     .review-color {
@@ -52,26 +56,28 @@
             height: auto;
             margin: 0 0 10px 0;
         }
+
         .breadcumb-section {
-          padding: 20px 15px;
-      }
+            padding: 20px 15px;
+        }
     }
 </style>
 
 <section class="breadcumb-section pt-4 container mt120">
-<div>
-    <div class="container cta-service-v3 cta-banner mx-auto maxw1700 pt120 pb120 position-relative overflow-hidden d-flex align-items-center px30-lg" style="background-image: linear-gradient(to right, #0040E6, #FFD312); height: 220px; border-radius: 20px;">
-        
-        <!--<img class="service-v3-vector d-none d-lg-block" src="{{ asset('public/site/images/test_new.jpg') }}"
+    <div>
+        <div class="container cta-service-v3 cta-banner mx-auto maxw1700 pt120 pb120 position-relative overflow-hidden d-flex align-items-center px30-lg"
+            style="background-image: linear-gradient(to right, #0040E6, #FFD312); height: 220px; border-radius: 20px;">
+
+            <!--<img class="service-v3-vector d-none d-lg-block" src="{{ asset('public/site/images/test_new.jpg') }}"
             alt="Customer service experience with Vendorscity UAE">-->
-        
+
             <div class="row wow fadeInUp container">
                 <div class="col-xl-12">
                     <div class="position-relative">
-                        <h1 class=" banner_title" style="color: #fff;" >Our Vendors</h1>
+                        <h1 class=" banner_title" style="color: #fff;">Our Vendors</h1>
                         <!-- <p class="text mb30 text-white">Give your visitor a smooth online experience with a solid UX design</p> -->
                         <!--<div class="d-flex align-items-center">
-							<h6 class="mb-0" style="color: #fff;" >Use Code MoveitMoveit</h6>
+       <h6 class="mb-0" style="color: #fff;" >Use Code MoveitMoveit</h6>
                         </div>-->
                     </div>
                 </div>
@@ -342,11 +348,12 @@
                                         <!-- Advance Features modal trigger -->
                                         <button type="button" class="open-btn filter-btn-left"> <img class="me-2"
                                                 src="{{ asset('public/site/images/icon/all-filter-icon.svg') }}"
-                                                alt="Service filter icon – Vendorscity search filter"> All Filter</button>
+                                                alt="Service filter icon – Vendorscity search filter"> All
+                                            Filter</button>
                                     </li>
                                 </ul>
                             </div>
-                            {{--<div class="pcs_dropdown dark-color pr10 text-center text-md-end"><span>Sort by</span>
+                            {{-- <div class="pcs_dropdown dark-color pr10 text-center text-md-end"><span>Sort by</span>
                                 <select class="selectpicker show-tick">
                                     <option>Best Selling</option>
                                     <option>Recommended</option>
@@ -369,40 +376,34 @@
                         @endphp
 
                         @foreach ($allvendor as $allvendor_data)
+                            @php
 
-                         @php
+                                $currentDate = now();
 
-                               $currentDate = now();
+                                $id = $allvendor_data->user_id;
 
-                               $id = $allvendor_data->user_id;
+                                $result = DB::table('subscription')
+                                    ->select('*')
+                                    ->where('vendor_id', '=', $id)
+                                    ->where('enddate', '>=', $currentDate)
+                                    ->orderBy('id', 'desc')
+                                    ->get();
+                                $result_new = $result->toArray();
+                                //echo "<pre>";print_r($result_new);echo "</pre>";
 
-                               $result = DB::table('subscription')
-                                   ->select('*')
-                                   ->where('vendor_id', '=', $id)
-                                   ->where('enddate', '>=', $currentDate)
-                                   ->orderBy('id', 'desc')
-                                   ->get();
-                               $result_new = $result->toArray();
-                              //echo "<pre>";print_r($result_new);echo "</pre>";
+                                $allServices = [];
 
-                              $allServices = [];
-
-                              foreach ($result_new as $result_new_data) {
-                                
-                                   $services_test = explode(',', $result_new_data->services);
+                                foreach ($result_new as $result_new_data) {
+                                    $services_test = explode(',', $result_new_data->services);
                                     $allServices = array_merge($allServices, $services_test);
                                 }
 
-                            $allServices = array_unique($allServices);
-                            $allServices = array_values($allServices);
+                                $allServices = array_unique($allServices);
+                                $allServices = array_values($allServices);
 
-                           
+                                //echo "<pre>";print_r($allvendor_data);echo "</pre>";
 
-
-                            //echo "<pre>";print_r($allvendor_data);echo "</pre>";
-
-                              
-                           @endphp
+                            @endphp
                             <div class="col-md-6 col-lg-12">
                                 <div class="freelancer-style1 bdr1 hover-box-shadow row ms-0 align-items-lg-center">
                                     <div class="col-lg-8 ps-0">
@@ -424,20 +425,20 @@
 
                                                 <div class="review">
                                                     <p>
-                                                        @if($allvendor_data->rating != '')
-                                                        <i class="fas fa-star fz10 review-color pr10"></i>
-                                                        <span class="dark-color fw500">{{$allvendor_data->rating}}</span> 
+                                                        @if ($allvendor_data->rating != '')
+                                                            <i class="fas fa-star fz10 review-color pr10"></i>
+                                                            <span
+                                                                class="dark-color fw500">{{ $allvendor_data->rating }}</span>
                                                         @endif
-                                                        @if($allvendor_data->number_of_review != '')
-
-                                                            @if($allvendor_data->review_link != '')
-                                                            <a href="{{$allvendor_data->review_link}}">({{$allvendor_data->number_of_review}} reviews)</a>
+                                                        @if ($allvendor_data->number_of_review != '')
+                                                            @if ($allvendor_data->review_link != '')
+                                                                <a href="{{ $allvendor_data->review_link }}">({{ $allvendor_data->number_of_review }}
+                                                                    reviews)</a>
                                                             @else
-
-                                                            ({{$allvendor_data->number_of_review}} reviews)
+                                                                ({{ $allvendor_data->number_of_review }} reviews)
                                                             @endif
                                                         @endif
-                                                            
+
                                                     </p>
                                                 </div>
 
@@ -453,13 +454,13 @@
 
 
 
-                                                 @if(!empty($allServices))
-                                                <div
-                                                    class="skill-tags d-flex align-items-center justify-content-start">
-                                                    @foreach($allServices as $allServices_data)
-                                                    <span class="tag mx10">{!! Helper::servicename($allServices_data) !!}</span>
-                                                    @endforeach
-                                                </div>
+                                                @if (!empty($allServices))
+                                                    <div
+                                                        class="skill-tags d-flex align-items-center justify-content-start">
+                                                        @foreach ($allServices as $allServices_data)
+                                                            <span class="tag mx10">{!! Helper::servicename($allServices_data) !!}</span>
+                                                        @endforeach
+                                                    </div>
                                                 @endif
                                             </div>
                                         </div>
@@ -514,24 +515,27 @@
 
 <section class="pb90 pb30-md pt30">
     <div class="container">
-	<div class="container">
-        <div class="row wow fadeInUp" data-wow-delay="00ms" style="visibility: visible; animation-delay: 0ms; animation-name: fadeInUp;">
-            <div class="col-lg-6">
-                <div class="main-title2">
-                    <h2 class="title we_do_heading">Most Popular Services</h2>
+        <div class="container">
+            <div class="row wow fadeInUp" data-wow-delay="00ms"
+                style="visibility: visible; animation-delay: 0ms; animation-name: fadeInUp;">
+                <div class="col-lg-6">
+                    <div class="main-title2">
+                        <h2 class="title we_do_heading">Most Popular Services</h2>
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+
+                    <p class="paragraph we_cut_out_paragraph">Get your weekend back, we've got your to-do list covered.
+                        Hire our top rated verified vendors for the best in class stress free service and top class
+                        prices
+                    </p>
 
                 </div>
             </div>
-            <div class="col-lg-6">
 
-                <p class="paragraph we_cut_out_paragraph">Get your weekend back, we've got your to-do list covered. Hire our top rated verified vendors for the best in class stress free service and top class prices
-                </p>
-
-            </div>
         </div>
 
-    </div>
-        
         <div class="tab-content ha" id="pills-tabContent">
             <div class="tab-pane fade fz15 text show active" id="pills-home" role="tabpanel"
                 aria-labelledby="pills-home-tab">
@@ -540,7 +544,8 @@
                         <div class="item">
                             <div class="listing-style1">
                                 <div class="list-thumb">
-                                    <a href="{{ url('service/' . $services_data->page_url) }}">
+                                    <a
+                                        href="{{ route('front.subservices', ['page_url' => $services_data->page_url]) }}">
                                         @if (isset($services_data->image) && $services_data->image != '')
                                             <img class="w-100"
                                                 src="{{ asset('public/upload/service/large/' . $services_data->image) }}"
@@ -556,16 +561,17 @@
                                 <div class="list-content"
                                     style="padding: 35px 15px 20px 15px; background:#eee; !important">
 
-                                    {{--<div class="review-meta d-flex align-items-center">
+                                    {{-- <div class="review-meta d-flex align-items-center">
                                         <i class="fas fa-star fz10 review-color"></i>
                                         <i class="fas fa-star fz10 review-color"></i>
                                         <i class="fas fa-star fz10 review-color"></i>
                                         <i class="fas fa-star fz10 review-color"></i>
 
-                                    </div>--}}
+                                    </div> --}}
 
                                     <div class="list-meta d-flex justify-content-between align-items-center mt15">
-                                        <a class="d-flex" href="{{ url('service/' . $services_data->page_url) }}">
+                                        <a class="d-flex"
+                                            href="{{ route('front.subservices', ['page_url' => $services_data->page_url]) }}">
                                             <span class="fz14"
                                                 style="font-size: 20px;!important">{{ $services_data->servicename }}</span>
                                         </a>
@@ -597,7 +603,9 @@
             </div>
             <div class="col-lg-6">
 
-                <p class="paragraph we_cut_out_paragraph">Step into a world of satisfaction and trust as you explore stories and positive experiences ahared by our delighted customers.Discover firsthand the joy and reliability that defines our services!
+                <p class="paragraph we_cut_out_paragraph">Step into a world of satisfaction and trust as you explore
+                    stories and positive experiences ahared by our delighted customers.Discover firsthand the joy and
+                    reliability that defines our services!
                 </p>
 
             </div>
@@ -620,7 +628,7 @@
                     <div class="col-sm-6 col-lg-4">
                         <div class="funfact_one">
                             <div class="details">
-                                
+
                                 <ul class="ps-0 d-flex mb-0">
                                     <li>
                                         <div class="timer">4.7</div>
@@ -653,49 +661,47 @@
             </div>
             <div class="col-md-6 col-lg-4 col-xl-4">
 
-                @if(!empty($googleReview))
-                <div class="testimonial-slider2 mb15 navi_pagi_bottom_center slider-1-grid owl-carousel owl-theme wow fadeInUp"
-                    data-wow-delay="300ms">
+                @if (!empty($googleReview))
+                    <div class="testimonial-slider2 mb15 navi_pagi_bottom_center slider-1-grid owl-carousel owl-theme wow fadeInUp"
+                        data-wow-delay="300ms">
 
-                    @foreach($googleReview as $googleReview_data)
-                    <div class="item">
-                        <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
-                            <div class="testimonial-content">
-                                @if($googleReview_data->label != '')
-
-                                <div class="d-flex">
-                                       @for ($i = 1; $i <= 5; $i++)
-                                            @if ($i <= $googleReview_data->label)
-                                                <i class="fas fa-star review-color"></i>
-                                            @else
-                                                <i class="far fa-star review-color ms-2"></i>
+                        @foreach ($googleReview as $googleReview_data)
+                            <div class="item">
+                                <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
+                                    <div class="testimonial-content">
+                                        @if ($googleReview_data->label != '')
+                                            <div class="d-flex">
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    @if ($i <= $googleReview_data->label)
+                                                        <i class="fas fa-star review-color"></i>
+                                                    @else
+                                                        <i class="far fa-star review-color ms-2"></i>
+                                                    @endif
+                                                @endfor
+                                            </div>
+                                        @endif
+                                        <span class="icon fas fa-quote-left"></span>
+                                        @if ($googleReview_data->description != '')
+                                            <h4 class="t_content">“{{ $googleReview_data->description }}”</h4>
+                                        @endif
+                                    </div>
+                                    <div class="thumb d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <img src="{{ asset('public/site/images/profileimage.png') }}"
+                                                alt="" style="width: 75px !important;">
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            @if ($googleReview_data->name != '')
+                                                <h6 class="mb-0">{{ $googleReview_data->name }}</h6>
                                             @endif
-                                        @endfor
-                                      </div>
-                                    
-                                @endif 
-                                <span class="icon fas fa-quote-left"></span>
-                                @if($googleReview_data->description != '')
-                                <h4 class="t_content">“{{$googleReview_data->description}}”</h4>
-                                     @endif 
-                            </div>
-                            <div class="thumb d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <img src="{{ asset('public/site/images/profileimage.png') }}"
-                                    alt="" style="width: 75px !important;">
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    @if($googleReview_data->name != '')
-                                    <h6 class="mb-0">{{$googleReview_data->name}}</h6>
-                                    @endif 
-                                    <!-- <p class="fz14 mb-0">Web Designer</p> -->
+                                            <!-- <p class="fz14 mb-0">Web Designer</p> -->
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    @endforeach
+                        @endforeach
 
-                    <!-- <div class="item">
+                        <!-- <div class="item">
                         <div class="testimonial-style1 default-box-shadow1 position-relative bdrs16 mb35">
                             <div class="testimonial-content">
                                 <h4 class="title text-thm text_blue">Good Service</h4>
@@ -757,11 +763,11 @@
                         </div>
                     </div> -->
 
-                    
 
-                </div>
 
-                 @endif
+                    </div>
+
+                @endif
             </div>
         </div>
     </div>
@@ -775,32 +781,31 @@
             </div>
         </div>
         <div class="row" style="margin:0; ">
-            @if(!empty($googleReview))
-                @foreach($googleReview as $googleReview_data)
-                <div class="col-lg-3">
-                    <div class="reviewListBox">
+            @if (!empty($googleReview))
+                @foreach ($googleReview as $googleReview_data)
+                    <div class="col-lg-3">
+                        <div class="reviewListBox">
 
-                        @if($googleReview_data->name != '')
-                        <h5 class="mb-0">{{$googleReview_data->name}}</h5>
-                        @endif 
+                            @if ($googleReview_data->name != '')
+                                <h5 class="mb-0">{{ $googleReview_data->name }}</h5>
+                            @endif
 
-                        @if($googleReview_data->label != '')
-                        <div class="d-flex">
-                               @for ($i = 1; $i <= 5; $i++)
-                                    @if ($i <= $googleReview_data->label)
-                                        <i class="fas fa-star review-color"></i>
-                                    @else
-                                        <i class="far fa-star review-color ms-2"></i>
-                                    @endif
-                                @endfor
-                              </div>
-                            
-                        @endif 
-                        @if($googleReview_data->description != '')
-                            <p>“{{$googleReview_data->description}}”</p>
-                        @endif 
+                            @if ($googleReview_data->label != '')
+                                <div class="d-flex">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        @if ($i <= $googleReview_data->label)
+                                            <i class="fas fa-star review-color"></i>
+                                        @else
+                                            <i class="far fa-star review-color ms-2"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+                            @endif
+                            @if ($googleReview_data->description != '')
+                                <p>“{{ $googleReview_data->description }}”</p>
+                            @endif
+                        </div>
                     </div>
-                </div>
                 @endforeach
             @endif
         </div>
@@ -815,10 +820,13 @@
                 <p>Explore our Google Reviews and discover why customers trust us with home service needs</p>
             </div>
             <div class="col-lg-3 wow fadeInUp" data-wow-delay="300ms">
-                <a style="width: 100%;" href="https://www.google.com/search?q=vendorscity+dubai&sca_esv=e472bba1732e8ddb&sca_upv=1&rlz=1C5CHFA_enAE1014AE1015&sxsrf=ADLYWIKMm77ohxWtSjtB2FywHuiQPICeBA%3A1716628559794&ei=T6xRZquOMNCVxc8Ph-eCsAo&ved=0ahUKEwjr8ZHcu6iGAxXQSvEDHYezAKYQ4dUDCBA&uact=5&oq=vendorscity+dubai&gs_lp=Egxnd3Mtd2l6LXNlcnAiEXZlbmRvcnNjaXR5IGR1YmFpMgQQIxgnMggQABgIGA0YHjIIEAAYCBgNGB4yCBAAGAgYDRgeMgsQABiABBiGAxiKBTILEAAYgAQYhgMYigUyCxAAGIAEGIYDGIoFMgsQABiABBiGAxiKBTIIEAAYgAQYogQyCBAAGIAEGKIESMAKUMoEWN8GcAF4AZABAJgB_wGgAcYDqgEFMC4xLjG4AQPIAQD4AQGYAgOgAtMDwgIKEAAYsAMY1gQYR8ICBxAAGIAEGA3CAggQABgFGA0YHsICChAAGAUYDRgeGA-YAwDiAwUSATEgQIgGAZAGCJIHBTEuMC4yoAeUEA&sclient=gws-wiz-serp#lrd=0x4c30ffdf4bf81567:0xaf176b54bfc73c00,1" target="_blank" class="ud-btn btn-thm">Read More Reviews</a>
+                <a style="width: 100%;"
+                    href="https://www.google.com/search?q=vendorscity+dubai&sca_esv=e472bba1732e8ddb&sca_upv=1&rlz=1C5CHFA_enAE1014AE1015&sxsrf=ADLYWIKMm77ohxWtSjtB2FywHuiQPICeBA%3A1716628559794&ei=T6xRZquOMNCVxc8Ph-eCsAo&ved=0ahUKEwjr8ZHcu6iGAxXQSvEDHYezAKYQ4dUDCBA&uact=5&oq=vendorscity+dubai&gs_lp=Egxnd3Mtd2l6LXNlcnAiEXZlbmRvcnNjaXR5IGR1YmFpMgQQIxgnMggQABgIGA0YHjIIEAAYCBgNGB4yCBAAGAgYDRgeMgsQABiABBiGAxiKBTILEAAYgAQYhgMYigUyCxAAGIAEGIYDGIoFMgsQABiABBiGAxiKBTIIEAAYgAQYogQyCBAAGIAEGKIESMAKUMoEWN8GcAF4AZABAJgB_wGgAcYDqgEFMC4xLjG4AQPIAQD4AQGYAgOgAtMDwgIKEAAYsAMY1gQYR8ICBxAAGIAEGA3CAggQABgFGA0YHsICChAAGAUYDRgeGA-YAwDiAwUSATEgQIgGAZAGCJIHBTEuMC4yoAeUEA&sclient=gws-wiz-serp#lrd=0x4c30ffdf4bf81567:0xaf176b54bfc73c00,1"
+                    target="_blank" class="ud-btn btn-thm">Read More Reviews</a>
             </div>
             <div class="col-lg-4 wow fadeInUp" data-wow-delay="300ms" style="text-align: right;">
-                <img class="w100" src="{{ asset('public/site/images/googlereview.png') }}" alt="" style="max-width: 400px;">
+                <img class="w100" src="{{ asset('public/site/images/googlereview.png') }}" alt=""
+                    style="max-width: 400px;">
             </div>
         </div>
     </div>
@@ -937,10 +945,13 @@
 
             <div class="ticker-container">
                 <div class="ticker-items">
-                  <div class="ticker-item"><span class="fa-regular fa-user custom_icon"></span> 15,000+ Customers </div>
-                  <div class="ticker-item"><span class="fa-regular fa-star custom_icon"></span> Rated 4.8 out of 5</div>
-                  <div class="ticker-item"><span class="fa-regular fa-phone custom_icon"></span> Live Customer Support</div>
-                  <!-- Add more items as needed -->
+                    <div class="ticker-item"><span class="fa-regular fa-user custom_icon"></span> 15,000+ Customers
+                    </div>
+                    <div class="ticker-item"><span class="fa-regular fa-star custom_icon"></span> Rated 4.8 out of 5
+                    </div>
+                    <div class="ticker-item"><span class="fa-regular fa-phone custom_icon"></span> Live Customer
+                        Support</div>
+                    <!-- Add more items as needed -->
                 </div>
             </div>
 
@@ -956,7 +967,7 @@
     }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
-  <script>
+<script>
     const tickerContainer = document.querySelector('.ticker-container');
     const tickerItems = document.querySelector('.ticker-items');
     const items = document.querySelectorAll('.ticker-item');
@@ -964,24 +975,22 @@
     // Calculate the width of all items combined
     let itemsWidth = 0;
     items.forEach(item => {
-      itemsWidth += item.offsetWidth;
+        itemsWidth += item.offsetWidth;
     });
 
     // Clone items to fill the container at least twice
     while (tickerItems.offsetWidth < tickerContainer.offsetWidth * 2) {
-      items.forEach(item => {
-        const clone = item.cloneNode(true);
-        tickerItems.appendChild(clone);
-      });
+        items.forEach(item => {
+            const clone = item.cloneNode(true);
+            tickerItems.appendChild(clone);
+        });
     }
 
     // Set up GSAP animation
     gsap.to(tickerItems, {
-      duration: 5, // Adjust duration as needed
-      x: -itemsWidth,
-      ease: 'none',
-      repeat: -1
+        duration: 5, // Adjust duration as needed
+        x: -itemsWidth,
+        ease: 'none',
+        repeat: -1
     });
-
-    
-  </script>
+</script>

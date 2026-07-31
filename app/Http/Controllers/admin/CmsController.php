@@ -6,7 +6,7 @@ namespace App\Http\Controllers\admin;
 
 
 
-use App\Models\admin\Cms;
+use App\Models\Admin\Cms;
 
 use App\Http\Controllers\Controller;
 
@@ -32,10 +32,9 @@ class CmsController extends Controller
 
     {
 
-        $data['cms_data']=Cms::orderBy('id','desc')->get();        
+        $data['cms_data'] = Cms::orderBy('id', 'desc')->get();
 
-        return view('admin.list_cms',$data);
-
+        return view('admin.list_cms', $data);
     }
 
 
@@ -55,7 +54,6 @@ class CmsController extends Controller
     {
 
         return view('admin.add_cms');
-
     }
 
 
@@ -78,7 +76,7 @@ class CmsController extends Controller
 
         // echo"<pre>";print_r($request->post());echo"</pre>";exit;
 
-        $cms= new Cms;
+        $cms = new Cms;
 
         $cms->name              =   $request->name;
 
@@ -92,10 +90,7 @@ class CmsController extends Controller
 
         $cms->save();
 
-        return redirect()->route('cms.index')->with('success','CMS Added Successfully');
-
-
-
+        return redirect()->route('cms.index')->with('success', 'CMS Added Successfully');
     }
 
 
@@ -140,8 +135,7 @@ class CmsController extends Controller
 
         $data['cms'] = Cms::where('id', '=',  $id)->first();
 
-        return view('admin.edit_cms',$data);
-
+        return view('admin.edit_cms', $data);
     }
 
 
@@ -164,7 +158,7 @@ class CmsController extends Controller
 
     {
 
-        $cms= Cms::find($id);
+        $cms = Cms::find($id);
 
         $cms->name              =   $request->name;
 
@@ -178,10 +172,7 @@ class CmsController extends Controller
 
         $cms->save();
 
-        return redirect()->route('cms.index')->with('success','CMS  Updated Successfully');
-
-        
-
+        return redirect()->route('cms.index')->with('success', 'CMS  Updated Successfully');
     }
 
 
@@ -202,14 +193,10 @@ class CmsController extends Controller
 
     {
 
-        $id=$request->selected;
+        $id = $request->selected;
 
-        Cms::whereIn('id',$id)->delete();
+        Cms::whereIn('id', $id)->delete();
 
-        return redirect()->route('cms.index')->with('success','CMS Deleted Successfully');
-
-
-
+        return redirect()->route('cms.index')->with('success', 'CMS Deleted Successfully');
     }
-
 }

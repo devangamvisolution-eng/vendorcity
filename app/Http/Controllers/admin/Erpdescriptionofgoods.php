@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Admin\Erpdescriptionofgoods as dsgmodel;
+use App\Models\admin\Erpdescriptionofgoods as dsgmodel;
 
 class Erpdescriptionofgoods extends Controller
 {

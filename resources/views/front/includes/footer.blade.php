@@ -139,10 +139,12 @@
                                                              href="{{ route('payment_refund_policy') }}">Payment &
                                                              Refund
                                                              Policy</a>
-                                                         <a href="{{ url('/blog') }}" style="color: #eee;">Blogs</a>
-                                                         <a href="{{ url('/services') }}"
+                                                         <a href="{{ url($cityName_footer . '/blog') }}"
+                                                             style="color: #eee;">Blogs</a>
+                                                         <a href="{{ url($cityName_footer . '/services') }}"
                                                              style="color: #eee;">Services</a>
-                                                         <a href="{{ url('/our-vendors') }}" style="color: #eee;">Our
+                                                         <a href="{{ url($cityName_footer . '/our-vendors') }}"
+                                                             style="color: #eee;">Our
                                                              Vendors</a>
                                                          <!-- <a href="">Partnerships</a>
                         <a href="{{ route('privacy_policy') }}" style="color: #eee;">Privacy Policy</a>
@@ -187,19 +189,19 @@
                                                              $userdata = Session::get('user');
                                                          @endphp
                                                          @if (isset($userdata))
-                                                             <li><a href="{{ url('/my-profile') }}"
+                                                             <li><a href="{{ route('front.myprofile') }}"
                                                                      style="color: #eee;">Manage Your Account</a></li>
                                                          @else
-                                                             <li><a href="{{ url('/Sign-in') }}"
+                                                             <li><a href="{{ route('Sign-in') }}"
                                                                      style="color: #eee;">Manage
                                                                      Your Account</a></li>
                                                          @endif
 
                                                          @if (isset($userdata))
-                                                             <li><a href="{{ url('/refer&earn') }}"
+                                                             <li><a href="{{ route('front.refer_earn') }}"
                                                                      style="color: #eee;">Refer & Earn</a></li>
                                                          @else
-                                                             <li><a href="{{ url('/Sign-in') }}"
+                                                             <li><a href="{{ route('Sign-in') }}"
                                                                      style="color: #eee;">Refer & Earn</a></li>
                                                          @endif
 
@@ -208,7 +210,7 @@
                                                      </ul>
                                                      <h4 class="mb15" style="color: #fff;">For Vendors</h4>
                                                      <ul class="ps-0">
-                                                         <li><a href="{{ url('/become-a-vendor') }}""
+                                                         <li><a href="{{ url($cityName_footer . '/become-a-vendor') }}"
                                                                  style="color: #eee;">Become a Vendor</a></li>
                                                      </ul>
                                                  </div>
@@ -335,7 +337,7 @@
 
 
                                  <script src="{{ asset('public/site/js/jquery-migrate-3.0.0.min.js') }}"></script>
-                                 {{-- <script src="{{ asset('public/site/js/popper.min.js') }}"></script> --}}
+                                 <script src="{{ asset('public/site/js/popper.min.js') }}"></script>
                                  <script src="{{ asset('public/site/js/bootstrap.min.js') }}"></script>
                                  <script src="{{ asset('public/site/js/bootstrap-select.min.js') }}"></script>
                                  <script src="{{ asset('public/site/js/jquery.mmenu.all.js') }}"></script>
@@ -344,6 +346,7 @@
                                  <script src="{{ asset('public/site/js/wow.min.js') }}"></script>
                                  <script src="{{ asset('public/site/js/owl.js') }}"></script>
                                  <script src="{{ asset('public/site/js/jquery.counterup.js') }}"></script>
+                                 <link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}">
                                  <script src="{{ asset('public/site/js/intlTelInput.min.js') }}"></script>
                                  {{-- <script src="{{ asset('public/site/js/isotop.js') }}"></script> --}}
                                  <script src="{{ asset('public/site/js/scrollbalance.js') }}"></script>
@@ -565,12 +568,9 @@
                                      }
 
                                      function search_city_header(val) {
-
-                                         var currentUrl = window.location.href;
-                                         // alert(val);
-                                         $('#currentUrl_header').val(currentUrl);
-                                         $('#search_city_header').val(val);
-                                         $('#search_banner_header').submit();
+                                         if (val && val !== 'Choose City') {
+                                             window.location.href = '{{ url('/') }}' + '/' + val;
+                                         }
                                      }
 
 
@@ -638,13 +638,25 @@
                                      }
 
                                      function search_city_mobile(val) {
-
-                                         var currentUrl = window.location.href;
-                                         // alert(val);
-                                         $('#currentUrl_mobile').val(currentUrl);
-                                         $('#search_city_mobile_id').val(val);
-                                         $('#search_banner_mobile').submit();
+                                         if (val && val !== 'Choose City') {
+                                             window.location.href = '{{ url('/') }}' + '/' + val;
+                                         }
                                      }
+
+                                     // Bootstrap selectpicker fires jQuery change events — bind here to be sure
+                                     $(document).ready(function() {
+                                         // Desktop sticky header city dropdown (#city_picker_header)
+                                         $('#city_picker_header').on('change', function() {
+                                             var val = $(this).val();
+                                             search_city_header(val);
+                                         });
+
+                                         // Mobile header city dropdown
+                                         $(document).on('change', '.mobile_button_div .form-control', function() {
+                                             var val = $(this).val();
+                                             search_city_mobile(val);
+                                         });
+                                     });
                                  </script>
                                  <script>
                                      // JavaScript to open WhatsApp
@@ -659,7 +671,7 @@
 
                                  <script>
                                      /* When the user clicks on the button, 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           toggle between hiding and showing the dropdown content */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             toggle between hiding and showing the dropdown content */
                                      function adjustMegaMenuPosition() {
                                          var megaMenu = document.getElementById('mega-menu');
                                          var dropdown = document.getElementById('myDropdownnew');
@@ -735,17 +747,17 @@
 
                                  <script>
                                      /* document.addEventListener("DOMContentLoaded", function () {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           const Otpphoneinput = document.querySelector("#otp_phone_number"); // flagphone
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               initialCountry: "ae",  // UAE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               separateDialCode: true,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               autoPlaceholder: "aggressive",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             const Otpphoneinput = document.querySelector("#otp_phone_number"); // flagphone
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 initialCountry: "ae",  // UAE
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 separateDialCode: true,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 autoPlaceholder: "aggressive",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             });
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           // Assign globally to avoid the ReferenceError
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           window.Otpphoneinputnew = Otpphoneinputnew;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       }); */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             // Assign globally to avoid the ReferenceError
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             window.Otpphoneinputnew = Otpphoneinputnew;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         }); */
 
                                      document.addEventListener("DOMContentLoaded", function() {
                                          const Otpphoneinput = document.querySelector("#otp_phone_number");
@@ -874,7 +886,7 @@
                                                  }
                                              }
 
-                                             var url = '{{ url('otp-sent') }}';
+                                             var url = '{{ route('otp-sent') }}';
                                              var mobile = $('#otp_phone_number').val();
                                              var country_code = $('#country_code_otp_popup_Modal').val();
                                              $.ajax({

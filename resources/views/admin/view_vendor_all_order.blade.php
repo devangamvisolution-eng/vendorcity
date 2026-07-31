@@ -167,6 +167,32 @@
                                 <p class="text-muted mb-1 small uppercase">Full Name</p>
                                 <h6 class="fw-bold">{{ $order->user_name }}</h6>
                             </div>
+                            {{-- @if (data_get($order, 'items.0.subservice_id') == 95)
+                                @if (!empty($order->user_mobile) || !empty($order->user_country_code))
+                                    <div class="col-md-4">
+                                        <p class="text-muted mb-1 small">Phone</p>
+                                        <h6 class="fw-bold">
+                                            @if (!empty($order->user_country_code))
+                                                +{{ $order->user_country_code }}
+                                            @endif
+                                            {{ $order->user_mobile }}
+                                        </h6>
+                                    </div>
+                                @endif
+                            @endif
+
+                            @if (data_get($order, 'items.0.subservice_id') == 95)
+                                @if (!empty($order->user_email))
+                                    <div class="col-md-4">
+                                        <p class="text-muted mb-1 small">Email</p>
+                                        <h6 class="fw-bold">
+                                            @if (!empty($order->user_email))
+                                                {{ $order->user_email }}
+                                            @endif
+                                        </h6>
+                                    </div>
+                                @endif
+                            @endif --}}
 
 
                             <div class="col-md-4">
@@ -185,6 +211,43 @@
                                     <h6 class="fw-bold">{{ $order->items[0]->area }}</h6>
                                 </div>
                             @endif
+
+                            {{-- @php
+                                $firstItem = data_get($order, 'items.0');
+                            @endphp
+
+                            @if (data_get($firstItem, 'subservice_id') == 95 && !empty(data_get($firstItem, 'building_street_no')))
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small">Building/Street</p>
+                                    <h6 class="fw-bold">
+                                        {{ data_get($firstItem, 'building_street_no') }}
+                                    </h6>
+                                </div>
+                            @endif
+                            @if (data_get($firstItem, 'subservice_id') == 95 && !empty(data_get($firstItem, 'apartment_villa_no')))
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small">Apartment/Villa No</p>
+                                    <h6 class="fw-bold">
+                                        {{ data_get($firstItem, 'apartment_villa_no') }}
+                                    </h6>
+                                </div>
+                            @endif
+                            @if (data_get($firstItem, 'subservice_id') == 95 && !empty(data_get($firstItem, 'emirates_id_number')))
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small">Emirates ID Number</p>
+                                    <h6 class="fw-bold">
+                                        {{ data_get($firstItem, 'emirates_id_number') }}
+                                    </h6>
+                                </div>
+                            @endif
+                            @if (data_get($firstItem, 'subservice_id') == 95 && !empty(data_get($firstItem, 'passport_number')))
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small">Passport Number</p>
+                                    <h6 class="fw-bold">
+                                        {{ data_get($firstItem, 'passport_number') }}
+                                    </h6>
+                                </div>
+                            @endif --}}
                         </div>
                     </div>
                 </div>
@@ -245,82 +308,82 @@
                                 @if (!empty($item->package_item_name))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Services</p>
-                                            <span class="fw-bold text-dark">{!! $item->package_item_name !!} *
-                                                {!! $item->package_quantity !!}</span>
+                                        <span class="fw-bold text-dark">{!! $item->package_item_name !!} *
+                                            {!! $item->package_quantity !!}</span>
                                     </div>
                                 @endif
 
                                 @if (!empty($item->origin_add))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Origin Address</p>
-                                            <span class="fw-bold text-dark">{!! $item->origin_add !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->origin_add !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->origin_country))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Origin Country</p>
-                                            <span class="fw-bold text-dark">{!! Helper::countryname($item->origin_country) !!} </span>
+                                        <span class="fw-bold text-dark">{!! Helper::countryname($item->origin_country) !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->origin_state))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Origin State</p>
-                                            <span class="fw-bold text-dark">{!! $item->origin_state !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->origin_state !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->origin_city))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Origin City</p>
-                                            <span class="fw-bold text-dark">{!! $item->origin_city !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->origin_city !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->origin_location))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Origin Location</p>
-                                            <span class="fw-bold text-dark">{!! $item->origin_location !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->origin_location !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->origin_zip_post))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Origin ZIP/POST Code</p>
-                                            <span class="fw-bold text-dark">{!! $item->origin_zip_post !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->origin_zip_post !!} </span>
                                     </div>
                                 @endif
 
                                 @if (!empty($item->desti_add))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Destination Address</p>
-                                            <span class="fw-bold text-dark">{!! $item->desti_add !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->desti_add !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->desti_country))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Destination Country</p>
-                                            <span class="fw-bold text-dark">{!! Helper::countryname($item->desti_country) !!} </span>
+                                        <span class="fw-bold text-dark">{!! Helper::countryname($item->desti_country) !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->desti_state))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Destination State</p>
-                                            <span class="fw-bold text-dark">{!! $item->desti_state !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->desti_state !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->desti_city))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Destination City</p>
-                                            <span class="fw-bold text-dark">{!! $item->desti_city !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->desti_city !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->desti_location))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Destination Location</p>
-                                            <span class="fw-bold text-dark">{!! $item->desti_location !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->desti_location !!} </span>
                                     </div>
                                 @endif
                                 @if (!empty($item->desti_zip_post))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Destination ZIP/POST Code</p>
-                                            <span class="fw-bold text-dark">{!! $item->desti_zip_post !!} </span>
+                                        <span class="fw-bold text-dark">{!! $item->desti_zip_post !!} </span>
                                     </div>
                                 @endif
 
@@ -389,6 +452,55 @@
                                         <span class="fw-bold text-dark">{{ $item->no_of_ceilings ?: '-' }}</span>
                                     </div>
                                 @endif
+                                @if ($item->subservice_id == '102')
+                                    <div class="col-12 mt-3 mb-2">
+                                        <h6 class="fw-bold text-primary border-bottom pb-2">Manpower Requirements</h6>
+                                    </div>
+                                    @if (!empty($item->manpower_service_required))
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Service Required</p>
+                                            <span class="fw-bold text-dark">{{ $item->manpower_service_required }}</span>
+                                        </div>
+                                    @endif
+                                    @if (!empty($item->manpower_workers_required))
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Number of Workers</p>
+                                            <span class="fw-bold text-dark">{{ $item->manpower_workers_required }}</span>
+                                        </div>
+                                    @endif
+                                    @if (!empty($item->manpower_duration))
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Duration / Per Day</p>
+                                            <span class="fw-bold text-dark">{{ $item->manpower_duration }}</span>
+                                        </div>
+                                    @endif
+                                    @if (!empty($item->manpower_start_date))
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">Start Date</p>
+                                            <span
+                                                class="fw-bold text-dark">{{ date('d M Y', strtotime($item->manpower_start_date)) }}</span>
+                                        </div>
+                                    @endif
+                                    @if (!empty($item->manpower_end_date))
+                                        <div class="col-md-6 col-xl-4">
+                                            <p class="text-muted mb-0 small">End Date</p>
+                                            <span
+                                                class="fw-bold text-dark">{{ date('d M Y', strtotime($item->manpower_end_date)) }}</span>
+                                        </div>
+                                    @endif
+                                    @if (!empty($item->manpower_job_description))
+                                        <div class="col-12 mt-2">
+                                            <p class="text-muted mb-0 small">Job Description / Requirements</p>
+                                            <span class="fw-bold text-dark">{{ $item->manpower_job_description }}</span>
+                                        </div>
+                                    @endif
+                                    @if (!empty($item->manpower_additional_notes))
+                                        <div class="col-12 mt-2">
+                                            <p class="text-muted mb-0 small">Additional Notes</p>
+                                            <span class="fw-bold text-dark">{{ $item->manpower_additional_notes }}</span>
+                                        </div>
+                                    @endif
+                                @endif
                                 @if ($item->subservice_id == '92')
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">Inspection Location</p>
@@ -431,7 +543,7 @@
                                         </div>
                                     @endif
                                 @endif
-                                
+
                                 <div class="col-md-6 col-xl-4">
                                     <p class="text-muted mb-0 small">Booking Schedule</p>
                                     <span class="fw-bold text-primary"> {{ $item->bookingdate }}
@@ -440,10 +552,10 @@
                                 </div>
 
                                 @if ($item->any_special_instruction != '')
-                                        <div class="col-md-6 col-xl-4">
-                                            <p class="text-muted mb-0 small">Instruction</p>
-                                            <span class="fw-bold text-dark">{{ $item->any_special_instruction ?: '-' }}</span>
-                                        </div>
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Instruction</p>
+                                        <span class="fw-bold text-dark">{{ $item->any_special_instruction ?: '-' }}</span>
+                                    </div>
                                 @endif
                             @endforeach
                         </div>
@@ -534,6 +646,60 @@
                         </div>
                     </div>
                 </div>
+
+                @php
+                    // Fetch recurring visits dynamically for this order using Helper
+                    $recurring_visits = \App\Helpers\Helper::getUpcomingVisits($order->order_id, 5);
+                @endphp
+
+                @if ($recurring_visits->count() > 0)
+                    <div class="card shadow-sm border-0 mt-4">
+                        <div class="card-header bg-transparent border-bottom py-3">
+                            <h5 class="card-title mb-0">
+                                <i class="far fa-calendar-alt me-2 text-primary"></i>Upcoming Visits
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            <th>Status</th>
+                                            <th>Assigned Cleaner</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($recurring_visits as $visit)
+                                            <tr>
+                                                <td><strong>{{ date('d M Y', strtotime($visit->visit_date)) }}</strong>
+                                                </td>
+                                                <td>{{ $visit->visit_time ?? '-' }}</td>
+                                                <td>
+                                                    @if ($visit->visit_status == 'cancelled' || $visit->visit_status == 'skipped')
+                                                        <span class="badge bg-danger">Cancelled</span>
+                                                    @elseif($visit->visit_status == 'completed')
+                                                        <span class="badge bg-success">Completed</span>
+                                                    @else
+                                                        <span class="badge bg-info">Upcoming</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if ($visit->cleaner_name)
+                                                        {{ $visit->cleaner_name }}
+                                                    @else
+                                                        <span class="text-muted">Not Assigned</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <div class="col-lg-4">
@@ -565,7 +731,7 @@
                                     {{ number_format($order->service_charge, 2) }}</span>
                             </div>
                         @endif
-                        @if(isset($order->items[0]->package_item_name))
+                        @if (isset($order->items[0]->package_item_name))
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Service Charge</span>
                                 <span><span class="currency_dhiram"></span>

@@ -1,8 +1,48 @@
 @include('front.includes.header')
+<script>
+    window.isUserLoggedIn = {{ Session::has('user') ? 'true' : 'false' }};
+</script>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" />
 <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css" />
 <style>
+    .iti__flag {
+        background-image: url("{{ asset('public/site/images/flags.png') }}") !important;
+    }
+
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+        .iti__flag {
+            background-image: url("{{ asset('public/site/images/flags.png') }}") !important;
+        }
+    }
+
+    .form-control {
+        padding: 0;
+    }
+
+    @media (max-width: 767px) {
+        .otp-login-form-modal .modal-dialog-bottom-otp {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+        }
+
+
+    }
+
+
+    @media only screen and (max-width: 767px) {
+
+        .advance-search-tab {
+            display: none;
+        }
+    }
+
     .wallet_apply {
         border: none;
         background-color: inherit;
@@ -52,10 +92,12 @@
         margin: 0;
     }
 
-    .modal-dialog {
-        max-width: 60%;
-        height: auto !important;
-        max-height: 70% !important;
+    @media (min-width: 768px) {
+        .modal-dialog {
+            max-width: 60%;
+            height: auto !important;
+            max-height: 70% !important;
+        }
     }
 
     .mobile-next {
@@ -132,7 +174,7 @@
         }
 
         /* Prevent Bootstrap's default top-down animation */
-        .modal .modal-dialog {
+        .modal:not(.otp-login-form-modal) .modal-dialog {
             transform: none !important;
             transition: none !important;
         }
@@ -962,7 +1004,7 @@
 
     /* Buttons */
     .enquiry-card-ui .btn-thm,
-    .btn-thm {
+    .btn-thm:not(.detail-continue-btn) {
         background: #0040E6 !important;
         color: #fff !important;
         border-radius: 10px !important;
@@ -984,7 +1026,7 @@
     }
 
     .enquiry-card-ui .btn-thm:hover,
-    .btn-thm:hover {
+    .btn-thm:not(.detail-continue-btn):hover {
         background: #0033B8 !important;
         transform: translateY(-1px) !important;
         box-shadow: 0 6px 20px rgba(0, 64, 230, 0.25) !important;
@@ -1222,7 +1264,8 @@
             <div class="col-lg-6 m-auto wow fadeInUp" data-wow-delay="300ms">
                 <div class="main-title text-center">
                     <h2 class="title" id="head_hide" style="display: block">YOUR QUOTE REQUEST</h2>
-                    {{-- <p class="paragraph">Give your visitor a smooth online experience with a solid UX design</p> --}}
+                    {{-- <p class="paragraph">Give your visitor a smooth online experience with a solid UX design</p>
+                    --}}
                 </div>
             </div>
         </div>
@@ -1274,7 +1317,8 @@
                                 <h5 class="font-weight-bold h3 mt-3">Get quotes for your {{ $subservice_name }} Services
                                 </h5>
                                 <p class="card-text mb-4"><span>Get up to 5 free quotes from top companies by filling
-                                        out this short form.</span><br />
+                                        out this
+                                        short form.</span><br />
                                     <a href="javascript:void(0)" data-bs-toggle="modal" id="read_more"
                                         data-bs-target="#GardeningModal_{{ $subservice_id }}"
                                         style="text-decoration: underline; color: #0040E6;">
@@ -1287,7 +1331,8 @@
                                 <h5 class="font-weight-bold h3 mt-3">Get quotes for your {{ $subservice_name }} Services
                                 </h5>
                                 <p class="card-text mb-4"><span>Get up to 5 free quotes from top companies by filling
-                                        out this short form.</span><br />
+                                        out this
+                                        short form.</span><br />
                                     <a href="javascript:void(0)" data-bs-toggle="modal" id="read_more"
                                         data-bs-target="#MousePestModal_{{ $subservice_id }}"
                                         style="text-decoration: underline; color: #0040E6;">
@@ -1299,7 +1344,8 @@
                             @if ($subservice_id == 78)
                                 <div class="form-group mb-3">
                                     <label class="form-label fw500 dark-color requiredStar" for="service_type">Which
-                                        service do you need quotes for?</label>
+                                        service do
+                                        you need quotes for?</label>
                                     <select class="form-control searches_drop form-select" id="service_type"
                                         name="service_type" onchange="garden_calculation();">
                                         @php
@@ -1324,7 +1370,8 @@
 
                             <div class="form-group mb-3">
                                 <label class="form-label fw500 dark-color requiredStar" for="service_date">When do you
-                                    need the service?</label> <br>
+                                    need
+                                    the service?</label> <br>
                                 <input type="text" name="service_date" id="service_date" class="form-control"
                                     placeholder="Service Date" onchange="garden_calculation();">
                                 <p style="color:red;" id="service_date_error"></p>
@@ -1332,7 +1379,8 @@
 
                             <div class="form-group mb-3">
                                 <label class="form-label fw500 dark-color requiredStar" for="city">Which city do
-                                    you need the service?</label> <br>
+                                    you need
+                                    the service?</label> <br>
                                 <select class="form-control searches_drop form-select" id="city" name="city">
                                     <option value="">Select City</option>
                                     @foreach ($city_data as $data)
@@ -1346,7 +1394,8 @@
 
                             <div class="form-group mb-3">
                                 <label class="form-label fw500 dark-color requiredStar" for="address">Where do you
-                                    need the service?</label> <br>
+                                    need the
+                                    service?</label> <br>
                                 <input type="text" name="address" id="address" class="form-control"
                                     placeholder="Enter Address">
                                 <p style="color:red;" id="address_error"></p>
@@ -1354,7 +1403,8 @@
 
                             <div class="form-group mb-3">
                                 <label class="form-label fw500 dark-color requiredStar" for="type_of_home">What is the
-                                    type of the unit you live in?</label><br>
+                                    type
+                                    of the unit you live in?</label><br>
 
                                 <div id="unit_you_live_slider_spatie" class="splide radio-group">
                                     <div class="splide__track">
@@ -1404,7 +1454,8 @@
                                 <div class="form-group main-garden-home-{{ $attributes_data->form_option }} {{ $form_option }} mb-3"
                                     style="display: none;">
                                     <label class="form-label fw500 dark-color requiredStar" for="size_of_home_1">What
-                                        is the size of your home?</label><br>
+                                        is the
+                                        size of your home?</label><br>
                                     <div id="size_of_home_slider_{{ $attributes_data->id }}"
                                         class="splide radio-group size-of-home-slider-class">
                                         <div class="splide__track">
@@ -1439,7 +1490,8 @@
 
                             <div class="form-group mb-3">
                                 <label class="form-label fw500 dark-color " for="describe_your_requirements">Please
-                                    describe the job in as much detail as possible (Optional)</label>
+                                    describe
+                                    the job in as much detail as possible (Optional)</label>
                                 <textarea name="describe_your_requirements" id="describe_your_requirements" class="form-control"
                                     placeholder="If you have any other requirements, feel free to describe them here in as much detail as you want. Or just leave us a message to call you if its easier to explain on the phone"></textarea>
                                 <p class="form-error-text" id="describe_your_requirements_error"
@@ -1698,14 +1750,14 @@
     aria-labelledby="otpLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-bottom-otp user-modal-dialog modal-dialog-centered">
         <div class="modal-content details-modal-content">
-            <div class="modal-header details-header">
+            <div class="modal-header details-header bn-modal-header">
                 <h5 class="modal-title w-100" id="modalStepTitle">Log in or Sign Up</h5>
             </div>
 
             <div class="modal-body">
                 <div id="booknow_refresh_otp_div">
                     <input type="hidden" name="book_session_otp" id="book_session_otp"
-                        value= "{{ session('book-login-otp') }}">
+                        value="{{ session('book-login-otp') }}">
                 </div>
                 <form class="form-horizontal details-form" id="BookOtpForm" method="POST"
                     action="{{ route('booknow-user-otp-login') }}">
@@ -1722,7 +1774,7 @@
                             <label id="mobilename-label">Please Enter Your WhatsApp mobile number</label>
                             <input type="hidden" name="country_code_otp_popup_Modal"
                                 id="country_code_otp_popup_Modal_book" value="">
-                            <input type="text" class="input-field" name="phone" id="user-phone-number"
+                            <input type="tel" class="input-field" name="phone" id="user-phone-number"
                                 placeholder="Mobile No" onkeypress="return validateNumber(event)">
                             <p id="booknow_otp_phone_error" style="display:none;color:red;"></p>
                         </div>
@@ -1752,17 +1804,17 @@
                         </label>
 
                         <div class="d-flex justify-content-center gap-2 my-3">
-                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                            <input type="tel" maxlength="1" class="booknow-otp-input form-control text-center"
                                 style="width: 40px;">
-                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                            <input type="tel" maxlength="1" class="booknow-otp-input form-control text-center"
                                 style="width: 40px;">
-                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                            <input type="tel" maxlength="1" class="booknow-otp-input form-control text-center"
                                 style="width: 40px;">
-                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                            <input type="tel" maxlength="1" class="booknow-otp-input form-control text-center"
                                 style="width: 40px;">
-                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                            <input type="tel" maxlength="1" class="booknow-otp-input form-control text-center"
                                 style="width: 40px;">
-                            <input type="text" maxlength="1" class="booknow-otp-input form-control text-center"
+                            <input type="tel" maxlength="1" class="booknow-otp-input form-control text-center"
                                 style="width: 40px;">
                         </div>
                         <p id="booknow_otp_error" style="display:none;color:red;"></p>
@@ -1834,14 +1886,14 @@
     aria-labelledby="otpLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-bottom-otp user-modal-dialog modal-dialog-centered">
         <div class="modal-content details-modal-content">
-            <div class="modal-header details-header">
+            <div class="modal-header details-header bn-modal-header">
                 <h5 class="modal-title w-100" id="booknow_email_modalStepTitle">Log in or Sign Up</h5>
             </div>
 
             <div class="modal-body">
                 <div id="book_email_refresh_otp_div">
                     <input type="hidden" name="book_email_session_otp" id="book_email_session_otp"
-                        value= "{{ session('book-email-login-otp') }}">
+                        value="{{ session('book-email-login-otp') }}">
                 </div>
                 <form class="form-horizontal details-form" id="bookemailOtpForm" method="POST"
                     action="{{ route('home.book-email-otp-login') }}">
@@ -1888,17 +1940,17 @@
                         </label>
 
                         <div class="d-flex justify-content-center gap-2 my-3">
-                            <input type="text" maxlength="1"
+                            <input type="tel" maxlength="1"
                                 class="book-email-otp-input form-control text-center" style="width: 40px;">
-                            <input type="text" maxlength="1"
+                            <input type="tel" maxlength="1"
                                 class="book-email-otp-input form-control text-center" style="width: 40px;">
-                            <input type="text" maxlength="1"
+                            <input type="tel" maxlength="1"
                                 class="book-email-otp-input form-control text-center" style="width: 40px;">
-                            <input type="text" maxlength="1"
+                            <input type="tel" maxlength="1"
                                 class="book-email-otp-input form-control text-center" style="width: 40px;">
-                            <input type="text" maxlength="1"
+                            <input type="tel" maxlength="1"
                                 class="book-email-otp-input form-control text-center" style="width: 40px;">
-                            <input type="text" maxlength="1"
+                            <input type="tel" maxlength="1"
                                 class="book-email-otp-input form-control text-center" style="width: 40px;">
                         </div>
                         <p id="book_email_otp_error" style="display:none;color:red;"></p>
@@ -1927,15 +1979,16 @@
                             <p id="book_email_name_error" style="display:none;color:red;"></p>
                         </div>
                         <div class="form-group mt-3">
-                            <input type="text" class="form-control" id="book_email_mobile"
+                            <input type="tel" class="form-control" id="book_email_mobile"
                                 name="book_email_mobile" placeholder="Phone Number"
                                 onkeypress="return validateNumber(event)">
                             <p id="book_email_mobile_error" style="display:none;color:red;"></p>
                         </div>
                         {{-- <div class="form-group mt-3">
-            <input type="text" class="form-control" id="book_email_area" name="book_email_area" placeholder="Area">
-            <p id="book_email_area_error" style="display:none;color:red;"></p>
-        </div> --}}
+                            <input type="text" class="form-control" id="book_email_area" name="book_email_area"
+                                placeholder="Area">
+                            <p id="book_email_area_error" style="display:none;color:red;"></p>
+                        </div> --}}
                         <div class="text-center mt-3">
                             <button class="brds50 ud-btn btn-thm default-box-shadow2 detail-continue-btn"
                                 type="button" disabled id="spinner_button_email_book3" style="display: none;"><span
@@ -2002,7 +2055,7 @@
       autoPlaceholder: "aggressive",
       utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
     });
-
+    
     // Function to get the selected country code
     function getCountryCode() {
       const countryData = phoneInput.getSelectedCountryData();
@@ -2101,7 +2154,7 @@
                 }
             }
 
-            var url = '{{ url('booknow-otp-sent') }}';
+            var url = '{{ url(session('search_city_name') . '/booknow-otp-sent') }}';
             var mobile = $('#user-phone-number').val();
             var country_code = $('#country_code_otp_popup_Modal_book').val();
             $.ajax({
@@ -2209,7 +2262,8 @@
             $('#submit_button_phone_book2').hide();
 
             if (name !== '' && email !== '') {
-                jQuery("#BookOtpForm").submit();
+                submitLoginFormAjax('BookOtpForm', proceedAfterLogin);
+                return false;
             } else {
                 document.getElementById('booknow-step-otp').style.display = 'none';
                 document.getElementById('booknow-step-details').style.display = 'block';
@@ -2247,8 +2301,8 @@
             $('#spinner_button_phone_book3').show();
             $('#submit_button_phone_book3').hide();
 
-            // All validation passed, submit the form
-            jQuery("#BookOtpForm").submit();
+            // All validation passed, submit the form via AJAX
+            submitLoginFormAjax('BookOtpForm', proceedAfterLogin);
         }
     }
 
@@ -2416,9 +2470,8 @@
             $('#submit_button_email_book2').hide();
 
             if (email_name !== '' && email_mobile !== '') {
-
-                jQuery("#bookemailOtpForm").submit();
-
+                submitLoginFormAjax('bookemailOtpForm', proceedAfterLogin);
+                return false;
             } else {
                 // One or both fields are empty, show Step 3
                 document.getElementById('booknow-email-step-otp').style.display = 'none';
@@ -2460,18 +2513,18 @@
                 }
             }
             /* if (email_area === '') {
-
-            jQuery('#book_email_area_error').html("Please Enter Area");
-            jQuery('#book_email_area_error').show().delay(0).fadeIn('show');
-            jQuery('#book_email_area_error').show().delay(2000).fadeOut('show');
-            return false;
-        } */
+  
+              jQuery('#book_email_area_error').html("Please Enter Area");
+              jQuery('#book_email_area_error').show().delay(0).fadeIn('show');
+              jQuery('#book_email_area_error').show().delay(2000).fadeOut('show');
+              return false;
+          } */
 
             $('#spinner_button_email_book3').show();
             $('#submit_button_email_book3').hide();
 
-            // All validation passed, submit the form
-            jQuery("#bookemailOtpForm").submit();
+            // All validation passed, submit the form via AJAX
+            submitLoginFormAjax('bookemailOtpForm', proceedAfterLogin);
         }
     }
 
@@ -2840,6 +2893,53 @@
             }
         });
     });
+
+    function submitLoginFormAjax(formId, callback) {
+        var form = document.getElementById(formId);
+        var formData = new FormData(form);
+        var url = form.action;
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                if (response.success) {
+                    window.isUserLoggedIn = true;
+                    $('.modal').modal('hide');
+                    if (callback && typeof callback === 'function') {
+                        callback();
+                    }
+                } else {
+                    alert(response.message || 'Login failed');
+                    $('#spinner_button_phone_book3').hide();
+                    $('#submit_button_phone_book3').show();
+                    $('#spinner_button_email_book3').hide();
+                    $('#submit_button_email_book3').show();
+                }
+            },
+            error: function(xhr) {
+                var message = 'An error occurred. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                alert(message);
+                $('#spinner_button_phone_book3').hide();
+                $('#submit_button_phone_book3').show();
+                $('#spinner_button_email_book3').hide();
+                $('#submit_button_email_book3').show();
+            }
+        });
+    }
+
+    function proceedAfterLogin() {
+        location.reload();
+    }
 </script>
 
 <script>

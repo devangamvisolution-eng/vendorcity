@@ -7,6 +7,13 @@
         margin-right: 3px
     } */
 
+    #stickyHeader:empty {
+        display: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+    }
+
     .currency_dhiram {
         -webkit-mask: url('{{ asset('public/site/icons/dirham.svg') }}') no-repeat center;
         mask: url('{{ asset('public/site/icons/dirham.svg') }}') no-repeat center;
@@ -40,24 +47,12 @@
         justify-content: center !important;
         gap: 4px;
         position: relative;
-        top: 2px;
+        top: 1px;
     }
-
 
     .mabrook-saving-banner .currency_dhiramnew {
         position: relative;
-        top: -1px;
-    }
-
-    @media (max-width: 767px) {
-
-        .mabrook-saving-banner .price-wrapper {
-            top: 1px;
-        }
-
-        .mabrook-saving-banner .currency_dhiramnew {
-            top: 0px;
-        }
+        /* top: 1px; */
     }
 
     @media (min-width: 768px) {
@@ -348,8 +343,8 @@
         height: 88vh !important;
         height: 88dvh !important;
         /* dynamic viewport height (iOS 16+) */
-        max-height: 88vh !important;
-        max-height: 88dvh !important;
+        max-height: 80vh !important;
+        max-height: 80dvh !important;
 
         /* Flex column — header pinned top, footer pinned bottom */
         display: -webkit-box !important;
@@ -852,10 +847,9 @@
                                 <span></span>
                                 <div class="sticky-footer-btn">
                                     <div class="mabrook-saving-banner d-none">
-                                        <span>🎉</span> <span class="price-wrapper"><span class="currency_dhiramnew"
-                                                style="font-size: 12px;">AED</span><span
-                                                class="mabrook-saving-amount">0.00</span></span><span> added to wallet.
-                                            Use it on your next service.</span>
+                                        <span>🎉 Mabrook! You are saving</span> <span class="price-wrapper"><span
+                                                class="currency_dhiramnew" style="font-size: 12px;">AED</span><span
+                                                class="mabrook-saving-amount">0.00</span></span>.
                                     </div>
                                     <div class="row">
                                         <div class="col-md-8 col-lg-6 col-sm-6 col-8">
@@ -997,12 +991,10 @@
                                         onclick="prevStep()">Back</button>
                                     <div class="sticky-footer-btn">
                                         <div class="mabrook-saving-banner d-none">
-                                            <span>🎉</span> <span class="price-wrapper"><span
+                                            <span>🎉 Mabrook! You are saving</span> <span class="price-wrapper"><span
                                                     class="currency_dhiramnew"
                                                     style="font-size: 12px;">AED</span><span
-                                                    class="mabrook-saving-amount">0.00</span></span><span> added to
-                                                wallet.
-                                                Use it on your next service.</span>
+                                                    class="mabrook-saving-amount">0.00</span></span>.
                                         </div>
                                         <div class="row align-items-center">
                                             <div class="col-md-8 col-lg-6 col-sm-6 col-8">
@@ -1117,10 +1109,9 @@
                                     type="button">Back</button>
                                 <div class="sticky-footer-btn">
                                     <div class="mabrook-saving-banner d-none">
-                                        <span>🎉</span> <span class="price-wrapper"><span class="currency_dhiramnew"
-                                                style="font-size: 12px;">AED</span><span
-                                                class="mabrook-saving-amount">0.00</span></span><span> added to wallet.
-                                            Use it on your next service.</span>
+                                        <span>🎉 Mabrook! You are saving</span> <span class="price-wrapper"><span
+                                                class="currency_dhiramnew" style="font-size: 12px;">AED</span><span
+                                                class="mabrook-saving-amount">0.00</span></span>.
                                     </div>
                                     <div class="row">
                                         <div class="col-md-8 col-lg-6 col-sm-6 col-8">
@@ -1369,10 +1360,9 @@
                                     type="button">Back</button>
                                 <div class="sticky-footer-btn">
                                     <div class="mabrook-saving-banner d-none">
-                                        <span>🎉</span> <span class="price-wrapper"><span class="currency_dhiramnew"
-                                                style="font-size: 12px;">AED</span><span
-                                                class="mabrook-saving-amount">0.00</span></span><span> added to wallet.
-                                            Use it on your next service.</span>
+                                        <span>🎉 Mabrook! You are saving</span> <span class="price-wrapper"><span
+                                                class="currency_dhiramnew" style="font-size: 12px;">AED</span><span
+                                                class="mabrook-saving-amount">0.00</span></span>.
                                     </div>
                                     <div class="row">
                                         <div class="col-md-8 col-lg-6 col-sm-6 col-8">
@@ -1605,10 +1595,9 @@
 
                                 <div class="sticky-footer-btn">
                                     <div class="mabrook-saving-banner d-none">
-                                        <span>🎉</span> <span class="price-wrapper"><span class="currency_dhiramnew"
-                                                style="font-size: 12px;">AED</span><span
-                                                class="mabrook-saving-amount">0.00</span></span><span> added to wallet.
-                                            Use it on your next service.</span>
+                                        <span>🎉 Mabrook! You are saving</span> <span class="price-wrapper"><span
+                                                class="currency_dhiramnew" style="font-size: 12px;">AED</span><span
+                                                class="mabrook-saving-amount">0.00</span></span>.
                                     </div>
                                     <div class="row">
                                         <div class="col-md-8 col-lg-6 col-sm-6 col-7">
@@ -1802,13 +1791,7 @@
                             <span class="cod_charge"></span>
                         </div>
                     </div> --}}
-                    {{-- <div class="d-flex justify-content-between d-none service-fee-div">
-                        <div>Service Fee</div>
-                        <div class="font-weight-bold sm-summary">
-                            <span class="currency_dhiramnew">AED</span>
-                            <span class="service_fee">0.00</span>
-                        </div>
-                    </div> --}}
+
 
                     {{-- <div class="d-flex justify-content-between subheadingdev d-none additional-charge-div">
                         <div>Material Charges</div>
@@ -1825,11 +1808,26 @@
                             <span class="sub_total">0.00</span>
                         </div>
                     </div>
+
                     <div class="d-flex justify-content-between subheadingdev d-none vat-div align-items-center">
                         <div>VAT ({{ \App\Enums\VC_ChargiesEnum::VAT_PERCENT->percentage() }}%)</div>
                         <div class="font-weight-bold sm-summary price-wrapper">
                             <span class="currency_dhiramnew">AED</span>
                             <span class="vat_charge">0</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between d-none service-fee-div">
+                        <div>Service Fee @if ($subservice_data->service_fee_popup != '')
+                                <a data-bs-toggle="modal" data-bs-target="#service_fee_popup_{{ $subservice_id }}"
+                                    style="cursor:pointer; line-height:1;">
+                                    <img src="{{ asset('public/site/images/infoicon.svg') }}"
+                                        style="height:14px; width:14px; vertical-align:middle;">
+                                </a>
+                            @endif
+                        </div>
+                        <div class="font-weight-bold sm-summary">
+                            <span class="currency_dhiramnew">AED</span>
+                            <span class="service_fee">0.00</span>
                         </div>
                     </div>
                     <div class="subheadingdev">
@@ -2224,34 +2222,33 @@
     </div>
 </div>
 
-<div class="modal fade" id="mobilesummaryModal" tabindex="-1">
-    <div class="modal-dialog modal-summary-sheet"
+<div class="modal fade subservice-read-more-model" id="mobilesummaryModal" tabindex="-1">
+    <div class="modal-dialog modal-summary-sheet modal-dialog-scrollable"
         style="margin:0; position:fixed; bottom:0; left:0; right:0; width:100%; max-width:100%;">
-        <div class="modal-content border-0" style="border-radius:20px 20px 0 0; background:#fff;">
+        <div class="modal-content border-0" style="border-radius:20px 20px 0 0; background:#fff; max-height: 85vh;">
 
             {{-- ── Drag Handle ── --}}
-            <div class="modal-drag-handle" style="padding:10px 0 6px; text-align:center; cursor:grab;">
+            <div class="modal-drag-handle"
+                style="padding:10px 0 6px; text-align:center; cursor:grab; flex-shrink:0;">
                 <div style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;"></div>
             </div>
 
             {{-- ── Header ── --}}
-            <div class="modal-sheet-header"
-                style="display:flex; align-items:center; justify-content:space-between; padding:8px 20px 14px; position:relative;">
+            <div class="modal-header bn-modal-header"
+                style="padding: 0.5rem 1.5rem 1rem; border-bottom: 1px solid #eee;">
                 <div>
                     <div
                         style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#aaa; margin-bottom:2px;">
                         Summary</div>
-                    <h5 style="margin:0; font-size:1.25rem; font-weight:900; color:#000; letter-spacing:-0.02em;">
+                    <h5 class="modal-title"
+                        style="margin:0; font-size:1.25rem; font-weight:900; color:#000; letter-spacing:-0.02em;">
                         Booking Summary</h5>
                 </div>
-                <button type="button" data-bs-dismiss="modal"
-                    style="width:36px; height:36px; border-radius:50%; border:1.5px solid #e0e0e0; background:#fff; display:flex; align-items:center; justify-content:center; color:#111; font-size:1.1rem; font-weight:700; line-height:1; cursor:pointer; flex-shrink:0; z-index:10;">
-                    &times;
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             {{-- ── Scrollable Body ── --}}
-            <div class="modal-body sidebar-summary" style="flex:1; overflow-y:auto; padding:0 20px 16px;">
+            <div class="modal-body sidebar-summary" style="padding: 1rem 1.5rem 16px;">
 
                 {{-- ─ Your Service Chip ─ --}}
                 <div style="background:#0040E6; border-radius:14px; padding:16px 18px; margin-bottom:16px;">
@@ -2374,11 +2371,11 @@
                         <span style="font-size:0.85rem; color:#555; display:flex; align-items:center; gap:5px;">Timing
                             Fee
                             @if ($subservice_data->timing_fee_popup != '')
-                                <a data-bs-toggle="modal" data-bs-target="#timing_fee_popup_{{ $subservice_id }}"
-                                    style="cursor:pointer; line-height:1;">
-                                    <img src="{{ asset('public/site/images/infoicon.svg') }}"
-                                        style="height:14px; width:14px; vertical-align:middle;">
-                                </a>
+                            <a data-bs-toggle="modal" data-bs-target="#timing_fee_popup_{{ $subservice_id }}"
+                                style="cursor:pointer; line-height:1;">
+                                <img src="{{ asset('public/site/images/infoicon.svg') }}"
+                                    style="height:14px; width:14px; vertical-align:middle;">
+                            </a>
                             @endif
                         </span>
                         <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
@@ -2386,16 +2383,14 @@
                         </span>
                     </div>
                     <div class="d-flex justify-content-between py-1 d-none cod-charge-div align-items-center">
-                        <span
-                            style="font-size:0.85rem; color:#555; display:flex; align-items:center; gap:5px;">Delivery
+                        <span style="font-size:0.85rem; color:#555; display:flex; align-items:center; gap:5px;">Delivery
                             Charge
                             @if ($subservice_data->delivery_charge_popup != '')
-                                <a data-bs-toggle="modal"
-                                    data-bs-target="#delivery_charge_popup_{{ $subservice_id }}"
-                                    style="cursor:pointer; line-height:1;">
-                                    <img src="{{ asset('public/site/images/infoicon.svg') }}"
-                                        style="height:14px; width:14px; vertical-align:middle;">
-                                </a>
+                            <a data-bs-toggle="modal" data-bs-target="#delivery_charge_popup_{{ $subservice_id }}"
+                                style="cursor:pointer; line-height:1;">
+                                <img src="{{ asset('public/site/images/infoicon.svg') }}"
+                                    style="height:14px; width:14px; vertical-align:middle;">
+                            </a>
                             @endif
                         </span>
                         <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
@@ -2407,6 +2402,14 @@
                         <span style="font-size:0.85rem; color:#555;">Sub Total</span>
                         <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
                             <span class="currency_dhiramnew">AED</span><span class="sub_total">0.00</span>
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-1 d-none vat-div">
+                        <span style="font-size:0.85rem; color:#555;">VAT
+                            ({{ \App\Enums\VC_ChargiesEnum::VAT_PERCENT->percentage() }}%)</span>
+                        <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
+                            <span class="currency_dhiramnew">AED</span><span class="vat_charge">0</span>
                         </span>
                     </div>
                     <div class="d-flex justify-content-between py-1 d-none service-fee-div align-items-center">
@@ -2423,13 +2426,6 @@
                         </span>
                         <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
                             <span class="currency_dhiramnew">AED</span><span class="service_fee">0.00</span>
-                        </span>
-                    </div>
-                    <div class="d-flex justify-content-between py-1 d-none vat-div">
-                        <span style="font-size:0.85rem; color:#555;">VAT
-                            ({{ \App\Enums\VC_ChargiesEnum::VAT_PERCENT->percentage() }}%)</span>
-                        <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
-                            <span class="currency_dhiramnew">AED</span><span class="vat_charge">0</span>
                         </span>
                     </div>
 
@@ -2504,24 +2500,22 @@
             </div>
 
             {{-- ── Sticky Footer ── --}}
-            <div class="modal-sheet-footer"
-                style="padding:12px 20px 28px; background:#fff; border-top:1px solid #f0f0f0;">
-                <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <div>
-                        <div
-                            style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#bbb; margin-bottom:3px;">
-                            Total to Pay</div>
-                        <div style="display:flex; align-items:baseline; gap:4px;">
-                            <span style="font-size:0.82rem; color:#888; font-weight:600;">AED</span>
-                            <span class="total_to_pay"
-                                style="font-size:1.65rem; font-weight:900; color:#000; letter-spacing:-0.03em;">0.00</span>
-                        </div>
+            <div class="modal-footer"
+                style="padding:12px 20px; background:#fff; border-top:1px solid #f0f0f0; display:flex; align-items:center; justify-content:space-between; width:100%;">
+                <div>
+                    <div
+                        style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#bbb; margin-bottom:3px;">
+                        Total to Pay</div>
+                    <div style="display:flex; align-items:baseline; gap:4px;">
+                        <span style="font-size:0.82rem; color:#888; font-weight:600;">AED</span>
+                        <span class="total_to_pay"
+                            style="font-size:1.65rem; font-weight:900; color:#000; letter-spacing:-0.03em;">0.00</span>
                     </div>
-                    <button type="button" data-bs-dismiss="modal"
-                        style="background:transparent; border:none; color:#aaa; font-size:0.8rem; font-weight:600; padding:6px 0; letter-spacing:0.03em; text-decoration:underline; text-underline-offset:3px; cursor:pointer;">
-                        Close
-                    </button>
                 </div>
+                <button type="button" data-bs-dismiss="modal"
+                    style="background:transparent; border:none; color:#aaa; font-size:0.8rem; font-weight:600; padding:6px 0; letter-spacing:0.03em; text-decoration:underline; text-underline-offset:3px; cursor:pointer;">
+                    Close
+                </button>
             </div>
 
         </div>
@@ -3402,7 +3396,7 @@
         ) || 0;
 
         $.ajax({
-            url: '{{ url('homecleaner-time-check') }}',
+            url: '{{ url(session('search_city_name') . '/homecleaner-time-check') }}',
             type: 'POST',
             data: {
                 _token: "{{ csrf_token() }}",
@@ -3841,6 +3835,35 @@
         });
     }
     $(document).ready(function() {
+        // Restore selections from localStorage after login reloads
+        const hours = localStorage.getItem('hc_hours');
+        if (hours) {
+            let el = document.querySelector('input[name="how_many_hours_should_they_stay"][value="' + hours +
+                '"]');
+            if (el) el.checked = true;
+        }
+
+        const cleaners = localStorage.getItem('hc_cleaners');
+        if (cleaners) {
+            let el = document.querySelector('input[name="how_many_cleaners_do_you_need"][value="' + cleaners +
+                '"]');
+            if (el) el.checked = true;
+        }
+
+        const freq = localStorage.getItem('hc_freq');
+        if (freq) {
+            let el = document.querySelector('input[name="how_often_do_you_need_cleaning"][value="' + freq +
+                '"]');
+            if (el) el.checked = true;
+        }
+
+        const material = localStorage.getItem('hc_material');
+        if (material) {
+            let el = document.querySelector('input[name="do_you_need_cleaning_material"][value="' + material +
+                '"]');
+            if (el) el.checked = true;
+        }
+
         setTimeout(() => {
             calculation();
         }, 500);
@@ -3850,6 +3873,13 @@
 
         let selectedCleaner = document.querySelector('input[name="how_many_cleaners_do_you_need"]:checked');
         let selectedHours = document.querySelector('input[name="how_many_hours_should_they_stay"]:checked');
+        let freq = document.querySelector('input[name="how_often_do_you_need_cleaning"]:checked');
+        let material = document.querySelector('input[name="do_you_need_cleaning_material"]:checked');
+
+        if (selectedHours) localStorage.setItem('hc_hours', selectedHours.value);
+        if (selectedCleaner) localStorage.setItem('hc_cleaners', selectedCleaner.value);
+        if (freq) localStorage.setItem('hc_freq', freq.value);
+        if (material) localStorage.setItem('hc_material', material.value);
 
         if (selectedCleaner.value === '1') {
             $('#cleaner_section').css('display', 'block');
@@ -3871,7 +3901,7 @@
         $.ajax({
 
             type: 'POST',
-            url: '{{ url('get_price_cleaning ') }}',
+            url: '{{ url(session('search_city_name') . '/get_price_cleaning') }}',
             data: {
 
                 "_token": "{{ csrf_token() }}",
@@ -4080,11 +4110,10 @@
                         timing_charge +
                         weekly_off_charge +
                         cod_charge +
-                        package_charge +
-                        service_fee;
+                        package_charge;
 
                     const original_vat = original_sub_total * 0.05;
-                    const original_total = original_sub_total + original_vat;
+                    const original_total = original_sub_total + original_vat + service_fee;
 
                     /* ================= FREQUENCY ================= */
                     const frequency = $('input[name="how_often_do_you_need_cleaning"]:checked').val();
@@ -4135,12 +4164,11 @@
                         timing_charge +
                         weekly_off_charge +
                         cod_charge +
-                        package_charge +
-                        service_fee;
+                        package_charge;
 
                     /* ================= VAT & TOTAL ================= */
                     const vat_total = sub_total * (vatPercent / 100);
-                    const total_to_pay = sub_total + vat_total - wallet_used;
+                    const total_to_pay = sub_total + vat_total + service_fee - wallet_used;
 
                     /* ================= DISPLAY ================= */
                     const f = v => parseFloat(v).toFixed(2);
@@ -4158,7 +4186,7 @@
                     /* ================= CROSS PRICE ================= */
                     $('.cross_amount').html(f(original_total));
 
-                    let beforePromo = sub_total + vat_total - wallet_used;
+                    let beforePromo = sub_total + vat_total + service_fee - wallet_used;
 
 
                     checkapplyPromo(beforePromo);
@@ -4198,6 +4226,34 @@
 
             if (couponData && couponData !== 'null' && typeof couponData === 'object' && couponData
                 .coupancode) {
+
+                window.currentAppliedCoupon = couponData.coupancode;
+                window.lastValidPromoCode = couponData.coupancode;
+
+                let minOrder = parseFloat(couponData.minimum_order) || 0;
+                if (minOrder > 0 && baseTotal < minOrder) {
+                    window.currentAppliedCoupon = null;
+                    $.ajax({
+                        url: "{{ route('homecleaning.remove_coupon') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function() {
+                            $('#promo_name').val('');
+                            $('#promo_discount').val('0.00');
+                            $(".promo_code").text('0.00');
+                            $(".promo_code_name").text('');
+                            $(".cross_amount_div").hide();
+                            showToast('warning', 'Notice',
+                                'Promo code removed. Minimum order amount is <span class="price-wrapper"><span class="currency_dhiramnew">AED</span>' +
+                                minOrder + '</span>');
+                            calculation();
+                        }
+                    });
+                    return;
+                }
+
                 coupanApplyWallet = parseInt(couponData.coupan_apply_wallet) || 0;
                 let discountVal = parseFloat(couponData.discount) || 0;
                 let calculatedAmount = 0;
@@ -4251,6 +4307,7 @@
                 walletReward = 0;
                 $(".promo_dicount_replace_div").addClass('d-none');
                 $(".wallet_reward_summary_div").addClass('d-none');
+                window.currentAppliedCoupon = null;
             }
 
             // 🔥 FIX: enforce number again before toFixed()
@@ -4347,6 +4404,7 @@
                         $(".promo_code").text('0.00');
                         $(".promo_code_name").text('');
                         $(".cross_amount_div").hide();
+                        window.currentAppliedCoupon = null;
 
                         calculation();
 
@@ -4662,10 +4720,8 @@
     (function() {
         // Values passed from PHP controller
         var promoCode = @json($promo ?? '');
-        var sessionCouponCode = @json($session_coupon_applied ?? '');
-
-        // One-shot flag: once applied (or determined not needed), don't run again
-        var promoAttempted = false;
+        window.lastValidPromoCode = promoCode || @json($session_coupon_applied ?? '');
+        window.currentAppliedCoupon = @json($session_coupon_applied ?? '');
 
         /**
          * Show the "Promo Applied" green UI card.
@@ -4681,29 +4737,31 @@
          * At that point sub_total is already populated with a real value.
          */
         window.maybeAutoApplyPromo = function(baseTotal) {
-            if (!promoCode) return; // no promo in URL
-            if (promoAttempted) return; // already tried
+            if (!window.lastValidPromoCode) return; // no promo in URL or session
             if (baseTotal <= 0) return; // sub_total still 0, wait for next calc
 
-            promoAttempted = true; // mark as attempted now
-
             // If the exact same promo is already in PHP session — just show UI
-            if (sessionCouponCode && sessionCouponCode === promoCode) {
-                showPromoApplied(sessionCouponCode);
+            if (window.currentAppliedCoupon === window.lastValidPromoCode) {
+                showPromoApplied(window.lastValidPromoCode);
                 return;
             }
 
             // If a DIFFERENT promo is already applied — don't override
-            if (sessionCouponCode && sessionCouponCode !== promoCode) {
+            if (window.currentAppliedCoupon && window.currentAppliedCoupon !== window.lastValidPromoCode) {
                 return;
             }
+
+            if (window.lastPromoAttemptTotal === baseTotal) {
+                return;
+            }
+            window.lastPromoAttemptTotal = baseTotal;
 
             // No coupon in session — silently apply via AJAX
             $.ajax({
                 url: "{{ route('home_promo_check') }}",
                 type: 'POST',
                 data: {
-                    'promo_code': promoCode,
+                    'promo_code': window.lastValidPromoCode,
                     'service': @json($service_id),
                     'sub_service': @json($subservice_id),
                     'sub_total': baseTotal,

@@ -112,6 +112,18 @@
                                         value="{{ $packagecategory->slider_image_alt_tag }}" />
                                 </div>
 
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>App Slider Image (Optional, for category tabs)</label>
+                                        <input type="file" class="form-control" id="app_slider_image"
+                                            name="app_slider_image" value="{{ $packagecategory->app_slider_image }}">
+                                        @if ($packagecategory->app_slider_image != '')
+                                            <img src="{{ asset('public/upload/packagecategory/' . $packagecategory->app_slider_image) }}"
+                                                style="width: 15%;object-fit: cover; margin-top: 10px; border-radius: 8px;" />
+                                        @endif
+                                    </div>
+                                </div>
+
 
                             </div>
                             <div class="text-end mt-4">

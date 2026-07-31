@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Admin\Subservice;
-use App\Models\Admin\Service;
+use App\Models\admin\Subservice;
+use App\Models\admin\Service;
 use Image;
 use DB;
 use File;
@@ -31,12 +31,15 @@ class SubserviceController extends Controller
      */
     public function create()
     {
+
+
         $data['service_data'] = service::where('is_active', 0)->orderBy('id', 'DESC')->get();
         $data['form_field_data'] = DB::table('form_fileds')->get();
 
         $data['country_data'] = DB::table('countries')->select('*')->orderBy('country', 'ASC')->get();
 
         $data['allcity'] = DB::table('cities')->where('country', 22)->orderBy('id', 'DESC')->get();
+        $data['all_subservices'] = Subservice::where('is_active', 0)->orderBy('subservicename', 'ASC')->get();
 
         return view('admin.add_subservice', $data);
     }
@@ -99,6 +102,25 @@ class SubserviceController extends Controller
             $subservice->form_fields_two = implode(",", $request->form_fields_two);
         }
 
+        $subservice->step_1_title = $request->step_1_title;
+        $subservice->step_2_title = $request->step_2_title;
+        $subservice->step_3_title = $request->step_3_title;
+        $subservice->step_4_title = $request->step_4_title;
+
+        for ($i = 1; $i <= 4; $i++) {
+            $field = 'step_' . $i . '_image';
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $fileName = time() . '-' . str_replace(' ', '-', $file->getClientOriginalName());
+                $path = public_path('upload/subservice/');
+                if (!\File::exists($path)) {
+                    \File::makeDirectory($path, 0755, true);
+                }
+                $file->move($path, $fileName);
+                $subservice->$field = $fileName;
+            }
+        }
+
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $originalName = $file->getClientOriginalName();
@@ -107,9 +129,9 @@ class SubserviceController extends Controller
             $fileName = time() . '-' . $modifiedName;
 
             $pathOriginal = public_path('upload/subservice/');
-            $pathLarge    = public_path('upload/subservice/large/');
-            $pathMedium   = public_path('upload/subservice/medium/');
-            $pathSmall    = public_path('upload/subservice/small/');
+            $pathLarge = public_path('upload/subservice/large/');
+            $pathMedium = public_path('upload/subservice/medium/');
+            $pathSmall = public_path('upload/subservice/small/');
 
             // Create directories if they don't exist
             foreach ([$pathOriginal, $pathLarge, $pathMedium, $pathSmall] as $path) {
@@ -252,7 +274,11 @@ class SubserviceController extends Controller
 
         if (count($_POST['title_addmore_banner']) > 0 && $_POST['title_addmore_banner'] != '') {
             for ($i = 0; $i < count($_POST['title_addmore_banner']); $i++) {
-                if ($_FILES['image_addmore_banner' . $i]['name'] != '') {
+
+                if (
+                    isset($_FILES['image_addmore_banner' . $i]) &&
+                    !empty($_FILES['image_addmore_banner' . $i]['name'])
+                ) {
                     $image = $_FILES['image_addmore_banner' . $i]['tmp_name'];
                     $originalName = $_FILES['image_addmore_banner' . $i]['name']; // Get the original file name    
                     $filename = time() . '-' . str_replace(' ', '-', $originalName);
@@ -264,12 +290,15 @@ class SubserviceController extends Controller
                     Image::make($image)
                         ->save(public_path('upload/subservice/banner_attr/' . $filename));
 
-                    $content['image']   = $filename;
+                    $content['image'] = $filename;
                 } else {
-                    $content['image']   = '';
+                    $content['image'] = '';
                 }
 
-                if ($_FILES['mobile_banner_image_addmore' . $i]['name'] != '') {
+                if (
+                    isset($_FILES['mobile_banner_image_addmore' . $i]) &&
+                    !empty($_FILES['mobile_banner_image_addmore' . $i]['name'])
+                ) {
                     $image = $_FILES['mobile_banner_image_addmore' . $i]['tmp_name'];
                     $originalName = $_FILES['mobile_banner_image_addmore' . $i]['name']; // Get the original file name    
                     $filename = time() . '-' . str_replace(' ', '-', $originalName);
@@ -281,9 +310,9 @@ class SubserviceController extends Controller
                     Image::make($image)
                         ->save(public_path('upload/subservice/mobile_banner/' . $filename));
 
-                    $content['moble_banner_image']   = $filename;
+                    $content['moble_banner_image'] = $filename;
                 } else {
-                    $content['moble_banner_image']   = '';
+                    $content['moble_banner_image'] = '';
                 }
                 if ($_POST['title_addmore_banner'][$i] != '') {
                     $content['city'] = $_POST['city_addmore_banner'][$i];
@@ -297,7 +326,10 @@ class SubserviceController extends Controller
 
         if (count($_POST['title_addmore']) > 0 && $_POST['title_addmore'] != '') {
             for ($i = 0; $i < count($_POST['title_addmore']); $i++) {
-                if ($_FILES['image_' . $i]['name'] != '') {
+                if (
+                    isset($_FILES['image_' . $i]) &&
+                    !empty($_FILES['image_' . $i]['name'])
+                ) {
                     $image = $_FILES['image_' . $i]['tmp_name'];
                     $originalName = $_FILES['image_' . $i]['name']; // Get the original file name    
                     $filename = time() . '-' . str_replace(' ', '-', $originalName);
@@ -309,7 +341,7 @@ class SubserviceController extends Controller
                     Image::make($image)
                         ->save(public_path('upload/subservice/subservice_attr/' . $filename));
 
-                    $content['image']   = $filename;
+                    $content['image'] = $filename;
                 }
                 if ($_POST['title_addmore'][$i] != '') {
                     $content['city'] = $_POST['city_addmore_second'][$i];
@@ -335,7 +367,51 @@ class SubserviceController extends Controller
             }
         }
 
+        if (isset($_POST['city_addmore_why_choose']) && is_array($_POST['city_addmore_why_choose'])) {
+            for ($i = 0; $i < count($_POST['city_addmore_why_choose']); $i++) {
+                if (!empty($_POST['city_addmore_why_choose'][$i])) {
+                    $content['subservice_id'] = $package_id;
+                    $content['city'] = $_POST['city_addmore_why_choose'][$i];
+                    $content['description'] = $_POST['whychoosevc_addmore'][$i];
+                    $this->insert_why_choose_attribute($content);
+                }
+            }
+        }
 
+        if (isset($_POST['city_addmore_more_service']) && is_array($_POST['city_addmore_more_service'])) {
+            for ($i = 0; $i < count($_POST['city_addmore_more_service']); $i++) {
+                if (!empty($_POST['city_addmore_more_service'][$i])) {
+                    $content['subservice_id'] = $package_id;
+                    $content['city'] = $_POST['city_addmore_more_service'][$i];
+                    $content['more_subservice_id'] = isset($_POST['subservice_addmore_more_service'][$i]) ? implode(",", (array)$_POST['subservice_addmore_more_service'][$i]) : '';
+                    $this->insert_more_service_attribute($content);
+                }
+            }
+        }
+
+
+        if (isset($_POST['city_addmore_what_else_service']) && is_array($_POST['city_addmore_what_else_service'])) {
+            for ($i = 0; $i < count($_POST['city_addmore_what_else_service']); $i++) {
+                if (!empty($_POST['city_addmore_what_else_service'][$i])) {
+                    $content['subservice_id'] = $package_id;
+                    $content['city'] = $_POST['city_addmore_what_else_service'][$i];
+                    $content['what_else_subservice_id'] = isset($_POST['subservice_addmore_what_else_service'][$i]) ? implode(",", (array)$_POST['subservice_addmore_what_else_service'][$i]) : '';
+                    $this->insert_what_else_service_attribute($content);
+                }
+            }
+        }
+
+        if (isset($_POST['city_addmore_description']) && is_array($_POST['city_addmore_description'])) {
+            for ($i = 0; $i < count($_POST['city_addmore_description']); $i++) {
+                if (!empty($_POST['city_addmore_description'][$i])) {
+                    \App\Models\admin\SubserviceDescription::create([
+                        'subservice_id' => $package_id,
+                        'city' => $_POST['city_addmore_description'][$i],
+                        'description' => $_POST['description_addmore_new'][$i] ?? ''
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('subservice.index')->with('success', 'Sub Service Added Successfully');
     }
@@ -416,6 +492,7 @@ class SubserviceController extends Controller
      */
     public function edit(Subservice $subservice)
     {
+
         /*  echo "<pre>";
         print_r($subservice);
         echo "</pre>";
@@ -423,7 +500,7 @@ class SubserviceController extends Controller
 
         $data['all_service'] = Service::orderBy('id', 'DESC')->get();
         $countryArray = explode(',', $subservice->country);
-        $data['allcity'] =  DB::table('cities')->whereIn('country', $countryArray)->get();
+        $data['allcity'] = DB::table('cities')->whereIn('country', $countryArray)->get();
         $data['form_field_data'] = DB::table('form_fileds')->get();
         $data['banner_attribute_data'] = DB::table('subservice_banner_attr')
             ->select('*')
@@ -440,6 +517,11 @@ class SubserviceController extends Controller
             ->where('subservice_id', '=', $subservice->id)
             ->get()
             ->toArray();
+        $data['subservice_why_choose_attr'] = DB::table('subservice_why_choose_attr')
+            ->select('*')
+            ->where('subservice_id', '=', $subservice->id)
+            ->get()
+            ->toArray();
         //$data['allcity'] =  DB::table('cities')->where('country',22)->get();		
 
         $data['subservice_top_description_attr'] = DB::table('subservice_top_description_attr')
@@ -447,6 +529,22 @@ class SubserviceController extends Controller
             ->where('subservice_id', '=', $subservice->id)
             ->get()
             ->toArray();
+
+        $data['subservice_more_service_attr'] = DB::table('subservice_more_services')
+            ->select('*')
+            ->where('subservice_id', '=', $subservice->id)
+            ->get()->toArray();
+
+        $data['subservice_what_else_service_attr'] = DB::table('subservice_what_else_services')
+            ->select('*')
+            ->where('subservice_id', '=', $subservice->id)
+            ->get()->toArray();
+
+        $data['subservice_description_addmores'] = \App\Models\admin\SubserviceDescription::where('subservice_id', $subservice->id)
+            ->get()->toArray();
+
+        $data['all_subservices'] = Subservice::where('is_active', 0)->orderBy('subservicename', 'ASC')->get();
+
         $data['country_data'] = DB::table('countries')->select('*')->orderBy('country', 'ASC')->get();
 
         return view('admin.edit_subservice', compact('subservice'), $data);
@@ -512,6 +610,25 @@ class SubserviceController extends Controller
             $data['form_fields_two'] = implode(",", $request->form_fields_two);
         }
 
+        $data['step_1_title'] = $request->step_1_title;
+        $data['step_2_title'] = $request->step_2_title;
+        $data['step_3_title'] = $request->step_3_title;
+        $data['step_4_title'] = $request->step_4_title;
+
+        for ($i = 1; $i <= 4; $i++) {
+            $field = 'step_' . $i . '_image';
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $fileName = time() . '-' . str_replace(' ', '-', $file->getClientOriginalName());
+                $path = public_path('upload/subservice/');
+                if (!\File::exists($path)) {
+                    \File::makeDirectory($path, 0755, true);
+                }
+                $file->move($path, $fileName);
+                $data[$field] = $fileName;
+            }
+        }
+
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $originalName = $file->getClientOriginalName();
@@ -520,9 +637,9 @@ class SubserviceController extends Controller
             $fileName = time() . '-' . $modifiedName;
 
             $pathOriginal = public_path('upload/subservice/');
-            $pathLarge    = public_path('upload/subservice/large/');
-            $pathMedium   = public_path('upload/subservice/medium/');
-            $pathSmall    = public_path('upload/subservice/small/');
+            $pathLarge = public_path('upload/subservice/large/');
+            $pathMedium = public_path('upload/subservice/medium/');
+            $pathSmall = public_path('upload/subservice/small/');
 
             // Create directories if they don't exist
             foreach ([$pathOriginal, $pathLarge, $pathMedium, $pathSmall] as $path) {
@@ -779,9 +896,9 @@ class SubserviceController extends Controller
                         ->save(public_path('upload/subservice/subservice_attr/' . $filename));
 
 
-                    $content['image']   = $filename;
+                    $content['image'] = $filename;
                 } else {
-                    $content['image']  = '';
+                    $content['image'] = '';
                 }
 
                 if ($_POST['title_addmore1'][$i] != '') {
@@ -830,10 +947,10 @@ class SubserviceController extends Controller
                             ->save(public_path('upload/subservice/subservice_attr/' . $filename));
 
 
-                        $contentu['image']   = $filename;
+                        $contentu['image'] = $filename;
                     } else {
 
-                        $contentu['image']   = '';
+                        $contentu['image'] = '';
                     }
                     $contentu['city'] = $_POST['city_addmore_secondu'][$i];
                     $contentu['p_id'] = $id;
@@ -945,6 +1062,98 @@ class SubserviceController extends Controller
             }
         }
 
+        if (isset($_POST['city_addmore_why_chooseu']) && count($_POST['city_addmore_why_chooseu']) > 0 && $_POST['city_addmore_why_chooseu'] != '') {
+            for ($i = 0; $i < count($_POST['city_addmore_why_chooseu']); $i++) {
+                if ($_POST['city_addmore_why_chooseu'][$i] != '') {
+                    $content['subservice_id'] = $id;
+                    $content['city'] = $_POST['city_addmore_why_chooseu'][$i];
+                    $content['description'] = $_POST['whychoosevc_addmoreu'][$i];
+                    $content['updateid_why_choose'] = $_POST['updateid_why_choose'][$i];
+                    $this->update_why_choose_attribute($content);
+                }
+            }
+        }
+        if (isset($_POST['city_addmore_why_choose1']) && count($_POST['city_addmore_why_choose1']) > 0 && $_POST['city_addmore_why_choose1'] != '') {
+            for ($i = 0; $i < count($_POST['city_addmore_why_choose1']); $i++) {
+                if ($_POST['city_addmore_why_choose1'][$i] != '') {
+                    $content['subservice_id'] = $id;
+                    $content['city'] = $_POST['city_addmore_why_choose1'][$i];
+                    $content['description'] = $_POST['whychoosevc_addmore1'][$i];
+                    $this->insert_why_choose_attribute($content);
+                }
+            }
+        }
+
+        if (isset($_POST['city_addmore_more_serviceu']) && count($_POST['city_addmore_more_serviceu']) > 0 && $_POST['city_addmore_more_serviceu'] != '') {
+            for ($i = 0; $i < count($_POST['city_addmore_more_serviceu']); $i++) {
+                if ($_POST['city_addmore_more_serviceu'][$i] != '') {
+                    $content['subservice_id'] = $id;
+                    $content['city'] = $_POST['city_addmore_more_serviceu'][$i];
+                    $content['more_subservice_id'] = isset($_POST['subservice_addmore_more_serviceu'][$i]) ? implode(",", (array)$_POST['subservice_addmore_more_serviceu'][$i]) : '';
+                    $content['updateid_more_service'] = $_POST['updateid_more_service'][$i];
+                    $this->update_more_service_attribute($content);
+                }
+            }
+        }
+        if (isset($_POST['city_addmore_more_service1']) && count($_POST['city_addmore_more_service1']) > 0 && $_POST['city_addmore_more_service1'] != '') {
+            for ($i = 0; $i < count($_POST['city_addmore_more_service1']); $i++) {
+                if ($_POST['city_addmore_more_service1'][$i] != '') {
+                    $content['subservice_id'] = $id;
+                    $content['city'] = $_POST['city_addmore_more_service1'][$i];
+                    $content['more_subservice_id'] = isset($_POST['subservice_addmore_more_service1'][$i]) ? implode(",", (array)$_POST['subservice_addmore_more_service1'][$i]) : '';
+                    $this->insert_more_service_attribute($content);
+                }
+            }
+        }
+
+        if (isset($_POST['city_addmore_what_else_serviceu']) && count($_POST['city_addmore_what_else_serviceu']) > 0 && $_POST['city_addmore_what_else_serviceu'] != '') {
+            for ($i = 0; $i < count($_POST['city_addmore_what_else_serviceu']); $i++) {
+                if ($_POST['city_addmore_what_else_serviceu'][$i] != '') {
+                    $content['subservice_id'] = $id;
+                    $content['city'] = $_POST['city_addmore_what_else_serviceu'][$i];
+                    $content['what_else_subservice_id'] = isset($_POST['subservice_addmore_what_else_serviceu'][$i]) ? implode(",", (array)$_POST['subservice_addmore_what_else_serviceu'][$i]) : '';
+                    $content['updateid_what_else_service'] = $_POST['updateid_what_else_service'][$i];
+                    $this->update_what_else_service_attribute($content);
+                }
+            }
+        }
+        if (isset($_POST['city_addmore_what_else_service1']) && count($_POST['city_addmore_what_else_service1']) > 0 && $_POST['city_addmore_what_else_service1'] != '') {
+            for ($i = 0; $i < count($_POST['city_addmore_what_else_service1']); $i++) {
+                if ($_POST['city_addmore_what_else_service1'][$i] != '') {
+                    $content['subservice_id'] = $id;
+                    $content['city'] = $_POST['city_addmore_what_else_service1'][$i];
+                    $content['what_else_subservice_id'] = isset($_POST['subservice_addmore_what_else_service1'][$i]) ? implode(",", (array)$_POST['subservice_addmore_what_else_service1'][$i]) : '';
+                    $this->insert_what_else_service_attribute($content);
+                }
+            }
+        }
+
+        if (isset($_POST['city_addmore_descriptionu']) && count($_POST['city_addmore_descriptionu']) > 0 && $_POST['city_addmore_descriptionu'] != '') {
+            for ($i = 0; $i < count($_POST['city_addmore_descriptionu']); $i++) {
+                if ($_POST['city_addmore_descriptionu'][$i] != '') {
+                    $descId = $_POST['updateid_description'][$i];
+                    $descriptionModel = \App\Models\admin\SubserviceDescription::find($descId);
+                    if ($descriptionModel) {
+                        $descriptionModel->city = $_POST['city_addmore_descriptionu'][$i];
+                        $descriptionModel->description = $_POST['description_addmore_newu'][$i] ?? '';
+                        $descriptionModel->save();
+                    }
+                }
+            }
+        }
+
+        if (isset($_POST['city_addmore_description1']) && count($_POST['city_addmore_description1']) > 0 && $_POST['city_addmore_description1'] != '') {
+            for ($i = 0; $i < count($_POST['city_addmore_description1']); $i++) {
+                if ($_POST['city_addmore_description1'][$i] != '') {
+                    \App\Models\admin\SubserviceDescription::create([
+                        'subservice_id' => $id,
+                        'city' => $_POST['city_addmore_description1'][$i],
+                        'description' => $_POST['description_addmore_new1'][$i] ?? ''
+                    ]);
+                }
+            }
+        }
+
         //   echo"<pre>";print_r($data);echo"</pre>";exit;
 
         return redirect()->route('subservice.index')->with('success', 'Sub Service Updated Successfully');
@@ -989,6 +1198,39 @@ class SubserviceController extends Controller
 
         return redirect()->route('subservice.edit', $subservice)->with('success', 'SubService Contain attribute deleted successfully');
     }
+
+    function insert_why_choose_attribute($content)
+    {
+        $data['subservice_id'] = $content['subservice_id'];
+        $data['city'] = $content['city'];
+        $data['description'] = $content['description'];
+        $data['created_at'] = date('Y-m-d H:i:s');
+        DB::table('subservice_why_choose_attr')->insertGetId($data);
+    }
+
+    function update_why_choose_attribute($content)
+    {
+        $data['city'] = $content['city'];
+        $data['description'] = $content['description'];
+        $data['updated_at'] = date('Y-m-d H:i:s');
+        DB::table('subservice_why_choose_attr')->where('id', $content['updateid_why_choose'])->update($data);
+    }
+
+    function removed_why_choose_att(Request $request)
+    {
+        $subservice = $request->pid;
+        $id = $request->id;
+        $result = DB::table('subservice_why_choose_attr')->where('subservice_id', '=', $subservice)->where('id', '=', $id)->delete();
+        return redirect()->route('subservice.edit', $subservice)->with('success', 'Why Choose VendorCity attribute deleted successfully');
+    }
+
+    function removed_description_att(Request $request)
+    {
+        $subservice = $request->pid;
+        $id = $request->id;
+        $result = \App\Models\admin\SubserviceDescription::where('subservice_id', '=', $subservice)->where('id', '=', $id)->delete();
+        return redirect()->route('subservice.edit', $subservice)->with('success', 'Description attribute deleted successfully');
+    }
     function removed_subservice_banner_addmore_att(Request $request)
     {
         $subservice = $request->pid;
@@ -1011,7 +1253,7 @@ class SubserviceController extends Controller
         $data['title_addmore'] = $content['title_addmore'];
 
         if ($content['image'] != '') {
-            $data['image'] =  $content['image'];
+            $data['image'] = $content['image'];
         }
         $data['description_addmore'] = $content['description_addmore'];
         $data['image_alt_tag'] = $content['image_alt_tag_addmore'];
@@ -1028,10 +1270,10 @@ class SubserviceController extends Controller
         $data['title'] = $content['title_addmore'];
 
         if ($content['image'] != '') {
-            $data['image'] =  $content['image'];
+            $data['image'] = $content['image'];
         }
         if ($content['mobile_banner_image'] != '') {
-            $data['mobile_banner_image'] =  $content['mobile_banner_image'];
+            $data['mobile_banner_image'] = $content['mobile_banner_image'];
         }
         $data['short_description'] = $content['description_addmore'];
 
@@ -1052,7 +1294,6 @@ class SubserviceController extends Controller
         return redirect()->route('subservice.index')->with('success', 'Sub Service Deleted Successfully');
     }
     public function set_order_subservice()
-
     {
 
         $id = $_POST['id'];
@@ -1129,5 +1370,55 @@ class SubserviceController extends Controller
         $result = DB::table('subservice_top_description_attr')->where('subservice_id', '=', $subservice)->where('id', '=', $id)->delete();
 
         return redirect()->route('subservice.edit', $subservice)->with('success', 'Top Description attribute deleted successfully');
+    }
+
+    function removed_more_service_att(Request $request)
+    {
+        $subservice = $request->pid;
+        $id = $request->id;
+        DB::table('subservice_more_services')->where('subservice_id', '=', $subservice)->where('id', '=', $id)->delete();
+        return redirect()->route('subservice.edit', $subservice)->with('success', 'More Service attribute deleted successfully');
+    }
+
+    function insert_more_service_attribute($content)
+    {
+        $data['subservice_id'] = $content['subservice_id'];
+        $data['city'] = $content['city'];
+        $data['more_subservice_id'] = $content['more_subservice_id'];
+        $data['created_at'] = date('Y-m-d H:i:s');
+        DB::table('subservice_more_services')->insertGetId($data);
+    }
+
+    function update_more_service_attribute($content)
+    {
+        $data['city'] = $content['city'];
+        $data['more_subservice_id'] = $content['more_subservice_id'];
+        $data['updated_at'] = date('Y-m-d H:i:s');
+        DB::table('subservice_more_services')->where('id', $content['updateid_more_service'])->update($data);
+    }
+
+    function removed_what_else_att(Request $request)
+    {
+        $subservice = $request->pid;
+        $id = $request->id;
+        DB::table('subservice_what_else_services')->where('subservice_id', '=', $subservice)->where('id', '=', $id)->delete();
+        return redirect()->route('subservice.edit', $subservice)->with('success', 'What Else Service attribute deleted successfully');
+    }
+
+    function insert_what_else_service_attribute($content)
+    {
+        $data['subservice_id'] = $content['subservice_id'];
+        $data['city'] = $content['city'];
+        $data['what_else_subservice_id'] = $content['what_else_subservice_id'];
+        $data['created_at'] = date('Y-m-d H:i:s');
+        DB::table('subservice_what_else_services')->insertGetId($data);
+    }
+
+    function update_what_else_service_attribute($content)
+    {
+        $data['city'] = $content['city'];
+        $data['what_else_subservice_id'] = $content['what_else_subservice_id'];
+        $data['updated_at'] = date('Y-m-d H:i:s');
+        DB::table('subservice_what_else_services')->where('id', $content['updateid_what_else_service'])->update($data);
     }
 }

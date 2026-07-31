@@ -52,7 +52,8 @@
 
     <link rel="stylesheet" href="{{ asset('public/admin/assets/plugins/icons/ionic/ionicons.css') }}">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css">
 
     <style>
         #set_order_model h3 {
@@ -78,13 +79,16 @@
         }
 
         .custom-swal-popup {
-                background-color: blue !important; /* Change background color */
-                color: white !important; /* Change font color */
-            }
+            background-color: blue !important;
+            /* Change background color */
+            color: white !important;
+            /* Change font color */
+        }
 
-            .custom-swal-title {
-                color: white !important; /* Change font color of title */
-            }
+        .custom-swal-title {
+            color: white !important;
+            /* Change font color of title */
+        }
     </style>
 
 

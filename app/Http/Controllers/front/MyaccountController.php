@@ -923,7 +923,7 @@ if (empty($userdata)) {
 
         $orderdata = DB::table('ci_order_item')->where('id', $id)->update($data_u);
 
-        return redirect()->to('/my-order')->with('L_strsucessMessage', 'Package Cancel Successfully');
+        return redirect(route('front.myorder'))->with('L_strsucessMessage', 'Package Cancel Successfully');
     }
 
     function update_instruction()
@@ -936,7 +936,7 @@ if (empty($userdata)) {
             'any_special_instruction' => $edit_instruction
         ]);
 
-        return redirect('/order-detail/' . $order_id);
+        return redirect(route('order-detail', $order_id));
     }
 
     function update_address()
@@ -956,7 +956,7 @@ if (empty($userdata)) {
             'apartment_villa_no' => $apartment_villa_no,
         ]);
 
-        return redirect('/order-detail/' . $order_id);
+        return redirect(route('order-detail', $order_id));
     }
 
     public function order_add_tip(Request $request)
@@ -1017,7 +1017,7 @@ if (empty($userdata)) {
     {
         $tip = DB::table('ci_tips')->where('id', $id)->first();
         if (!$tip || !$tip->stripe_session_id) {
-            return redirect('/my-order?tab=past')->with('error', 'Invalid tip session.');
+            return redirect(route('front.myorder') . '?tab=past')->with('error', 'Invalid tip session.');
         }
 
         Stripe::setApiKey(config('stripe.stripe_sk'));
@@ -1029,12 +1029,12 @@ if (empty($userdata)) {
             'updated_at' => now(),
         ]);
 
-        return redirect('/my-order?tab=past')->with('L_strsucessMessage', 'Thank you for your tip!');
+        return redirect(route('front.myorder') . '?tab=past')->with('L_strsucessMessage', 'Thank you for your tip!');
     }
 
     public function tip_payment_cancel($id)
     {
-        return redirect('/my-order?tab=past')->with('error', 'Tip payment was cancelled.');
+        return redirect(route('front.myorder') . '?tab=past')->with('error', 'Tip payment was cancelled.');
     }
 
     function cancel_order()
@@ -1053,7 +1053,7 @@ if (empty($userdata)) {
 
             $this->whatsappmsg_tmp_cancellation_vc($order_id);
         }
-        return redirect('/order-detail/' . $order_id);
+        return redirect(route('order-detail', $order_id));
     }
 
     function whatsappmsg_tmp_cancellation_vc($order_id)
@@ -1375,7 +1375,7 @@ if (empty($userdata)) {
             $this->whatsappmsg_tmp_reschedule_vc($request->old_order_id);
 
 
-            return redirect('/order-detail/' . $request->old_order_id);
+            return redirect(route('order-detail', $request->old_order_id));
         }
     }
 
@@ -2176,5 +2176,102 @@ if (empty($userdata)) {
             'status' => $status,
             'message' => $msg
         ]);
+    }
+
+    public function cancel_recurring_visit(Request $request)
+    {
+        $visit_date = $request->input('visit_date');
+        $order_id = $request->input('order_id');
+        $userdata = Session::get('user');
+
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login to cancel.']);
+        }
+
+        if ($visit_date && $order_id) {
+            // Check if the order belongs to this user
+            $order = DB::table('ci_orders')
+                ->where('order_id', $order_id)
+                ->where('user_id', $userdata['userid'])
+                ->first();
+
+            if ($order) {
+                $existing_visit = DB::table('ci_order_visits')
+                    ->where('order_id', $order_id)
+                    ->where('visit_date', $visit_date)
+                    ->first();
+
+                if ($existing_visit) {
+                    DB::table('ci_order_visits')
+                        ->where('id', $existing_visit->id)
+                        ->update(['visit_status' => 'cancelled']);
+                } else {
+                    DB::table('ci_order_visits')->insert([
+                        'order_id' => $order_id,
+                        'visit_date' => $visit_date,
+                        'visit_status' => 'cancelled',
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 1,
+                    'message' => 'Visit Cancelled Successfully'
+                ]);
+            } else {
+                return response()->json(['status' => 0, 'message' => 'Invalid order or unauthorized.']);
+            }
+        }
+
+        return response()->json(['status' => 0, 'message' => 'Visit date or Order ID missing']);
+    }
+    public function skip_visit(Request $request)
+    {
+        $visit_date = $request->input('visit_date');
+        $order_id = $request->input('order_id');
+        $userdata = Session::get('user');
+
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login to skip visit.']);
+        }
+
+        if ($visit_date && $order_id) {
+            // Check if the order belongs to this user
+            $order = DB::table('ci_orders')
+                ->where('order_id', $order_id)
+                ->where('user_id', $userdata['userid'])
+                ->first();
+
+            if ($order) {
+                $existing_visit = DB::table('ci_order_visits')
+                    ->where('order_id', $order_id)
+                    ->where('visit_date', $visit_date)
+                    ->first();
+
+                if ($existing_visit) {
+                    DB::table('ci_order_visits')
+                        ->where('id', $existing_visit->id)
+                        ->update(['visit_status' => 'skipped']);
+                } else {
+                    DB::table('ci_order_visits')->insert([
+                        'order_id' => $order_id,
+                        'visit_date' => $visit_date,
+                        'visit_status' => 'skipped',
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 1,
+                    'message' => 'Visit Skipped Successfully'
+                ]);
+            } else {
+                return response()->json(['status' => 0, 'message' => 'Invalid order or unauthorized.']);
+            }
+        }
+
+        return response()->json(['status' => 0, 'message' => 'Visit date or Order ID missing']);
     }
 }
