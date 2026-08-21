@@ -138,7 +138,18 @@
             </div>
         </div>
 
-        <div id="filter_inputs" class="card filter-card">
+        @php
+            $isFilterApplied =
+                request()->filled('start_date') ||
+                request()->filled('end_date') ||
+                request()->filled('customer_id') ||
+                request()->filled('status') ||
+                request()->filled('salesperson_id') ||
+                request()->filled('source_lead_id') ||
+                request()->filled('service_id') ||
+                request()->filled('subservice_id');
+        @endphp
+        <div id="filter_inputs" class="card filter-card" style="display: {{ $isFilterApplied ? 'block' : 'none' }};">
             <div class="row mb-4 ">
                 <div class="col-sm-12">
                     <div class="card premium-card">
@@ -384,7 +395,7 @@
             <div class="col-sm-12">
                 <div class="card premium-card">
                     <div class="card-body">
-                        <div class="table-responsive" style="min-height: 300px; overflow-x: visible;">
+                        <div class="table-responsive" style="min-height: 300px; overflow-x: auto;">
                             <table class="table premium-table" id="enquiry_table">
                                 <thead>
                                     <tr>
@@ -403,12 +414,18 @@
                                         <tr>
                                             <td>{{ $enquiry->id }}</td>
                                             <td>
-                                                <strong>{{ $enquiry->customer_name }}</strong><br>
-                                                <small>{{ $enquiry->country_code }} {{ $enquiry->customer_phone }}</small>
+                                                <strong>{{ $enquiry->customer_name ?: ($enquiry->c_name ?: 'Unknown / Guest') }}</strong><br>
+                                                <small>{{ $enquiry->country_code }}
+                                                    {{ $enquiry->customer_phone ?: ($enquiry->c_mobile ?: '-') }}</small>
                                             </td>
                                             <td>
-                                                <strong>{{ $enquiry->servicename }}</strong><br>
-                                                <small>{{ $enquiry->subservicename }}</small>
+                                                @if ($enquiry->service_id == 0)
+                                                    <strong>{{ $enquiry->other_service }} <span class="badge bg-secondary"
+                                                            style="font-size: 10px;">Unknown</span></strong><br>
+                                                @else
+                                                    <strong>{{ $enquiry->servicename }}</strong><br>
+                                                    <small>{{ $enquiry->subservicename }}</small>
+                                                @endif
                                             </td>
                                             <td>
                                                 @php
@@ -431,10 +448,30 @@
                                             <td>
                                                 @php
                                                     $currentStatus = $enquiry->status ?? 'Pending';
-                                                    $badgeClass = 'badge-' . strtolower($currentStatus);
                                                 @endphp
-                                                <span
-                                                    class="badge {{ $badgeClass }}">{{ ucfirst($currentStatus) }}</span>
+                                                <select class="form-select form-select-sm status-dropdown"
+                                                    data-id="{{ $enquiry->id }}" style="min-width: 110px;">
+                                                    <option value="Pending"
+                                                        {{ $currentStatus == 'Pending' ? 'selected' : '' }}>Pending
+                                                    </option>
+                                                    <option value="Followup"
+                                                        {{ $currentStatus == 'Followup' ? 'selected' : '' }}>Followup
+                                                    </option>
+                                                    <option value="Completed"
+                                                        {{ $currentStatus == 'Completed' ? 'selected' : '' }}>Completed
+                                                    </option>
+                                                    <option value="Booked"
+                                                        {{ $currentStatus == 'Booked' ? 'selected' : '' }}>Booked</option>
+                                                    <option value="Lost"
+                                                        {{ $currentStatus == 'Lost' ? 'selected' : '' }}>Lost</option>
+                                                    <option value="Invalid"
+                                                        {{ $currentStatus == 'Invalid' ? 'selected' : '' }}>Invalid
+                                                    </option>
+                                                    <option value="Vendor"
+                                                        {{ $currentStatus == 'Vendor' ? 'selected' : '' }}>Vendor</option>
+                                                    <option value="Job"
+                                                        {{ $currentStatus == 'Job' ? 'selected' : '' }}>Job</option>
+                                                </select>
                                             </td>
                                             <td>
                                                 @if ($enquiry->salesperson_id)
@@ -470,10 +507,8 @@
                                                         </li>
                                                         <li>
                                                             <a class="dropdown-item py-2 view-notes-btn"
-                                                                href="javascript:void(0)"
-                                                                data-notes="{{ $enquiry->notes ?? 'No notes available.' }}">
-                                                                <i class="fas fa-sticky-note text-info me-2"></i> View
-                                                                Notes
+                                                                href="javascript:void(0)" data-id="{{ $enquiry->id }}">
+                                                                <i class="fas fa-sticky-note text-info me-2"></i> Notes
                                                             </a>
                                                         </li>
                                                         <li>
@@ -496,9 +531,7 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                            <div class="mt-4 d-flex justify-content-end">
-                                {{ $enquiries->links('pagination::bootstrap-5') }}
-                            </div>
+                            <!-- Removed server-side pagination links -->
                         </div>
                     </div>
                 </div>
@@ -508,20 +541,32 @@
 
     <!-- Notes Modal -->
     <div class="modal fade" id="notesModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-sticky-note text-info me-2"></i> Enquiry Notes</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="modal_notes_content" class="p-3 bg-light rounded"
-                        style="white-space: pre-wrap; font-size: 14px; color: #555;">
-                        <!-- Notes will be injected here -->
+                    <div id="modal_notes_list" class="mb-4" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Notes will be injected here via AJAX -->
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                    <hr>
+
+                    <form id="addNoteForm">
+                        <input type="hidden" id="note_enquiry_id" name="enquiry_id">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Add New Note</label>
+                            <input type="date" class="form-control mb-2" id="new_note_date" name="note_date"
+                                required>
+                            <textarea class="form-control" id="new_note_text" name="note" rows="3"
+                                placeholder="Enter your note here..." required></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary" id="saveNoteBtn">Save Note</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -545,19 +590,6 @@
                                 @foreach ($salespersons as $sp)
                                     <option value="{{ $sp->id }}">{{ $sp->name }}</option>
                                 @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" id="assign_status" name="status">
-                                <option value="Pending">Pending</option>
-                                <option value="Followup">Followup</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Booked">Booked</option>
-                                <option value="Lost">Lost</option>
-                                <option value="Invalid">Invalid</option>
-                                <option value="Vendor">Vendor</option>
-                                <option value="Job">Job</option>
                             </select>
                         </div>
                     </form>
@@ -584,9 +616,26 @@
                     showConfirmButton: false
                 });
             @endif
-            /* Removed DataTables client-side initialization as pagination is now server-side */
+            if ($.fn.DataTable.isDataTable('#enquiry_table')) {
+                $('#enquiry_table').DataTable().destroy();
+            }
+            $('#enquiry_table').DataTable({
+                "order": [
+                    [0, "desc"]
+                ],
+                "pageLength": 10,
+                "lengthMenu": [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                "language": {
+                    "search": "Search:",
+                    "lengthMenu": "Showing _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                }
+            });
 
-            $('.delete-btn').on('click', function(e) {
+            $(document).on('click', '.delete-btn', function(e) {
                 e.preventDefault();
                 var form = $(this).closest('form');
                 Swal.fire({
@@ -604,16 +653,12 @@
                 });
             });
 
-            $('.assign-btn').on('click', function() {
+            $(document).on('click', '.assign-btn', function() {
                 var id = $(this).data('id');
                 var salesperson = $(this).data('salesperson');
-                var status = $(this).data('status') || 'Pending';
 
                 $('#assign_enquiry_id').val(id);
                 $('#assign_salesperson_id').val(salesperson);
-                // capitalize first letter to match dropdown options
-                status = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
-                $('#assign_status').val(status);
 
                 $('#assignModal').modal('show');
             });
@@ -628,7 +673,6 @@
                     data: {
                         enquiry_id: $('#assign_enquiry_id').val(),
                         salesperson_id: $('#assign_salesperson_id').val(),
-                        status: $('#assign_status').val(),
                         _token: "{{ csrf_token() }}"
                     },
                     success: function(response) {
@@ -656,10 +700,130 @@
             });
 
             // View Notes logic
-            $('.view-notes-btn').on('click', function() {
-                var notes = $(this).data('notes');
-                $('#modal_notes_content').text(notes);
+            $(document).on('click', '.view-notes-btn', function() {
+                var enquiryId = $(this).data('id');
+                $('#note_enquiry_id').val(enquiryId);
+                $('#new_note_date').val('');
+                $('#new_note_text').val('');
+
+                loadNotes(enquiryId);
                 $('#notesModal').modal('show');
+            });
+
+            $('#addNoteForm').on('submit', function(e) {
+                e.preventDefault();
+                var btn = $('#saveNoteBtn');
+                var enquiryId = $('#note_enquiry_id').val();
+
+                btn.prop('disabled', true).text('Saving...');
+
+                $.ajax({
+                    url: "{{ url('admin/general-enquiries') }}/" + enquiryId + "/notes",
+                    type: "POST",
+                    data: {
+                        note_date: $('#new_note_date').val(),
+                        note: $('#new_note_text').val(),
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#new_note_date').val('');
+                            $('#new_note_text').val('');
+                            loadNotes(enquiryId);
+                        } else {
+                            Swal.fire('Error', response.message || 'Error saving note.',
+                                'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'An error occurred while saving the note.', 'error');
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).text('Save Note');
+                    }
+                });
+            });
+
+            function loadNotes(enquiryId) {
+                var notesList = $('#modal_notes_list');
+                notesList.html(
+                    '<div class="text-center p-3"><span class="spinner-border spinner-border-sm"></span> Loading notes...</div>'
+                    );
+
+                $.ajax({
+                    url: "{{ url('admin/general-enquiries') }}/" + enquiryId + "/notes",
+                    type: "GET",
+                    success: function(response) {
+                        if (response.success) {
+                            if (response.notes.length === 0) {
+                                notesList.html(
+                                    '<div class="text-muted text-center p-3">No notes available.</div>'
+                                    );
+                            } else {
+                                var html = '';
+                                response.notes.forEach(function(note) {
+                                    var creator = note.creator_name ? note.creator_name :
+                                        'Unknown';
+                                    var date = note.note_date ? new Date(note.note_date)
+                                        .toLocaleDateString() : '';
+                                    html += `
+                                        <div class="card mb-2 border-0 bg-light">
+                                            <div class="card-body p-3">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <strong>${creator}</strong>
+                                                    <span class="text-muted small"><i class="fas fa-calendar-alt"></i> ${date}</span>
+                                                </div>
+                                                <div style="white-space: pre-wrap; font-size: 14px; color: #444;">${note.note}</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                });
+                                notesList.html(html);
+                            }
+                        }
+                    },
+                    error: function() {
+                        notesList.html(
+                            '<div class="text-danger text-center p-3">Failed to load notes.</div>');
+                    }
+                });
+            }
+
+            // Status Dropdown Change Event
+            $(document).on('change', '.status-dropdown', function() {
+                var select = $(this);
+                var id = select.data('id');
+                var newStatus = select.val();
+
+                select.prop('disabled', true);
+
+                $.ajax({
+                    url: "{{ route('general-enquiries.update-status') }}",
+                    type: "POST",
+                    data: {
+                        enquiry_id: id,
+                        status: newStatus,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        select.prop('disabled', false);
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated!',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        select.prop('disabled', false);
+                        Swal.fire('Error', 'An error occurred while updating status.', 'error');
+                    }
+                });
             });
         });
 

@@ -38,22 +38,22 @@ class AuthController extends Controller
             ]
         );
 
-        // $apiResponse = $this->booknow_otp_sent($mobile, $country_code, $otp);
+        $apiResponse = $this->booknow_otp_sent($mobile, $country_code, $otp);
 
-        // if (!$apiResponse['success']) {
+        if (!$apiResponse['success']) {
 
-        //     return response()->json([
-        //         'status' => false,
-        //         'message' => $apiResponse['message'] ?? 'OTP sending failed',
-        //         'error' => $apiResponse['response'] ?? null
-        //     ], 400);
-        // }
+            return response()->json([
+                'status' => false,
+                'message' => $apiResponse['message'] ?? 'OTP sending failed',
+                'error' => $apiResponse['response'] ?? null
+            ], 400);
+        }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'OTP Sent Successfully',
-            'otp' => $otp // remove in production
-        ]);
+        // return response()->json([
+        //     'status' => true,
+        //     'message' => 'OTP Sent Successfully',
+        //     'otp' => $otp // remove in production
+        // ]);
     }
 
     function booknow_otp_sent($mobile, $country_code, $otp)

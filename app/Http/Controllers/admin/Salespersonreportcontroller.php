@@ -16,7 +16,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Salespersonreportcontroller extends Controller
-
 {
     public function index(Request $request)
     {
@@ -27,6 +26,7 @@ class Salespersonreportcontroller extends Controller
         $salesperson_id = $request->salesperson_id;
         $service_id = $request->service_id;
         $subservice_id = $request->subservice_id;
+        $order_type = $request->order_type;
         $user_data = Auth::user();
 
         $query = DB::table('ci_order_item')
@@ -45,6 +45,11 @@ class Salespersonreportcontroller extends Controller
         }
         if (!empty($salesperson_id)) {
             $query->where("salesperson_id", $salesperson_id);
+        }
+        if ($order_type == 'survey') {
+            $query->where('ci_orders.is_survey_order', 1);
+        } elseif ($order_type == 'manpower') {
+            $query->where('ci_orders.is_manpower_order', 1);
         }
 
         if ($user_data->role_id == 11) {
@@ -70,7 +75,7 @@ class Salespersonreportcontroller extends Controller
             ));
 
             $days = $item->which_day_of_the_week_do_you_want_the_service;
-            $end  = $item->end_date;
+            $end = $item->end_date;
 
             $visit_dates = [];
 
@@ -106,13 +111,42 @@ class Salespersonreportcontroller extends Controller
             foreach ($visit_dates as $vdate) {
 
                 // ✅ APPLY FILTER HERE (IMPORTANT 🔥)
-                if (!empty($startdate) && $vdate < date('Y-m-d', strtotime($startdate))) continue;
-                if (!empty($enddate) && $vdate > date('Y-m-d', strtotime($enddate))) continue;
+                if (!empty($startdate) && $vdate < date('Y-m-d', strtotime($startdate)))
+                    continue;
+                if (!empty($enddate) && $vdate > date('Y-m-d', strtotime($enddate)))
+                    continue;
 
                 $row = clone $item;
 
                 $row->visit_date = $vdate;
-                $row->visit_day  = date('l', strtotime($vdate));
+                $row->visit_day = date('l', strtotime($vdate));
+
+                // 🚫 EXCLUDE FUTURE VISITS
+                if ($vdate > date('Y-m-d')) {
+                    continue;
+                }
+
+                $visit_record = DB::table('ci_order_visits')
+                    ->where('order_id', $row->order_id)
+                    ->where('visit_date', $vdate)
+                    ->first();
+
+                $row->is_cancelled = false;
+                if ($visit_record) {
+                    if ($visit_record->visit_status == 'cancelled') {
+                        $row->is_cancelled = true;
+                    }
+
+                    if (!empty($visit_record->extra_charge)) {
+                        $row->order_total += $visit_record->extra_charge;
+                        if (isset($row->sub_total))
+                            $row->sub_total += $visit_record->extra_charge;
+                        if (isset($row->service_charge))
+                            $row->service_charge += $visit_record->extra_charge;
+                        $row->extra_hours = $visit_record->extra_hours;
+                        $row->extra_charge = $visit_record->extra_charge;
+                    }
+                }
 
                 $final_data[] = $row;
             }
@@ -132,13 +166,18 @@ class Salespersonreportcontroller extends Controller
             ->get();
 
         $data['service_data'] = DB::table('services')->where('is_active', '0')->get();
-        $data['subservice_data'] = DB::table('subservices')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        if (!empty($service_id)) {
+            $data['subservice_data'] = DB::table('subservices')->where('is_active', '0')->where('serviceid', $service_id)->orderBy('id', 'DESC')->get();
+        } else {
+            $data['subservice_data'] = DB::table('subservices')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        }
 
         $data['startdate'] = $startdate;
         $data['enddate'] = $enddate;
         $data['filter_salesperson_id'] = $salesperson_id;
         $data['filter_service_id'] = $service_id;
         $data['filter_subservice_id'] = $subservice_id;
+        $data['filter_order_type'] = $order_type;
 
         // echo "<pre>";
         // print_r($data['salesperson_order_data']);
@@ -158,6 +197,7 @@ class Salespersonreportcontroller extends Controller
         $salesperson_id = $request->filter_salesperson_id;
         $service_id = $request->service_id;
         $subservice_id = $request->subservice_id;
+        $order_type = $request->order_type_fil;
         $user_data = Auth::user();
 
         $query = DB::table('ci_order_item')
@@ -176,6 +216,11 @@ class Salespersonreportcontroller extends Controller
         }
         if (!empty($salesperson_id)) {
             $query->where("salesperson_id", $salesperson_id);
+        }
+        if ($order_type == 'survey') {
+            $query->where('ci_orders.is_survey_order', 1);
+        } elseif ($order_type == 'manpower') {
+            $query->where('ci_orders.is_manpower_order', 1);
         }
 
         if ($user_data->role_id == 11) {
@@ -197,7 +242,7 @@ class Salespersonreportcontroller extends Controller
             ));
 
             $days = $item->which_day_of_the_week_do_you_want_the_service;
-            $end  = $item->end_date;
+            $end = $item->end_date;
 
             $visit_dates = [];
 
@@ -233,13 +278,42 @@ class Salespersonreportcontroller extends Controller
             foreach ($visit_dates as $vdate) {
 
                 // ✅ APPLY FILTER HERE (IMPORTANT 🔥)
-                if (!empty($startdate) && $vdate < date('Y-m-d', strtotime($startdate))) continue;
-                if (!empty($enddate) && $vdate > date('Y-m-d', strtotime($enddate))) continue;
+                if (!empty($startdate) && $vdate < date('Y-m-d', strtotime($startdate)))
+                    continue;
+                if (!empty($enddate) && $vdate > date('Y-m-d', strtotime($enddate)))
+                    continue;
 
                 $row = clone $item;
 
                 $row->visit_date = $vdate;
-                $row->visit_day  = date('l', strtotime($vdate));
+                $row->visit_day = date('l', strtotime($vdate));
+
+                // 🚫 EXCLUDE FUTURE VISITS
+                if ($vdate > date('Y-m-d')) {
+                    continue;
+                }
+
+                $visit_record = DB::table('ci_order_visits')
+                    ->where('order_id', $row->order_id)
+                    ->where('visit_date', $vdate)
+                    ->first();
+
+                $row->is_cancelled = false;
+                if ($visit_record) {
+                    if ($visit_record->visit_status == 'cancelled') {
+                        $row->is_cancelled = true;
+                    }
+
+                    if (!empty($visit_record->extra_charge)) {
+                        $row->order_total += $visit_record->extra_charge;
+                        if (isset($row->sub_total))
+                            $row->sub_total += $visit_record->extra_charge;
+                        if (isset($row->service_charge))
+                            $row->service_charge += $visit_record->extra_charge;
+                        $row->extra_hours = $visit_record->extra_hours;
+                        $row->extra_charge = $visit_record->extra_charge;
+                    }
+                }
 
                 $final_data[] = $row;
             }
@@ -255,8 +329,51 @@ class Salespersonreportcontroller extends Controller
         $total_service_charge = 0;
         $total_vendor_charges = 0;
         $total_vat = 0;
+        $total_profit = 0;
 
         foreach ($final_data as $row) {
+            if (isset($row->is_cancelled) && $row->is_cancelled) {
+                $invoice_amount = 0;
+                $vat_amount = 0;
+                $base_amount = 0;
+                $row->service_charge = 0;
+            } else {
+                $invoice_amount = $row->order_total ?? 0;
+                $vat_amount = $invoice_amount - ($invoice_amount / 1.05);
+                $base_amount = $invoice_amount - $vat_amount;
+            }
+
+            $total_invoice_amt += $invoice_amount;
+            $total_service_charge += $row->service_charge;
+            $total_vat += $vat_amount;
+
+            // Vendor Charge Logic
+            $vendor_payout = 0;
+            $commission = 0;
+            if ($row->vendor_id != 0 && !(isset($row->is_cancelled) && $row->is_cancelled)) {
+                if (!empty($row->subservice_booking_amount) && $row->subservice_booking_amount > 0) {
+                    $commission = $row->subservice_booking_amount;
+                    if (isset($row->extra_charge) && $row->extra_charge > 0) {
+                        $original_invoice = $invoice_amount - $row->extra_charge;
+                        if ($original_invoice > 0) {
+                            $original_vat = $original_invoice - ($original_invoice / 1.05);
+                            $original_base = $original_invoice - $original_vat;
+                            if ($original_base > 0) {
+                                $percentage = $commission / $original_base;
+                                $commission = $base_amount * $percentage;
+                            }
+                        }
+                    }
+                } else {
+                    $commission = ($base_amount * $row->subservice_booking_percentage) / 100;
+                }
+                $vendor_payout = $base_amount - $commission;
+                $total_vendor_charges += $vendor_payout;
+            }
+
+            $order_profit = $invoice_amount - $vat_amount - $vendor_payout;
+
+            // Grouping by Service
             $sName = Helper::servicename($row->service_id);
             if (!isset($service_wise_sales[$sName])) {
                 $service_wise_sales[$sName] = [
@@ -265,26 +382,13 @@ class Salespersonreportcontroller extends Controller
                     'jobs' => 0
                 ];
             }
-            $service_wise_sales[$sName]['invoice_amount'] += $row->order_total;
+            $service_wise_sales[$sName]['invoice_amount'] += $invoice_amount;
             $service_wise_sales[$sName]['jobs'] += 1;
-
-            $total_invoice_amt += $row->order_total;
-            $total_service_charge += $row->service_charge;
-            $total_vat += $row->vatcharge;
-
-            // Vendor Charge Logic
-            $order_vendor_payout = 0;
-            if ($row->vendor_id != 0 && $row->subservice_booking_percentage > 0) {
-                $commission = ($row->sub_total * $row->subservice_booking_percentage) / 100;
-                $order_vendor_payout = $row->sub_total - $commission;
-                $total_vendor_charges += $order_vendor_payout;
-            }
-                    $order_profit = $row->service_charge - $order_vendor_payout;
             $service_wise_sales[$sName]['profit'] += $order_profit;
         }
 
         // Profit calculation
-        $total_profit = $total_service_charge - $total_vendor_charges;
+        $total_profit = $total_invoice_amt - $total_vat - $total_vendor_charges;
 
         // ✅ 2. DRAW THE SUMMARY TABLES IN EXCEL
         $row_num = 1;
@@ -298,14 +402,14 @@ class Salespersonreportcontroller extends Controller
         $sheet->getStyle("A{$row_num}")->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle("A{$row_num}:B{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312'); // Yellow
         $sheet->getStyle("A{$row_num}")->getAlignment()->setHorizontal('center');
-        
+
         $row_num++;
-        
+
         $sheet->setCellValue("A{$row_num}", "Charges");
         $sheet->setCellValue("B{$row_num}", "Total (AED)");
         $sheet->getStyle("A{$row_num}:B{$row_num}")->getFont()->setBold(true);
         $row_num++;
-        
+
         $sheet->setCellValue("A{$row_num}", "Invoice Amount");
         $sheet->setCellValue("B{$row_num}", number_format($total_invoice_amt, 2));
         $row_num++;
@@ -328,7 +432,7 @@ class Salespersonreportcontroller extends Controller
         $sheet->setCellValue("B{$row_num}", number_format($total_profit, 2));
         $sheet->getStyle("A{$row_num}:B{$row_num}")->getFont()->getColor()->setARGB('FFFFFFFF');
         $sheet->getStyle("A{$row_num}:B{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF0040E6'); // Blue
-        
+
         $row_num += 2; // Leave a blank row
 
         // 2nd Table: Service wise Sales
@@ -337,7 +441,7 @@ class Salespersonreportcontroller extends Controller
         $sheet->getStyle("A{$row_num}")->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312'); // Yellow
         $sheet->getStyle("A{$row_num}")->getAlignment()->setHorizontal('center');
-        
+
         $row_num++;
 
         $sheet->setCellValue("A{$row_num}", 'Services');
@@ -350,7 +454,7 @@ class Salespersonreportcontroller extends Controller
 
         foreach ($service_wise_sales as $name => $data) {
             $percentage = 0;
-            if($data['invoice_amount'] > 0){
+            if ($data['invoice_amount'] > 0) {
                 $percentage = ($data['profit'] / $data['invoice_amount']) * 100;
             }
             $sheet->setCellValue("A{$row_num}", $name);
@@ -362,7 +466,7 @@ class Salespersonreportcontroller extends Controller
         }
 
         $total_percentage = 0;
-        if($total_invoice_amt > 0){
+        if ($total_invoice_amt > 0) {
             $total_percentage = ($total_profit / $total_invoice_amt) * 100;
         }
 
@@ -371,12 +475,12 @@ class Salespersonreportcontroller extends Controller
         $sheet->setCellValue("C{$row_num}", number_format($total_profit, 2));
         $sheet->setCellValue("D{$row_num}", number_format($total_percentage, 2) . '%');
         $sheet->setCellValue("E{$row_num}", count($final_data));
-        
+
         $sheet->getStyle("A{$row_num}:E{$row_num}")->getFont()->setBold(true);
         $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312');
 
         $row_num += 2; // Leave a blank row
-        
+
         // ✅ 3. START ORDER LISTING BELOW SUMMARY
         // Table Header for Orders
         $order_headers = ['Booking Date', 'Service Type', 'Order Id', 'Sales Person', 'Customer', 'Vendor', 'Vendor Charge', 'Profit'];
@@ -391,11 +495,23 @@ class Salespersonreportcontroller extends Controller
 
         // Fill Order Data
         foreach ($final_data as $order) {
-            $v_payout = 0;
-            if ($order->vendor_id != 0 && $order->subservice_booking_percentage > 0) {
-                $comm = ($order->sub_total * $order->subservice_booking_percentage) / 100;
-                $v_payout = ($order->sub_total - $comm);
+            $invoice_amount = $order->order_total ?? 0;
+            $vat_amount = $invoice_amount - ($invoice_amount / 1.05);
+            $base_amount = $invoice_amount - $vat_amount;
+
+            $vendor_payout = 0;
+            $commission = 0;
+
+            if ($order->vendor_id != 0) {
+                if (!empty($order->subservice_booking_amount) && $order->subservice_booking_amount > 0) {
+                    $commission = $order->subservice_booking_amount;
+                } else {
+                    $commission = ($base_amount * $order->subservice_booking_percentage) / 100;
+                }
+                $vendor_payout = $base_amount - $commission;
             }
+
+            $order_profit = $invoice_amount - $vat_amount - $vendor_payout;
 
             $sheet->setCellValue("A{$row_num}", $order->visit_date);
             $sheet->setCellValue("B{$row_num}", Helper::servicename($order->service_id));
@@ -403,8 +519,8 @@ class Salespersonreportcontroller extends Controller
             $sheet->setCellValue("D{$row_num}", Helper::salesperson($order->salesperson_id));
             $sheet->setCellValue("E{$row_num}", $order->name ?? 'N/A');
             $sheet->setCellValue("F{$row_num}", ($order->vendor_id != 0) ? Helper::vendorsname($order->vendor_id) : '-');
-            $sheet->setCellValue("G{$row_num}", number_format($v_payout, 2));
-            $sheet->setCellValue("H{$row_num}", number_format($order->service_charge - $v_payout, 2));
+            $sheet->setCellValue("G{$row_num}", number_format($vendor_payout, 2, '.', ''));
+            $sheet->setCellValue("H{$row_num}", number_format($order_profit, 2, '.', ''));
             $row_num++;
         }
 

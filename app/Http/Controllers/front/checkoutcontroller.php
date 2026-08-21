@@ -313,66 +313,6 @@ class checkoutcontroller extends Controller
                     'updated_at' => now(),
                 ]);
                 Session::forget('booknow_pending_lead_id');
-            } else {
-                $pendingLeadId = Session::get('booknow_pending_lead_id');
-                if ($pendingLeadId) {
-                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                        'status' => 'Booked',
-                        'updated_at' => now(),
-                    ]);
-                    Session::forget('booknow_pending_lead_id');
-                } else {
-                    $pendingLeadId = Session::get('booknow_pending_lead_id');
-                    if ($pendingLeadId) {
-                        DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                            'status' => 'Booked',
-                            'updated_at' => now(),
-                        ]);
-                        Session::forget('booknow_pending_lead_id');
-                    } else {
-                        $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
-                        $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
-
-                        $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
-                        $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
-                        $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
-                        $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
-                        if ($pastOrders > 0 && $repeatedSourceId) {
-                            $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
-                        } else {
-                            $sourceLeadId = $sourceWebsiteId;
-                        }
-
-                        $salespersonId = null;
-                        if ($pastOrders > 0) {
-                            $lastOrder = DB::table('ci_orders')
-                                ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
-                                ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
-                                ->whereNotNull('ci_order_item.salesperson_id')
-                                ->orderBy('ci_orders.order_id', 'desc')
-                                ->select('ci_order_item.salesperson_id')
-                                ->first();
-                            if ($lastOrder) {
-                                $salespersonId = $lastOrder->salesperson_id;
-                            }
-                        }
-
-                        DB::table('general_enquiries')->insert([
-                            'salesperson_id' => $salespersonId,
-                            'customer_id' => $arrData['user_info_id'] ?? null,
-                            'customer_name' => $customerInfo ? $customerInfo->name : null,
-                            'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
-                            'customer_email' => $customerInfo ? $customerInfo->email : null,
-                            'country_code' => $customerInfo ? $customerInfo->country_code : null,
-                            'service_id' => $arrData['service_id'] ?? null,
-                            'subservice_id' => $arrData['subservice_id'] ?? null,
-                            'source_lead_id' => $sourceLeadId,
-                            'status' => 'Booked',
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                    }
-                }
             }
         }
 
@@ -479,6 +419,8 @@ class checkoutcontroller extends Controller
             }
         }
 
+        $CIData = DB::table('ci_orders')->where('order_id', $arrOrderId)->first();
+
         if ($id == 1) {
             $success = $this->success_mail();
             if ($success) {
@@ -499,7 +441,7 @@ class checkoutcontroller extends Controller
                             'product_data' => [
                                 'name' => 'Your Total'
                             ],
-                            'unit_amount' => $order_total_new * 100,
+                            'unit_amount' => $CIData->order_total * 100,
                         ],
                         'quantity' => 1,
                     ],
@@ -949,69 +891,7 @@ class checkoutcontroller extends Controller
                     'updated_at' => now(),
                 ]);
                 Session::forget('booknow_pending_lead_id');
-            } else {
-                $pendingLeadId = Session::get('booknow_pending_lead_id');
-                if ($pendingLeadId) {
-                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                        'status' => 'Booked',
-                        'updated_at' => now(),
-                    ]);
-                    Session::forget('booknow_pending_lead_id');
-                } else {
-                    $pendingLeadId = Session::get('booknow_pending_lead_id');
-                    if ($pendingLeadId) {
-                        DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                            'status' => 'Booked',
-                            'updated_at' => now(),
-                        ]);
-                        Session::forget('booknow_pending_lead_id');
-                    } else {
-                        $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
-                        $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
-
-                        $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
-                        $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
-                        $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
-                        $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
-                        if ($pastOrders > 0 && $repeatedSourceId) {
-                            $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
-                        } else {
-                            $sourceLeadId = $sourceWebsiteId;
-                        }
-
-                        $salespersonId = null;
-                        if ($pastOrders > 0) {
-                            $lastOrder = DB::table('ci_orders')
-                                ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
-                                ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
-                                ->whereNotNull('ci_order_item.salesperson_id')
-                                ->orderBy('ci_orders.order_id', 'desc')
-                                ->select('ci_order_item.salesperson_id')
-                                ->first();
-                            if ($lastOrder) {
-                                $salespersonId = $lastOrder->salesperson_id;
-                            }
-                        }
-
-                        DB::table('general_enquiries')->insert([
-                            'salesperson_id' => $salespersonId,
-                            'customer_id' => $arrData['user_info_id'] ?? null,
-                            'customer_name' => $customerInfo ? $customerInfo->name : null,
-                            'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
-                            'customer_email' => $customerInfo ? $customerInfo->email : null,
-                            'country_code' => $customerInfo ? $customerInfo->country_code : null,
-                            'service_id' => $arrData['service_id'] ?? null,
-                            'subservice_id' => $arrData['subservice_id'] ?? null,
-                            'source_lead_id' => $sourceLeadId,
-                            'status' => 'Booked',
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                    }
-                }
-            }
-
-            // --- START: RECURRING BOOKING GENERATION LOGIC ---
+            } // --- START: RECURRING BOOKING GENERATION LOGIC ---
             $frequency = $request->how_often_do_you_need_cleaning ?? 'Once';
 
             if (!empty($frequency) && $frequency != 'Once') {
@@ -1251,21 +1131,25 @@ class checkoutcontroller extends Controller
                 }
             }
 
+            $CIData = DB::table('ci_orders')->where('order_id', $arrOrderId)->first();
+
             Session::put('painting_service_name', $type_of_paintingInset);
             if ($payment_type == 'COD') {
                 // echo"here";exit;
-                $success = $this->success_mail_book_now();
-                $success_vendor = $this->success_mail_book_now_allvendor();
-                if ($success) {
-                    // Redirect to the 'thankyou' route
+                $this->send_success_mail_api();
+                $this->send_vendor_lead_mail_api();
+                // $success = $this->success_mail_book_now();
+                // $success_vendor = $this->success_mail_book_now_allvendor();
+                // if ($success) {
+                // Redirect to the 'thankyou' route
 
-                    if ($isPaintingData == "" && empty($isPaintingData)) {
+                if ($isPaintingData == "" && empty($isPaintingData)) {
 
-                        return redirect(route('thankyou_book_now'));
-                    } else {
-                        return redirect(route('thankyou-book-now'));
-                    }
+                    return redirect(route('thankyou_book_now'));
+                } else {
+                    return redirect(route('thankyou-book-now'));
                 }
+                // }
             } elseif ($payment_type == 'TABBY') {
                 $tabbyService = app(\App\Services\TabbyService::class);
 
@@ -1304,7 +1188,7 @@ class checkoutcontroller extends Controller
                                 'product_data' => [
                                     'name' => 'Your Total'
                                 ],
-                                'unit_amount' => $order_total_new * 100,
+                                'unit_amount' => $CIData->order_total * 100,
                             ],
                             'quantity' => 1,
                         ],
@@ -1438,24 +1322,7 @@ class checkoutcontroller extends Controller
                     'updated_at' => now(),
                 ]);
                 Session::forget('booknow_pending_lead_id');
-            } else {
-                $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
-                $customerInfo = DB::table('frontloginregisters')->where('id', $userdata['userid'] ?? 0)->first();
-                DB::table('general_enquiries')->insert([
-                    'customer_id' => $userdata['userid'] ?? null,
-                    'customer_name' => $customerInfo ? $customerInfo->name : ($arrayOfWoodenEnquiry['name'] ?? null),
-                    'customer_phone' => $customerInfo ? $customerInfo->mobile : ($arrayOfWoodenEnquiry['mobile'] ?? null),
-                    'customer_email' => $customerInfo ? $customerInfo->email : ($arrayOfWoodenEnquiry['email'] ?? null),
-                    'country_code' => $customerInfo ? $customerInfo->country_code : null,
-                    'service_id' => $arrayOfWoodenEnquiry['service_id'] ?? null,
-                    'subservice_id' => $arrayOfWoodenEnquiry['subservice_id'] ?? null,
-                    'source_lead_id' => $sourceWebsite ? $sourceWebsite->id : null,
-                    'status' => 'Booked',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-            // $processed_text = "WoodenFloor";
+            } // $processed_text = "WoodenFloor";
             // $yearForId =date('y');
             // $data_u['inquiry_id'] = "IQ-".$processed_text."-" . $yearForId ."-". sprintf("%06d", $enquiryInsertId);
             // DB::table('wooden_floor_enquiry')->where('id', $enquiryInsertId)->update($data_u);
@@ -1579,24 +1446,7 @@ class checkoutcontroller extends Controller
                     'updated_at' => now(),
                 ]);
                 Session::forget('booknow_pending_lead_id');
-            } else {
-                $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
-                $customerInfo = DB::table('frontloginregisters')->where('id', $userdata['userid'] ?? 0)->first();
-                DB::table('general_enquiries')->insert([
-                    'customer_id' => $userdata['userid'] ?? null,
-                    'customer_name' => $customerInfo ? $customerInfo->name : ($arrayOfEnquiry['name'] ?? null),
-                    'customer_phone' => $customerInfo ? $customerInfo->mobile : ($arrayOfEnquiry['mobile'] ?? null),
-                    'customer_email' => $customerInfo ? $customerInfo->email : ($arrayOfEnquiry['email'] ?? null),
-                    'country_code' => $customerInfo ? $customerInfo->country_code : null,
-                    'service_id' => $arrayOfEnquiry['service_id'] ?? null,
-                    'subservice_id' => $arrayOfEnquiry['subservice_id'] ?? null,
-                    'source_lead_id' => $sourceWebsite ? $sourceWebsite->id : null,
-                    'status' => 'Booked',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-            //   $processed_text = "Painting";
+            } //   $processed_text = "Painting";
             //   $yearForId =date('y');
             //   $data_u['inquiry_id'] = "IQ-".$processed_text."-" . $yearForId ."-". sprintf("%06d", $enquiryInsertId);
             //DB::table('painting_enquiry')->where('id', $enquiryInsertId)->update($data_u);
@@ -1710,25 +1560,7 @@ class checkoutcontroller extends Controller
                     'updated_at' => now(),
                 ]);
                 Session::forget('booknow_pending_lead_id');
-            } else {
-                $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
-                $customerInfo = DB::table('frontloginregisters')->where('id', $userdata['userid'] ?? 0)->first();
-                DB::table('general_enquiries')->insert([
-                    'customer_id' => $userdata['userid'] ?? null,
-                    'customer_name' => $customerInfo ? $customerInfo->name : ($data['name'] ?? null),
-                    'customer_phone' => $customerInfo ? $customerInfo->mobile : ($data['mobile'] ?? null),
-                    'customer_email' => $customerInfo ? $customerInfo->email : ($data['email'] ?? null),
-                    'country_code' => $customerInfo ? $customerInfo->country_code : null,
-                    'service_id' => $data['service_id'] ?? null,
-                    'subservice_id' => $data['subservice_id'] ?? null,
-                    'source_lead_id' => $sourceWebsite ? $sourceWebsite->id : null,
-                    'status' => 'Booked',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-
-            // $service_name = \Helper::servicename($package_data_n->service_id);
+            } // $service_name = \Helper::servicename($package_data_n->service_id);
 
             // $processed_text = strtoupper(str_replace(' ', '', $service_name));
 
@@ -2066,24 +1898,26 @@ class checkoutcontroller extends Controller
 
                 $item = DB::table('ci_order_item')->where('order_id', $order_number)->first();
 
-                $success = $this->success_mail_book_now();
-                $success_vendor = $this->success_mail_book_now_allvendor();
-                if ($success) {
+                $this->send_success_mail_api();
+                $this->send_vendor_lead_mail_api();
+                // $success = $this->success_mail_book_now();
+                // $success_vendor = $this->success_mail_book_now_allvendor();
+                // if ($success) {
 
-                    if ($item->service_id == 45) {
-                        return redirect()->route('cleaning.thankyou_book_now');
-                    } elseif ($item->service_id == 48) {
-                        return redirect()->route('saloon_spa.thankyou_book_now');
-                    } elseif ($item->service_id == 34) {
-                        return redirect()->route('hanyman.thankyou_book_now');
-                    } elseif ($item->service_id == 47) {
-                        return redirect()->route('pest_control.thankyou_book_now');
-                    } else {
-                        return redirect(route('thankyou_book_now'));
-                    }
-                    // Redirect to the 'thankyou' route
-
+                if ($item->service_id == 45) {
+                    return redirect()->route('cleaning.thankyou_book_now');
+                } elseif ($item->service_id == 48) {
+                    return redirect()->route('saloon_spa.thankyou_book_now');
+                } elseif ($item->service_id == 34) {
+                    return redirect()->route('hanyman.thankyou_book_now');
+                } elseif ($item->service_id == 47) {
+                    return redirect()->route('pest_control.thankyou_book_now');
+                } else {
+                    return redirect(route('thankyou_book_now'));
                 }
+                // Redirect to the 'thankyou' route
+
+                // }
             }
         } else {
             return redirect()->route('payment_fail');
@@ -3349,7 +3183,7 @@ class checkoutcontroller extends Controller
 
 
 
-        $this->success_msg_whatsapp_customer($userid, $order_number);
+        \Helper::success_msg_whatsapp_customer($userid, $order_number);
 
         return true;
 
@@ -3638,7 +3472,7 @@ class checkoutcontroller extends Controller
                     }
 
                     // WhatsApp message
-                    $this->success_msg_whatsapp_allVendor($vendor->id, $order_number);
+                    \Helper::success_msg_whatsapp_allVendor($vendor->id, $order_number);
                 } catch (\Exception $e) {
                     \Log::error('Vendor mail failed (' . $vendor->email . '): ' . $e->getMessage());
                 }
@@ -3649,316 +3483,10 @@ class checkoutcontroller extends Controller
     }
 
 
-    function success_msg_whatsapp_allVendor($vendor_id, $order_number)
-    {
-
-        // echo "sd";exit;
-
-        // $vendor_id = '100028';
-        // $order_number = '349';
-        $vendors = DB::table('users')->where('id', $vendor_id)->where('is_active', 0)->first();
-        $vendors_attribute = DB::table('vendors_attribute')->where('pid', $vendors->id)->get();
-
-        $orders = DB::table('ci_orders as o')
-            ->select('o.*')
-            ->where('o.order_id', $order_number)
-            ->where('o.payment_status', 'Success') // ✅ Only successful payments
-            ->orderByDesc('o.order_id')
-            ->get()
-            ->map(function ($order) {
-                $order->items = DB::table('ci_order_item as i')
-                    ->where('i.order_id', $order->order_id)
-                    ->select('i.*')
-                    ->get()
-                    ->map(function ($item) {
-                        $item->packages = DB::table('ci_order_item_packages as p')
-                            ->where('p.order_item_id', $item->id)
-                            ->select('p.*')
-                            ->get();
-                        return $item;
-                    });
-                return $order;
-            });
-
-        $firstItem = $orders->flatMap->items->first();
-
-        $subservice = \Helper::subservicename($firstItem->subservice_id);
-
-        // echo"<pre>";print_r($vendors);echo"";
-        // echo"<pre>";print_r($subservice);echo"";
-        // exit;
-
-        $phone = $vendors->country_code . '' . $vendors->mobile;
-
-
-        if (isset($vendors->country_code) && isset($vendors->mobile)) {
-            // $curl = curl_init();
-
-            // curl_setopt_array($curl, array(
-            //     CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => '{"messages":[{"to":"' . $phone . '","content":{"templateName":"new_booking_alert","language":"en","templateData":{"body":{"placeholders":["' . $subservice . '"]},"buttons":[{"type":"URL"}]}}}]}',
-            //     CURLOPT_HTTPHEADER => array(
-            //         'accept: application/json',
-            //         'content-type: application/json',
-            //         'Authorization: key_uTZeOXQPMd'
-            //     ),
-            // ));
-
-            // $response = curl_exec($curl);
-
-            // curl_close($curl);
-
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '
-            {
-            "messages": [
-                {
-                "content": {
-                    "language": "en",
-                    "templateData": {
-                    "body": {
-                        "placeholders": [
-                        "' . $subservice . '"
-                        ]
-                    }
-                    },
-                    "templateName": "new_booking_alert"
-                },
-                "from": "+971503204846",
-                "to": "' . $phone . '"
-                }
-            ]
-            }
-            ',
-                CURLOPT_HTTPHEADER => array(
-                    'Authorization: key_uTZeOXQPMd',
-                    'accept: application/json',
-                    'content-type: application/json'
-                ),
-            ));
-
-            $response = curl_exec($curl);
-
-            curl_close($curl);
-
-            $response = json_decode($response, true);
-        }
-
-        if (isset($vendors_attribute) && count($vendors_attribute) > 0) {
-
-            foreach ($vendors_attribute as $vendorAtt) {
-
-                $vendorAttphone = $vendorAtt->country_code . '' . $vendorAtt->telephone;
-                if (isset($vendorAtt->country_code) && isset($vendorAtt->telephone)) {
-                    // $curl = curl_init();
-
-                    // curl_setopt_array($curl, array(
-                    //     CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
-                    //     CURLOPT_RETURNTRANSFER => true,
-                    //     CURLOPT_ENCODING => '',
-                    //     CURLOPT_MAXREDIRS => 10,
-                    //     CURLOPT_TIMEOUT => 0,
-                    //     CURLOPT_FOLLOWLOCATION => true,
-                    //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    //     CURLOPT_CUSTOMREQUEST => 'POST',
-                    //     CURLOPT_POSTFIELDS => '{"messages":[{"to":"' . $vendorAttphone . '","content":{"templateName":"new_booking_alert","language":"en","templateData":{"body":{"placeholders":["' . $subservice . '"]},"buttons":[{"type":"URL"}]}}}]}',
-                    //     CURLOPT_HTTPHEADER => array(
-                    //         'accept: application/json',
-                    //         'content-type: application/json',
-                    //         'Authorization: key_uTZeOXQPMd'
-                    //     ),
-                    // ));
-
-                    // $response = curl_exec($curl);
-
-                    // curl_close($curl);
-
-                    $curl = curl_init();
-
-                    curl_setopt_array($curl, array(
-                        CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_ENCODING => '',
-                        CURLOPT_MAXREDIRS => 10,
-                        CURLOPT_TIMEOUT => 0,
-                        CURLOPT_FOLLOWLOCATION => true,
-                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                        CURLOPT_CUSTOMREQUEST => 'POST',
-                        CURLOPT_POSTFIELDS => '
-                    {
-                    "messages": [
-                        {
-                        "content": {
-                            "language": "en",
-                            "templateData": {
-                            "body": {
-                                "placeholders": [
-                                "' . $subservice . '"
-                                ]
-                            }
-                            },
-                            "templateName": "new_booking_alert"
-                        },
-                        "from": "+971503204846",
-                        "to": "' . $vendorAttphone . '"
-                        }
-                    ]
-                    }
-                    ',
-                        CURLOPT_HTTPHEADER => array(
-                            'Authorization: key_uTZeOXQPMd',
-                            'accept: application/json',
-                            'content-type: application/json'
-                        ),
-                    ));
-
-                    $response = curl_exec($curl);
-
-                    curl_close($curl);
-
-                    $response = json_decode($response, true);
-                }
-            }
-        }
 
 
 
-        return true;
-        //echo"<pre>";print_r($response);echo"";exit;
-    }
 
-
-    function success_msg_whatsapp_customer($userid, $order_number)
-    {
-
-        $userdata = DB::table('frontloginregisters')->where('id', $userid)->first();
-        $orders = DB::table('ci_orders as o')
-            ->select('o.*')
-            ->where('o.order_id', $order_number)
-            ->where('o.payment_status', 'Success') // ✅ Only successful payments
-            ->orderByDesc('o.order_id')
-            ->get()
-            ->map(function ($order) {
-                $order->items = DB::table('ci_order_item as i')
-                    ->where('i.order_id', $order->order_id)
-                    ->select('i.*')
-                    ->get()
-                    ->map(function ($item) {
-                        $item->packages = DB::table('ci_order_item_packages as p')
-                            ->where('p.order_item_id', $item->id)
-                            ->select('p.*')
-                            ->get();
-                        return $item;
-                    });
-                return $order;
-            });
-
-        $firstItem = $orders->flatMap->items->first();
-
-        $subservice = \Helper::subservicename($firstItem->subservice_id);
-        // echo"<pre>";print_r($userdata);echo"";
-        // echo"<pre>";print_r($subservice);echo"";
-        // exit;
-        $phone = $userdata->country_code . '' . $userdata->mobile;
-        $customer_name = $userdata->name;
-        if (isset($userdata->country_code) && isset($userdata->mobile)) {
-            // $curl = curl_init();
-
-            // curl_setopt_array($curl, array(
-            //     CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => '{"messages":[{"to":"' . $phone . '","content":{"templateName":"service_requested","language":"en","templateData":{"body":{"placeholders":["' . $customer_name . '","' . $subservice . '"]},"buttons":[{"type":"URL","parameter": "' . $order_number . '"}]}}}]}',
-            //     CURLOPT_HTTPHEADER => array(
-            //         'accept: application/json',
-            //         'content-type: application/json',
-            //         'Authorization: key_uTZeOXQPMd'
-            //     ),
-            // ));
-
-            // $response = curl_exec($curl);
-
-            // curl_close($curl);
-
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '
-                {
-                "messages": [
-                    {
-                    "content": {
-                        "language": "en",
-                        "templateData": {
-                        "body": {
-                            "placeholders": [
-                            "' . $customer_name . '",
-                            "' . $subservice . '"
-                            ]
-                        },
-                        "buttons": [
-                            {
-                            "type": "URL",
-                            "parameter": "' . $order_number . '"
-                            }
-                        ]
-                        },
-                        "templateName": "service_requested"
-                    },
-                    "from": "+971503204846",
-                    "to": "' . $phone . '"
-                    }
-                ]
-                }
-                ',
-                CURLOPT_HTTPHEADER => array(
-                    'Authorization: key_uTZeOXQPMd',
-                    'accept: application/json',
-                    'content-type: application/json'
-                ),
-            ));
-
-            $response = curl_exec($curl);
-
-            curl_close($curl);
-
-            $response = json_decode($response, true);
-        }
-        return true;
-
-        //frontloginregisters
-
-    }
 
 
 
@@ -4867,7 +4395,8 @@ class checkoutcontroller extends Controller
 
         // Add package duration to end_date
         $package_duration_months = (int) $request->package_duration_months;
-        if ($package_duration_months < 1) $package_duration_months = 1;
+        if ($package_duration_months < 1)
+            $package_duration_months = 1;
         $end_date = date('Y-m-d', strtotime($formatted_date . " +{$package_duration_months} months"));
 
         $arrData = array(
@@ -4904,68 +4433,7 @@ class checkoutcontroller extends Controller
                 'updated_at' => now(),
             ]);
             Session::forget('booknow_pending_lead_id');
-        } else {
-            $pendingLeadId = Session::get('booknow_pending_lead_id');
-            if ($pendingLeadId) {
-                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                    'status' => 'Booked',
-                    'updated_at' => now(),
-                ]);
-                Session::forget('booknow_pending_lead_id');
-            } else {
-                $pendingLeadId = Session::get('booknow_pending_lead_id');
-                if ($pendingLeadId) {
-                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                        'status' => 'Booked',
-                        'updated_at' => now(),
-                    ]);
-                    Session::forget('booknow_pending_lead_id');
-                } else {
-                    $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
-                    $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
-
-                    $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
-                    $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
-                    $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
-                    $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
-                    if ($pastOrders > 0 && $repeatedSourceId) {
-                        $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
-                    } else {
-                        $sourceLeadId = $sourceWebsiteId;
-                    }
-
-                    $salespersonId = null;
-                    if ($pastOrders > 0) {
-                        $lastOrder = DB::table('ci_orders')
-                            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
-                            ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
-                            ->whereNotNull('ci_order_item.salesperson_id')
-                            ->orderBy('ci_orders.order_id', 'desc')
-                            ->select('ci_order_item.salesperson_id')
-                            ->first();
-                        if ($lastOrder) {
-                            $salespersonId = $lastOrder->salesperson_id;
-                        }
-                    }
-
-                    DB::table('general_enquiries')->insert([
-                        'salesperson_id' => $salespersonId,
-                        'customer_id' => $arrData['user_info_id'] ?? null,
-                        'customer_name' => $customerInfo ? $customerInfo->name : null,
-                        'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
-                        'customer_email' => $customerInfo ? $customerInfo->email : null,
-                        'country_code' => $customerInfo ? $customerInfo->country_code : null,
-                        'service_id' => $arrData['service_id'] ?? null,
-                        'subservice_id' => $arrData['subservice_id'] ?? null,
-                        'source_lead_id' => $sourceLeadId,
-                        'status' => 'Booked',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-            }
         }
-
         $data = [];
         $data['first_name'] = "";
         $data['last_name'] = "";
@@ -4986,13 +4454,17 @@ class checkoutcontroller extends Controller
 
         session()->forget('coupan_data');
 
+        $CIData = DB::table('ci_orders')->where('order_id', $arrOrderId)->first();
+
         if ($payment_type == 'COD') {
-            $success = $this->success_mail_book_now();
-            $success_vendor = $this->success_mail_book_now_allvendor();
-            if ($success) {
-                return response()->json(['status' => 'success', 'redirect' => route('cleaning.thankyou_book_now')]);
-            }
+            // $success = $this->success_mail_book_now();
+            // $success_vendor = $this->success_mail_book_now_allvendor();
+            $this->send_success_mail_api();
+            $this->send_vendor_lead_mail_api();
+            // if ($success) {
             return response()->json(['status' => 'success', 'redirect' => route('cleaning.thankyou_book_now')]);
+            // }
+            // return response()->json(['status' => 'success', 'redirect' => route('cleaning.thankyou_book_now')]);
         } else {
             $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
 
@@ -5004,7 +4476,7 @@ class checkoutcontroller extends Controller
                             'product_data' => [
                                 'name' => 'Your Total'
                             ],
-                            'unit_amount' => $order_total_new * 100,
+                            'unit_amount' => $CIData->order_total * 100,
                         ],
                         'quantity' => 1,
                     ],
@@ -5077,6 +4549,7 @@ class checkoutcontroller extends Controller
         $coupon_discounted = 0;
         $coupan_code_name = "";
 
+        // $order_total_new = $request->sub_total + $vat_total;
         $order_total_new = $request->sub_total + $vat_total;
 
         if (Session::has('coupan_data')) {
@@ -5269,6 +4742,10 @@ class checkoutcontroller extends Controller
             'time_slot' => $request->time_slot,
             'end_date' => $end_date,
             'which_day_of_the_week_do_you_want_the_service' => $which_day_of_the_week_do_you_want_the_service,
+            'plate_source' => ($request->subservice_id == 93) ? $request->plate_source : '',
+            'plate_code' => ($request->subservice_id == 93) ? $request->plate_code : '',
+            'plate_number' => ($request->subservice_id == 93) ? $request->plate_number : '',
+            'describe_your_car' => ($request->subservice_id == 93) ? $request->car_description : '',
             'cdate' => date('Y-m-d'),
         );
 
@@ -5281,69 +4758,7 @@ class checkoutcontroller extends Controller
                 'updated_at' => now(),
             ]);
             Session::forget('booknow_pending_lead_id');
-        } else {
-            $pendingLeadId = Session::get('booknow_pending_lead_id');
-            if ($pendingLeadId) {
-                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                    'status' => 'Booked',
-                    'updated_at' => now(),
-                ]);
-                Session::forget('booknow_pending_lead_id');
-            } else {
-                $pendingLeadId = Session::get('booknow_pending_lead_id');
-                if ($pendingLeadId) {
-                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                        'status' => 'Booked',
-                        'updated_at' => now(),
-                    ]);
-                    Session::forget('booknow_pending_lead_id');
-                } else {
-                    $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
-                    $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
-
-                    $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
-                    $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
-                    $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
-                    $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
-                    if ($pastOrders > 0 && $repeatedSourceId) {
-                        $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
-                    } else {
-                        $sourceLeadId = $sourceWebsiteId;
-                    }
-
-                    $salespersonId = null;
-                    if ($pastOrders > 0) {
-                        $lastOrder = DB::table('ci_orders')
-                            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
-                            ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
-                            ->whereNotNull('ci_order_item.salesperson_id')
-                            ->orderBy('ci_orders.order_id', 'desc')
-                            ->select('ci_order_item.salesperson_id')
-                            ->first();
-                        if ($lastOrder) {
-                            $salespersonId = $lastOrder->salesperson_id;
-                        }
-                    }
-
-                    DB::table('general_enquiries')->insert([
-                        'salesperson_id' => $salespersonId,
-                        'customer_id' => $arrData['user_info_id'] ?? null,
-                        'customer_name' => $customerInfo ? $customerInfo->name : null,
-                        'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
-                        'customer_email' => $customerInfo ? $customerInfo->email : null,
-                        'country_code' => $customerInfo ? $customerInfo->country_code : null,
-                        'service_id' => $arrData['service_id'] ?? null,
-                        'subservice_id' => $arrData['subservice_id'] ?? null,
-                        'source_lead_id' => $sourceLeadId,
-                        'status' => 'Booked',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-            }
-        }
-
-        // --- START: RECURRING BOOKING GENERATION LOGIC ---
+        } // --- START: RECURRING BOOKING GENERATION LOGIC ---
         $frequency = $request->how_often_do_you_need_cleaning ?? 'Once';
 
         if (!empty($frequency) && $frequency != 'Once') {
@@ -5403,16 +4818,19 @@ class checkoutcontroller extends Controller
         session()->forget('coupan_data');
         session()->forget('addons_cart');
 
+        $CIData = DB::table('ci_orders')->where('order_id', $arrOrderId)->first();
+
         if ($payment_type == 'COD') {
+            $this->send_success_mail_api();
+            $this->send_vendor_lead_mail_api();
+            // $success = $this->success_mail_book_now();
+            // $success_vendor = $this->success_mail_book_now_allvendor();
+            // if ($success) {
+            // Redirect to the 'thankyou' route
 
-            $success = $this->success_mail_book_now();
-            $success_vendor = $this->success_mail_book_now_allvendor();
-            if ($success) {
-                // Redirect to the 'thankyou' route
 
-
-                return redirect()->route('cleaning.thankyou_book_now');
-            }
+            return redirect()->route('cleaning.thankyou_book_now');
+            // }
         } else {
 
             $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
@@ -5425,7 +4843,7 @@ class checkoutcontroller extends Controller
                             'product_data' => [
                                 'name' => 'Your Total'
                             ],
-                            'unit_amount' => $order_total_new * 100,
+                            'unit_amount' => $CIData->order_total * 100,
                         ],
                         'quantity' => 1,
                     ],
@@ -5690,6 +5108,10 @@ class checkoutcontroller extends Controller
             'month' => $request->month,
             'time_slot' => $request->time_slot,
             'end_date' => $end_date,
+            'plate_source' => ($request->subservice_id == 93) ? $request->plate_source : '',
+            'plate_code' => ($request->subservice_id == 93) ? $request->plate_code : '',
+            'plate_number' => ($request->subservice_id == 93) ? $request->plate_number : '',
+            'describe_your_car' => ($request->subservice_id == 93) ? $request->car_description : '',
             'cdate' => date('Y-m-d'),
         );
 
@@ -5702,68 +5124,7 @@ class checkoutcontroller extends Controller
                 'updated_at' => now(),
             ]);
             Session::forget('booknow_pending_lead_id');
-        } else {
-            $pendingLeadId = Session::get('booknow_pending_lead_id');
-            if ($pendingLeadId) {
-                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                    'status' => 'Booked',
-                    'updated_at' => now(),
-                ]);
-                Session::forget('booknow_pending_lead_id');
-            } else {
-                $pendingLeadId = Session::get('booknow_pending_lead_id');
-                if ($pendingLeadId) {
-                    DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                        'status' => 'Booked',
-                        'updated_at' => now(),
-                    ]);
-                    Session::forget('booknow_pending_lead_id');
-                } else {
-                    $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
-                    $customerInfo = DB::table('frontloginregisters')->where('id', $arrData['user_info_id'] ?? 0)->first();
-
-                    $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
-                    $pastOrders = DB::table('ci_orders')->where('user_id', $arrData['user_info_id'] ?? 0)->count();
-                    $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
-                    $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
-                    if ($pastOrders > 0 && $repeatedSourceId) {
-                        $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
-                    } else {
-                        $sourceLeadId = $sourceWebsiteId;
-                    }
-
-                    $salespersonId = null;
-                    if ($pastOrders > 0) {
-                        $lastOrder = DB::table('ci_orders')
-                            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
-                            ->where('ci_orders.user_id', $arrData['user_info_id'] ?? 0)
-                            ->whereNotNull('ci_order_item.salesperson_id')
-                            ->orderBy('ci_orders.order_id', 'desc')
-                            ->select('ci_order_item.salesperson_id')
-                            ->first();
-                        if ($lastOrder) {
-                            $salespersonId = $lastOrder->salesperson_id;
-                        }
-                    }
-
-                    DB::table('general_enquiries')->insert([
-                        'salesperson_id' => $salespersonId,
-                        'customer_id' => $arrData['user_info_id'] ?? null,
-                        'customer_name' => $customerInfo ? $customerInfo->name : null,
-                        'customer_phone' => $customerInfo ? $customerInfo->mobile : null,
-                        'customer_email' => $customerInfo ? $customerInfo->email : null,
-                        'country_code' => $customerInfo ? $customerInfo->country_code : null,
-                        'service_id' => $arrData['service_id'] ?? null,
-                        'subservice_id' => $arrData['subservice_id'] ?? null,
-                        'source_lead_id' => $sourceLeadId,
-                        'status' => 'Booked',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-            }
-        }
-        // echo"<pre>";print_r($cart_data);echo"</pre>";exit;
+        } // echo"<pre>";print_r($cart_data);echo"</pre>";exit;
         if (count($cart_data) > 0) {
 
             foreach ($cart_data as $cart) {
@@ -5844,30 +5205,33 @@ class checkoutcontroller extends Controller
         session()->forget('coupan_data');
         session()->forget('package_cart');
 
-        if ($payment_type == 'COD') {
+        $CIData = DB::table('ci_orders')->where('order_id', $arrOrderId)->first();
 
-            $success = $this->success_mail_book_now();
-            $success_vendor = $this->success_mail_book_now_allvendor();
-            if ($success) {
-                // Redirect to the 'thankyou' route
-                if ($request->service_id == 45) {
-                    return redirect()->route('cleaning.thankyou_book_now');
-                } elseif ($request->service_id == 48) {
-                    return redirect()->route('saloon_spa.thankyou_book_now');
-                } elseif ($request->service_id == 34) {
-                    return redirect()->route('hanyman.thankyou_book_now');
-                } elseif ($request->service_id == 47) {
-                    return redirect()->route('pest_control.thankyou_book_now');
-                } else {
-                    return redirect(route('thankyou_book_now'));
-                }
+        if ($payment_type == 'COD') {
+            $this->send_success_mail_api();
+            $this->send_vendor_lead_mail_api();
+            // $success = $this->success_mail_book_now();
+            // $success_vendor = $this->success_mail_book_now_allvendor();
+            // if ($success) {
+            // Redirect to the 'thankyou' route
+            if ($request->service_id == 45) {
+                return redirect()->route('cleaning.thankyou_book_now');
+            } elseif ($request->service_id == 48) {
+                return redirect()->route('saloon_spa.thankyou_book_now');
+            } elseif ($request->service_id == 34) {
+                return redirect()->route('hanyman.thankyou_book_now');
+            } elseif ($request->service_id == 47) {
+                return redirect()->route('pest_control.thankyou_book_now');
+            } else {
+                return redirect(route('thankyou_book_now'));
             }
+            // }
         } elseif ($payment_type == 'TABBY') {
             $tabbyService = app(\App\Services\TabbyService::class);
 
             $bookingData = [
                 'order_id' => $formatOrderId,
-                'total_amount' => $order_total_new,
+                'total_amount' => $CIData->order_total,
                 'customer_phone' => $userdata['mobile'] ?? '',
                 'customer_email' => $userdata['email'] ?? '',
                 'customer_name' => $userdata['name'] ?? '',
@@ -5901,7 +5265,7 @@ class checkoutcontroller extends Controller
                             'product_data' => [
                                 'name' => 'Your Total'
                             ],
-                            'unit_amount' => $order_total_new * 100,
+                            'unit_amount' => $CIData->order_total * 100,
                         ],
                         'quantity' => 1,
                     ],
@@ -5923,5 +5287,181 @@ class checkoutcontroller extends Controller
                 return redirect()->route('payment_fail');
             }
         }
+    }
+
+    public function send_success_mail_api()
+    {
+        $userdata = Session::get('user');
+        $userid = $userdata['userid'];
+        $order_id = Session::get('order_number');
+
+        $user = DB::table('frontloginregisters')->where('id', $userid)->first();
+        $orderdata = DB::table('ci_orders')->where('order_id', $order_id)->first();
+        $order_item_data = DB::table('ci_order_item')->where('order_id', $order_id)->get();
+
+        if (!$orderdata)
+            return false;
+
+        $payment_mode = ($orderdata->paymentmode == 1) ? "COD" : "Online";
+
+        $subject = "Service Booking Confirmation " . $orderdata->format_order_id;
+        $to = $user->email;
+        $bccRecipients = ['hello@vendorscity.com'];
+
+        // dispatch(function () use ($orderdata, $order_item_data, $user, $payment_mode, $to, $subject, $bccRecipients, $order_id) {
+        Mail::send('emails.customer_booking_request', [
+            'orderdata' => $orderdata,
+            'order_item_data' => $order_item_data,
+            'user' => $user,
+            'payment_mode' => $payment_mode
+        ], function ($message) use ($to, $subject, $bccRecipients) {
+            $message->to($to);
+            $message->subject($subject);
+            foreach ($bccRecipients as $bcc) {
+                $message->bcc($bcc);
+            }
+        });
+
+        \Helper::success_msg_whatsapp_customer($userid, $order_id);
+        // });
+
+        return true;
+    }
+
+    public function send_vendor_lead_mail_api()
+    {
+
+        $userdata = Session::get('user');
+        $userid = $userdata['userid'];
+        $order_id = Session::get('order_number');
+
+        $user = DB::table('frontloginregisters')->where('id', $userid)->first();
+        $orders = DB::table('ci_orders as o')
+            ->select('o.*')
+            ->where('o.order_id', $order_id)
+            ->get()
+            ->map(function ($order) {
+                $order->items = DB::table('ci_order_item as i')
+                    ->where('i.order_id', $order->order_id)
+                    ->select('i.*')
+                    ->get()
+                    ->map(function ($item) {
+                        $item->packages = DB::table('ci_order_item_packages as p')
+                            ->where('p.order_item_id', $item->id)
+                            ->select('p.*')
+                            ->get();
+                        return $item;
+                    });
+                return $order;
+            });
+
+        if ($orders->isEmpty())
+            return false;
+
+        $orderdata = $orders->first();
+
+        // Extract services, subservices, cities
+        $serviceIds = [];
+        $subserviceIds = [];
+        $orderCities = [];
+
+        foreach ($orders as $order) {
+            foreach ($order->items as $item) {
+                if (!empty($item->service_id))
+                    $serviceIds[] = $item->service_id;
+                if (!empty($item->subservice_id))
+                    $subserviceIds[] = $item->subservice_id;
+                if (!empty($item->city))
+                    $orderCities[] = trim($item->city);
+            }
+        }
+
+        $serviceIds = array_unique($serviceIds);
+        $subserviceIds = array_unique($subserviceIds);
+        $orderCities = array_unique($orderCities);
+
+        if (empty($serviceIds) && empty($subserviceIds)) {
+            return false;
+        }
+
+        $cityMaster = DB::table('cities')->pluck('name', 'id')->toArray();
+
+        $vendors = DB::table('users')
+            ->where('vendor', 1)
+            ->where('is_active', 0)
+            ->get()
+            ->filter(function ($vendor) use ($serviceIds, $subserviceIds, $orderCities, $cityMaster) {
+                if (empty($vendor->serviceList) || empty($vendor->subserviceList) || empty($vendor->city)) {
+                    return false;
+                }
+                $vendorServices = explode(',', $vendor->serviceList);
+                $vendorSubservices = explode(',', $vendor->subserviceList);
+
+                $hasServiceMatch = count(array_intersect($serviceIds, $vendorServices)) > 0;
+                $hasSubserviceMatch = count(array_intersect($subserviceIds, $vendorSubservices)) > 0;
+
+                $vendorCityIDs = explode(',', $vendor->city);
+                $vendorCityNames = [];
+                foreach ($vendorCityIDs as $cid) {
+                    if (isset($cityMaster[$cid])) {
+                        $vendorCityNames[] = trim($cityMaster[$cid]);
+                    }
+                }
+                $hasCityMatch = count(array_intersect($orderCities, $vendorCityNames)) > 0;
+
+                return $hasServiceMatch && $hasSubserviceMatch && $hasCityMatch;
+            });
+
+        if ($vendors->isEmpty()) {
+            return false;
+        }
+
+        $firstItem = $orders->flatMap->items->first();
+        $service_name = $firstItem ? \Helper::subservicename($firstItem->subservice_id) : '';
+        $subject = "You got New Booking for $service_name | Order Number {$orderdata->format_order_id}";
+
+        $vendor_bcc_emails = ['hello@vendorscity.com', 'zafar@quickserverelo.com'];
+
+        // SEND MAIL TO VENDORS ASYNC
+        dispatch(function () use ($vendors, $orders, $order_id, $user, $orderdata, $service_name, $subject, $vendor_bcc_emails) {
+            foreach ($vendors as $vendor) {
+                try {
+                    $attributeEmails = DB::table('vendors_attribute')
+                        ->where('pid', $vendor->id)
+                        ->whereNotNull('c_email')
+                        ->pluck('c_email')
+                        ->toArray();
+
+                    $allVendorEmails = array_filter(array_merge([$vendor->email], $attributeEmails));
+
+                    if (!empty($allVendorEmails)) {
+                        Mail::send('emails.vendor_booking_order_notification', [
+                            'user' => $user,
+                            'orders' => $orders,
+                            'order_number' => $order_id,
+                            'vendor' => $vendor,
+                        ], function ($message) use ($allVendorEmails, $vendor, $subject, $vendor_bcc_emails) {
+                            $message->to($allVendorEmails, $vendor->name ?? 'Vendor')
+                                ->bcc($vendor_bcc_emails)
+                                ->subject($subject);
+                        });
+                    }
+
+                    // insert into notification table
+                    // $data_notification = [
+                    //     'vendor_id' => $vendor->id,
+                    //     'subject' => 'New Lead Generated for ' . $service_name,
+                    //     'added_datetime' => date('Y-m-d h:i:s')
+                    // ];
+                    // DB::table('notification')->insert($data_notification);
+
+                    \Helper::success_msg_whatsapp_allVendor($vendor->id, $order_id);
+                } catch (\Exception $e) {
+                    \Log::error('Vendor mail failed (' . $vendor->email . '): ' . $e->getMessage());
+                }
+            }
+        });
+
+        return true;
     }
 }

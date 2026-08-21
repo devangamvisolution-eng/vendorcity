@@ -291,6 +291,34 @@
                     </div>
                 </div>
 
+                @if (isset($order->items[0]->subservice_id) && $order->items[0]->subservice_id == 93)
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-transparent border-bottom">
+                            <h5 class="card-title mb-0"><i class="fas fa-car me-2 text-primary"></i> Car Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small text-uppercase">Plate Source</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->plate_source ?? '-' }}</h6>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small text-uppercase">Plate Code</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->plate_code ?? '-' }}</h6>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small text-uppercase">Plate Number</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->plate_number ?? '-' }}</h6>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <p class="text-muted mb-1 small text-uppercase">Car Description</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->describe_your_car ?? '-' }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-transparent border-bottom">
                         <h5 class="card-title mb-0"><i class="fas fa-broom me-2 text-primary"></i> Service Details</h5>
@@ -693,10 +721,14 @@
                 @php
                     $statusFlow = [
                         'BK' => 'Booking Requested',
+                        'BC' => 'Booking Confirmed',
                         'P' => 'Booking Confirmed',
                         'PA' => 'Vendor Assigned',
+                        'OTW' => 'On the way',
+                        'IP' => 'In progress',
                         'CO' => 'Booking Completed',
                         'CL' => 'Booking Cancelled',
+                        'UP' => 'Unpaid',
                     ];
 
                     $currentStatus = $order->order_status;
@@ -801,7 +833,7 @@
                                             <tr>
                                                 <td><strong>{{ date('d M Y', strtotime($visit->visit_date)) }}</strong>
                                                 </td>
-                                                <td>{{ $visit->visit_time ?? '-' }}</td>
+                                                <td>{{ \App\Helpers\Helper::timeslotname($visit->visit_time) }}</td>
                                                 <td>
                                                     @if ($visit->visit_status == 'cancelled' || $visit->visit_status == 'skipped')
                                                         <span class="badge bg-danger">Cancelled</span>

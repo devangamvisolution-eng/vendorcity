@@ -252,6 +252,34 @@
                     </div>
                 </div>
 
+                @if (isset($order->items[0]->subservice_id) && $order->items[0]->subservice_id == 93)
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-transparent border-bottom">
+                            <h5 class="card-title mb-0"><i class="fas fa-car me-2 text-primary"></i> Car Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small text-uppercase">Plate Source</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->plate_source ?? '-' }}</h6>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small text-uppercase">Plate Code</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->plate_code ?? '-' }}</h6>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="text-muted mb-1 small text-uppercase">Plate Number</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->plate_number ?? '-' }}</h6>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <p class="text-muted mb-1 small text-uppercase">Car Description</p>
+                                    <h6 class="fw-bold">{{ $order->items[0]->describe_your_car ?? '-' }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-transparent border-bottom">
                         <h5 class="card-title mb-0"><i class="fas fa-broom me-2 text-primary"></i> Service Details</h5>
@@ -405,7 +433,8 @@
                                 @if (isset($item->how_many_hours_should_they_stay))
                                     <div class="col-md-6 col-xl-4">
                                         <p class="text-muted mb-0 small">No. of Hours</p>
-                                        <span class="fw-bold text-dark">{{ $item->how_many_hours_should_they_stay }}</span>
+                                        <span
+                                            class="fw-bold text-dark">{{ $item->how_many_hours_should_they_stay }}</span>
                                     </div>
                                 @endif
                                 @if (isset($item->how_often_do_you_need_cleaning))
@@ -565,9 +594,14 @@
                 @php
                     $statusFlow = [
                         'BK' => 'Booking Requested',
+                        'BC' => 'Booking Confirmed',
                         'P' => 'Booking Confirmed',
                         'PA' => 'Vendor Assigned',
+                        'OTW' => 'On the way',
+                        'IP' => 'In progress',
                         'CO' => 'Booking Completed',
+                        'CL' => 'Booking Cancelled',
+                        'UP' => 'Unpaid',
                     ];
 
                     $currentStatus = $order->order_status;
@@ -825,7 +859,7 @@
                     </div>
                     {{-- Fixed Buttons Section --}}
                     <div class="card-footer bg-white border-0 p-3">
-                        @if ($order->order_status == 'BK')
+                        @if ($order->order_status != 'CL')
                             <div class="d-grid gap-2">
                                 <button class="btn btn-primary py-2 fw-bold shadow-sm" type="button" disabled
                                     id="spinner_button_accept" style="display: none; border-radius: 10px;">

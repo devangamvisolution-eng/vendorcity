@@ -1527,57 +1527,59 @@ class Packagecontroller extends Controller
         $package_inquiry = DB::table('packages_enquiry',)->insertGetId($data);
 
         $customerInfo = DB::table('frontloginregisters')->where('id', $data['user_id'] ?? 0)->first();
-        $pendingLeadId = Session::get('enquiry_pending_lead_id');
-        if ($pendingLeadId) {
-            DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
-                'status' => 'Pending',
-                'customer_name' => $customerInfo ? $customerInfo->name : ($data['name'] ?? null),
-                'customer_phone' => $customerInfo ? $customerInfo->mobile : ($data['mobile'] ?? null),
-                'customer_email' => $customerInfo ? $customerInfo->email : ($data['email'] ?? null),
-                'updated_at' => now(),
-            ]);
-        } else {
-            $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
-
-            $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
-            $pastOrders = DB::table('ci_orders')->where('user_id', $data['user_id'] ?? 0)->count();
-            $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
-            $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
-            if ($pastOrders > 0 && $repeatedSourceId) {
-                $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+        if ($customerInfo) {
+            $pendingLeadId = Session::get('enquiry_pending_lead_id');
+            if ($pendingLeadId) {
+                DB::table('general_enquiries')->where('id', $pendingLeadId)->update([
+                    'status' => 'Pending',
+                    'customer_name' => $customerInfo ? $customerInfo->name : ($data['name'] ?? null),
+                    'customer_phone' => $customerInfo ? $customerInfo->mobile : ($data['mobile'] ?? null),
+                    'customer_email' => $customerInfo ? $customerInfo->email : ($data['email'] ?? null),
+                    'updated_at' => now(),
+                ]);
             } else {
-                $sourceLeadId = $sourceWebsiteId;
-            }
+                $sourceWebsite = DB::table('source_leads')->where('name', 'Website')->first();
 
-            $salespersonId = null;
-            if ($pastOrders > 0) {
-                $lastOrder = DB::table('ci_orders')
-                    ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
-                    ->where('ci_orders.user_id', $data['user_id'] ?? 0)
-                    ->whereNotNull('ci_order_item.salesperson_id')
-                    ->orderBy('ci_orders.order_id', 'desc')
-                    ->select('ci_order_item.salesperson_id')
-                    ->first();
-                if ($lastOrder) {
-                    $salespersonId = $lastOrder->salesperson_id;
+                $repeatedSource = DB::table('source_leads')->where('name', 'Repeted Customer')->first();
+                $pastOrders = DB::table('ci_orders')->where('user_id', $data['user_id'] ?? 0)->count();
+                $sourceWebsiteId = $sourceWebsite ? $sourceWebsite->id : null;
+                $repeatedSourceId = $repeatedSource ? $repeatedSource->id : null;
+                if ($pastOrders > 0 && $repeatedSourceId) {
+                    $sourceLeadId = $sourceWebsiteId . ',' . $repeatedSourceId;
+                } else {
+                    $sourceLeadId = $sourceWebsiteId;
                 }
-            }
 
-            $leadId = DB::table('general_enquiries')->insertGetId([
-                'salesperson_id' => $salespersonId,
-                'customer_id' => $data['user_id'] ?? null,
-                'customer_name' => $customerInfo ? $customerInfo->name : ($data['name'] ?? null),
-                'customer_phone' => $customerInfo ? $customerInfo->mobile : ($data['mobile'] ?? null),
-                'customer_email' => $customerInfo ? $customerInfo->email : ($data['email'] ?? null),
-                'country_code' => $customerInfo ? $customerInfo->country_code : null,
-                'service_id' => $data['service_id'] ?? null,
-                'subservice_id' => $data['subservice_id'] ?? null,
-                'source_lead_id' => $sourceLeadId,
-                'status' => 'Pending',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            Session::put('enquiry_pending_lead_id', $leadId);
+                $salespersonId = null;
+                if ($pastOrders > 0) {
+                    $lastOrder = DB::table('ci_orders')
+                        ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+                        ->where('ci_orders.user_id', $data['user_id'] ?? 0)
+                        ->whereNotNull('ci_order_item.salesperson_id')
+                        ->orderBy('ci_orders.order_id', 'desc')
+                        ->select('ci_order_item.salesperson_id')
+                        ->first();
+                    if ($lastOrder) {
+                        $salespersonId = $lastOrder->salesperson_id;
+                    }
+                }
+
+                $leadId = DB::table('general_enquiries')->insertGetId([
+                    'salesperson_id' => $salespersonId,
+                    'customer_id' => $data['user_id'] ?? null,
+                    'customer_name' => $customerInfo ? $customerInfo->name : ($data['name'] ?? null),
+                    'customer_phone' => $customerInfo ? $customerInfo->mobile : ($data['mobile'] ?? null),
+                    'customer_email' => $customerInfo ? $customerInfo->email : ($data['email'] ?? null),
+                    'country_code' => $customerInfo ? $customerInfo->country_code : null,
+                    'service_id' => $data['service_id'] ?? null,
+                    'subservice_id' => $data['subservice_id'] ?? null,
+                    'source_lead_id' => $sourceLeadId,
+                    'status' => 'Pending',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                Session::put('enquiry_pending_lead_id', $leadId);
+            }
         }
         $package_data_n = DB::table('packages_enquiry',)->where('id', $package_inquiry)->first();
 

@@ -92,6 +92,11 @@
                                     <h5>Enquiry Details</h5>
                                     <hr>
                                 </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Enquiry Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="enquiry_date" id="enquiry_date"
+                                        value="{{ date('Y-m-d', strtotime($enquiry->created_at)) }}" required>
+                                </div>
 
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Service <span class="text-danger">*</span></label>
@@ -102,8 +107,20 @@
                                                 {{ $enquiry->service_id == $service->id ? 'selected' : '' }}>
                                                 {{ $service->servicename }}</option>
                                         @endforeach
+                                        <option value="other" {{ $enquiry->service_id == 0 ? 'selected' : '' }}>Other /
+                                            Unknown</option>
                                     </select>
                                     <p class="form-error-text" id="service_error"
+                                        style="color: red; margin-top: 10px; display: none;"></p>
+                                </div>
+
+                                <div class="col-md-4 mb-3" id="other_service_div"
+                                    style="display: {{ $enquiry->service_id == 0 ? 'block' : 'none' }};">
+                                    <label class="form-label">Specify Unknown Service <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="other_service" id="other_service"
+                                        value="{{ $enquiry->other_service }}">
+                                    <p class="form-error-text" id="other_service_error"
                                         style="color: red; margin-top: 10px; display: none;"></p>
                                 </div>
 
@@ -155,13 +172,15 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">Notes</label>
-                                    <textarea class="form-control" name="notes" id="notes" rows="3"
-                                        placeholder="Enter any notes or special requests here...">{{ $enquiry->notes }}</textarea>
+                            <!--
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Notes</label>
+                                        <textarea class="form-control" name="notes" id="notes" rows="3"
+                                            placeholder="Enter any notes or special requests here...">{{ $enquiry->notes }}</textarea>
+                                    </div>
                                 </div>
-                            </div>
+                                -->
 
                             <div class="mt-4 text-end">
                                 <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">Update
@@ -213,27 +232,38 @@
             // Sub Service dependent dropdown
             $('#service_id').on('change', function() {
                 var serviceId = $(this).val();
-                if (serviceId) {
-                    $.ajax({
-                        url: "{{ route('general-enquiries.get-subservices') }}",
-                        type: "POST",
-                        data: {
-                            service_id: serviceId,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(data) {
-                            $('#subservice_id').empty();
-                            $('#subservice_id').append(
-                                '<option value="">-- Select Sub Service --</option>');
-                            $.each(data, function(key, value) {
-                                $('#subservice_id').append('<option value="' + value
-                                    .id + '">' + value.subservicename + '</option>');
-                            });
-                        }
-                    });
-                } else {
+
+                if (serviceId === 'other') {
+                    $('#other_service_div').show();
                     $('#subservice_id').empty();
                     $('#subservice_id').append('<option value="">-- Select Sub Service --</option>');
+                } else {
+                    $('#other_service_div').hide();
+                    $('#other_service').val('');
+
+                    if (serviceId) {
+                        $.ajax({
+                            url: "{{ route('general-enquiries.get-subservices') }}",
+                            type: "POST",
+                            data: {
+                                service_id: serviceId,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(data) {
+                                $('#subservice_id').empty();
+                                $('#subservice_id').append(
+                                    '<option value="">-- Select Sub Service --</option>');
+                                $.each(data, function(key, value) {
+                                    $('#subservice_id').append('<option value="' + value
+                                        .id + '">' + value.subservicename +
+                                        '</option>');
+                                });
+                            }
+                        });
+                    } else {
+                        $('#subservice_id').empty();
+                        $('#subservice_id').append('<option value="">-- Select Sub Service --</option>');
+                    }
                 }
             });
 
@@ -270,6 +300,18 @@
                         scrollTop: $('#service_id').offset().top - 150
                     }, 1000);
                     return false;
+                }
+
+                if (service === 'other') {
+                    var otherService = $('#other_service').val();
+                    if (otherService == '') {
+                        $('#other_service_error').html("Please Specify Unknown Service");
+                        $('#other_service_error').show().delay(2000).fadeOut('show');
+                        $('html, body').animate({
+                            scrollTop: $('#other_service').offset().top - 150
+                        }, 1000);
+                        return false;
+                    }
                 }
 
                 var customerId = $('#customer_id').val();

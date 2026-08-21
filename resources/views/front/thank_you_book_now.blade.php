@@ -748,12 +748,14 @@
                                     // ];
                                     $statuses = [
                                         'BK' => 'Booking Requested',
+                                        'BC' => 'Booking Confirmed',
                                         'P' => 'Booking Confirmed',
-                                        'PA' => 'Booking Confirmed', // changed
-                                        'OTW' => 'On The Way',
-                                        'IP' => 'In Progress',
+                                        'PA' => 'Vendor Assigned',
+                                        'OTW' => 'On the way',
+                                        'IP' => 'In progress',
                                         'CO' => 'Booking Completed',
                                         'CL' => 'Booking Cancelled',
+                                        'UP' => 'Unpaid',
                                     ];
                                     $currentStatusText = $statuses[$thank_order_data->order_status] ?? 'Processing';
                                 @endphp

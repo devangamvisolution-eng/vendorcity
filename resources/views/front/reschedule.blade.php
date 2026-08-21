@@ -4,6 +4,161 @@
         border-radius: 1.3rem;
     }
 
+    /* ══════════════════════════════════════════════════
+       ALL INFO / ADDON POPUPS — Bottom Sheet (Mobile)
+
+       KEY RULE: Only override display when Bootstrap has
+       opened the modal (.show). Never block display:none
+       so the close button always works.
+    ══════════════════════════════════════════════════ */
+
+    .addonsinstruction {
+        background: linear-gradient(135deg, rgb(243, 242, 249) 0%, rgb(231, 230, 244) 100%);
+        border-width: 1.5px;
+        border-style: solid;
+        border-color: rgba(21, 4, 149, 0.3);
+        border-image: initial;
+        border-radius: 12px;
+        padding: 4px 8px;
+        margin: 20px 0px 0px;
+    }
+
+    .addonsinstruction h5 {
+        font-size: 14px;
+        color: #150495;
+        line-height: 1.5;
+        margin: 0;
+        padding: 5px 0;
+    }
+
+    .addonsinstruction h5 i {
+        font-size: 13px;
+    }
+
+    /* ── Mobile (≤ 767px) — iOS Bottom Sheet ── */
+    @media (max-width: 767px) {
+        .addonsinstruction h5 {
+            font-size: 11px;
+        }
+
+        .addonsinstruction h5 i {
+            font-size: 11px;
+        }
+
+        /* 1. Modal overlay — flex to push dialog to bottom */
+        .subservice-read-more-model.show {
+            display: flex !important;
+            align-items: flex-end !important;
+            padding: 0 !important;
+            /* NO overflow:hidden here — it blocks pointer events on close button */
+        }
+
+        /* 2. Dialog — fixed full-width strip at the bottom */
+        .subservice-read-more-model .modal-dialog {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            /* Slide-up animation */
+            transform: translateY(100%);
+            transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1) !important;
+            will-change: transform;
+        }
+
+        /* 3. Animate in when Bootstrap adds .show */
+        .subservice-read-more-model.show .modal-dialog {
+            transform: translateY(0) !important;
+        }
+
+        /* 4. White card — shrinks to content, never exceeds 80% screen */
+        .subservice-read-more-model .modal-content {
+            border-radius: 20px 20px 0 0 !important;
+            border: none !important;
+            box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.18) !important;
+            height: auto !important;
+            max-height: 80dvh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            /* overflow:hidden removed — was blocking close button taps on iOS */
+            overflow: visible !important;
+            padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+        }
+
+        /* 5. Drag handle pill */
+        .subservice-read-more-model .modal-drag-handle {
+            flex: 0 0 auto !important;
+            width: 100%;
+            padding: 10px 0 4px;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+            background: #fff;
+        }
+
+        /* 6. Header row — never scrolls, pinned */
+        .subservice-read-more-model .modal-header {
+            flex: 0 0 auto !important;
+            border-bottom: 1px solid #f0f0f0 !important;
+            padding: 12px 20px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            background: #fff;
+            /* Ensure close button is always tappable */
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 7. Body — scrolls only when content overflows, doesn't stretch */
+        .subservice-read-more-model .modal-body {
+            flex: 0 0 auto !important;
+            min-height: 0 !important;
+            max-height: 55dvh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: contain !important;
+            overflow-x: hidden !important;
+            background: #fff;
+        }
+
+        /* 8. Footer — pinned */
+        .subservice-read-more-model .modal-footer,
+        .subservice-read-more-model .modal-footer-sticky {
+            flex: 0 0 auto !important;
+            background: #fff;
+        }
+
+        /* 9. Close button — large enough to tap easily */
+        .subservice-read-more-model .modal-header button[data-bs-dismiss="modal"] {
+            min-width: 44px !important;
+            min-height: 44px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            position: relative !important;
+            z-index: 20 !important;
+            pointer-events: auto !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+    }
+
+    /* ── Tablet (768px +) — centred dialog ── */
+    @media (min-width: 768px) {
+        .subservice-read-more-model .modal-dialog {
+            max-width: 480px;
+            margin: 1.75rem auto;
+        }
+
+        .subservice-read-more-model .modal-content {
+            border-radius: 16px;
+            max-height: 80vh;
+        }
+
+        .modal-drag-handle {
+            display: none !important;
+        }
+    }
+
     .modal-title {
         font-size: 20px;
     }
@@ -490,7 +645,7 @@
     table {
         font-family: arial, sans-serif;
         border-collapse: collapse;
-        width: 50%;
+        /* width: 50%; */
     }
 
     td,
@@ -1677,19 +1832,23 @@
 
                     <div class="tab2" id="tab2-div">
 
-                        <div class="form-group mb-3 cancel-policy-back">
-                            <div class="cancel-content">
-                                <div class="cancel-text">
-                                    <img src="{{ asset('public/site/images/infoicon.svg') }}" alt="Info"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#cancel_policy_{{ $ci_order_item->subservice_id }}"
-                                        style="cursor: pointer;">
-                                    Enjoy free cancellation up to 6 hours before your booking start time.
+                        @php
+                            $subservice_data = DB::table('subservices')
+                                ->where('id', $ci_order_item->subservice_id)
+                                ->first();
+                        @endphp
+                        @if (!empty($subservice_data) && !empty($subservice_data->cancel_policy))
+                            <div class="addonsinstruction">
+                                <h5 class=""> <i class="fas fa-info-circle tabby-banner-info-icon ms-2"></i>
+                                    Enjoy free cancellation up to 6 hours before your booking start time.</h5>
+                                <div class="text-end" style="margin-right:28px">
+                                    <a href="javascript:void(0);" data-bs-toggle="modal"
+                                        data-bs-target="#cancelPolicyModal"
+                                        style="text-decoration: underline; color: #150495; font-size: 13px; font-weight: 600;">View
+                                        Policy</a>
                                 </div>
-                                <a class="cancel-details" data-bs-toggle="modal"
-                                    data-bs-target="#cancel_policy_{{ $ci_order_item->subservice_id }}">Details</a>
                             </div>
-                        </div>
+                        @endif
 
                         @php
                             $cleanerIds = explode(',', $ci_order_item->cleaner_id);
@@ -1920,32 +2079,31 @@
 @php
     $subservice_service_fee_popup = DB::table('subservices')->where('id', $ci_order_item->subservice_id)->first();
 @endphp
-
-<div class="modal modal-mobile-bottom" id="cancel_policy_{{ $ci_order_item->subservice_id }}" tabindex="-1"
-    aria-labelledby="materialTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-bottom  modal-lg service-fee-custome-modal modal-dialog-centered"
-        id="modal-digi" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h6 class="modal-title" id="LearnmoreTitle">Cancellation and rescheduling policy </h6>
-                <button type="button" class="close closeBtn" id="close" data-bs-dismiss="modal"
-                    aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-                <div>
-                    <span id="cancel-table">{!! html_entity_decode($subservice_service_fee_popup->cancel_policy) !!}</span>
+@if (!empty($subservice_service_fee_popup) && !empty($subservice_service_fee_popup->cancel_policy))
+    <div class="modal subservice-read-more-model fade" id="cancelPolicyModal" tabindex="-1" aria-hidden="true"
+        style="z-index: 9999;">
+        <div class="modal-dialog modal-dialog-scrollable" id="modal-digi" role="document">
+            <div class="modal-content">
+                <div class="modal-drag-handle" style="padding:10px 0 4px; text-align:center;">
+                    <div style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;">
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <p class="cancel-footer">*You can reschedule a cash-paid booking up to two times.</p>
-
+                <div class="modal-header"
+                    style="border-bottom:1px solid #f0f0f0; padding:12px 20px; display:flex; align-items:center; justify-content:space-between;">
+                    <h5 class="modal-title" style="margin:0; font-size:1rem; font-weight:800; color:#111;">
+                        Cancellation Policy</h5>
+                    <button type="button" data-bs-dismiss="modal" aria-label="Close"
+                        style="background:#f4f4f4; border:none; width:32px; height:32px; border-radius:50%; font-size:1.1rem; color:#555; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body" style="padding:20px; overflow-y:scroll; -webkit-overflow-scrolling:touch;">
+                    {!! $subservice_service_fee_popup->cancel_policy !!}
+                </div>
             </div>
         </div>
     </div>
-</div>
+@endif
 <!--- Cancel Policy Popup End ---->
 
 

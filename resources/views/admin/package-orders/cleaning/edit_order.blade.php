@@ -101,13 +101,78 @@
                                     </div>
                                 </div>
 
-                                <div class="home_cleaning_form">
+                                <div class="col-md-12 car_wash_form"
+                                    style="{{ isset($order->items[0]) && $order->items[0]->subservice_id == 93 ? '' : 'display: none;' }}">
+                                    <h4 class="mt-3">Car Wash Details : </h4>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Plate Source</label>
+                                                <select id="plate_source" name="plate_source"
+                                                    class="form-control form-select">
+                                                    <option value="">Select Plate Source</option>
+                                                    <option value="Dubai"
+                                                        {{ isset($order->items[0]) && $order->items[0]->plate_source == 'Dubai' ? 'selected' : '' }}>
+                                                        Dubai</option>
+                                                    <option value="Abu Dhabi"
+                                                        {{ isset($order->items[0]) && $order->items[0]->plate_source == 'Abu Dhabi' ? 'selected' : '' }}>
+                                                        Abu Dhabi</option>
+                                                    <option value="Sharjah"
+                                                        {{ isset($order->items[0]) && $order->items[0]->plate_source == 'Sharjah' ? 'selected' : '' }}>
+                                                        Sharjah</option>
+                                                    <option value="Ajman"
+                                                        {{ isset($order->items[0]) && $order->items[0]->plate_source == 'Ajman' ? 'selected' : '' }}>
+                                                        Ajman</option>
+                                                    <option value="Umm Al-Quwain"
+                                                        {{ isset($order->items[0]) && $order->items[0]->plate_source == 'Umm Al-Quwain' ? 'selected' : '' }}>
+                                                        Umm Al-Quwain</option>
+                                                    <option value="Fujairah"
+                                                        {{ isset($order->items[0]) && $order->items[0]->plate_source == 'Fujairah' ? 'selected' : '' }}>
+                                                        Fujairah</option>
+                                                    <option value="Ras Al Khaimah"
+                                                        {{ isset($order->items[0]) && $order->items[0]->plate_source == 'Ras Al Khaimah' ? 'selected' : '' }}>
+                                                        Ras Al Khaimah</option>
+                                                    <option value="Classic"
+                                                        {{ isset($order->items[0]) && $order->items[0]->plate_source == 'Classic' ? 'selected' : '' }}>
+                                                        Classic</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Plate Code</label>
+                                                <input type="text" id="plate_code" name="plate_code"
+                                                    class="form-control" placeholder="Enter Plate Code"
+                                                    value="{{ $order->items[0]->plate_code ?? '' }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Plate Number</label>
+                                                <input type="text" id="plate_number" name="plate_number"
+                                                    class="form-control" placeholder="Enter Plate Number"
+                                                    value="{{ $order->items[0]->plate_number ?? '' }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Car Description</label>
+                                                <textarea id="describe_your_car" name="describe_your_car" class="form-control"
+                                                    placeholder="Describe your car (model, color, etc.)">{{ $order->items[0]->describe_your_car ?? '' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="home_cleaning_form"
+                                    style="{{ isset($order->items[0]) && ($order->items[0]->subservice_id == 28 || $order->items[0]->subservice_id == 97) ? '' : 'display:none;' }}">
                                     <h4>Service Details : </h4>
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>How many hours your cleaner will stay ?</label>
-                                                <select id="hour_value" name="hour_value" class="form-control form-select">
+                                                <select id="hour_value" name="hour_value"
+                                                    class="form-control form-select">
                                                     <option value="">Select Cleaning Hour Value</option>
                                                     @foreach ($cleanin_subserviceprice as $key => $data)
                                                         <option value="{{ $data->hour_value }}"
@@ -337,6 +402,48 @@
                                                     @endif
                                                 </select>
                                                 <p class="form-error-text" id="sub_frequency_error"
+                                                    style="color: red; margin-top: 10px;"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Which days do you prefer?</label>
+                                                @php
+                                                    $subSelectedDays =
+                                                        isset($order->items[0]) &&
+                                                        $order->items[0]->which_day_of_the_week_do_you_want_the_service
+                                                            ? explode(
+                                                                ',',
+                                                                $order->items[0]
+                                                                    ->which_day_of_the_week_do_you_want_the_service,
+                                                            )
+                                                            : [];
+                                                @endphp
+                                                <select id="sub_which_day_you_want" name="which_day_you_want[]"
+                                                    class="form-control form-select" multiple="multiple">
+                                                    <option value="Monday"
+                                                        {{ in_array('Monday', $subSelectedDays) ? 'selected' : '' }}>Monday
+                                                    </option>
+                                                    <option value="Tuesday"
+                                                        {{ in_array('Tuesday', $subSelectedDays) ? 'selected' : '' }}>
+                                                        Tuesday</option>
+                                                    <option value="Wednesday"
+                                                        {{ in_array('Wednesday', $subSelectedDays) ? 'selected' : '' }}>
+                                                        Wednesday</option>
+                                                    <option value="Thursday"
+                                                        {{ in_array('Thursday', $subSelectedDays) ? 'selected' : '' }}>
+                                                        Thursday</option>
+                                                    <option value="Friday"
+                                                        {{ in_array('Friday', $subSelectedDays) ? 'selected' : '' }}>Friday
+                                                    </option>
+                                                    <option value="Saturday"
+                                                        {{ in_array('Saturday', $subSelectedDays) ? 'selected' : '' }}>
+                                                        Saturday</option>
+                                                    <option value="Sunday"
+                                                        {{ in_array('Sunday', $subSelectedDays) ? 'selected' : '' }}>Sunday
+                                                    </option>
+                                                </select>
+                                                <p class="form-error-text" id="sub_which_day_you_want_error"
                                                     style="color: red; margin-top: 10px;"></p>
                                             </div>
                                         </div>
@@ -842,6 +949,28 @@
                     return false;
                 }
 
+                var sub_which_day_you_want = jQuery("#sub_which_day_you_want").val() || [];
+                var visitsPerWeek = parseInt(jQuery('#sub_frequency').find(':selected').data('visits')) || 0;
+
+                if (sub_which_day_you_want.length === 0) {
+                    jQuery('#sub_which_day_you_want_error').html("Please Select Which days do you prefer");
+                    jQuery('#sub_which_day_you_want_error').show().delay(0).fadeIn('show');
+                    jQuery('#sub_which_day_you_want_error').show().delay(2000).fadeOut('show');
+                    $('html, body').animate({
+                        scrollTop: $('#sub_which_day_you_want').offset().top - 150
+                    }, 1000);
+                    return false;
+                } else if (visitsPerWeek > 0 && sub_which_day_you_want.length !== visitsPerWeek) {
+                    jQuery('#sub_which_day_you_want_error').html("Please select exactly " + visitsPerWeek +
+                        " day(s) based on your frequency.");
+                    jQuery('#sub_which_day_you_want_error').show().delay(0).fadeIn('show');
+                    jQuery('#sub_which_day_you_want_error').show().delay(2000).fadeOut('show');
+                    $('html, body').animate({
+                        scrollTop: $('#sub_which_day_you_want').offset().top - 150
+                    }, 1000);
+                    return false;
+                }
+
                 var sub_package = jQuery("#sub_package").val();
                 if (sub_package == '') {
                     jQuery('#sub_package_error').html("Please Select Package Duration");
@@ -1049,6 +1178,9 @@
             if (subservice_id == 28 || subservice_id == 97) {
                 // for home cleaning Calculation
                 home_cleaning_calculation();
+            } else if (subservice_id == 101) {
+                // for Subscription Calculation
+                calculateSubscriptionPrice();
             } else {
                 // for Package System Calculation
                 package_calculation();
@@ -1146,6 +1278,7 @@
                         $('.home_cleaning_form').show();
                         $('.cleaning_subscription_form').hide();
                         $('.add_to_cart').hide();
+                        $('.car_wash_form').hide();
 
                         if (currentCleanerCount == 1) {
                             $('#cleaner_div').show();
@@ -1158,11 +1291,17 @@
                         $('.cleaning_subscription_form').show();
                         $('.add_to_cart').hide();
                         $('#cleaner_div').show();
+                        $('.car_wash_form').hide();
                     } else {
                         $('.home_cleaning_form').hide();
                         $('.cleaning_subscription_form').hide();
                         $('#cleaner_div').hide();
                         $('.add_to_cart').show();
+                        if (subservice_id == 93) {
+                            $('.car_wash_form').show();
+                        } else {
+                            $('.car_wash_form').hide();
+                        }
                     }
                 }
 
@@ -1344,7 +1483,7 @@
                         if (rule) {
                             var hourlyRate = parseFloat(rule.price_per_hour);
                             var formattedRate = hourlyRate % 1 === 0 ? hourlyRate.toString() : hourlyRate.toFixed(
-                            2);
+                                2);
                             $(this).text(baseLabel + " - AED " + formattedRate + "/hr");
                         } else {
                             $(this).text(baseLabel);
@@ -1423,6 +1562,10 @@
         }
 
         $(document).ready(function() {
+            $('#sub_which_day_you_want').select2({
+                placeholder: 'Select which days do you prefer'
+            });
+
             $('#sub_hours, #sub_frequency, #sub_package, #subservice_id, #sub_materials, #sub_cleaning_material_charge')
                 .change(calculateSubscriptionPrice);
             $('#price_change_of_visit').on('input', calculateSubscriptionPrice);

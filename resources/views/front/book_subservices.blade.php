@@ -229,24 +229,26 @@
             @endif
 
             {{-- <div class="row col-lg-12 wow fadeInUp" style="text-align:center;">
-                  <div class="col-xl-12"> --}}
+                <div class="col-xl-12"> --}}
             {{-- <div class="position-relative content-title">
-                          <h2 class=" banner_title" style="color: #fff;" >{{"$service_banner_attr->title"}}</h2>
-                          <div class="align-items-center">
-                              <h6 class="mb-0" style="color: #fff;">{{"$service_banner_attr->sub_title"}}
-                              </h6>
-                          </div>
-                      </div> --}}
+                        <h2 class=" banner_title" style="color: #fff;">{{"$service_banner_attr->title"}}</h2>
+                        <div class="align-items-center">
+                            <h6 class="mb-0" style="color: #fff;">{{"$service_banner_attr->sub_title"}}
+                            </h6>
+                        </div>
+                    </div> --}}
 
             <div class="banner-content-center">
-                <h2 class="banner_title text-white banner_static_title">{{ $service_banner_attr->title ?? '' }}</h2>
+                <h2 class="banner_title text-white banner_static_title">{{ $service_banner_attr->title ?? '' }}
+                </h2>
                 <h6 class="text-white banner_static_subtitle">
                     {{ $service_banner_attr->short_description ?? '' }}
                 </h6>
             </div>
 
-            {{-- </div>
-              </div> --}}
+            {{--
+                </div>
+            </div> --}}
         </div>
     </div>
 </section>
@@ -302,7 +304,8 @@
                                                 href="{{ route('automobile.listing', ['page_url' => $subservice->page_url]) }}">
                                             @else
                                                 {{-- <a
-                                                    href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $subservice->page_url]) }}"> --}}
+                                                                href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $subservice->page_url]) }}">
+                                                                --}}
                                                 @if ($subservice->is_bookable == 1)
                                                     <a
                                                         href="{{ route('enquiry', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id]) }}">
@@ -368,7 +371,7 @@
     <section class="pt30 pbm0  pb30 pt0-sm ">
         <div class="container">
             <div class="row">
-                <div class="col-lg-12 subservice-name">
+                <div class="col-lg-12 subservice-name booking_desc">
                     @if (isset($top_description->description))
                         {!! html_entity_decode($top_description->description) !!}
                     @endif
@@ -393,12 +396,11 @@
 
                                 {{-- ✅ Image always comes first in HTML so mobile sees image → description --}}
                                 {{-- <div class="col-12 col-md-5 p-0">
-                                    <div class="placeholder rect bg-primary rounded"
-                                        style="background: url('{{ asset('public/upload/service/service_attr/large/' . $package_attribut->image) }}');
-                                           background-size: cover;
-                                           background-position:center;
-                                           width: 100%;
-                                           height: 300px;">
+                                    <div class="placeholder rect bg-primary rounded" style="background: url('{{ asset('public/upload/service/service_attr/large/' . $package_attribut->image) }}');
+                                                           background-size: cover;
+                                                           background-position:center;
+                                                           width: 100%;
+                                                           height: 300px;">
                                     </div>
                                 </div> --}}
 
@@ -523,17 +525,24 @@
                                 @endphp
 
                                 @foreach ($faq as $faq_data)
-                                    <div class="accordion-item @php if($i == 0){echo 'active';} @endphp">
+                                    <div
+                                        class="accordion-item @php if ($i == 0) {
+                                        echo 'active';
+                                    } @endphp">
                                         <h2 class="accordion-header" id="headingOne_{{ $faq_data->id }}">
                                             <button
-                                                class="accordion-button @php if($i != 0){echo 'collapsed';} @endphp"
+                                                class="accordion-button @php if ($i != 0) {
+                                                echo 'collapsed';
+                                            } @endphp"
                                                 type="button" data-bs-toggle="collapse"
                                                 data-bs-target="#collapseOne_{{ $faq_data->id }}"
                                                 aria-expanded="true"
                                                 aria-controls="collapseOne">{{ $faq_data->question }}</button>
                                         </h2>
                                         <div id="collapseOne_{{ $faq_data->id }}"
-                                            class="accordion-collapse collapse @php if($i == 0){echo 'show';} @endphp"
+                                            class="accordion-collapse collapse @php if ($i == 0) {
+                                            echo 'show';
+                                        } @endphp"
                                             aria-labelledby="headingOne_{{ $faq_data->id }}"
                                             data-parent="#accordionExample">
                                             <div class="accordion-body">{!! html_entity_decode($faq_data->answer) !!}</div>

@@ -5,6 +5,74 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
+// Prevent missing static assets from being saved as 'intended' URLs
+Route::get('{file}.{ext}', function () {
+    abort(404);
+})->where('file', '.*')->where('ext', 'ico|css|js|png|jpg|jpeg|gif|map|svg|woff|woff2|ttf|eot');
+
+Route::get('/run-expiries-cron', function () {
+    \Illuminate\Support\Facades\Artisan::call('vendor:check-expiries');
+    return "<pre>Cron executed successfully. Output:\n" . \Illuminate\Support\Facades\Artisan::output() . "</pre>";
+});
+
+Route::get('vendor/update-documents/{vendor}', [\App\Http\Controllers\VendorDocumentUpdateController::class, 'show'])
+    ->name('vendor.document.update')
+    ->middleware('signed');
+
+Route::post('vendor/update-documents/{vendor}', [\App\Http\Controllers\VendorDocumentUpdateController::class, 'update'])
+    ->name('vendor.document.update.submit')
+    ->middleware('signed');
+
+Route::get('vendor/update-documents-thank-you', [\App\Http\Controllers\VendorDocumentUpdateController::class, 'thankYou'])
+    ->name('vendor.document.update.thankyou');
+Route::get('admin/vendors/{id}/verify-documents', [\App\Http\Controllers\admin\VendorsController::class, 'showVerifyDocumentsForm'])
+    ->name('admin.vendors.verify-documents.form')
+    ->middleware(['auth']);
+
+Route::post('admin/vendors/{id}/verify-documents', [\App\Http\Controllers\admin\VendorsController::class, 'verifyDocumentsOnly'])
+    ->name('admin.vendors.verify-documents')
+    ->middleware(['auth']);
+
+Route::get('admin/vendors/{id}/verify-contract', [\App\Http\Controllers\admin\VendorsController::class, 'verifyDocumentAndSendContract'])
+    ->name('admin.vendors.verify-contract')
+    ->middleware(['auth']);
+
+Route::get('admin/contracts/{contract_id}/approve', [\App\Http\Controllers\admin\VendorsController::class, 'approveVendorContract'])
+    ->name('admin.contracts.approve')
+    ->middleware(['auth']);
+
+Route::get('admin/contracts/{contract_id}/reject', [\App\Http\Controllers\admin\VendorsController::class, 'rejectVendorContract'])
+    ->name('admin.contracts.reject')
+    ->middleware(['auth']);
+
+Route::get('admin/vendors/{id}/contracts', [\App\Http\Controllers\admin\VendorsController::class, 'manageContracts'])
+    ->name('admin.vendors.contracts')
+    ->middleware(['auth']);
+
+Route::post('admin/vendors/{id}/contracts/upload', [\App\Http\Controllers\admin\VendorsController::class, 'manualContractUpload'])
+    ->name('admin.vendors.contracts.upload')
+    ->middleware(['auth']);
+
+Route::post('vendor/upload-signed-contract', [\App\Http\Controllers\admin\VendorsController::class, 'uploadSignedContract'])
+    ->name('vendor.upload-signed-contract')
+    ->middleware(['auth']);
+
+Route::get('vendor/contract-upload/{id}', [\App\Http\Controllers\admin\VendorsController::class, 'showUploadForm'])
+    ->name('vendor.contract.upload.form')
+    ->middleware('signed');
+
+Route::post('vendor/contract-upload/{id}', [\App\Http\Controllers\admin\VendorsController::class, 'submitUploadForm'])
+    ->name('vendor.contract.upload.submit')
+    ->middleware('signed');
+
+Route::get('/contract/{path}', function ($path) {
+    $fullPath = storage_path('app/public/contracts/' . $path);
+    if (!file_exists($fullPath)) {
+        abort(404, 'File not found');
+    }
+    return response()->file($fullPath);
+})->where('path', '.*')->name('contract.download');
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -108,6 +176,8 @@ use App\Http\Controllers\front\TabbyController;
 use App\Http\Controllers\front\Croncontroller;
 use App\Http\Controllers\admin\Salespersonreportcontroller;
 use App\Http\Controllers\admin\ReportsDashboardController;
+use App\Http\Controllers\admin\SurveyOrdercontroller;
+use App\Http\Controllers\admin\ManpowerOrderController;
 
 
 
@@ -135,6 +205,19 @@ Route::get('/run-all-jobs', function () {
     ]);
 
     return 'All jobs completed';
+});
+
+Route::get('/fix-db', function () {
+    if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'trn_certificate_number')) {
+        \Illuminate\Support\Facades\Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
+            $table->string('trn_certificate_number')->nullable();
+            $table->string('trade_license_number')->nullable();
+            $table->string('passport_number')->nullable();
+            $table->string('emirates_id_number')->nullable();
+        });
+        return 'Successfully added columns to users table!';
+    }
+    return 'Columns already exist!';
 });
 
 // Clear application cache:
@@ -166,6 +249,9 @@ Route::get('/run-all-jobs', function () {
 
 
 /*------End Front routes  ------*/
+Route::post('/vendor-otp-sent', [FrontvendorController::class, 'vendor_otp_sent'])->name('vendor-otp-sent');
+Route::post('/vendor-otp-verify', [FrontvendorController::class, 'vendor_otp_verify'])->name('vendor-otp-verify');
+
 Route::post('/order-add-tip', [MyaccountController::class, 'order_add_tip'])->name('order-add-tip');
 Route::get('/tip-success/{id}', [MyaccountController::class, 'tip_payment_success']);
 Route::get('/tip-cancel/{id}', [MyaccountController::class, 'tip_payment_cancel']);
@@ -220,6 +306,10 @@ Route::prefix('vendor')->group(function () {
         Route::get('/dashboard', function () {
             return view('admin.vendorsdashboard');
         })->name('vendor.dashboard');
+
+        Route::get('/suspended', function () {
+            return view('front.vendor_suspended');
+        })->name('vendor.suspended');
     });
 });
 
@@ -564,6 +654,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/add-enquiry', '\App\Http\Controllers\admin\EnquiryController@movingenquiryadd')->name('admin.movingenquiryadd');
 
     Route::get('/get-subservices/{service_id}', '\App\Http\Controllers\admin\EnquiryController@getSubservices')->name('getSubservices');
+    Route::post('/admin/change_drop_down', '\App\Http\Controllers\front\Packagecontroller@change_drop_down')->name('admin.change_drop_down');
     Route::post('/admin/get-dynamic-forms', [EnquiryController::class, 'getDynamicForms'])->name('admin.get.dynamic.forms');
     Route::post('/admin/movingstorageenquirystore', [EnquiryController::class, 'movingstorageenquirystore'])->name('admin.movingstorageenquirystore');
 
@@ -625,6 +716,9 @@ Route::middleware('auth')->group(function () {
     Route::post('mail_send', 'App\Http\Controllers\admin\Form_fieldController@mail_send_fun');
     Route::get('remove_add_more_attribute/{form_id}/{id}/{attr_id}', [Form_fieldController::class, 'remove_more_attribute'])->name('remove_add_more_attribute');
 
+
+    Route::resource('admin/survey-orders', 'App\Http\Controllers\admin\SurveyOrdercontroller');
+    Route::resource('admin/manpower-orders', 'App\Http\Controllers\admin\ManpowerOrderController');
 
     Route::resource('admin/order', 'App\Http\Controllers\admin\Ordercontroller');
     Route::post('admin/addCommission', 'App\Http\Controllers\admin\Ordercontroller@addCommission')->name('add.commission');
@@ -703,11 +797,15 @@ Route::middleware('auth')->group(function () {
     Route::get('admin/order/detail/{order_id}', [Ordercontroller::class, 'detail'])->name('detail');
     Route::get('admin/order/painting-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('painting-detail');
     Route::get('admin/order/cleaning-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('cleaning-detail');
+    Route::post('admin/order/deduct-visit-charge', [Ordercontroller::class, 'deductVisitCharge'])->name('admin.deduct_visit_charge');
     Route::get('admin/order/moving-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('moving-detail');
     Route::get('admin/order/handyman-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('handyman-detail');
     Route::get('admin/order/car-inspection-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('car-inspection-detail');
     Route::get('admin/order/salon-spa-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('salon-spa-detail');
     Route::get('admin/order/pest-control-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('pest-control-detail');
+    Route::get('admin/order/storage-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('storage-detail');
+    Route::get('admin/order/survey-order-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('survey-order-detail');
+    Route::get('admin/order/manpower-order-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('manpower-order-detail');
 
     Route::get('cleaning-admin-order/add', '\App\Http\Controllers\admin\Ordercontroller@cleaning_admin_order')
         ->name('cleaning-admin-order');
@@ -1107,6 +1205,30 @@ Route::get('/request-accept/{enquiry_id}/{format_type}', [ErpQuotecontroller::cl
 Route::get('/', '\App\Http\Controllers\front\Homecontroller@redirectToCity')
     ->name('default.city');
 
+Route::match(['get', 'post'], 'lost-password', [AdminpassController::class, 'lost_password'])->name('lost_password');
+Route::post('email-check-login-admin', '\App\Http\Controllers\admin\AdminpassController@emailCheck');
+Route::get('reset-password-vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@reset_password')->name('reset_password');
+Route::post('set_password_vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@set_password_vendor')->name('set_password_vendor');
+
+Route::get('test-email/{order_id}', function ($order_id) {
+    $orderdata = \Illuminate\Support\Facades\DB::table('ci_orders')->where('order_id', $order_id)->first();
+    $order_item_data = \Illuminate\Support\Facades\DB::table('ci_order_item')->where('order_id', $order_id)->get();
+
+    if (!$orderdata) {
+        return "Order not found! Try passing a valid order_id like /test-email/121";
+    }
+
+    $user = \Illuminate\Support\Facades\DB::table('frontloginregisters')->where('id', $orderdata->user_id)->first();
+    $payment_mode = ($orderdata->paymentmode == 1) ? "COD" : "Online";
+
+    return view('emails.customer_booking_request', [
+        'orderdata' => $orderdata,
+        'order_item_data' => $order_item_data,
+        'user' => $user,
+        'payment_mode' => $payment_mode
+    ]);
+});
+
 Route::prefix('{city}')
     ->where(['city' => '^(?!admin|login|logout|config-cache|accept-quotation|request-accept).*$'])
     ->middleware('front.city')
@@ -1196,11 +1318,6 @@ Route::prefix('{city}')
 
 
         Route::post('set_password/{uid}', '\App\Http\Controllers\front\FrontloginregisterController@set_password')->name('set_password');
-
-        Route::match(['get', 'post'], 'lost-password', [AdminpassController::class, 'lost_password'])->name('lost_password');
-        Route::post('email-check-login-admin', '\App\Http\Controllers\admin\AdminpassController@emailCheck');
-        Route::get('reset-password-vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@reset_password')->name('reset_password');
-        Route::post('set_password_vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@set_password_vendor')->name('set_password_vendor');
 
 
 
@@ -1459,6 +1576,7 @@ Route::prefix('{city}')
 
 Route::post('admin/cancel_recurring_visit', '\App\Http\Controllers\admin\Ordercontroller@cancel_recurring_visit')->name('admin.cancel_recurring_visit');
 Route::post('admin/assign_visit_cleaner', '\App\Http\Controllers\admin\Ordercontroller@assign_visit_cleaner')->name('admin.assign_visit_cleaner');
+Route::post('admin/adjust_visit_hours', '\App\Http\Controllers\admin\Ordercontroller@adjust_visit_hours')->name('admin.adjust_visit_hours');
 Route::post('admin/mark_visit_paid', '\App\Http\Controllers\admin\Ordercontroller@mark_visit_paid')->name('admin.mark_visit_paid');
 Route::post('cancel_recurring_visit', '\App\Http\Controllers\front\MyaccountController@cancel_recurring_visit')->name('front.cancel_recurring_visit');
 
@@ -1472,11 +1590,20 @@ Route::get('/schema-update-now', function () {
     return "Column cleaner_id already exists.";
 });
 
+
+// General Enquiry Module
+Route::resource('admin/general-enquiries', 'App\Http\Controllers\admin\GeneralEnquiryController');
+
+
+
 // General Enquiry Module
 Route::resource('admin/general-enquiries', 'App\Http\Controllers\admin\GeneralEnquiryController');
 Route::post('admin/general-enquiries/get-customer-details', 'App\Http\Controllers\admin\GeneralEnquiryController@getCustomerDetails')->name('general-enquiries.get-customer-details');
 Route::post('admin/general-enquiries/get-subservices', 'App\Http\Controllers\admin\GeneralEnquiryController@getSubServices')->name('general-enquiries.get-subservices');
+Route::post('admin/general-enquiries/check-customer-exist', 'App\Http\Controllers\admin\GeneralEnquiryController@checkCustomerExist')->name('general-facts.check-customer-exist');
 Route::post('admin/general-enquiries/check-customer-exist', 'App\Http\Controllers\admin\GeneralEnquiryController@checkCustomerExist')->name('general-enquiries.check-customer-exist');
 Route::post('admin/general-enquiries/assign', 'App\Http\Controllers\admin\GeneralEnquiryController@assignSalesperson')->name('general-enquiries.assign');
-
+Route::get('admin/general-enquiries/{id}/notes', 'App\Http\Controllers\admin\GeneralEnquiryController@getNotes')->name('general-enquiries.get-notes');
+Route::post('admin/general-enquiries/{id}/notes', 'App\Http\Controllers\admin\GeneralEnquiryController@storeNote')->name('general-enquiries.store-note');
+Route::post('admin/general-enquiries/update-status', 'App\Http\Controllers\admin\GeneralEnquiryController@updateStatus')->name('general-enquiries.update-status');
 require __DIR__ . '/auth.php';

@@ -353,7 +353,11 @@
                                             value="{{ $vendors->establishment_date }}" />
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-md-12 mt-4 mb-3">
+                                    <h4>Document Section</h4>
+                                    <hr>
+                                </div>
+                                <div class="col-lg-12">
                                     <div class="form-group">
                                         <label for="name">Company Logo (90px * 90px)</label>
                                         <input id="company_logo" name="company_logo" type="file" class="form-control"
@@ -361,82 +365,124 @@
                                         @if ($vendors->company_logo != '')
                                             <a href="{{ asset('public/upload/vendors/' . $vendors->company_logo) }}"
                                                 class="btn btn-primary" target="_blank">View</a>
-                                            {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->company_logo) }}"
-                                                style="width: 10%;margin-top: 10px;" /> --}}
                                         @endif
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label for="name">VAT Certificate </label>
+                                        <label for="name">VAT Certificate<span class="text-danger">*</span></label>
                                         <input id="vatcertificate" name="vatcertificate" type="file"
                                             class="form-control" placeholder="Select VAT Certificate" />
                                         @if ($vendors->vatcertificate != '')
                                             <a href="{{ asset('public/upload/vendors/' . $vendors->vatcertificate) }}"
-                                                class="btn btn-primary" target="_blank">View</a>
-                                            {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->vatcertificate) }}"
-                                                style="width: 10%;margin-top: 10px;" /> --}}
+                                                class="btn btn-primary mt-2" target="_blank">View</a>
                                         @endif
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label for="name">TRN Certificate </label>
-                                        <input id="trncertificate" name="trncertificate" type="file"
-                                            class="form-control" placeholder="Select TRN Certificate" />
-                                        @if ($vendors->trncertificate != '')
-                                            <a href="{{ asset('public/upload/vendors/' . $vendors->trncertificate) }}"
-                                                class="btn btn-primary" target="_blank">View</a>
-                                            {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->trncertificate) }}"
-                                                style="width: 10%;margin-top: 10px;" /> --}}
-                                        @endif
+                                        <label for="name">TRN Certificate Number<span
+                                                class="text-danger">*</span></label>
+                                        <input id="trn_certificate_number" name="trn_certificate_number" type="text"
+                                            class="form-control" placeholder="Enter TRN Certificate Number"
+                                            value="{{ $vendors->trn_certificate_number ?? '' }}" />
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+
+                                <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Trade License</label>
+                                        <label for="name">Trade License<span class="text-danger">*</span></label>
                                         <input id="tradelicense" name="tradelicense" type="file" class="form-control"
                                             placeholder="Select Trade License" />
                                         @if ($vendors->tradelicense != '')
                                             <a href="{{ asset('public/upload/vendors/' . $vendors->tradelicense) }}"
-                                                class="btn btn-primary" target="_blank">View</a>
-                                            {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->tradelicense) }}"
-                                                style="width: 10%;margin-top: 10px;" /> --}}
+                                                class="btn btn-primary mt-2" target="_blank">View</a>
                                         @endif
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Passport</label>
+                                        <label for="name">Trade License Number<span
+                                                class="text-danger">*</span></label>
+                                        <input id="trade_license_number" name="trade_license_number" type="text"
+                                            class="form-control" placeholder="Enter Trade License Number"
+                                            value="{{ $vendors->trade_license_number ?? '' }}" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="name">Trade License Expiry Date<span
+                                                class="text-danger">*</span></label>
+                                        <input id="tlexpiry" name="tlexpiry" type="date" class="form-control"
+                                            placeholder="Select Trade License Expiry Date"
+                                            value="{{ $vendors->tlexpiry }}" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="name">Passport (authorized person)<span
+                                                class="text-danger">*</span></label>
                                         <input id="passport" name="passport" type="file" class="form-control"
                                             placeholder="Select Passport" />
                                         @if ($vendors->passport != '')
                                             <a href="{{ asset('public/upload/vendors/' . $vendors->passport) }}"
-                                                class="btn btn-primary" target="_blank">View</a>
-                                            {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->tradelicense) }}"
-                                                style="width: 10%;margin-top: 10px;" /> --}}
+                                                class="btn btn-primary mt-2" target="_blank">View</a>
                                         @endif
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Emirates ID</label>
+                                        <label for="name">Passport Number (authorized person)<span
+                                                class="text-danger">*</span></label>
+                                        <input id="passport_number" name="passport_number" type="text"
+                                            class="form-control" placeholder="Enter Passport Number"
+                                            value="{{ $vendors->passport_number ?? '' }}" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="name">Passport Expiry Date (authorized person)<span
+                                                class="text-danger">*</span></label>
+                                        <input id="passport_expiry" name="passport_expiry" type="date"
+                                            class="form-control" placeholder="Select Passport Expiry Date"
+                                            value="{{ $vendors->passport_expiry }}" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="name">Emirates ID (authorized person)<span
+                                                class="text-danger">*</span></label>
                                         <input id="emirates_id" name="emirates_id" type="file" class="form-control"
                                             placeholder="Select emirates_id" />
                                         @if ($vendors->emirates_id != '')
                                             <a href="{{ asset('public/upload/vendors/' . $vendors->emirates_id) }}"
-                                                class="btn btn-primary" target="_blank">View</a>
-                                            {{-- <img src="{{ asset('public/upload/vendors/' . $vendors->tradelicense) }}"
-                                                style="width: 10%;margin-top: 10px;" /> --}}
+                                                class="btn btn-primary mt-2" target="_blank">View</a>
                                         @endif
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">TL expiry date</label>
-                                        <input id="tlexpiry" name="tlexpiry" type="date" class="form-control"
-                                            placeholder="Select TL expiry date" value="{{ $vendors->tlexpiry }}" />
+                                        <label for="name">Emirates ID Number (authorized person)<span
+                                                class="text-danger">*</span></label>
+                                        <input id="emirates_id_number" name="emirates_id_number" type="text"
+                                            class="form-control" placeholder="Enter Emirates ID Number"
+                                            value="{{ $vendors->emirates_id_number ?? '' }}" />
                                     </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="name">Emirates ID Expiry Date (authorized person)<span
+                                                class="text-danger">*</span></label>
+                                        <input id="emirates_id_expiry" name="emirates_id_expiry" type="date"
+                                            class="form-control" placeholder="Select Emirates ID Expiry Date"
+                                            value="{{ $vendors->emirates_id_expiry }}" />
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-4 mb-3">
+                                    <h4>Additional Information</h4>
+                                    <hr>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">

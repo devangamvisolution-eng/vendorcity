@@ -507,7 +507,7 @@
                             @foreach ($package_cat as $package_cat_data)
                                 <div id="sofa{{ $package_cat_data->id }}" class="section-packages" style="">
                                     <!-- <div id="sofa{{ $package_cat_data->id }}" class="section-packages"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            style="padding-top: 40px;"> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    style="padding-top: 40px;"> -->
 
                                     @php
                                         $package = DB::table('packages')
@@ -978,6 +978,49 @@
                                     <p class="form-error-text" id="time_slot_error"
                                         style="color: red; margin-top: 10px;"></p>
                                 </div>
+                                @if (!empty($subservice_data->cancel_policy))
+                                    <div class="addonsinstruction">
+                                        <h5 class=""> <i
+                                                class="fas fa-info-circle tabby-banner-info-icon ms-2"></i>
+                                            Enjoy free cancellation up to 6 hours before your booking start time.</h5>
+                                        <div class="text-end" style="margin-right:28px">
+                                            <a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#cancelPolicyModal"
+                                                style="text-decoration: underline; color: #150495; font-size: 13px; font-weight: 600;">View
+                                                Policy</a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cancel Policy Modal -->
+                                    <div class="modal subservice-read-more-model fade" id="cancelPolicyModal"
+                                        tabindex="-1" aria-hidden="true" style="z-index: 9999;">
+                                        <div class="modal-dialog modal-dialog-scrollable" id="modal-digi"
+                                            role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-drag-handle"
+                                                    style="padding:10px 0 4px; text-align:center;">
+                                                    <div
+                                                        style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;">
+                                                    </div>
+                                                </div>
+                                                <div class="modal-header"
+                                                    style="border-bottom:1px solid #f0f0f0; padding:12px 20px; display:flex; align-items:center; justify-content:space-between;">
+                                                    <h5 class="modal-title"
+                                                        style="margin:0; font-size:1rem; font-weight:800; color:#111;">
+                                                        Cancellation Policy</h5>
+                                                    <button type="button" data-bs-dismiss="modal" aria-label="Close"
+                                                        style="background:#f4f4f4; border:none; width:32px; height:32px; border-radius:50%; font-size:1.1rem; color:#555; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                                                        &times;
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body"
+                                                    style="padding:20px; overflow-y:scroll; -webkit-overflow-scrolling:touch;">
+                                                    {!! $subservice_data->cancel_policy !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                             @if ($emiratesShow == true)
                                 <div class="timeslotinstruction">
@@ -995,6 +1038,42 @@
                                             sample collection.</h5>
                                     </div>
                                 @endif
+                            @endif
+                            @if ($subservice_id == 93)
+                                <div class="form-group mb-3 mt-3">
+                                    <label class="form-label fw500 dark-color">Car Details</label>
+                                    <div class="row">
+                                        <div class="col-md-4 col-4 mb-2" style="padding-right: 5px;">
+                                            <select class="form-control" name="plate_source" id="plate_source"
+                                                style="padding: 0.375rem 0.5rem; font-size: 13px;">
+                                                <option value="">Plate Source</option>
+                                                <option value="Dubai">Dubai</option>
+                                                <option value="Abu Dhabi">Abu Dhabi</option>
+                                                <option value="Sharjah">Sharjah</option>
+                                                <option value="Ajman">Ajman</option>
+                                                <option value="Umm Al-Quwain">Umm Al-Quwain</option>
+                                                <option value="Fujairah">Fujairah</option>
+                                                <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+                                                <option value="Classic">Classic</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 col-4 mb-2"
+                                            style="padding-right: 5px; padding-left: 5px;">
+                                            <input type="text" class="form-control" name="plate_code"
+                                                id="plate_code" placeholder="Plate Code"
+                                                style="padding: 0.375rem 0.5rem; font-size: 13px;">
+                                        </div>
+                                        <div class="col-md-4 col-4 mb-2" style="padding-left: 5px;">
+                                            <input type="text" class="form-control" name="plate_number"
+                                                id="plate_number" placeholder="Plate Number"
+                                                style="padding: 0.375rem 0.5rem; font-size: 13px;">
+                                        </div>
+                                        <div class="col-md-12 mb-2">
+                                            <textarea class="form-control" name="car_description" id="car_description"
+                                                placeholder="add some sentence add your car model and data"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
                             @endif
                             <div class="step-buttons">
                                 <button class="btn btn-secondary custome-black" type="button"
@@ -1211,7 +1290,7 @@
                                         </div>
                                     </label>
 
-                                    <label class="payment-method-card" for="paymet_1">
+                                    <!-- <label class="payment-method-card" for="paymet_1">
                                         <input type="radio" id="paymet_1" name="payment_type" value="COD">
                                         <div class="payment-card-content">
                                             <div class="payment-card-header">
@@ -1227,7 +1306,7 @@
                                                 <span>Cash handling charges will be applied.</span>
                                             </p>
                                         </div>
-                                    </label>
+                                    </label> -->
 
                                     {{-- <label class="payment-method-card" for="paymet_3" id="tabby_payment_option">
                                         <input type="radio" id="paymet_3" name="payment_type" value="TABBY">
@@ -1355,8 +1434,8 @@
                                                                 <div id="wallet_amount" class="price-wrapper">
                                                                     <span class="currency_dhiramnew"
                                                                         style="
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            style=&quot;font-size: 0.95rem; font-weight:700; position:relative;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ">AED</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    style=&quot;font-size: 0.95rem; font-weight:700; position:relative;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ">AED</span>
                                                                     <span>{{ $wallet_amount }}</span>
                                                                 </div>
                                                             </div>
@@ -1561,18 +1640,19 @@
                             <span class="sub_total">0.00</span>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-between d-none service-fee-div">
-                        <div>Service Fee</div>
-                        <div class="font-weight-bold sm-summary price-wrapper">
-                            <span class="currency_dhiramnew">AED</span>
-                            <span class="service_fee">0.00</span>
-                        </div>
-                    </div>
+
                     <div class="d-flex justify-content-between subheadingdev d-none vat-div">
                         <div>VAT ({{ \App\Enums\VC_ChargiesEnum::VAT_PERCENT->percentage() }}%)</div>
                         <div class="font-weight-bold sm-summary price-wrapper">
                             <span class="currency_dhiramnew">AED</span>
                             <span class="vat_charge">0</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between d-none service-fee-div">
+                        <div>Service Fee</div>
+                        <div class="font-weight-bold sm-summary price-wrapper">
+                            <span class="currency_dhiramnew">AED</span>
+                            <span class="service_fee">0.00</span>
                         </div>
                     </div>
                     <div class="subheadingdev">
@@ -2242,6 +2322,20 @@
                             <span class="currency_dhiramnew">AED</span><span class="cod_charge"></span>
                         </span>
                     </div>
+
+                    <div class="d-flex justify-content-between py-1 d-none subtotal-div">
+                        <span style="font-size:0.85rem; color:#555;">Sub Total</span>
+                        <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
+                            <span class="currency_dhiramnew">AED</span><span class="sub_total">0.00</span>
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1 d-none vat-div">
+                        <span style="font-size:0.85rem; color:#555;">VAT
+                            ({{ \App\Enums\VC_ChargiesEnum::VAT_PERCENT->percentage() }}%)</span>
+                        <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
+                            <span class="currency_dhiramnew">AED</span><span class="vat_charge">0</span>
+                        </span>
+                    </div>
                     <div class="d-flex justify-content-between py-1 d-none service-fee-div align-items-center">
                         <span style="font-size:0.85rem; color:#555; display:flex; align-items:center; gap:5px;">Service
                             Fee
@@ -2257,19 +2351,6 @@
                             <span class="currency_dhiramnew">AED</span><span class="service_fee">0.00</span>
                         </span>
                     </div>
-                    <div class="d-flex justify-content-between py-1 d-none subtotal-div">
-                        <span style="font-size:0.85rem; color:#555;">Sub Total</span>
-                        <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
-                            <span class="currency_dhiramnew">AED</span><span class="sub_total">0.00</span>
-                        </span>
-                    </div>
-                    <div class="d-flex justify-content-between py-1 d-none vat-div">
-                        <span style="font-size:0.85rem; color:#555;">VAT
-                            ({{ \App\Enums\VC_ChargiesEnum::VAT_PERCENT->percentage() }}%)</span>
-                        <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
-                            <span class="currency_dhiramnew">AED</span><span class="vat_charge">0</span>
-                        </span>
-                    </div>
 
                     {{-- Promo Applied --}}
                     <div class="subheadingdev">
@@ -2279,7 +2360,8 @@
                             <div style="display:flex; align-items:center; gap:8px;">
                                 <span style="font-size:0.82rem; font-weight:800; color:#16a34a;"
                                     class="price-wrapper">
-                                    − <span class="currency_dhiramnew">AED</span><span class="promo_code">0.00</span>
+                                    − <span class="currency_dhiramnew">AED</span><span
+                                        class="promo_code">0.00</span>
                                 </span>
                                 <a href="javascript:void(0)" onclick="remove_coupon();"
                                     style="font-size:0.72rem; color:#999; text-decoration:none; background:#eee; padding:2px 8px; border-radius:6px;">Remove</a>
@@ -2399,6 +2481,7 @@
             ->where('service_id', $service_id)
             ->where('subservice_id', $subservice_id)
             ->where('packagecategory_id', $package_cat_data->id)
+            ->where('is_active', 0)
             ->get()
             ->toArray();
     @endphp
@@ -3550,15 +3633,15 @@
 
         //alert(timingCharge);
 
-        let subtotalCharge = total + timingCharge + codCharge + serviceFee;
+        let subtotalCharge = total + timingCharge + codCharge;
         let vat_charge = subtotalCharge * (vatPercent / 100);
-        let totalToPay = subtotalCharge + vat_charge - promo_discount - wallet_used;
+        let totalToPay = subtotalCharge + vat_charge + serviceFee - promo_discount - wallet_used;
 
         // alert(totalToPay);
         // alert(wallet_used);
 
         // BEFORE PROMO
-        let beforePromo = subtotalCharge + vat_charge - promo_discount - wallet_used;
+        let beforePromo = subtotalCharge + vat_charge + serviceFee - promo_discount - wallet_used;
 
         $("#service_charge").val(total.toFixed(2));
         $("#sub_total").val(subtotalCharge.toFixed(2));
@@ -4012,7 +4095,30 @@
             return false;
         }
 
+        if ($('#plate_source').length) {
+            let plateSource = $('#plate_source').val();
+            let plateNumber = $('#plate_number').val();
 
+            if (plateSource === "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Plate Source Required',
+                    text: 'Please select a plate source.',
+                    confirmButtonColor: '#3085d6',
+                });
+                return false;
+            }
+
+            if (plateNumber.trim() === "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Plate Number Required',
+                    text: 'Please enter a plate number.',
+                    confirmButtonColor: '#3085d6',
+                });
+                return false;
+            }
+        }
 
         return true;
     }
@@ -4555,6 +4661,11 @@
 
             if (rawCartTotal <= 0) return; // no packages yet — don't apply
 
+            // Prevent spamming AJAX if we already know it's below minimum order
+            if (window.appliedPromoMinOrder && rawCartTotal < window.appliedPromoMinOrder) {
+                return;
+            }
+
             promoAttempted = true;
 
             // Hide the Step 1 banner — we are about to apply or already applied
@@ -4596,6 +4707,12 @@
                             let toastMsg = 'Your promo code has been applied.';
                             if (couponData && couponData !== 'null' && typeof couponData ===
                                 'object' && couponData.coupancode) {
+
+                                if (couponData.minimum_order) {
+                                    window.appliedPromoMinOrder = parseFloat(couponData
+                                        .minimum_order) || 0;
+                                }
+
                                 let rewardMsg = '';
                                 if (couponData.coupanvalue == '0') {
                                     rewardMsg = couponData.discount + '%';
@@ -4626,6 +4743,14 @@
                         );
                         promoAttempted = false; // allow retry
                         showBanner(); // Show banner again — need more items
+                    } else if (!isNaN(parseFloat(response)) && isFinite(response)) {
+                        window.appliedPromoMinOrder = parseFloat(response);
+                        showPromoToast('info', 'Notice',
+                            'To apply this promo you need a minimum order of ' + response +
+                            ' AED'
+                        );
+                        promoAttempted = false; // allow retry when total increases
+                        showBanner(); // Show banner again
                     }
                     // For 'invalid', 'Already', 'expired' — silently do nothing
                 }
@@ -4646,6 +4771,17 @@
                 Object.keys(cart).forEach(function(id) {
                     rawTotal += (parseFloat(cart[id].price) || 0) * (parseInt(cart[id].qty) || 1);
                 });
+            }
+
+            if (window.appliedPromoMinOrder && rawTotal > 0 && rawTotal < window.appliedPromoMinOrder) {
+                // Cart dropped below minimum order threshold, remove promo automatically
+                silentRemovePromo(function() {
+                    showPromoToast('info', 'Notice',
+                        'Promo code removed because the new total is below the minimum order of ' +
+                        window.appliedPromoMinOrder + ' AED');
+                    if (typeof updateSidebarCart === 'function') updateSidebarCart();
+                });
+                return;
             }
 
             if (rawTotal > 0) return; // cart still has items — keep promo

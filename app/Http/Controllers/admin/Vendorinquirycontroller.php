@@ -1088,7 +1088,10 @@ class Vendorinquirycontroller extends Controller
                                         ->where('form_id', 20)
                                         ->where('more_form_attributes_id', $local_more_formfields_details_att->more_form_attributes_id)
                                         ->first();
-                                    //    echo"<pre>else";print_r($subscription_local_move_attribute);echo"</pre>";exit;
+                                    // echo "<pre>else";
+                                    // print_r($local_more_formfields_details_att);
+                                    // echo "</pre>";
+                                    // exit;
 
                                     $vendors_data = DB::table('users')->where('id', $vendorId)->first();
 

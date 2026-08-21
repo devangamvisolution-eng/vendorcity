@@ -20,10 +20,29 @@ class GeneralEnquiryController extends Controller
                 $table->text('notes')->nullable();
             });
         }
+
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('general_enquiries', 'other_service')) {
+            \Illuminate\Support\Facades\Schema::table('general_enquiries', function ($table) {
+                $table->string('other_service')->nullable();
+            });
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('general_enquiry_notes')) {
+            \Illuminate\Support\Facades\Schema::create('general_enquiry_notes', function ($table) {
+                $table->id();
+                $table->integer('general_enquiry_id');
+                $table->date('note_date')->nullable();
+                $table->text('note')->nullable();
+                $table->integer('created_by')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function index(Request $request)
     {
+        session(['enquiries_list_url' => request()->fullUrl()]);
+
         $query = GeneralEnquiry::leftJoin('services', 'services.id', '=', 'general_enquiries.service_id')
             ->leftJoin('subservices', 'subservices.id', '=', 'general_enquiries.subservice_id')
             ->leftJoin('users', 'users.id', '=', 'general_enquiries.salesperson_id')
@@ -35,9 +54,11 @@ class GeneralEnquiryController extends Controller
         $roleIds = explode(',', $user_data->role_id ?? '');
 
         // Restrict list to unassigned enquiries AND the user's own enquiries if they are a salesperson
-        if (in_array('11', $roleIds) && !in_array('1', $roleIds)) {
+        if (!in_array('1', $roleIds)) {
             $query->where(function ($q) use ($user_data) {
                 $q->whereNull('general_enquiries.salesperson_id')
+                    ->orWhere('general_enquiries.salesperson_id', 0)
+                    ->orWhere('general_enquiries.salesperson_id', '')
                     ->orWhere('general_enquiries.salesperson_id', $user_data->id);
             });
         }
@@ -91,7 +112,7 @@ class GeneralEnquiryController extends Controller
             $sourceLeadsData = DB::table('source_leads')->whereIn('id', array_keys($sourceCounts))->get()->keyBy('id');
             foreach ($sourceCounts as $id => $count) {
                 if (isset($sourceLeadsData[$id])) {
-                    $source_summary->push((object)[
+                    $source_summary->push((object) [
                         'name' => $sourceLeadsData[$id]->name,
                         'total' => $count
                     ]);
@@ -127,13 +148,13 @@ class GeneralEnquiryController extends Controller
             );
         }
 
-        $enquiries = $query->paginate(15)->appends($request->except('page'));
+        $enquiries = $query->get();
 
         $salespersonsQuery = DB::table('users')
             ->whereIn('role_id', [11, 12])
             ->where('is_active', '0');
 
-        if (in_array('11', $roleIds) && !in_array('1', $roleIds)) {
+        if (!in_array('1', $roleIds)) {
             $salespersonsQuery->where('id', $user_data->id);
         }
 
@@ -174,36 +195,74 @@ class GeneralEnquiryController extends Controller
         $customerId = $request->customer_id;
 
         // If no customer is selected, check if mobile exists or create new
+        // if (empty($customerId)) {
+        //     $existingCustomer = FrontLoginRegister::where('mobile', $request->customer_phone)->first();
+        //     if ($existingCustomer) {
+        //         $customerId = $existingCustomer->id;
+        //     } else {
+        //         $newCustomer = FrontLoginRegister::create([
+        //             'name' => $request->customer_name,
+        //             'email' => $request->customer_email,
+        //             'mobile' => $request->customer_phone,
+        //             'country_code' => $request->country_code,
+        //             'password' => bcrypt('12345678') // default dummy password
+        //         ]);
+        //         $customerId = $newCustomer->id;
+        //     }
+        // } else {
+        //     // Update the existing customer if details were changed
+        //     $customer = FrontLoginRegister::find($customerId);
+        //     if ($customer) {
+        //         $customer->update([
+        //             'name' => $request->customer_name,
+        //             'email' => $request->customer_email,
+        //             'mobile' => $request->customer_phone,
+        //             'country_code' => $request->country_code
+        //         ]);
+        //     }
+        // }
+
         if (empty($customerId)) {
             $existingCustomer = FrontLoginRegister::where('mobile', $request->customer_phone)->first();
+
             if ($existingCustomer) {
                 $customerId = $existingCustomer->id;
             } else {
                 $newCustomer = FrontLoginRegister::create([
-                    'name' => $request->customer_name,
-                    'email' => $request->customer_email,
-                    'mobile' => $request->customer_phone,
-                    'country_code' => $request->country_code,
+                    'name' => $request->filled('customer_name') ? $request->customer_name : null,
+                    'email' => $request->filled('customer_email') ? $request->customer_email : null,
+                    'mobile' => $request->filled('customer_phone') ? $request->customer_phone : null,
+                    'country_code' => $request->filled('country_code') ? $request->country_code : null,
                     'password' => bcrypt('12345678') // default dummy password
                 ]);
+
                 $customerId = $newCustomer->id;
             }
         } else {
             // Update the existing customer if details were changed
             $customer = FrontLoginRegister::find($customerId);
+
             if ($customer) {
                 $customer->update([
-                    'name' => $request->customer_name,
-                    'email' => $request->customer_email,
-                    'mobile' => $request->customer_phone,
-                    'country_code' => $request->country_code
+                    'name' => $request->filled('customer_name') ? $request->customer_name : null,
+                    'email' => $request->filled('customer_email') ? $request->customer_email : null,
+                    'mobile' => $request->filled('customer_phone') ? $request->customer_phone : null,
+                    'country_code' => $request->filled('country_code') ? $request->country_code : null,
                 ]);
             }
         }
 
         $enquiry = new GeneralEnquiry();
         $enquiry->customer_id = $customerId;
-        $enquiry->service_id = $request->service_id;
+
+        if ($request->service_id === 'other') {
+            $enquiry->service_id = 0;
+            $enquiry->other_service = $request->other_service;
+        } else {
+            $enquiry->service_id = $request->service_id;
+            $enquiry->other_service = null;
+        }
+
         $enquiry->subservice_id = $request->subservice_id;
         $enquiry->source_lead_id = is_array($request->source_lead_id) ? implode(',', $request->source_lead_id) : $request->source_lead_id;
         $enquiry->customer_name = $request->customer_name;
@@ -217,6 +276,17 @@ class GeneralEnquiryController extends Controller
             $enquiry->status = 'Pending';
         }
         $enquiry->created_by = Auth::id();
+
+        $user_data = Auth::user();
+        $roleIds = explode(',', $user_data->role_id ?? '');
+        if ((in_array('11', $roleIds) || in_array('12', $roleIds)) && !in_array('1', $roleIds)) {
+            $enquiry->salesperson_id = $user_data->id;
+        }
+
+        if ($request->filled('enquiry_date')) {
+            $enquiry->created_at = $request->enquiry_date . ' ' . date('H:i:s');
+        }
+
         $enquiry->save();
 
         return redirect()->route('general-enquiries.index')->with('success', 'Enquiry added successfully.');
@@ -275,7 +345,15 @@ class GeneralEnquiryController extends Controller
         }
 
         $enquiry->customer_id = $customerId;
-        $enquiry->service_id = $request->service_id;
+
+        if ($request->service_id === 'other') {
+            $enquiry->service_id = 0;
+            $enquiry->other_service = $request->other_service;
+        } else {
+            $enquiry->service_id = $request->service_id;
+            $enquiry->other_service = null;
+        }
+
         $enquiry->subservice_id = $request->subservice_id;
         $enquiry->source_lead_id = is_array($request->source_lead_id) ? implode(',', $request->source_lead_id) : $request->source_lead_id;
         $enquiry->customer_name = $request->customer_name;
@@ -286,16 +364,23 @@ class GeneralEnquiryController extends Controller
         if ($request->has('status') && $request->status) {
             $enquiry->status = $request->status;
         }
+        if ($request->filled('enquiry_date')) {
+            $time = $enquiry->created_at ? $enquiry->created_at->format('H:i:s') : date('H:i:s');
+            $enquiry->created_at = $request->enquiry_date . ' ' . $time;
+        }
+
         $enquiry->save();
 
-        return redirect()->route('general-enquiries.index')->with('success', 'Enquiry updated successfully.');
+        $redirectUrl = session('enquiries_list_url', route('general-enquiries.index'));
+        return redirect($redirectUrl)->with('success', 'Enquiry updated successfully.');
     }
 
     public function destroy($id)
     {
         $enquiry = GeneralEnquiry::findOrFail($id);
         $enquiry->delete();
-        return redirect()->route('general-enquiries.index')->with('success', 'Enquiry deleted successfully.');
+        $redirectUrl = session('enquiries_list_url', route('general-enquiries.index'));
+        return redirect($redirectUrl)->with('success', 'Enquiry deleted successfully.');
     }
 
     // AJAX endpoints
@@ -317,7 +402,10 @@ class GeneralEnquiryController extends Controller
     public function getSubservices(Request $request)
     {
         $subservices = Subservice::where('serviceid', $request->service_id)
-            ->where('is_active', 0)
+            ->where(function ($query) {
+                $query->whereIn('id', [101])
+                    ->orWhere('is_active', 0);
+            })
             ->orderBy('subservicename', 'ASC')
             ->get();
         return response()->json($subservices);
@@ -343,19 +431,67 @@ class GeneralEnquiryController extends Controller
     {
         $request->validate([
             'enquiry_id' => 'required|exists:general_enquiries,id',
-            'salesperson_id' => 'nullable|exists:users,id',
-            'status' => 'required|string'
+            'salesperson_id' => 'nullable|exists:users,id'
         ]);
 
         $enquiry = GeneralEnquiry::find($request->enquiry_id);
         if ($enquiry) {
             $enquiry->salesperson_id = $request->salesperson_id;
-            $enquiry->status = $request->status;
             $enquiry->save();
 
-            return response()->json(['success' => true, 'message' => 'Salesperson and Status updated successfully!']);
+            return response()->json(['success' => true, 'message' => 'Salesperson assigned successfully!']);
         }
 
         return response()->json(['success' => false, 'message' => 'Enquiry not found.']);
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $request->validate([
+            'enquiry_id' => 'required|exists:general_enquiries,id',
+            'status' => 'required|string'
+        ]);
+
+        $enquiry = GeneralEnquiry::find($request->enquiry_id);
+        if ($enquiry) {
+            $enquiry->status = $request->status;
+            $enquiry->save();
+
+            return response()->json(['success' => true, 'message' => 'Status updated successfully!']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Enquiry not found.']);
+    }
+
+    public function getNotes($id)
+    {
+        $notes = DB::table('general_enquiry_notes')
+            ->leftJoin('users', 'general_enquiry_notes.created_by', '=', 'users.id')
+            ->where('general_enquiry_id', $id)
+            ->select('general_enquiry_notes.*', 'users.name as creator_name')
+            ->orderBy('note_date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json(['success' => true, 'notes' => $notes]);
+    }
+
+    public function storeNote(Request $request, $id)
+    {
+        $request->validate([
+            'note_date' => 'required|date',
+            'note' => 'required|string'
+        ]);
+
+        DB::table('general_enquiry_notes')->insert([
+            'general_enquiry_id' => $id,
+            'note_date' => $request->note_date,
+            'note' => $request->note,
+            'created_by' => Auth::id(),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Note added successfully!']);
     }
 }

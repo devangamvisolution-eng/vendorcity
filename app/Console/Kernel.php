@@ -16,6 +16,15 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        // Run recurring payment processing daily at 1 AM
+        $schedule->command('payments:process-recurring')->dailyAt('01:00');
+
+        // Check vendor expiries daily at midnight (Dubai Time)
+        $schedule->command('vendor:check-expiries')->timezone('Asia/Dubai')->dailyAt('00:00');
+        $schedule->command('vendor:check-documents')->timezone('Asia/Dubai')->dailyAt('00:00');
+
+        // Run package inquiries every minute
+        $schedule->command('package:inquiry')->everyMinute();
     }
 
     /**
@@ -25,7 +34,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

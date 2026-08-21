@@ -367,6 +367,24 @@
                                                                         Subscription
                                                                     </a>
                                                                 </li>
+                                                                @if (in_array('1', $roleIds))
+                                                                    <li>
+                                                                        <a class="dropdown-item py-2"
+                                                                            href="{{ route('admin.vendors.verify-documents.form', $vendors_data[$i]->id) }}">
+                                                                            <i
+                                                                                class="fas fa-check-circle text-success me-2"></i>
+                                                                            Verify Document
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item py-2"
+                                                                            href="{{ route('admin.vendors.contracts', $vendors_data[$i]->id) }}">
+                                                                            <i
+                                                                                class="fas fa-file-signature text-secondary me-2"></i>
+                                                                            Manage Contracts
+                                                                        </a>
+                                                                    </li>
+                                                                @endif
                                                             @endif
                                                             <li>
                                                                 <a class="dropdown-item py-2"
@@ -435,9 +453,7 @@
                                         @endfor
                                     </tbody>
                                 </table>
-                                <div class="d-flex justify-content-end mt-3">
-                                    {{ $vendors_data->appends(request()->query())->links('pagination::bootstrap-4') }}
-                                </div>
+                                <!-- Laravel pagination removed in favor of DataTables -->
                             </div>
                         </form>
                     </div>
@@ -559,8 +575,18 @@
             // Initialize DataTable with the new options
             $('#example').dataTable({
                 "searching": true,
-                "paging": false,
-                "info": false
+                "paging": true,
+                "lengthChange": true,
+                "info": true,
+                "language": {
+                    "search": "",
+                    "searchPlaceholder": "Quick Search...",
+                    "paginate": {
+                        "next": '<i class="fas fa-chevron-right"></i>',
+                        "previous": '<i class="fas fa-chevron-left"></i>'
+                    }
+                },
+                "dom": '<"d-flex justify-content-between align-items-center mb-3"lf>rt<"d-flex justify-content-between align-items-center mt-3"ip><"clear">'
             });
 
             // Fix dropdown clipping in responsive tables
