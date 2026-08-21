@@ -115,376 +115,244 @@
                                    </h5>
                                </div>
                                <div class="card-body">
+                                   @php
+                                        $vendors_services = explode(',',$vendor_data->serviceList);
+                                        $services_names = [];
+                                        foreach ($vendors_services as $city_id) {
+                                            $services_names[] =  \Helper::servicename(trim($city_id)); 
+                                        }
+                                        $services_names = implode(', ',$services_names);
 
-                                   <ul class="list-unstyled mb-0">
-                                       <div class="row">
-                                           <div class="col-lg-12">
-                                               <li class="py-0">
-                                                   <small class="text-dark">Company Name</small>
-                                               </li>
-                                               <li>
-                                                   @if ($vendor_data->name != '')
-                                                       {{ $vendor_data->name }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-                                           @if ($addmore_data != '')
-
-                                               <div class="row mt-2 mb-2">
-
+                                        $vendors_city = explode(',',$vendor_data->city);
+                                        $city_names = [];
+                                        foreach ($vendors_city as $city_id) {
+                                            $city_names[] =  \Helper::cityname(trim($city_id)); 
+                                        }
+                                        $city_names = implode(', ',$city_names);
+                                   @endphp
+                                   <!-- Company Overview -->
+                                   <h6 class="card-title text-primary mb-3"><i class="fas fa-building me-2"></i> Company Overview</h6>
+                                   <div class="row mb-4">
+                                       <div class="col-md-4 mb-3">
+                                           <p class="text-muted mb-1 small">Company Name</p>
+                                           <h6 class="mb-0">{{ $vendor_data->name ?: '-' }}</h6>
+                                       </div>
+                                       <div class="col-md-4 mb-3">
+                                           <p class="text-muted mb-1 small">Company Website</p>
+                                           <h6 class="mb-0">{{ $vendor_data->companywebsite ?: '-' }}</h6>
+                                       </div>
+                                       <div class="col-md-4 mb-3">
+                                           <p class="text-muted mb-1 small">Company City</p>
+                                           <h6 class="mb-0">{{ $city_names ?: '-' }}</h6>
+                                       </div>
+                                       <div class="col-md-8 mb-3">
+                                           <p class="text-muted mb-1 small">Services Offered</p>
+                                           <h6 class="mb-0">{{ $services_names ?: '-' }}</h6>
+                                       </div>
+                                       <div class="col-md-4 mb-3">
+                                           <p class="text-muted mb-1 small">Number of Staff</p>
+                                           <h6 class="mb-0">{{ $vendor_data->staff ?: '-' }}</h6>
+                                       </div>
+                                       <div class="col-md-12 mb-3">
+                                           <p class="text-muted mb-1 small">Remarks</p>
+                                           <h6 class="mb-0">{{ $vendor_data->remarks ?: '-' }}</h6>
+                                       </div>
+                                   </div>
+                               
+                                   <hr>
+                                   <!-- Points of Contact -->
+                                   <h6 class="card-title text-primary mb-3"><i class="fas fa-users me-2"></i> Points of Contact</h6>
+                                   @if(count($addmore_data) > 0)
+                                       <div class="table-responsive mb-4">
+                                           <table class="table table-bordered table-sm">
+                                               <thead class="table-light">
+                                                   <tr>
+                                                       <th>POC Full</th>
+                                                       <th>Title</th>
+                                                       <th>Email</th>
+                                                       <th>Phone</th>
+                                                   </tr>
+                                               </thead>
+                                               <tbody>
                                                    @foreach ($addmore_data as $addmore)
-                                                       <div class="col-lg-3">
-                                                           <li class="pt-2 pb-0">
-                                                               <small class="text-dark">POC Full</small>
-                                                           </li>
-                                                           <li class="pb-2">
-                                                               @if ($addmore && $addmore->poc !== null)
-                                                                   {{ $addmore->poc }}
-                                                               @else
-                                                                   {{ '-' }}
-                                                               @endif
-
-                                                           </li>
-                                                       </div>
-                                                       <div class="col-lg-3">
-                                                           <li class="pt-2 pb-0">
-                                                               <small class="text-dark">POC Title</small>
-                                                           </li>
-                                                           <li class="pb-2">
-                                                               @if ($addmore && $addmore->poctitle !== null)
-                                                                   {{ $addmore->poctitle }}
-                                                               @else
-                                                                   {{ '-' }}
-                                                               @endif
-                                                           </li>
-                                                       </div>
-                                                       <div class="col-lg-3">
-                                                           <li class="pt-2 pb-0">
-                                                               <small class="text-dark">Company
-                                                                   Email</small>
-                                                           </li>
-                                                           <li class="pb-2">
-                                                               @if ($addmore && $addmore->c_email !== null)
-                                                                   {{ $addmore->c_email }}
-                                                               @else
-                                                                   {{ '-' }}
-                                                               @endif
-                                                           </li>
-                                                       </div>
-                                                       <div class="col-lg-3">
-                                                           <li class="pt-2 pb-0">
-                                                               <small class="text-dark">Phone</small>
-                                                           </li>
-                                                           <li class="pb-2">
-                                                               @if ($addmore && $addmore->telephone !== null)
-                                                                    @if(isset($addmore->country_code))
-                                                                   +{{ $addmore->country_code }} 
-                                                                   @endif
-                                                                   
-                                                                   {{ $addmore->telephone }}
-                                                               @else
-                                                                   {{ '-' }}
-                                                               @endif
-                                                           </li>
-                                                       </div>
+                                                   <tr>
+                                                       <td>{{ $addmore->poc ?: '-' }}</td>
+                                                       <td>{{ $addmore->poctitle ?: '-' }}</td>
+                                                       <td>{{ $addmore->c_email ?: '-' }}</td>
+                                                       <td>
+                                                           @if ($addmore->telephone)
+                                                               {{ isset($addmore->country_code) ? '+' . $addmore->country_code . ' ' : '' }}{{ $addmore->telephone }}
+                                                           @else
+                                                               -
+                                                           @endif
+                                                       </td>
+                                                   </tr>
                                                    @endforeach
-                                               </div>
-                                           @endif
-                                           @php
-                                                $vendors_services = explode(',',$vendor_data->serviceList);
-                                                $services_names = [];
-                                                foreach ($vendors_services as $city_id) {
-                                                    // Assuming getCityNameById is your helper function
-                                                    $services_names[] =  \Helper::servicename(trim($city_id)); // trim to remove any extra whitespace
-                                                }
-                                                $services_names = implode(',',$services_names);
-
-                                                $vendors_city = explode(',',$vendor_data->city);
-                                                $city_names = [];
-                                                foreach ($vendors_city as $city_id) {
-                                                    // Assuming getCityNameById is your helper function
-                                                    $city_names[] =  \Helper::cityname(trim($city_id)); // trim to remove any extra whitespace
-                                                }
-                                                $city_names = implode(',',$city_names);
-                                           @endphp
-
-                                           <div class="col-lg-12">
-                                            <li class="py-0">
-                                                <small class="text-dark">What services do you offer</small>
-                                            </li>
-                                            <li>
-                                                @if ($services_names != '')
-                                                    {{ $services_names }}
-                                                @else
-                                                    {{ '-' }}
-                                                @endif
-
-                                            </li>
-                                        </div>
-
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Company Website</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->companywebsite != '')
-                                                       {{ $vendor_data->companywebsite }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Company City</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($city_names)
-                                                       {{ $city_names }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Company Role</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->crole != '')
-                                                       {{ $vendor_data->crole }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-                                               </li>
-                                           </div>
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Parent Company Name</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->parentcname != '')
-                                                       {{ $vendor_data->parentcname }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Establishment Date</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @php
-                                                       $establishment_Date = $vendor_data->establishment_date;
-                                                   @endphp
-                                                   @if ($establishment_Date != '' && $establishment_Date != '0000-00-00')
-                                                       {{ \Carbon\Carbon::parse($establishment_Date)->format('d-m-Y') }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-
-                                           <div class="col-lg-6">
-                                            <li class="pt-2 pb-0">
-                                                <small class="text-dark">Company Logo</small>
-                                            </li>
-                                            <li class="pb-2">
-                                                @if ($vendor_data->company_logo != '')
-                                                    <a href="{{ asset('public/upload/vendors/' . $vendor_data->company_logo) }}"
-                                                        download>
-                                                        <button class="btn btn-primary">Download</button>
-                                                    </a>
-                                                @else
-                                                    {{ '-' }}
-                                                @endif
-                                            </li>
-                                        </div>
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">VAT Certificate</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->vatcertificate != '')
-                                                       <a href="{{ asset('public/upload/vendors/' . $vendor_data->vatcertificate) }}"
-                                                           download>
-                                                           <button class="btn btn-primary">Download</button>
-                                                       </a>
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-                                               </li>
-                                           </div>
-
-                                           {{-- <div class="col-lg-2">
-                                               <li class="pt-2 pb-0">
-                                               </li>
-                                               <li class="pt-4">
-
-                                               </li>
-                                           </div> --}}
-
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">TRN Certificate</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->trncertificate != '')
-                                                       <a href="{{ asset('public/upload/vendors/' . $vendor_data->trncertificate) }}"
-                                                           download>
-                                                           <button class="btn btn-primary">Download</button>
-                                                       </a>
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-                                           {{-- <div class="col-lg-2">
-                                               <li class="pt-2 pb-0">
-                                               </li>
-                                               <li class="pt-4">
-                                                   <a href="{{ asset('public/upload/vendors/' . $vendor_data->trncertificate) }}"
-                                                       download>
-                                                       <button class="btn btn-primary">Download</button>
-                                                   </a>
-                                               </li>
-                                           </div> --}}
-
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Trade License</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->tradelicense != '')
-                                                       <a href="{{ asset('public/upload/vendors/' . $vendor_data->tradelicense) }}"
-                                                           download>
-                                                           <button class="btn btn-primary">Download</button>
-                                                       </a>
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-                                           {{-- <div class="col-lg-2">
-                                               <li class="pt-2 pb-0">
-                                               </li>
-                                               <li class="pt-4">
-                                                   <a href="{{ asset('public/upload/vendors/' . $vendor_data->tradelicense) }}"
-                                                       download>
-                                                       <button class="btn btn-primary">Download</button>
-                                                   </a>
-                                               </li>
-                                           </div> --}}
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">TL expiry date</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @php
-                                                       $Tl_Date = $vendor_data->tlexpiry;
-                                                   @endphp
-                                                   @if ($Tl_Date != '' && $Tl_Date != '0000-00-00')
-                                                       {{ \Carbon\Carbon::parse($Tl_Date)->format('d-m-Y') }}
-                                                   @else
-                                                       {{ \Carbon\Carbon::parse()->format('-') }}
-                                                   @endif
-                                               </li>
-                                           </div>
-
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">No Of Staff</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->staff != '')
-                                                       {{ $vendor_data->staff }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Remarks</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->remarks != '')
-                                                       {{ $vendor_data->remarks }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Social Media</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->socialmedai != '')
-                                                       {{ $vendor_data->socialmedai }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-
-                                               </li>
-                                           </div>
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Email For Login</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->email != '')
-                                                       {{ $vendor_data->email }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-                                               </li>
-                                           </div>
-
-                                           <div class="col-lg-6">
-                                               <li class="pt-2 pb-0">
-                                                   <small class="text-dark">Company Mobile No</small>
-                                               </li>
-                                               <li class="pb-2">
-                                                   @if ($vendor_data->mobile != '')
-                                                   @if(isset($vendor_data->country_code))
-                                                                   +{{ $vendor_data->country_code }} 
-                                                                   @endif
-
-                                                       {{ $vendor_data->mobile }}
-                                                   @else
-                                                       {{ '-' }}
-                                                   @endif
-                                               </li>
+                                               </tbody>
+                                           </table>
+                                       </div>
+                                   @else
+                                       <p class="text-muted mb-4 small">No Points of Contact added.</p>
+                                   @endif
+                               
+                                   <hr>
+                                   <!-- Contact Details -->
+                                   <h6 class="card-title text-primary mb-3"><i class="fas fa-address-book me-2"></i> Contact Details</h6>
+                                   <div class="row mb-4">
+                                       <div class="col-md-6 mb-3">
+                                           <p class="text-muted mb-1 small">Email for Login</p>
+                                           <h6 class="mb-0">{{ $vendor_data->email ?: '-' }}</h6>
+                                       </div>
+                                       <div class="col-md-6 mb-3">
+                                           <p class="text-muted mb-1 small">Company Mobile No</p>
+                                           <h6 class="mb-0">
+                                               @if ($vendor_data->mobile)
+                                                   {{ isset($vendor_data->country_code) ? '+' . $vendor_data->country_code . ' ' : '' }}{{ $vendor_data->mobile }}
+                                               @else
+                                                   -
+                                               @endif
+                                           </h6>
+                                       </div>
+                                   </div>
+                               
+                                   <hr>
+                                   <!-- Legal & Documents -->
+                                   <h6 class="card-title text-primary mb-3"><i class="fas fa-file-contract me-2"></i> Legal & Documents</h6>
+                                   <div class="row">
+                                       <!-- TRN / VAT -->
+                                       <div class="col-md-6 mb-3">
+                                           <div class="p-3 border rounded h-100 bg-light">
+                                               <p class="text-muted mb-1 small">TRN Certificate Number</p>
+                                               <h6 class="mb-3">{{ $vendor_data->trn_certificate_number ?: '-' }}</h6>
+                                               <p class="text-muted mb-1 small">VAT Certificate</p>
+                                               @if ($vendor_data->vatcertificate)
+                                                   <a href="{{ asset('public/upload/vendors/' . $vendor_data->vatcertificate) }}" class="btn btn-sm btn-outline-primary" download><i class="fas fa-download"></i> Download</a>
+                                               @else
+                                                   <h6>-</h6>
+                                               @endif
                                            </div>
                                        </div>
-                                   </ul>
+                                       
+                                       <!-- Trade License -->
+                                       <div class="col-md-6 mb-3">
+                                           <div class="p-3 border rounded h-100 bg-light">
+                                               <p class="text-muted mb-1 small">Trade License Number</p>
+                                               <h6 class="mb-3">{{ $vendor_data->trade_license_number ?: '-' }}</h6>
+                                               
+                                               <p class="text-muted mb-1 small">TL Expiry Date</p>
+                                               <h6 class="mb-3">
+                                                   @if ($vendor_data->tlexpiry && $vendor_data->tlexpiry != '0000-00-00')
+                                                       {{ \Carbon\Carbon::parse($vendor_data->tlexpiry)->format('d-m-Y') }}
+                                                       @php
+                                                           $tlDate = \Carbon\Carbon::parse($vendor_data->tlexpiry);
+                                                           $daysUntil = \Carbon\Carbon::now()->diffInDays($tlDate, false);
+                                                       @endphp
+                                                       @if ($tlDate->isPast())
+                                                           <span class="badge bg-danger ms-2">Expired</span>
+                                                           <a href="{{ url('vendor/vendorsprofile/' . $vendor_data->id . '/edit#document_section') }}" class="btn btn-sm btn-primary ms-2" style="padding: 2px 8px; font-size: 12px;">Update</a>
+                                                       @elseif ($daysUntil <= 60)
+                                                           <span class="badge bg-warning text-dark ms-2">Expires soon</span>
+                                                           <a href="{{ url('vendor/vendorsprofile/' . $vendor_data->id . '/edit#document_section') }}" class="btn btn-sm btn-primary ms-2" style="padding: 2px 8px; font-size: 12px;">Update</a>
+                                                       @endif
+                                                   @else
+                                                       -
+                                                   @endif
+                                               </h6>
+                               
+                                               <p class="text-muted mb-1 small">Trade License File</p>
+                                               @if ($vendor_data->tradelicense)
+                                                   <a href="{{ asset('public/upload/vendors/' . $vendor_data->tradelicense) }}" class="btn btn-sm btn-outline-primary" download><i class="fas fa-download"></i> Download</a>
+                                               @else
+                                                   <h6>-</h6>
+                                               @endif
+                                           </div>
+                                       </div>
+                                       
+                                       <!-- Passport -->
+                                       <div class="col-md-6 mb-3">
+                                           <div class="p-3 border rounded h-100 bg-light">
+                                               <p class="text-muted mb-1 small">Passport Number</p>
+                                               <h6 class="mb-3">{{ $vendor_data->passport_number ?: '-' }}</h6>
+                                               
+                                               <p class="text-muted mb-1 small">Passport Expiry Date</p>
+                                               <h6 class="mb-3">
+                                                   @if ($vendor_data->passport_expiry && $vendor_data->passport_expiry != '0000-00-00')
+                                                       {{ \Carbon\Carbon::parse($vendor_data->passport_expiry)->format('d-m-Y') }}
+                                                       @php
+                                                           $passDate = \Carbon\Carbon::parse($vendor_data->passport_expiry);
+                                                           $daysUntilPass = \Carbon\Carbon::now()->diffInDays($passDate, false);
+                                                       @endphp
+                                                       @if ($passDate->isPast())
+                                                           <span class="badge bg-danger ms-2">Expired</span>
+                                                           <a href="{{ url('vendor/vendorsprofile/' . $vendor_data->id . '/edit#document_section') }}" class="btn btn-sm btn-primary ms-2" style="padding: 2px 8px; font-size: 12px;">Update</a>
+                                                       @elseif ($daysUntilPass <= 60)
+                                                           <span class="badge bg-warning text-dark ms-2">Expires soon</span>
+                                                           <a href="{{ url('vendor/vendorsprofile/' . $vendor_data->id . '/edit#document_section') }}" class="btn btn-sm btn-primary ms-2" style="padding: 2px 8px; font-size: 12px;">Update</a>
+                                                       @endif
+                                                   @else
+                                                       -
+                                                   @endif
+                                               </h6>
+                               
+                                               <p class="text-muted mb-1 small">Passport File</p>
+                                               @if ($vendor_data->passport)
+                                                   <a href="{{ asset('public/upload/vendors/' . $vendor_data->passport) }}" class="btn btn-sm btn-outline-primary" download><i class="fas fa-download"></i> Download</a>
+                                               @else
+                                                   <h6>-</h6>
+                                               @endif
+                                           </div>
+                                       </div>
+                                       
+                                       <!-- Emirates ID -->
+                                       <div class="col-md-6 mb-3">
+                                           <div class="p-3 border rounded h-100 bg-light">
+                                               <p class="text-muted mb-1 small">Emirates ID Number</p>
+                                               <h6 class="mb-3">{{ $vendor_data->emirates_id_number ?: '-' }}</h6>
+                                               
+                                               <p class="text-muted mb-1 small">Emirates ID Expiry Date</p>
+                                               <h6 class="mb-3">
+                                                   @if ($vendor_data->emirates_id_expiry && $vendor_data->emirates_id_expiry != '0000-00-00')
+                                                       {{ \Carbon\Carbon::parse($vendor_data->emirates_id_expiry)->format('d-m-Y') }}
+                                                       @php
+                                                           $emDate = \Carbon\Carbon::parse($vendor_data->emirates_id_expiry);
+                                                           $daysUntilEm = \Carbon\Carbon::now()->diffInDays($emDate, false);
+                                                       @endphp
+                                                       @if ($emDate->isPast())
+                                                           <span class="badge bg-danger ms-2">Expired</span>
+                                                           <a href="{{ url('vendor/vendorsprofile/' . $vendor_data->id . '/edit#document_section') }}" class="btn btn-sm btn-primary ms-2" style="padding: 2px 8px; font-size: 12px;">Update</a>
+                                                       @elseif ($daysUntilEm <= 60)
+                                                           <span class="badge bg-warning text-dark ms-2">Expires soon</span>
+                                                           <a href="{{ url('vendor/vendorsprofile/' . $vendor_data->id . '/edit#document_section') }}" class="btn btn-sm btn-primary ms-2" style="padding: 2px 8px; font-size: 12px;">Update</a>
+                                                       @endif
+                                                   @else
+                                                       -
+                                                   @endif
+                                               </h6>
+                               
+                                               <p class="text-muted mb-1 small">Emirates ID File</p>
+                                               @if ($vendor_data->emirates_id)
+                                                   <a href="{{ asset('public/upload/vendors/' . $vendor_data->emirates_id) }}" class="btn btn-sm btn-outline-primary" download><i class="fas fa-download"></i> Download</a>
+                                               @else
+                                                   <h6>-</h6>
+                                               @endif
+                                           </div>
+                                       </div>
+                                       
+                                       <!-- Company Logo -->
+                                       <div class="col-md-6 mb-3">
+                                           <div class="p-3 border rounded h-100 bg-light">
+                                               <p class="text-muted mb-1 small">Company Logo</p>
+                                               @if ($vendor_data->company_logo)
+                                                   <div class="mb-3">
+                                                       <img src="{{ asset('public/upload/vendors/' . $vendor_data->company_logo) }}" alt="Logo" class="img-thumbnail" style="max-height: 80px;">
+                                                   </div>
+                                                   <a href="{{ asset('public/upload/vendors/' . $vendor_data->company_logo) }}" class="btn btn-sm btn-outline-primary" download><i class="fas fa-download"></i> Download</a>
+                                               @else
+                                                   <h6>-</h6>
+                                               @endif
+                                           </div>
+                                       </div>
+                                   </div>
                                </div>
                            </div>
 

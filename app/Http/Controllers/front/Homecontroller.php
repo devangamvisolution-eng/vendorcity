@@ -38,15 +38,16 @@ class Homecontroller extends Controller
         // Get geo data from session
         $slug = session('search_city_name');
 
+        $queryString = request()->getQueryString();
+        $querySuffix = $queryString ? '?' . $queryString : '';
+
         // If middleware already set city, redirect
         if (!empty($slug)) {
-            return redirect()->to(url($slug));
+            return redirect()->to(url($slug) . $querySuffix);
         }
 
-        // echo "here";exit;
-
         // Fallback (should not happen)
-        return redirect()->to(url('dubai'));
+        return redirect()->to(url('dubai') . $querySuffix);
     }
 
 
@@ -420,52 +421,55 @@ class Homecontroller extends Controller
         $data['vendor'] = 1;
         $data['is_active'] = 1;
 
-        //     if ($request->hasFile('vatcertificate')) 
-        // {
+        if ($request->hasFile('company_logo')) {
+            $file = $request->file('company_logo');
+            $path = public_path('upload/vendors/');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $fileName);
+            $data['company_logo'] = $fileName;
+        }
 
-        //     $file = $request->file('vatcertificate');
+        if ($request->hasFile('vatcertificate')) {
+            $file = $request->file('vatcertificate');
+            $path = public_path('upload/vendors/');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $fileName);
+            $data['vatcertificate'] = $fileName;
+        }
 
-        //     $path = public_path('upload/vendors/');
+        if ($request->hasFile('tradelicense')) {
+            $file = $request->file('tradelicense');
+            $path = public_path('upload/vendors/');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $fileName);
+            $data['tradelicense'] = $fileName;
+        }
 
-        //     $fileName = uniqid().'.'.$file->getClientOriginalExtension();
+        if ($request->hasFile('passport')) {
+            $file = $request->file('passport');
+            $path = public_path('upload/vendors/');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $fileName);
+            $data['passport'] = $fileName;
+        }
 
-        //     $file->move($path, $fileName);
+        if ($request->hasFile('emirates_id')) {
+            $file = $request->file('emirates_id');
+            $path = public_path('upload/vendors/');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $fileName);
+            $data['emirates_id'] = $fileName;
+        }
 
+        // Additional fields from the frontend form
+        $data['trn_certificate_number'] = $request->trn_certificate_number;
+        $data['trade_license_number'] = $request->trade_license_number;
+        $data['passport_number'] = $request->passport_number;
+        $data['emirates_id_number'] = $request->emirates_id_number;
 
-        //     $data['vatcertificate']= $fileName;
-
-        // }
-        // if ($request->hasFile('trncertificate')) 
-        // {
-
-        //     $file = $request->file('trncertificate');
-
-        //     $path = public_path('upload/vendors/');
-
-        //     $fileName = uniqid().'.'.$file->getClientOriginalExtension();
-
-        //     $file->move($path, $fileName);
-
-
-        //     $data['trncertificate']= $fileName;
-
-
-        // }
-        // if ($request->hasFile('tradelicense')) 
-        // {
-
-        //     $file = $request->file('tradelicense');
-
-        //     $path = public_path('upload/vendors/');
-
-        //     $fileName = uniqid().'.'.$file->getClientOriginalExtension();
-
-        //     $file->move($path, $fileName);
-
-
-        //     $data['tradelicense']= $fileName;
-
-        // }
+        $data['tlexpiry'] = $request->tlexpiry;
+        $data['passport_expiry'] = $request->passport_expiry;
+        $data['emirates_id_expiry'] = $request->emirates_id_expiry;
 
 
         // echo"<pre>";

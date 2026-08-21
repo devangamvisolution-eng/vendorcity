@@ -1354,6 +1354,49 @@
                                     <p class="form-error-text" id="time_slot_error"
                                         style="color: red; margin-top: 10px;"></p>
                                 </div>
+                                @if (!empty($subservice_data->cancel_policy))
+                                    <div class="addonsinstruction">
+                                        <h5 class=""> <i
+                                                class="fas fa-info-circle tabby-banner-info-icon ms-2"></i>
+                                            Enjoy free cancellation up to 6 hours before your booking start time.</h5>
+                                        <div class="text-end" style="margin-right:28px">
+                                            <a href="javascript:void(0);" data-bs-toggle="modal"
+                                                data-bs-target="#cancelPolicyModal"
+                                                style="text-decoration: underline; color: #150495; font-size: 13px; font-weight: 600;">View
+                                                Policy</a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cancel Policy Modal -->
+                                    <div class="modal subservice-read-more-model fade" id="cancelPolicyModal"
+                                        tabindex="-1" aria-hidden="true" style="z-index: 9999;">
+                                        <div class="modal-dialog modal-dialog-scrollable" id="modal-digi"
+                                            role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-drag-handle"
+                                                    style="padding:10px 0 4px; text-align:center;">
+                                                    <div
+                                                        style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;">
+                                                    </div>
+                                                </div>
+                                                <div class="modal-header"
+                                                    style="border-bottom:1px solid #f0f0f0; padding:12px 20px; display:flex; align-items:center; justify-content:space-between;">
+                                                    <h5 class="modal-title"
+                                                        style="margin:0; font-size:1rem; font-weight:800; color:#111;">
+                                                        Cancellation Policy</h5>
+                                                    <button type="button" data-bs-dismiss="modal" aria-label="Close"
+                                                        style="background:#f4f4f4; border:none; width:32px; height:32px; border-radius:50%; font-size:1.1rem; color:#555; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                                                        &times;
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body"
+                                                    style="padding:20px; overflow-y:scroll; -webkit-overflow-scrolling:touch;">
+                                                    {!! $subservice_data->cancel_policy !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                             <div class="step-buttons">
                                 <button class="btn btn-secondary custome-black" onclick="prevStep()"
@@ -1437,7 +1480,7 @@
                                         </div>
                                     </label>
 
-                                    <label class="payment-method-card" for="paymet_1">
+                                    <!-- <label class="payment-method-card" for="paymet_1">
                                         <input type="radio" id="paymet_1" name="payment_type" value="COD">
                                         <div class="payment-card-content">
                                             <div class="payment-card-header">
@@ -1453,7 +1496,7 @@
                                                     charges will be applied.</span>
                                             </p>
                                         </div>
-                                    </label>
+                                    </label> -->
 
                                     {{-- <label class="payment-method-card" for="paymet_3">
                                         <input type="radio" id="paymet_3" name="payment_type" value="TABBY">

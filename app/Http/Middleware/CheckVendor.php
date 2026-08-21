@@ -16,16 +16,16 @@ class CheckVendor
      */
     public function handle(Request $request, Closure $next)
     {
-       if (auth()->check()) {
-            if (auth()->user()->vendor == 1) {
-                return $next($request);
-            } else {
-                dd('User does not have the "vendor" role.');
+        if (auth()->check() && auth()->user()->vendor == 1) {
+            $vendor = auth()->user();
+            if ($vendor->is_active == 1 && $vendor->suspension_reason === 'document_expired') {
+                // Check if the current route is NOT the suspended route and NOT the update documents route
+                if (!$request->routeIs('vendor.suspended') && !$request->routeIs('vendor.document.update') && !$request->routeIs('vendor.document.update.submit') && !$request->routeIs('vendor.document.update.thankyou') && !$request->routeIs('vendor.logout') && !$request->is('vendor/update-documents*')) {
+                    return redirect()->route('vendor.suspended');
+                }
             }
-        } else {
-            dd('User is not authenticated.');
         }
 
-        return abort(403, 'Unauthorized');
+        return $next($request);
     }
 }

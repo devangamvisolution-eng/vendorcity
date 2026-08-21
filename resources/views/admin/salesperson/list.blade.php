@@ -61,11 +61,12 @@
             border-collapse: separate;
             border-spacing: 0;
             width: 100%;
+            border: 1px solid #e9ecef;
         }
 
         .premium-table thead th {
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: #428df5;
+            color: #ffffff;
             font-weight: 600;
             text-transform: uppercase;
             font-size: 12px;
@@ -73,24 +74,37 @@
             border-bottom: 2px solid #eef2f5;
             padding: 16px;
             white-space: nowrap;
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .premium-table thead th:last-child {
+            border-right: none;
         }
 
         .premium-table tbody td {
             padding: 16px;
             vertical-align: middle;
             color: #555;
-            border-bottom: 1px solid #f1f3f5;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
             font-size: 14px;
+            transition: background-color 0.2s ease;
         }
 
-        .premium-table tbody tr {
-            transition: all 0.2s ease;
+        .premium-table tbody td:last-child {
+            border-right: none;
         }
 
-        .premium-table tbody tr:hover {
-            background-color: #fcfcfc;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        .premium-table tbody tr:hover td {
+            background-color: #eaeaea;
+        }
+
+        .premium-table tbody tr:hover td:first-child {
+            box-shadow: inset 3px 0 0 #ffc107;
+        }
+
+        .premium-table tbody tr:hover td:last-child {
+            box-shadow: inset -3px 0 0 #ffc107;
         }
 
         .filter-card {
@@ -185,16 +199,11 @@
 
 
                 @if (in_array('73', $edit_perm))
-
                     <div class="col-auto">
-
-                        @if ($filter_salesperson_id != '')
-                            <a class="btn btn-primary btn-premium me-1" href="javascript:void('0');"
-                                onclick="excel_download();"><i class="fas fa-file-excel"></i> Excel Download</a>
-                        @endif
-
+                        <a class="btn btn-primary shadow-sm me-1" href="javascript:void(0);" id="filter_search">
+                            <i class="fas fa-filter"></i>
+                        </a>
                     </div>
-
                 @endif
 
 
@@ -240,115 +249,122 @@
 
             <input type="hidden" name="filter_salesperson_id" id="filter_salesperson_id"
                 value="{{ $filter_salesperson_id ?: '' }}">
+            <input type="hidden" name="order_type_fil" id="order_type_fil"
+                value="{{ isset($filter_order_type) ? $filter_order_type : '' }}">
 
         </form>
 
 
-        <div id="filter_inputs" class="card filter-card" style="display: block !important;">
+        @php
+            $isFilterActive =
+                !empty($startdate) ||
+                !empty($enddate) ||
+                !empty($filter_service_id) ||
+                !empty($filter_subservice_id) ||
+                !empty($filter_salesperson_id) ||
+                !empty($filter_order_type);
+        @endphp
 
-            <div class="card-body pb-0">
-                <form id="filter_form" action="{{ route('salesperson_report') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="action" value="filter">
-
-                    <div class="row">
-
-                        <div class="col-sm-6 col-md-8">
-                            <div class="row">
-
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>Start Date</label>
-                                        <input type="date" class="form-control" name="s_date" id="s_date"
-                                            placeholder="Enter Start Date" value="{{ $startdate }}">
+        <div id="filter_inputs" class="card filter-card mb-4"
+            style="display: {{ $isFilterActive ? 'block' : 'none' }} !important;">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card premium-card mb-0">
+                        <div class="card-header pb-0 border-0 bg-white pt-3">
+                            <h5 class="card-title mb-0" style="font-size: 16px; font-weight: 600; color: #333;"><i
+                                    class="fas fa-filter text-muted me-2"></i> Filter Reports</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="filter_form" action="{{ route('salesperson_report') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="action" value="filter">
+                                <div class="row align-items-end">
+                                    <div class="col-md-2 mb-3">
+                                        <label style="font-size: 12px; font-weight: 500; color: #555;">Start Date</label>
+                                        <input type="date" class="form-control form-control-sm" name="s_date"
+                                            id="s_date" value="{{ $startdate }}">
                                     </div>
-                                </div>
-
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>End Date</label>
-                                        <input type="date" class="form-control" name="e_date" id="e_date"
-                                            placeholder="Enter End Date" value="{{ $enddate }}">
+                                    <div class="col-md-2 mb-3">
+                                        <label style="font-size: 12px; font-weight: 500; color: #555;">End Date</label>
+                                        <input type="date" class="form-control form-control-sm" name="e_date"
+                                            id="e_date" value="{{ $enddate }}">
                                     </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>Select Service</label>
-                                        <select name="service_id" class="form-control form-select" id="service_id">
-                                            <option value="">Select Service</option>
-
+                                    <div class="col-md-2 mb-3">
+                                        <label style="font-size: 12px; font-weight: 500; color: #555;">Service</label>
+                                        <select name="service_id" class="form-control" id="service_id">
+                                            <option value="">All</option>
                                             @foreach ($service_data as $serviceData)
                                                 <option value="{{ $serviceData->id }}"
                                                     @if ($serviceData->id == $filter_service_id) {{ 'selected' }} @endif>
-                                                    {{ $serviceData->servicename }}</option>
+                                                    {{ $serviceData->servicename }}
+                                                </option>
                                             @endforeach
                                         </select>
-                                        <p class="form-error-text" id="service_id_error"
-                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>Select Sub Service</label>
-                                        <select name="subservice_id" class="form-control form-select" id="subservice_id">
-                                            <option value="">Select Sub Service</option>
-
+                                    <div class="col-md-2 mb-3">
+                                        <label style="font-size: 12px; font-weight: 500; color: #555;">Sub Service</label>
+                                        <select name="subservice_id" class="form-control" id="subservice_id">
+                                            <option value="">All</option>
                                             @foreach ($subservice_data as $subserviceData)
                                                 <option value="{{ $subserviceData->id }}"
                                                     @if ($subserviceData->id == $filter_subservice_id) {{ 'selected' }} @endif>
-                                                    {{ $subserviceData->subservicename }}</option>
+                                                    {{ $subserviceData->subservicename }}
+                                                </option>
                                             @endforeach
                                         </select>
-                                        <p class="form-error-text" id="subservice_id_error"
-                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
-                                </div>
 
-                                @php
+                                    @php
+                                        if ($user_data->role_id == 16) {
+                                            $style = 'display:none;';
+                                        } else {
+                                            $style = 'display:block;';
+                                        }
+                                    @endphp
 
-                                    if ($user_data->role_id == 16) {
-                                        $style = 'display:none;';
-                                    } else {
-                                        $style = 'display:block;';
-                                    }
-                                @endphp
-
-                                <div class="col-lg-4" style="{{ $style }}">
-                                    <div class="form-group">
-                                        <label>Select Sales Person</label>
-                                        <select name="salesperson_id" class="form-control form-select"
-                                            id="salesperson_id">
-                                            <option value="">Select Sales Person</option>
-
+                                    <div class="col-md-2 mb-3" style="{{ $style }}">
+                                        <label style="font-size: 12px; font-weight: 500; color: #555;">Sales Person</label>
+                                        <select name="salesperson_id" class="form-control" id="salesperson_id">
+                                            <option value="">All</option>
                                             @foreach ($salesperson as $data)
                                                 <option value="{{ $data->id }}"
                                                     @if ($data->id == $filter_salesperson_id) {{ 'selected' }} @endif>
                                                     {{ $data->name }}</option>
                                             @endforeach
                                         </select>
-                                        <p class="form-error-text" id="salesperson_id_error"
-                                            style="color: red; margin-top: 10px;"></p>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label style="font-size: 12px; font-weight: 500; color: #555;">Order Type</label>
+                                        <select name="order_type" class="form-control form-control-sm" id="order_type">
+                                            <option value="">All</option>
+                                            <option value="survey" @if (isset($filter_order_type) && $filter_order_type == 'survey') selected @endif>Survey
+                                            </option>
+                                            <option value="manpower" @if (isset($filter_order_type) && $filter_order_type == 'manpower') selected @endif>
+                                                Manpower</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-12 text-end mt-2">
+                                        <a href="javascript:void(0);" onclick="filter_validation()"
+                                            class="btn btn-sm btn-primary px-3 rounded"><i class="fas fa-search"></i>
+                                            Search</a>
+                                        <a href="{{ route('salesperson_report') }}"
+                                            class="btn btn-sm btn-light border px-3 rounded"><i class="fas fa-sync"></i>
+                                            Reset</a>
+
+                                        @if (in_array('73', $edit_perm) && $filter_salesperson_id != '')
+                                            <a href="javascript:void('0');" onclick="excel_download();" id="excel_btn"
+                                                class="btn btn-sm btn-success px-3 rounded ms-2"><i
+                                                    class="fas fa-file-excel"></i> Download Excel</a>
+                                        @endif
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-3 col-md-4">
-                            <div class="form-group">
-                                <a class="btn btn-primary btn-premium filter-btn" href="javascript:void(0);"
-                                    style="margin-top: 22px;" onclick="filter_validation()">Submit</a>
-
-                                <a class="btn btn-secondary btn-premium filter-btn"
-                                    href="{{ route('salesperson_report') }}"
-                                    style="margin-top: 22px; background: #6c757d; color: white;">Reset</a>
-                            </div>
+                            </form>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
-
         </div>
 
         <div class="row">
@@ -402,35 +418,70 @@
                                                         //moving
                                                     }
 
+                                                    if (
+                                                        isset($salesperson_order->is_cancelled) &&
+                                                        $salesperson_order->is_cancelled
+                                                    ) {
+                                                        $invoice_amount = 0;
+                                                        $vat_amount = 0;
+                                                        $base_amount = 0;
+                                                        $salesperson_order->service_charge = 0;
+                                                    } else {
+                                                        $invoice_amount = $salesperson_order->order_total ?? 0;
+                                                        $vat_amount = $invoice_amount - $invoice_amount / 1.05;
+                                                        $base_amount = $invoice_amount - $vat_amount;
+                                                    }
+
                                                     $vendor_payout = 0;
                                                     $commission = 0;
 
                                                     if (
                                                         $salesperson_order->vendor_id != 0 &&
-                                                        $salesperson_order->subservice_booking_percentage > 0
+                                                        !(
+                                                            isset($salesperson_order->is_cancelled) &&
+                                                            $salesperson_order->is_cancelled
+                                                        )
                                                     ) {
                                                         if (
                                                             !empty($salesperson_order->subservice_booking_amount) &&
                                                             $salesperson_order->subservice_booking_amount > 0
                                                         ) {
                                                             $commission = $salesperson_order->subservice_booking_amount;
+                                                            if (
+                                                                isset($salesperson_order->extra_charge) &&
+                                                                $salesperson_order->extra_charge > 0
+                                                            ) {
+                                                                $original_invoice =
+                                                                    $invoice_amount - $salesperson_order->extra_charge;
+                                                                if ($original_invoice > 0) {
+                                                                    $original_vat =
+                                                                        $original_invoice - $original_invoice / 1.05;
+                                                                    $original_base = $original_invoice - $original_vat;
+                                                                    if ($original_base > 0) {
+                                                                        $percentage = $commission / $original_base;
+                                                                        $commission = $base_amount * $percentage;
+                                                                    }
+                                                                }
+                                                            }
                                                         } else {
                                                             $commission =
-                                                                ($salesperson_order->sub_total *
+                                                                ($base_amount *
                                                                     $salesperson_order->subservice_booking_percentage) /
                                                                 100;
                                                         }
-
-                                                        $vendor_payout = $salesperson_order->sub_total - $commission;
+                                                        $vendor_payout = $base_amount - $commission;
                                                     }
 
-                                                    $profit = $salesperson_order->service_charge - $vendor_payout;
+                                                    $profit = $invoice_amount - $vat_amount - $vendor_payout;
                                                 @endphp
                                                 <tr>
                                                     <td style="display: none">{{ $salesperson_order->order_id }}</td>
                                                     <td>
                                                         {{ $salesperson_order->visit_date ?? '' }}<br>
                                                         {{ $salesperson_order->visit_day ?? '' }}<br>
+                                                        @if (isset($salesperson_order->is_cancelled) && $salesperson_order->is_cancelled)
+                                                            <span class="badge bg-danger mt-1">Cancelled</span><br>
+                                                        @endif
                                                     </td>
                                                     <td>{!! Helper::servicename($salesperson_order->service_id) !!}
                                                         <br>
@@ -452,13 +503,16 @@
                                                         @endif
                                                     </td>
 
-                                                    <td>{{ $vendor_payout }}</td>
+                                                    <td>{{ number_format($vendor_payout, 2, '.', '') }}</td>
                                                     <td>-</td>
                                                     <td>-</td>
-                                                    <td>{{ $salesperson_order->vatcharge }}</td>
-                                                    <td>{{ $salesperson_order->service_charge }}</td>
-                                                    <td>{{ $salesperson_order->order_total }}</td>
-                                                    <td>{{ $profit }}</td>
+                                                    <td>{{ number_format($vat_amount, 2, '.', '') }}</td>
+                                                    <td>{{ !empty($salesperson_order->service_charge) && $salesperson_order->service_charge > 0
+                                                        ? $salesperson_order->service_charge
+                                                        : $salesperson_order->sub_total }}
+                                                    </td>
+                                                    <td>{{ number_format($invoice_amount, 2, '.', '') }}</td>
+                                                    <td>{{ number_format($profit, 2, '.', '') }}</td>
 
                                                 </tr>
                                             @endforeach
@@ -485,7 +539,8 @@
                             <thead>
                                 <tr>
                                     <th colspan="2" class="py-2 text-center" style="font-size: 16px;">Sales Report
-                                        Summary</th>
+                                        Summary
+                                    </th>
                                 </tr>
                                 <tr>
                                     <th>Charges</th>
@@ -502,30 +557,54 @@
 
                                     if (isset($salesperson_order_data)) {
                                         foreach ($salesperson_order_data as $order) {
-                                            $total_invoice += $order->order_total;
+                                            if (isset($order->is_cancelled) && $order->is_cancelled) {
+                                                $invoice_amount = 0;
+                                                $vat_amount = 0;
+                                                $base_amount = 0;
+                                                $order->service_charge = 0;
+                                            } else {
+                                                $invoice_amount = $order->order_total ?? 0;
+                                                $vat_amount = $invoice_amount - $invoice_amount / 1.05;
+                                                $base_amount = $invoice_amount - $vat_amount;
+                                            }
+
+                                            $total_invoice += $invoice_amount;
                                             $total_service_charge += $order->service_charge;
-                                            $total_vat += $order->vatcharge;
+                                            $total_vat += $vat_amount;
 
                                             // Calculate Vendor Payout
                                             $vendor_payout = 0;
+                                            $commission = 0;
                                             if (
                                                 $order->vendor_id != 0 &&
-                                                ($order->subservice_booking_percentage > 0 ||
-                                                    $order->subservice_booking_amount > 0)
+                                                !(isset($order->is_cancelled) && $order->is_cancelled)
                                             ) {
                                                 if (
                                                     !empty($order->subservice_booking_amount) &&
                                                     $order->subservice_booking_amount > 0
                                                 ) {
                                                     $commission = $order->subservice_booking_amount;
+                                                    if (isset($order->extra_charge) && $order->extra_charge > 0) {
+                                                        $original_invoice = $invoice_amount - $order->extra_charge;
+                                                        if ($original_invoice > 0) {
+                                                            $original_vat =
+                                                                $original_invoice - $original_invoice / 1.05;
+                                                            $original_base = $original_invoice - $original_vat;
+                                                            if ($original_base > 0) {
+                                                                $percentage = $commission / $original_base;
+                                                                $commission = $base_amount * $percentage;
+                                                            }
+                                                        }
+                                                    }
                                                 } else {
                                                     $commission =
-                                                        ($order->sub_total * $order->subservice_booking_percentage) /
-                                                        100;
+                                                        ($base_amount * $order->subservice_booking_percentage) / 100;
                                                 }
-                                                $vendor_payout = $order->sub_total - $commission;
+                                                $vendor_payout = $base_amount - $commission;
                                                 $total_vendor_payout += $vendor_payout;
                                             }
+
+                                            $order_profit = $invoice_amount - $vat_amount - $vendor_payout;
 
                                             // Grouping by Service for the second table
                                             $sName = Helper::servicename($order->service_id);
@@ -536,34 +615,14 @@
                                                     'jobs' => 0,
                                                 ];
                                             }
-                                            $service_grouping[$sName]['invoice_amount'] += $order->order_total;
+                                            $service_grouping[$sName]['invoice_amount'] += $invoice_amount;
                                             $service_grouping[$sName]['jobs'] += 1;
-
-                                            $order_vendor_payout = 0;
-                                            if (
-                                                $order->vendor_id != 0 &&
-                                                ($order->subservice_booking_percentage > 0 ||
-                                                    $order->subservice_booking_amount > 0)
-                                            ) {
-                                                if (
-                                                    !empty($order->subservice_booking_amount) &&
-                                                    $order->subservice_booking_amount > 0
-                                                ) {
-                                                    $commission = $order->subservice_booking_amount;
-                                                } else {
-                                                    $commission =
-                                                        ($order->sub_total * $order->subservice_booking_percentage) /
-                                                        100;
-                                                }
-                                                $order_vendor_payout = $order->sub_total - $commission;
-                                            }
-                                            $order_profit = $order->service_charge - $order_vendor_payout;
                                             $service_grouping[$sName]['profit'] += $order_profit;
                                         }
                                     }
 
-                                    // Formula: Profit = Service Charges - Vendor Charges
-                                    $total_profit = $total_service_charge - $total_vendor_payout;
+                                    // Formula: Profit = Invoice - VAT - Vendor Charges
+                                    $total_profit = $total_invoice - $total_vat - $total_vendor_payout;
                                 @endphp
                                 <tr>
                                     <td class="text-start ps-3">Invoice Amount</td>
@@ -581,9 +640,11 @@
                                     <td class="text-start ps-3">VAT</td>
                                     <td class="text-end pe-3">{{ number_format($total_vat, 2) }}</td>
                                 </tr>
-                                <tr style="background-color: #0040E6; color: #ffffff; font-weight: bold;">
-                                    <td class="text-start ps-3">Total Profit</td>
-                                    <td class="text-end pe-3">{{ number_format($total_profit, 2) }}</td>
+                                <tr style="background-color: #428df5; font-weight: bold;">
+                                    <td class="text-start ps-3" style="color: #ffffff !important;">Total Profit</td>
+                                    <td class="text-end pe-3" style="color: #ffffff !important;">
+                                        {{ number_format($total_profit, 2) }}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -598,7 +659,8 @@
                             <thead>
                                 <tr>
                                     <th colspan="5" class="py-2 text-center" style="font-size: 16px;">Service wise
-                                        Sales</th>
+                                        Sales
+                                    </th>
                                 </tr>
                                 <tr>
                                     <th>Services</th>
@@ -638,7 +700,8 @@
                                         {{ $total_invoice > 0 ? number_format(($total_profit / $total_invoice) * 100, 2) : '0.00' }}%
                                     </td>
                                     <td class="text-center">
-                                        {{ isset($salesperson_order_data) ? count($salesperson_order_data) : 0 }}</td>
+                                        {{ isset($salesperson_order_data) ? count($salesperson_order_data) : 0 }}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -731,7 +794,8 @@
                 "searching": true,
                 "paging": true,
                 "pageLength": 10,
-                "info": false,
+                "lengthChange": true,
+                "info": true,
                 "language": {
                     "search": "",
                     "searchPlaceholder": "Quick Search...",
@@ -740,7 +804,7 @@
                         "previous": '<i class="fas fa-chevron-left"></i>'
                     }
                 },
-                "dom": '<"top"f>rt<"bottom"p><"clear">'
+                "dom": '<"d-flex justify-content-between align-items-center mb-3"lf>rt<"d-flex justify-content-between align-items-center mt-3"ip><"clear">'
             });
         });
     </script>
@@ -774,7 +838,17 @@
         }
 
         function excel_download() {
+            let btn = $('#excel_btn');
+            let originalHTML = btn.html();
+            btn.css('pointer-events', 'none');
+            btn.html('<i class="fas fa-spinner fa-spin"></i> Downloading...');
+
             $('#filter_data').submit();
+
+            setTimeout(function() {
+                btn.css('pointer-events', 'auto');
+                btn.html(originalHTML);
+            }, 3000);
         }
 
         function filter_validation() {
@@ -793,6 +867,54 @@
 
             $('#filter_form').submit();
         }
+
+        $(document).ready(function() {
+            // Initialize Select2 for search and select
+            function initSelect2() {
+                $('select[name="service_id"], select[name="subservice_id"], select[name="salesperson_id"]')
+                    .select2({
+                        width: '100%',
+                        placeholder: "Search..."
+                    });
+            }
+
+            initSelect2();
+
+            // Re-initialize if the filter button is clicked, in case it was hidden and width was 0
+            $('#filter_search').on('click', function() {
+                setTimeout(initSelect2, 100);
+            });
+
+            $('select[name="service_id"]').change(function() {
+                var service_id = $(this).val();
+                if (service_id != '') {
+                    $.ajax({
+                        url: "{{ route('front.getSubservices', ['city' => 'dubai']) }}",
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            service_ids: [service_id]
+                        },
+                        success: function(response) {
+                            var $subservice_select = $('select[name="subservice_id"]');
+                            $subservice_select.empty();
+                            $subservice_select.append('<option value="">All</option>');
+                            $.each(response, function(index, subservice) {
+                                $subservice_select.append('<option value="' + subservice
+                                    .id + '">' + subservice.subservicename +
+                                    '</option>');
+                            });
+                            // Re-initialize/update Select2 UI
+                            $subservice_select.trigger('change');
+                        }
+                    });
+                } else {
+                    var $subservice_select = $('select[name="subservice_id"]');
+                    $subservice_select.empty().append('<option value="">All</option>');
+                    $subservice_select.trigger('change');
+                }
+            });
+        });
     </script>
 
 @stop

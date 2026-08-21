@@ -4,8 +4,8 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\City;
-use App\Models\admin\Service;
+use App\Models\Admin\City;
+use App\Models\Admin\Service;
 use DB;
 use Image;
 
@@ -251,7 +251,7 @@ class ServiceController extends Controller
             }
         }
 
-        if (count($_POST['city_addmore_second']) > 0 && $_POST['city_addmore_second'] != '') {
+        if (isset($_POST['city_addmore_second']) && count($_POST['city_addmore_second']) > 0 && $_POST['city_addmore_second'] != '') {
             for ($i = 0; $i < count($_POST['city_addmore_second']); $i++) {
                 if ($_FILES['image_' . $i]['name'] != '') {
                     $image = $_FILES['image_' . $i]['tmp_name'];
@@ -277,7 +277,7 @@ class ServiceController extends Controller
                 }
             }
         }
-        if (count($_POST['city_addmore_third']) > 0 && $_POST['city_addmore_third'] != '') {
+        if (isset($_POST['city_addmore_third']) && count($_POST['city_addmore_third']) > 0 && $_POST['city_addmore_third'] != '') {
             for ($i = 0; $i < count($_POST['city_addmore_third']); $i++) {
 
                 if ($_POST['city_addmore_third'][$i] != '') {
@@ -828,7 +828,7 @@ class ServiceController extends Controller
                 }
             }
         }
-        if (count($_POST['city_addmore_third1']) > 0 && $_POST['city_addmore_third1'] != '') {
+        if (isset($_POST['city_addmore_third1']) && count($_POST['city_addmore_third1']) > 0 && $_POST['city_addmore_third1'] != '') {
             for ($i = 0; $i < count($_POST['city_addmore_third1']); $i++) {
 
                 if ($_POST['city_addmore_third1'][$i] != '') {

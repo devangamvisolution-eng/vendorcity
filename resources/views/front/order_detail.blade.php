@@ -1188,7 +1188,7 @@
 
                                     // 1. Determine Base Status from DB
                                     $dbStatus = $orders->order_status;
-                                    $statusFlow = ['BK', 'P', 'PA', 'OTW', 'IP', 'CO', 'CL'];
+                                    $statusFlow = ['BK', 'BC', 'OTW', 'IP', 'CO', 'CL', 'UP'];
 
                                     // 2. Automate Status Progression based on time
 
@@ -1199,7 +1199,7 @@
                                     $iconColor = 'text-secondary';
                                     $modalTarget = '';
 
-                                    if ($dbStatus == 'P' || $dbStatus == 'PA') {
+                                    if ($dbStatus == 'BC' || $dbStatus == 'P' || $dbStatus == 'PA') {
                                         $statusText =
                                             $orders->items[0]->service_id == 50
                                                 ? 'Awaiting Confirmation'
@@ -1236,7 +1236,9 @@
                                     }
                                     $popupStepMap = [
                                         'BK' => 0,
+                                        'BC' => 1,
                                         'P' => 1,
+                                        'PA' => 1,
                                         'OTW' => 2,
                                         'IP' => 3,
                                         'CO' => 4,
@@ -1410,12 +1412,12 @@
                             @endif
                         </div>
                     </div>
-                    
+
                     @php
                         $recurring_visits = \App\Helpers\Helper::getUpcomingVisits($orders->order_id, 5);
                     @endphp
 
-                    @if($recurring_visits->count() > 0)
+                    @if ($recurring_visits->count() > 0)
                         <div class="classic-card mt-3">
                             <div class="classic-section-title mb-3">
                                 <i class="bi bi-calendar-event me-2"></i>Upcoming Schedule
@@ -1430,38 +1432,41 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($recurring_visits as $visit)
-                                        <tr>
-                                            <td><strong>{{ date('d M Y', strtotime($visit->visit_date)) }}</strong></td>
-                                            <td>
-                                                @if($visit->visit_status == 'cancelled')
-                                                    <span class="badge bg-danger">Skipped</span>
-                                                @elseif($visit->visit_status == 'completed')
-                                                    <span class="badge bg-success">Completed</span>
-                                                @else
-                                                    <span class="badge bg-info">Upcoming</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-end">
-                                                @if($visit->visit_status != 'cancelled' && $visit->visit_status != 'completed')
-                                                    <button class="btn btn-sm btn-outline-danger user-cancel-visit" data-date="{{ $visit->visit_date }}" data-order="{{ $orders->order_id }}">
-                                                        Skip Visit
-                                                    </button>
-                                                @endif
-                                            </td>
-                                        </tr>
+                                        @foreach ($recurring_visits as $visit)
+                                            <tr>
+                                                <td><strong>{{ date('d M Y', strtotime($visit->visit_date)) }}</strong>
+                                                </td>
+                                                <td>
+                                                    @if ($visit->visit_status == 'cancelled')
+                                                        <span class="badge bg-danger">Skipped</span>
+                                                    @elseif($visit->visit_status == 'completed')
+                                                        <span class="badge bg-success">Completed</span>
+                                                    @else
+                                                        <span class="badge bg-info">Upcoming</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-end">
+                                                    @if ($visit->visit_status != 'cancelled' && $visit->visit_status != 'completed')
+                                                        <button class="btn btn-sm btn-outline-danger user-cancel-visit"
+                                                            data-date="{{ $visit->visit_date }}"
+                                                            data-order="{{ $orders->order_id }}">
+                                                            Skip Visit
+                                                        </button>
+                                                    @endif
+                                                </td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        
+
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
                                 $('.user-cancel-visit').on('click', function() {
                                     let visitDate = $(this).data('date');
                                     let orderId = $(this).data('order');
-                                    
+
                                     Swal.fire({
                                         title: 'Are you sure?',
                                         text: "Do you want to skip this visit?",
@@ -1487,7 +1492,7 @@
                                         allowOutsideClick: () => !Swal.isLoading()
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            if(result.value.status == 1) {
+                                            if (result.value.status == 1) {
                                                 Swal.fire(
                                                     'Skipped!',
                                                     result.value.message,
@@ -1642,6 +1647,33 @@
 
 
 
+                            </div>
+                        </div>
+                    @endif
+
+                    @if (isset($orders->items[0]->subservice_id) && $orders->items[0]->subservice_id == 93)
+                        <div class="classic-card mb-3">
+                            <div class="classic-section-title">
+                                <i class="bi bi-car-front"></i> Car Details
+                            </div>
+                            <div class="classic-info-row">
+                                <div>
+                                    <span class="classic-item-label">Plate Source</span>
+                                    <div class="classic-item-value">{{ $orders->items[0]->plate_source ?? '-' }}</div>
+                                </div>
+                                <div>
+                                    <span class="classic-item-label">Plate Code</span>
+                                    <div class="classic-item-value">{{ $orders->items[0]->plate_code ?? '-' }}</div>
+                                </div>
+                                <div>
+                                    <span class="classic-item-label">Plate Number</span>
+                                    <div class="classic-item-value">{{ $orders->items[0]->plate_number ?? '-' }}</div>
+                                </div>
+                                <div style="width: 100%; flex: 0 0 100%;">
+                                    <span class="classic-item-label">Car Description</span>
+                                    <div class="classic-item-value">{{ $orders->items[0]->describe_your_car ?? '-' }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endif

@@ -3,1105 +3,978 @@
     ul li {
         list-style: inherit !important;
     }
+
+    .service-form-wrapper {
+        max-width: 1400px;
+        margin: auto;
+        padding: 16px 20px;
+        background: #f6f7f9;
+        /* Outer background */
+    }
+
+    .compact-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+        box-shadow: none;
+    }
+
+    .compact-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .compact-header h5 {
+        font-size: 15px;
+        font-weight: 600;
+        margin: 0;
+        color: #1f2937;
+    }
+
+    .compact-header h5 i {
+        font-size: 14px;
+        margin-right: 6px;
+    }
+
+    .service-form-wrapper label {
+        font-size: 12px;
+        font-weight: 500;
+        margin-bottom: 4px;
+        color: #4b5563;
+    }
+
+    .service-form-wrapper .form-control {
+        height: 38px;
+        font-size: 13px;
+        border: 1px solid #e2e5ea;
+        border-radius: 6px;
+        padding: 6px 12px;
+    }
+
+    .service-form-wrapper .form-control:focus {
+        border-color: #6777ef;
+        box-shadow: 0 0 0 2px rgba(103, 119, 239, 0.08);
+    }
+
+    .service-form-wrapper .form-group {
+        margin-bottom: 12px;
+    }
+
+    .service-form-wrapper .select2-container .select2-selection--single {
+        height: 38px;
+        border: 1px solid #e2e5ea;
+        border-radius: 6px;
+    }
+
+    .service-form-wrapper .select2-container .select2-selection--multiple {
+        min-height: 38px;
+        border: 1px solid #e2e5ea;
+        border-radius: 6px;
+    }
+
+    .ck-editor__editable {
+        min-height: 120px !important;
+        max-height: 200px !important;
+        font-size: 13px;
+    }
+
+    .sticky-action-bar {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        border-top: 1px solid #e5e7eb;
+        padding: 12px 20px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        z-index: 1000;
+        box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .sticky-action-bar .btn {
+        font-size: 13px;
+        padding: 8px 16px;
+        height: 38px;
+        margin-left: 10px;
+        border-radius: 6px;
+    }
+
+    .page-title-compact {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .breadcrumb-compact {
+        background: transparent;
+        padding: 0;
+        margin: 0 0 0 15px;
+    }
 </style>
 @section('content')
 
     <div class="content container-fluid">
 
+        <div class="service-form-wrapper">
 
 
-        <!-- Page Header -->
 
-        <div class="page-header">
+            <!-- Page Header -->
 
-            <div class="row">
+            <div class="page-header">
 
-                <div class="col-sm-12">
+                <div class="row">
 
-                    <h3 class="page-title">Edit Service</h3>
+                    <div class="col-sm-12">
 
-                    <ul class="breadcrumb">
+                        <h3 class="page-title">Edit Service</h3>
 
-                        <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Dashboard</a></li>
+                        <ul class="breadcrumb">
 
-                        <li class="breadcrumb-item"><a href="{{ route('service.index') }}">Service</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Dashboard</a></li>
 
-                        <li class="breadcrumb-item active">Edit Service</li>
+                            <li class="breadcrumb-item"><a href="{{ route('service.index') }}">Service</a></li>
 
-                    </ul>
+                            <li class="breadcrumb-item active">Edit Service</li>
+
+                        </ul>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
-
-        <!-- /Page Header -->
+            <!-- /Page Header -->
 
 
 
-        <div id="validate" class="alert alert-danger alert-dismissible fade show" style="display: none;">
+            <div id="validate" class="alert alert-danger alert-dismissible fade show" style="display: none;">
 
-            <span id="login_error"></span>
+                <span id="login_error"></span>
 
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 
-        </div>
+            </div>
 
 
 
-        <div class="row">
+            <div class="row">
 
-            <div class="col-md-12">
+                <div class="col-md-12">
 
-                <div class="card">
+                    <div class="card">
 
-                    <div class="card-body">
+                        <div class="card-body">
 
-                        <!-- <h4 class="card-title">Basic Info</h4> -->
+                            <!-- <h4 class="card-title">Basic Info</h4> -->
 
-                        <form id="service_form" action="{{ route('service.update', $service->id) }}" method="POST"
-                            enctype="multipart/form-data">
+                            <form id="service_form" action="{{ route('service.update', $service->id) }}" method="POST"
+                                enctype="multipart/form-data">
 
-                            @csrf
+                                @csrf
 
-                            @method('PUT')
+                                @method('PUT')
 
-                            <div class="row">
+                                <div class="row">
 
-                                {{-- <div class="form-group">
+                                    {{-- <div class="form-group">
 
-                                <label for="name">Group</label>
+                                    <label for="name">Group</label>
 
-                                <select name="group_id" id="group_id" class="form-control">
+                                    <select name="group_id" id="group_id" class="form-control">
 
-                                    <option value=""> Select Group</option>
+                                        <option value=""> Select Group</option>
 
-                                    @foreach ($all_group as $all_group_data)
+                                        @foreach ($all_group as $all_group_data)
 
-                                    <option value="{{ $all_group_data['id'] }}" @if ($all_group_data['id'] == $service->group_id) {{ 'selected' }} @endif>
+                                        <option value="{{ $all_group_data['id'] }}" @if ($all_group_data['id'] == $service->group_id) {{ 'selected' }} @endif>
 
-                                        {{ $all_group_data['name'] }}</option>
+                                            {{ $all_group_data['name'] }}</option>
 
-                                    @endforeach
+                                        @endforeach
 
-                                </select>
+                                    </select>
 
-                            </div> --}}
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label for="country">Country</label>
-                                        <select class="form-control" id="country" name="country[]"
-                                            onchange="city_change($(this).val())" multiple="multiple">
-                                            <option value="">Select Country</option>
-                                            @php $countryArray = explode(',', $service->country); @endphp@foreach ($country_data as $country)
-                                                <option value="{{ $country->id }}"
-                                                    {{ in_array($country->id, $countryArray) ? 'selected' : '' }}>
-                                                    {{ $country->country }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <p class="form-error-text" id="country_error" style="color: red; margin-top: 10px;">
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label for="city">City</label>
-                                        <span id="city_chang">
-                                            <select class="form-control" id="city" name="city[]" multiple="multiple">
-                                                <option value="">Select City</option>
-                                                @if ($allcity != '' && count($allcity) > 0)
-                                                    @php $cityname = explode(',', $service->city); @endphp
+                                </div> --}}
+                                    <div class="col-lg-6">
+                                    </div> <!-- close the original row -->
+                                    <div class="compact-card">
+                                        <div class="compact-header">
+                                            <h5><i class="fa fa-info-circle me-2" style="color: #6777ef;"></i> Basic & Other
+                                                Information</h5>
+                                        </div>
+                                        <div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="country">Country</label>
+                                                        <select class="form-control" id="country" name="country[]"
+                                                            onchange="city_change($(this).val())" multiple="multiple">
+                                                            <option value="">Select Country</option>
+                                                            @php $countryArray = explode(',', $service->country); @endphp@foreach ($country_data as $country)
+                                                                <option value="{{ $country->id }}"
+                                                                    {{ in_array($country->id, $countryArray) ? 'selected' : '' }}>
+                                                                    {{ $country->country }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        <p class="form-error-text" id="country_error"
+                                                            style="color: red; margin-top: 10px;">
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="city">City</label>
+                                                        <span id="city_chang">
+                                                            <select class="form-control" id="city" name="city[]"
+                                                                multiple="multiple">
+                                                                <option value="">Select City</option>
+                                                                @if ($allcity != '' && count($allcity) > 0)
+                                                                    @php $cityname = explode(',', $service->city); @endphp
 
-                                                    @foreach ($allcity as $city)
-                                                        <option value="{{ $city->id }}"
-                                                            {{ in_array($city->id, $cityname) ? 'selected' : '' }}>
-                                                            {{ $city->name }}
-                                                        </option>
-                                                    @endforeach
+                                                                    @foreach ($allcity as $city)
+                                                                        <option value="{{ $city->id }}"
+                                                                            {{ in_array($city->id, $cityname) ? 'selected' : '' }}>
+                                                                            {{ $city->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                        </span>
+                                                        <p class="form-error-text" id="city_error"
+                                                            style="color: red; margin-top: 10px;">
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+
+                                                        <label for="name">Service Name</label>
+
+                                                        <input id="servicename" name="servicename" type="text"
+                                                            class="form-control" placeholder="Enter Service Name"
+                                                            value="{{ $service->servicename }}" />
+
+                                                        <p class="form-error-text" id="service_error"
+                                                            style="color: red; margin-top: 10px;">
+                                                        </p>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+
+                                                        <label for="name">Page Url</label>
+
+                                                        <input id="page_url" name="page_url" type="text"
+                                                            class="form-control" placeholder="Enter Page Url"
+                                                            value="{{ $service->page_url }}" />
+
+                                                        <p class="form-error-text" id="page_url_error"
+                                                            style="color: red; margin-top: 10px;"></p>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+
+                                                        <label for="name">Home Icon </label>
+
+                                                        <input id="home_icon" name="home_icon" type="file"
+                                                            class="form-control" value="" />
+                                                        @if ($service->home_icon != '')
+                                                            <img src="{{ asset('public/upload/service/' . $service->home_icon) }}"
+                                                                style=" width: 10%;margin-top: 10px;" />
+                                                        @endif
+                                                        <p class="form-error-text" id="home_icon_error"
+                                                            style="color: red; margin-top: 10px;"></p>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+
+                                                        <label for="name">Home Icon Alt tag</label>
+
+                                                        <input id="homeicon_alt_tag" name="homeicon_alt_tag"
+                                                            type="text" class="form-control"
+                                                            value="{{ $service->homeicon_alt_tag }}"
+                                                            placeholder="Home Icon Alt tag" />
+                                                        <p class="form-error-text" id="homeicon_alt_tag_error"
+                                                            style="color: red; margin-top: 10px;"></p>
+
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+
+                                                        <label for="name">App Icon </label>
+
+                                                        <input id="app_icon" name="app_icon" type="file"
+                                                            class="form-control" value="" />
+                                                        @if ($service->app_icon != '')
+                                                            <img src="{{ asset('public/upload/service/' . $service->app_icon) }}"
+                                                                style=" width: 10%;margin-top: 10px;" />
+                                                        @endif
+                                                        <p class="form-error-text" id="app_icon_error"
+                                                            style="color: red; margin-top: 10px;"></p>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+
+                                                        <label for="name">App Icon Alt tag</label>
+
+                                                        <input id="appicon_alt_tag" name="appicon_alt_tag" type="text"
+                                                            class="form-control" value="{{ $service->appicon_alt_tag }}"
+                                                            placeholder="App Icon Alt tag" />
+                                                        <p class="form-error-text" id="appicon_alt_tag_error"
+                                                            style="color: red; margin-top: 10px;"></p>
+
+                                                    </div>
+                                                </div>
+
+
+
+
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="city">Local Fields</label>
+                                                        <select class="form-control" id="form_fields"
+                                                            name="form_fields[]" multiple="multiple">
+                                                            <option value="">Select Form Fields</option>
+                                                            @if ($form_field_data != '' && count($form_field_data) > 0)
+                                                                @php $mucraft = explode(',', $service->form_fields); @endphp
+                                                                @foreach ($form_field_data as $form_field)
+                                                                    <option value="{{ $form_field->id }}"
+                                                                        {{ in_array($form_field->id, $mucraft) ? 'selected' : '' }}>
+                                                                        {{ $form_field->lable_name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
+                                                        <p class="form-error-text" id="form_fields_error"
+                                                            style="color: red; margin-top: 10px;"></p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="city">International Fields</label>
+                                                        <select class="form-control" id="form_fields_two"
+                                                            name="form_fields_two[]" multiple="multiple">
+                                                            <option value="">Select Form Fields</option>
+                                                            @if ($form_field_data != '' && count($form_field_data) > 0)
+                                                                @php $mucraft = explode(',', $service->form_fields_two); @endphp
+                                                                @foreach ($form_field_data as $form_field)
+                                                                    <option value="{{ $form_field->id }}"
+                                                                        {{ in_array($form_field->id, $mucraft) ? 'selected' : '' }}>
+                                                                        {{ $form_field->lable_name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
+                                                        <p class="form-error-text" id="form_fields_error"
+                                                            style="color: red; margin-top: 10px;"></p>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div class="row">
+                                                </div>
+                                            </div>
+                                            <div class="compact-card">
+                                                <div class="compact-header">
+                                                    <h5><i class="fa fa-image me-2" style="color: #6777ef;"></i> Banners
+                                                        Section</h5>
+                                                    <button class="btn btn-sm btn-primary" type="button"
+                                                        id="add_field_button"
+                                                        style="height: 34px; font-size: 13px; font-weight: 500; border-radius: 6px;">+
+                                                        Add More</button>
+                                                </div>
+                                                <div>
+                                                    <div class="col-md-12">
+                                                        <h5>Add More Banners Section</h5>
+                                                        <hr>
+                                                    </div>
+                                                </div>
+
+
+                                                @php
+                                                    $k = 0;
+                                                @endphp
+
+
+
+
+
+                                                @if (!empty($banner_attribute_data))
+                                                    <input type="hidden" name="city_addmore_banner1[]" value="">
+                                                    <input type="hidden" name="title_addmore_banner1[]" value="">
+                                                    <input type="file" name="image_addmore_banner1[]" value=""
+                                                        style="display: none;">
+                                                    <input type="file" name="mobile_banner_image_addmore1[]"
+                                                        value="" style="display: none;">
+                                                    <input type="hidden" name="description_addmore_banner1[]"
+                                                        value="">
+                                                    @for ($i = 0; $i < count($banner_attribute_data); $i++)
+                                                        <div class="row">
+                                                            @if ($i != 0)
+                                                                <hr>
+                                                            @endif
+                                                            <input type="hidden" name="updateid1xxx0[]"
+                                                                id="updateid1xxx0{{ $i + 1 }}"
+                                                                value="{{ $banner_attribute_data[$i]->id }}">
+
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group"> <label
+                                                                        for="categoryname">City</label>
+                                                                    <select class="form-control" id="city_addmore_banner"
+                                                                        name="city_addmore_banneru[]">
+                                                                        <option value="">Select City</option>
+                                                                        @foreach ($allcity as $data)
+                                                                            <option value="{{ $data->id }}"
+                                                                                {{ $data->id == $banner_attribute_data[$i]->city ? 'selected' : '' }}>
+                                                                                {{ $data->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+
+                                                                <div class="form-group"> <label
+                                                                        for="categoryname">Title</label>
+                                                                    <input type="text" id="title_addmore_banner"
+                                                                        name="title_addmore_banneru[]"
+                                                                        class="form-control" placeholder="Enter  Title"
+                                                                        value="{{ $banner_attribute_data[$i]->title }}">
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group"> <label
+                                                                        for="categoryname">image</label>
+                                                                    <input type="file" id="image"
+                                                                        name="image_addmoreu[]" class="form-control">
+
+                                                                    <img src="{{ url('public/upload/service/banner_attr/large/' . $banner_attribute_data[$i]->image) }}"
+                                                                        style="width:35%;">
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <div class="form-group">
+
+                                                                    <label for="name">Mobile Banner Image (400px x
+                                                                        475px)</label>
+
+                                                                    <input id="mobile_banner_image_addmore"
+                                                                        name="mobile_banner_image_addmoreu[]"
+                                                                        type="file" class="form-control"
+                                                                        value="" />
+                                                                    <img src="{{ url('public/upload/service/banner_attr/large/' . $banner_attribute_data[$i]->mobile_banner_image) }}"
+                                                                        style="width:35%;">
+                                                                    <p class="form-error-text"
+                                                                        id="mobile_banner_image_error"
+                                                                        style="color: red; margin-top: 10px;">
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <div class="form-group"> <label
+                                                                        for="categoryname">Description</label>
+                                                                    {{-- <input type="text" id="description_addmore1"
+                                                                    name="description_addmore1[]" class="form-control"
+                                                                    placeholder="Enter Description"> --}}
+                                                                    <textarea id="description_addmoreu_{{ $banner_attribute_data[$i]->id }}" name="description_addmore_banneru[]"
+                                                                        class="form-control" placeholder="Enter Description">{{ $banner_attribute_data[$i]->short_description }}</textarea>
+
+                                                                </div>
+                                                            </div>
+
+
+
+                                                            <a href="#"
+                                                                onclick="singledeletebannerattr('{{ route('removed_banner_addmore_att', ['pid' => $banner_attribute_data[$i]->service_id, 'id' => $banner_attribute_data[$i]->id]) }}')"
+                                                                class="btn btn-danger pull-right remove_field1"
+                                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
+                                                        </div>
+
+
+
+
+                                                        @php
+                                                            $k++;
+                                                        @endphp
+                                                    @endfor
+                                                @else
+                                                    <div class="row">
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group"> <label
+                                                                    for="categoryname">City</label>
+                                                                <select class="form-control" id="city_addmore_banner"
+                                                                    name="city_addmore_banner1[]">
+                                                                    <option value="">Select City</option>
+                                                                    @foreach ($allcity as $data)
+                                                                        <option value="{{ $data->id }}">
+                                                                            {{ $data->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group"> <label
+                                                                    for="categoryname">Title</label>
+                                                                <input type="text" id="title_addmore_banner"
+                                                                    name="title_addmore_banner1[]" class="form-control"
+                                                                    placeholder="Enter  Title" value="">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group"> <label for="categoryname">Image
+                                                                    (2025px X
+                                                                    660px)</label>
+                                                                <input type="file" id="image"
+                                                                    name="image_addmore_banner1[]" class="form-control"
+                                                                    placeholder="">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+
+                                                                <label for="name">Mobile Banner Image (400px x
+                                                                    475px)</label>
+
+                                                                <input id="mobile_banner_image_addmore"
+                                                                    name="mobile_banner_image_addmore1[]" type="file"
+                                                                    class="form-control" value="" />
+                                                                <p class="form-error-text" id="ombile_banner_image_error"
+                                                                    style="color: red; margin-top: 10px;">
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-5">
+                                                            <div class="form-group"> <label for="categoryname">Short
+                                                                    Description</label>
+                                                                <textarea id="description_addmore_banner" name="description_addmore_banner1[]" class="form-control"
+                                                                    placeholder="Enter Description"></textarea>
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+
                                                 @endif
-                                            </select>
-                                        </span>
-                                        <p class="form-error-text" id="city_error" style="color: red; margin-top: 10px;">
-                                        </p>
-                                    </div>
-                                </div>
 
+                                                <div class="input_fields_wrap">
+                                                </div>
 
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="name">Service Name</label>
-
-                                        <input id="servicename" name="servicename" type="text" class="form-control"
-                                            placeholder="Enter Service Name" value="{{ $service->servicename }}" />
-
-                                        <p class="form-error-text" id="service_error" style="color: red; margin-top: 10px;">
-                                        </p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="name">Page Url</label>
-
-                                        <input id="page_url" name="page_url" type="text" class="form-control"
-                                            placeholder="Enter Page Url" value="{{ $service->page_url }}" />
-
-                                        <p class="form-error-text" id="page_url_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="title1">Home Banner Title 1</label>
-
-                                        <input id="title1" name="title1" type="text" class="form-control"
-                                            placeholder="Enter Banner Title 1" value="{{ $service->title1 }}" />
-
-                                        <p class="form-error-text" id="title1_error" style="color: red; margin-top: 10px;">
-                                        </p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="title2">Home Banner Title 2</label>
-
-                                        <input id="title2" name="title2" type="text" class="form-control"
-                                            placeholder="Enter Banner Title 2" value="{{ $service->title2 }}" />
-
-                                        <p class="form-error-text" id="title2_error"
-                                            style="color: red; margin-top: 10px;">
-                                        </p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="banner_url">Home Banner Url</label>
-
-                                        <input id="banner_url" name="banner_url" type="text" class="form-control"
-                                            placeholder="Enter Banner Url" value="{{ $service->banner_url }}" />
-
-                                        <p class="form-error-text" id="banner_url_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        @php
-                                            $shortDescription = trim($service->sort_description);
-                                        @endphp
-
-                                        <label for="banner_url">Sort Discription</label>
-                                        <textarea class="form-control" name="sort_description" id="sort_description" placeholder="Enter Sort Discription">{{ $shortDescription }}
-                                        </textarea>
-
-                                        <p class="form-error-text" id="banner_url_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="name">Home Icon </label>
-
-                                        <input id="home_icon" name="home_icon" type="file" class="form-control"
-                                            value="" />
-                                        @if ($service->home_icon != '')
-                                            <img src="{{ asset('public/upload/service/' . $service->home_icon) }}"
-                                                style=" width: 10%;margin-top: 10px;" />
-                                        @endif
-                                        <p class="form-error-text" id="home_icon_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="name">Home Icon Alt tag</label>
-
-                                        <input id="homeicon_alt_tag" name="homeicon_alt_tag" type="text"
-                                            class="form-control" value="{{ $service->homeicon_alt_tag }}"
-                                            placeholder="Home Icon Alt tag" />
-                                        <p class="form-error-text" id="homeicon_alt_tag_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-
-                                    <div class="form-group">
-
-                                        <label for="name">Home Banner (1350px x 440px)</label>
-
-                                        <input id="image" name="image" type="file" class="form-control"
-                                            value="" />
-                                        @if ($service->image != '')
-                                            <img src="{{ asset('public/upload/service/large/' . $service->image) }}"
-                                                style=" width: 10%;margin-top: 10px;" />
-                                        @endif
-                                        <p class="form-error-text" id="image_error"
-                                            style="color: red; margin-top: 10px;">
-                                        </p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="name">Home Banner Alt tag</label>
-
-                                        <input id="homebanner_alt_tag" name="homebanner_alt_tag" type="text"
-                                            class="form-control" value="{{ $service->homebanner_alt_tag }}"
-                                            placeholder="Home Banner Alt tag" />
-                                        <p class="form-error-text" id="homebanner_alt_tag_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="banner">Home Mobile Banner (400px x 475px)</label>
-
-                                        <input id="banner" name="banner" type="file" class="form-control"
-                                            value="" />
-                                        @if ($service->banner != '')
-                                            <img src="{{ asset('public/upload/service/banner/large/' . $service->banner) }}"
-                                                style=" width: 10%;margin-top: 10px;" />
-                                        @endif
-                                        <p class="form-error-text" id="banner_error"
-                                            style="color: red; margin-top: 10px;">
-                                        </p>
-
-                                    </div>
-                                </div>
-
-
-
-
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="name">Home Mobile Banner Alt tag</label>
-
-                                        <input id="homebanner_mobile_alt_tag" name="homebanner_mobile_alt_tag"
-                                            type="text" class="form-control"
-                                            value="{{ $service->homebanner_mobile_alt_tag }}"
-                                            placeholder="Home Mobile Banner Alt tag" />
-                                        <p class="form-error-text" id="homebanner_mobile_alt_tag_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="name">App Icon </label>
-
-                                        <input id="app_icon" name="app_icon" type="file" class="form-control"
-                                            value="" />
-                                        @if ($service->app_icon != '')
-                                            <img src="{{ asset('public/upload/service/' . $service->app_icon) }}"
-                                                style=" width: 10%;margin-top: 10px;" />
-                                        @endif
-                                        <p class="form-error-text" id="app_icon_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="name">App Icon Alt tag</label>
-
-                                        <input id="appicon_alt_tag" name="appicon_alt_tag" type="text"
-                                            class="form-control" value="{{ $service->appicon_alt_tag }}"
-                                            placeholder="App Icon Alt tag" />
-                                        <p class="form-error-text" id="appicon_alt_tag_error"
-                                            style="color: red; margin-top: 10px;"></p>
-
-                                    </div>
-                                </div>
-
-                                {{-- <div class="form-group">
-
-                                <label for="description" style="margin:15px 0 5px 0px; width:100%;">Top
-                                    Description</label>
-
-                                <textarea id="top_description" name="top_description" class="form-control"
-                                    placeholder="Enter Top Description">
-                                        {{$service->top_description}}
-                                    </textarea>
-
-                            </div> --}}
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="title">Banner Title</label>
-
-                                        <input id="title" name="title" type="text" class="form-control"
-                                            placeholder="Enter Banner Title" value="{{ $service->title }}" />
-
-                                        <p class="form-error-text" id="title_error"
-                                            style="color: red; margin-top: 10px;">
-                                        </p>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-
-                                        <label for="sub_title">Banner Sub-title</label>
-
-                                        <input id="sub_title" name="sub_title" type="text" class="form-control"
-                                            placeholder="Enter Banner Sub-title" value="{{ $service->sub_title }}" />
-
-                                        <p class="form-error-text" id="sub_title_error"
-                                            style="color: red; margin-top: 10px;">
-                                        </p>
-
-                                    </div>
-                                </div>
-
-
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label for="city">Local Fields</label>
-                                        <select class="form-control" id="form_fields" name="form_fields[]"
-                                            multiple="multiple">
-                                            <option value="">Select Form Fields</option>
-                                            @if ($form_field_data != '' && count($form_field_data) > 0)
-                                                @php $mucraft = explode(',', $service->form_fields); @endphp
-                                                @foreach ($form_field_data as $form_field)
-                                                    <option value="{{ $form_field->id }}"
-                                                        {{ in_array($form_field->id, $mucraft) ? 'selected' : '' }}>
-                                                        {{ $form_field->lable_name }}
-                                                    </option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                        <p class="form-error-text" id="form_fields_error"
-                                            style="color: red; margin-top: 10px;"></p>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label for="city">International Fields</label>
-                                        <select class="form-control" id="form_fields_two" name="form_fields_two[]"
-                                            multiple="multiple">
-                                            <option value="">Select Form Fields</option>
-                                            @if ($form_field_data != '' && count($form_field_data) > 0)
-                                                @php $mucraft = explode(',', $service->form_fields_two); @endphp
-                                                @foreach ($form_field_data as $form_field)
-                                                    <option value="{{ $form_field->id }}"
-                                                        {{ in_array($form_field->id, $mucraft) ? 'selected' : '' }}>
-                                                        {{ $form_field->lable_name }}
-                                                    </option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                        <p class="form-error-text" id="form_fields_error"
-                                            style="color: red; margin-top: 10px;"></p>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Scope Of
-                                        Job</label>
-
-                                    <textarea id="scope_of_job" name="scope_of_job" class="form-control" placeholder="Enter Scope Of Job">{{ $service->scope_of_job }}</textarea>
-
-                                </div>
-
-                                <div class="form-group">
-
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Price
-                                        Includes</label>
-
-                                    <textarea id="price_includes" name="price_includes" class="form-control" placeholder="Enter Price Includes">{{ $service->price_includes }}</textarea>
-
-                                </div>
-
-                                <div class="form-group">
-
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Price
-                                        Excludes</label>
-
-                                    <textarea id="price_excludes" name="price_excludes" class="form-control" placeholder="Enter Price Excludes">{{ $service->price_excludes }}</textarea>
-
-                                </div>
-                                <div class="form-group">
-
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Disclaimer</label>
-
-                                    <textarea id="disclaimer" name="disclaimer" class="form-control" placeholder="Enter Disclaimer">{{ $service->disclaimer }}</textarea>
-
-                                </div>
-                                <div class="form-group">
-
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Insurance</label>
-
-                                    <textarea id="insurance" name="insurance" class="form-control" placeholder="Enter Insurance">{{ $service->insurance }}</textarea>
-
-                                </div>
-                                <div class="form-group">
-
-                                    <label for="description" style="margin:15px 0 5px 0px; width:100%;">Payment
-                                        Terms</label>
-
-                                    <textarea id="payment_terms" name="payment_terms" class="form-control" placeholder="Enter Payment Terms">{{ $service->payment_terms }}</textarea>
-
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <h5>Add More Top Description Section</h5>
-                                        <hr>
-                                    </div>
-                                </div>
-
-                                @if ($service_top_description_attr != '')
-                                    <input type="hidden" name="city_addmore_top_description[]" value="">
-
-
-                                    <input type="hidden" name="description_addmore_top_description[]" value="">
-
-
-
-                                    @for ($i = 0; $i < count($service_top_description_attr); $i++)
-                                        <div class="row">
-                                            @if ($i != 0)
-                                                <hr>
-                                            @endif
-                                            <input type="hidden" name="updateid1xxx1_top_description[]"
-                                                id="updateid1xxx1{{ $i + 1 }}"
-                                                value="{{ $service_top_description_attr[$i]->id }}">
-
-                                            <div class="col-md-9">
-                                                <div class="form-group"> <label for="categoryname">City</label>
-                                                    <select class="form-control" id="city_addmore_top_descriptionu"
-                                                        name="city_addmore_top_descriptionu[]">
-                                                        <option value="">Select City</option>
-                                                        @foreach ($allcity as $data)
-                                                            <option value="{{ $data->id }}"
-                                                                @if ($data->id == $service_top_description_attr[$i]->city) selected @endif>
-                                                                {{ $data->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
+                                                <div class="row mt-4">
                                                 </div>
                                             </div>
+                                            <div class="compact-card">
+                                                <div class="compact-header">
+                                                    <h5><i class="fa fa-align-left me-2" style="color: #6777ef;"></i> Top
+                                                        Description Section</h5>
+                                                    <button class="btn btn-sm btn-primary" type="button"
+                                                        id="add_field_button01_top_description"
+                                                        style="height: 34px; font-size: 13px; font-weight: 500; border-radius: 6px;">+
+                                                        Add More</button>
+                                                </div>
+                                                <div>
+                                                    <!-- <div class="col-md-12 ">
+                                            <h5>Add More Top Description Section</h5>
+                                            <hr>
+                                        </div> -->
+                                                </div>
+
+                                                @if ($service_top_description_attr != '')
+                                                    <input type="hidden" name="city_addmore_top_description[]"
+                                                        value="">
+
+
+                                                    <input type="hidden" name="description_addmore_top_description[]"
+                                                        value="">
 
 
 
-                                            <div class="col-md-9">
+                                                    @for ($i = 0; $i < count($service_top_description_attr); $i++)
+                                                        <div class="row">
+                                                            @if ($i != 0)
+                                                                <hr>
+                                                            @endif
+                                                            <input type="hidden" name="updateid1xxx1_top_description[]"
+                                                                id="updateid1xxx1{{ $i + 1 }}"
+                                                                value="{{ $service_top_description_attr[$i]->id }}">
 
-                                                <div class="form-group"> <label for="categoryname">Description</label>
+                                                            <div class="col-md-9">
+                                                                <div class="form-group"> <label
+                                                                        for="categoryname">City</label>
+                                                                    <select class="form-control"
+                                                                        id="city_addmore_top_descriptionu"
+                                                                        name="city_addmore_top_descriptionu[]">
+                                                                        <option value="">Select City</option>
+                                                                        @foreach ($allcity as $data)
+                                                                            <option value="{{ $data->id }}"
+                                                                                @if ($data->id == $service_top_description_attr[$i]->city) selected @endif>
+                                                                                {{ $data->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
 
 
 
-                                                    <textarea id="description_addmore_top_descriptionu_{{ $service_top_description_attr[$i]->id }}"
-                                                        name="description_addmore_top_descriptionu[]" class="form-control" placeholder="Enter Description">{{ $service_top_description_attr[$i]->description }}</textarea>
+                                                            <div class="col-md-9">
+
+                                                                <div class="form-group"> <label
+                                                                        for="categoryname">Description</label>
+
+
+
+                                                                    <textarea id="description_addmore_top_descriptionu_{{ $service_top_description_attr[$i]->id }}"
+                                                                        name="description_addmore_top_descriptionu[]" class="form-control" placeholder="Enter Description">{{ $service_top_description_attr[$i]->description }}</textarea>
+
+
+
+                                                                </div>
+
+                                                            </div>
+
+
+
+                                                            <a href="#"
+                                                                onclick="singledelete('{{ route('service_removed_top_descatt', ['pid' => $service_top_description_attr[$i]->service_id, 'id' => $service_top_description_attr[$i]->id]) }}')"
+                                                                class="btn btn-danger pull-right remove_field12"
+                                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
+
+                                                        </div>
+                                                    @endfor
+                                                @endif
+
+                                                <div class="row">
+                                                    <div class="col-md-9">
+                                                        <div class="form-group"> <label for="categoryname">City</label>
+                                                            <select class="form-control" id="city_addmore_top_description"
+                                                                name="city_addmore_top_description[]">
+                                                                <option value="">Select City</option>
+                                                                @foreach ($allcity as $data)
+                                                                    <option value="{{ $data->id }}">
+                                                                        {{ $data->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="col-md-9">
+
+                                                        <div class="form-group"> <label
+                                                                for="categoryname">Description</label>
+
+
+                                                            <textarea id="description_addmore_top_description" name="description_addmore_top_description[]" class="form-control"
+                                                                placeholder="Enter Description"></textarea>
+
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="input_fields_wrap01_top_description">
+
+                                                </div>
+
+                                            </div>
+                                            <div class="compact-card">
+                                                <div class="compact-header">
+                                                    <h5><i class="fa fa-search me-2" style="color: #6777ef;"></i> Meta &
+                                                        SEO
+                                                        Information</h5>
+                                                    <button class="btn btn-sm btn-primary" type="button"
+                                                        id="add_field_button02"
+                                                        style="height: 34px; font-size: 13px; font-weight: 500; border-radius: 6px;">+
+                                                        Add More</button>
+                                                </div>
+                                                <div>
+
+
+
+
+                                                    @php
+                                                        $k = 0;
+                                                    @endphp
+
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <h5>Add More Meta Section</h5>
+                                                            <hr>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    @if (!empty($service_contains_data))
+
+                                                        <input type="hidden" name="city_addmore_third1[]"
+                                                            value="">
+                                                        <input type="hidden" name="meta_title1[]" value="">
+                                                        <input type="hidden" name="meta_keyword1[]" value="">
+                                                        <input type="hidden" name="meta_description1[]" value="">
+                                                        @for ($i = 0; $i < count($service_contains_data); $i++)
+                                                            <div class="row">
+                                                                @if ($i != 0)
+                                                                    <hr>
+                                                                @endif
+                                                                <input type="hidden" name="updateid1xxx2[]"
+                                                                    id="updateid1xxx2{{ $i + 1 }}"
+                                                                    value="{{ $service_contains_data[$i]->id }}">
+
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group"> <label
+                                                                            for="categoryname">City</label>
+                                                                        <select class="form-control"
+                                                                            id="city_addmore_thirdu"
+                                                                            name="city_addmore_thirdu[]">
+                                                                            <option value="">Select City</option>
+                                                                            @foreach ($allcity as $data)
+                                                                                <option value="{{ $data->id }}"
+                                                                                    @if ($data->id == $service_contains_data[$i]->city) selected @endif>
+                                                                                    {{ $data->name }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group"> <label
+                                                                            for="categoryname">Meta
+                                                                            Title</label>
+                                                                        <input type="text" id="meta_title"
+                                                                            name="meta_titleu[]" class="form-control"
+                                                                            placeholder=""
+                                                                            value="{{ $service_contains_data[$i]->meta_title }}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group"> <label
+                                                                            for="categoryname">Meta
+                                                                            Keyword</label>
+                                                                        <input type="text" id="meta_keyword"
+                                                                            name="meta_keywordu[]" class="form-control"
+                                                                            placeholder=""
+                                                                            value="{{ $service_contains_data[$i]->meta_keyword }}">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group"><label for="categoryname">Meta
+                                                                            Description</label>
+                                                                        <textarea id="meta_description" name="meta_descriptionu[]" class="form-control"
+                                                                            placeholder="Enter Meta Description">{{ $service_contains_data[$i]->meta_description }}</textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <a href="#"
+                                                                    onclick="singledeleteattr('{{ route('removed_service_contain_att', ['pid' => $service_contains_data[$i]->service_id, 'id' => $service_contains_data[$i]->id]) }}')"
+                                                                    class="btn btn-danger pull-right remove_field1"
+                                                                    style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
+                                                            </div>
+
+                                                            @php
+                                                                $k++;
+                                                            @endphp
+                                                        @endfor
+                                                    @else
+                                                        <div class="row">
+                                                            <div class="col-md-4">
+                                                                <div class="form-group"> <label
+                                                                        for="categoryname">City</label>
+                                                                    <select class="form-control" id="city_addmore_third1"
+                                                                        name="city_addmore_third1[]">
+                                                                        <option value="">Select City</option>
+                                                                        @foreach ($allcity as $data)
+                                                                            <option value="{{ $data->id }}">
+                                                                                {{ $data->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group"> <label for="categoryname">Meta
+                                                                        Title</label>
+                                                                    <input type="text" id="meta_title"
+                                                                        name="meta_title1[]" class="form-control"
+                                                                        placeholder="">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group"> <label for="categoryname">Meta
+                                                                        Keyword</label>
+                                                                    <input type="text" id="meta_keyword"
+                                                                        name="meta_keyword1[]" class="form-control"
+                                                                        placeholder="">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group"><label for="categoryname">Meta
+                                                                        Description</label>
+                                                                    <textarea id="meta_description" name="meta_description1[]" class="form-control"
+                                                                        placeholder="Enter Meta Description"></textarea>
+                                                                </div>
+                                                            </div>
+
+
+                                                        </div>
+
+                                                    @endif
+                                                    <div class="input_fields_wrap02">
+                                                    </div>
+
+
+
+
 
 
 
                                                 </div>
 
                                             </div>
-
-
-
-                                            <a href="#"
-                                                onclick="singledelete('{{ route('service_removed_top_descatt', ['pid' => $service_top_description_attr[$i]->service_id, 'id' => $service_top_description_attr[$i]->id]) }}')"
-                                                class="btn btn-danger pull-right remove_field12"
-                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
-
-                                        </div>
-                                    @endfor
-                                @endif
-
-                                <div class="row">
-                                    <div class="col-md-9">
-                                        <div class="form-group"> <label for="categoryname">City</label>
-                                            <select class="form-control" id="city_addmore_top_description"
-                                                name="city_addmore_top_description[]">
-                                                <option value="">Select City</option>
-                                                @foreach ($allcity as $data)
-                                                    <option value="{{ $data->id }}">{{ $data->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-md-9">
-
-                                        <div class="form-group"> <label for="categoryname">Description</label>
-
-
-                                            <textarea id="description_addmore_top_description" name="description_addmore_top_description[]" class="form-control"
-                                                placeholder="Enter Description"></textarea>
-
-
                                         </div>
 
-                                    </div>
+                                        <div class="compact-card">
+                                            <div class="compact-header">
+                                                <h5><i class="fa fa-file-text me-2" style="color: #6777ef;"></i> Service
+                                                    Policies & Details</h5>
+                                            </div>
+                                            <div>
+                                                <div class="row">
+                                                    <div class="form-group">
 
-                                </div>
-                                <div class="input_fields_wrap01_top_description">
+                                                        <label for="description"
+                                                            style="margin:15px 0 5px 0px; width:100%;">Scope Of
+                                                            Job</label>
 
-                                </div>
+                                                        <textarea id="scope_of_job" name="scope_of_job" class="form-control" placeholder="Enter Scope Of Job">{{ $service->scope_of_job }}</textarea>
 
-                                <div class="form-group">
+                                                    </div>
 
-                                    <div class="col-sm-12">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
 
-                                        <button
-                                            style="border: medium none;margin-right: 0px;line-height: 25px;margin-top: -62px;"
-                                            class="submit btn bg-purple pull-right" type="button"
-                                            id="add_field_button01_top_description">Add More </button>
+                                                            <label for="description"
+                                                                style="margin:15px 0 5px 0px; width:100%;">Price
+                                                                Includes</label>
 
-                                    </div>
+                                                            <textarea id="price_includes" name="price_includes" class="form-control" placeholder="Enter Price Includes">{{ $service->price_includes }}</textarea>
 
-                                </div>
+                                                        </div>
+                                                    </div>
 
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <h5>Add More Banners Section</h5>
-                                        <hr>
-                                    </div>
-                                </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
 
+                                                            <label for="description"
+                                                                style="margin:15px 0 5px 0px; width:100%;">Price
+                                                                Excludes</label>
 
-                                @php
-                                    $k = 0;
-                                @endphp
+                                                            <textarea id="price_excludes" name="price_excludes" class="form-control" placeholder="Enter Price Excludes">{{ $service->price_excludes }}</textarea>
 
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
 
+                                                        <label for="description"
+                                                            style="margin:15px 0 5px 0px; width:100%;">Disclaimer</label>
 
+                                                        <textarea id="disclaimer" name="disclaimer" class="form-control" placeholder="Enter Disclaimer">{{ $service->disclaimer }}</textarea>
 
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
 
-                                @if (!empty($banner_attribute_data))
-                                    <input type="hidden" name="city_addmore_banner1[]" value="">
-                                    <input type="hidden" name="title_addmore_banner1[]" value="">
-                                    <input type="file" name="image_addmore_banner1[]" value=""
-                                        style="display: none;">
-                                    <input type="file" name="mobile_banner_image_addmore1[]" value=""
-                                        style="display: none;">
-                                    <input type="hidden" name="description_addmore_banner1[]" value="">
-                                    @for ($i = 0; $i < count($banner_attribute_data); $i++)
-                                        <div class="row">
-                                            @if ($i != 0)
-                                                <hr>
-                                            @endif
-                                            <input type="hidden" name="updateid1xxx0[]"
-                                                id="updateid1xxx0{{ $i + 1 }}"
-                                                value="{{ $banner_attribute_data[$i]->id }}">
+                                                            <label for="description"
+                                                                style="margin:15px 0 5px 0px; width:100%;">Insurance</label>
 
+                                                            <textarea id="insurance" name="insurance" class="form-control" placeholder="Enter Insurance">{{ $service->insurance }}</textarea>
 
-                                            <div class="col-md-4">
-                                                <div class="form-group"> <label for="categoryname">City</label>
-                                                    <select class="form-control" id="city_addmore_banner"
-                                                        name="city_addmore_banneru[]">
-                                                        <option value="">Select City</option>
-                                                        @foreach ($allcity as $data)
-                                                            <option value="{{ $data->id }}"
-                                                                {{ $data->id == $banner_attribute_data[$i]->city ? 'selected' : '' }}>
-                                                                {{ $data->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+
+                                                            <label for="description"
+                                                                style="margin:15px 0 5px 0px; width:100%;">Payment
+                                                                Terms</label>
+
+                                                            <textarea id="payment_terms" name="payment_terms" class="form-control" placeholder="Enter Payment Terms">{{ $service->payment_terms }}</textarea>
+
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                        </div>
+                                        <!-- Sticky Action Bar -->
+                                        <div class="sticky-action-bar">
 
-                                                <div class="form-group"> <label for="categoryname">Title</label>
-                                                    <input type="text" id="title_addmore_banner"
-                                                        name="title_addmore_banneru[]" class="form-control"
-                                                        placeholder="Enter  Title"
-                                                        value="{{ $banner_attribute_data[$i]->title }}">
-                                                </div>
+                                            <a class="btn btn-light border"
+                                                href="{{ route('service.index') }}">Cancel</a>
 
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="form-group"> <label for="categoryname">image</label>
-                                                    <input type="file" id="image" name="image_addmoreu[]"
-                                                        class="form-control">
+                                            <button class="btn btn-primary mb-1" type="button" disabled
+                                                id="spinner_button" style="display: none;">
 
-                                                    <img src="{{ url('public/upload/service/banner_attr/large/' . $banner_attribute_data[$i]->image) }}"
-                                                        style="width:35%;">
+                                                <span class="spinner-border spinner-border-sm" role="status"
+                                                    aria-hidden="true"></span>
 
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
+                                                Loading...
 
-                                                    <label for="name">Mobile Banner Image (400px x 475px)</label>
-
-                                                    <input id="mobile_banner_image_addmore"
-                                                        name="mobile_banner_image_addmoreu[]" type="file"
-                                                        class="form-control" value="" />
-                                                    <img src="{{ url('public/upload/service/banner_attr/large/' . $banner_attribute_data[$i]->mobile_banner_image) }}"
-                                                        style="width:35%;">
-                                                    <p class="form-error-text" id="mobile_banner_image_error"
-                                                        style="color: red; margin-top: 10px;">
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-5">
-                                                <div class="form-group"> <label for="categoryname">Description</label>
-                                                    {{-- <input type="text" id="description_addmore1" name="description_addmore1[]"
-                                                    class="form-control" placeholder="Enter Description"> --}}
-                                                    <textarea id="description_addmoreu_{{ $banner_attribute_data[$i]->id }}" name="description_addmore_banneru[]"
-                                                        class="form-control" placeholder="Enter Description">{{ $banner_attribute_data[$i]->short_description }}</textarea>
-
-                                                </div>
-                                            </div>
+                                            </button>
 
 
 
-                                            <a href="#"
-                                                onclick="singledeletebannerattr('{{ route('removed_banner_addmore_att', ['pid' => $banner_attribute_data[$i]->service_id, 'id' => $banner_attribute_data[$i]->id]) }}')"
-                                                class="btn btn-danger pull-right remove_field1"
-                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
+                                            <button type="button" class="btn btn-primary" id="submit_button"
+                                                onclick="javascript:service_validation()">Save Service</button>
+
+                                            <!-- <input type="submit" name="submit" value="Submit" class="btn btn-primary"> -->
+
                                         </div>
 
+                            </form>
 
 
 
-                                        @php
-                                            $k++;
-                                        @endphp
-                                    @endfor
-                                @else
-                                    <div class="row">
-
-                                        <div class="col-md-4">
-                                            <div class="form-group"> <label for="categoryname">City</label>
-                                                <select class="form-control" id="city_addmore_banner"
-                                                    name="city_addmore_banner1[]">
-                                                    <option value="">Select City</option>
-                                                    @foreach ($allcity as $data)
-                                                        <option value="{{ $data->id }}">{{ $data->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group"> <label for="categoryname">Title</label>
-                                                <input type="text" id="title_addmore_banner"
-                                                    name="title_addmore_banner1[]" class="form-control"
-                                                    placeholder="Enter  Title" value="">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <div class="form-group"> <label for="categoryname">Image (2025px X
-                                                    660px)</label>
-                                                <input type="file" id="image" name="image_addmore_banner1[]"
-                                                    class="form-control" placeholder="">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-
-                                                <label for="name">Mobile Banner Image (400px x 475px)</label>
-
-                                                <input id="mobile_banner_image_addmore"
-                                                    name="mobile_banner_image_addmore1[]" type="file"
-                                                    class="form-control" value="" />
-                                                <p class="form-error-text" id="ombile_banner_image_error"
-                                                    style="color: red; margin-top: 10px;">
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-5">
-                                            <div class="form-group"> <label for="categoryname">Short Description</label>
-                                                <textarea id="description_addmore_banner" name="description_addmore_banner1[]" class="form-control"
-                                                    placeholder="Enter Description"></textarea>
-                                            </div>
-                                        </div>
-
-
-                                    </div>
-
-                                @endif
-
-                                <div class="input_fields_wrap">
-                                </div>
-
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <button
-                                            style="border: medium none;margin-right: 0px;line-height: 25px;margin-top: -62px;"
-                                            class="submit btn bg-purple pull-right" type="button"
-                                            id="add_field_button">Add
-                                            More </button>
-                                    </div>
-                                </div>
-
-
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <h5>Add More Content Section</h5>
-                                        <hr>
-                                    </div>
-                                </div>
-
-
-
-
-                                @php
-                                    $k = 0;
-                                @endphp
-
-
-
-                                @if (!empty($package_attribute_data))
-                                    <input type="hidden" name="title_addmore1[]" value="">
-                                    <input type="hidden" name="image_alt_tag_addmore1[]" value="">
-
-                                    <input type="file" name="image_addmore1[]" value="" style="display: none;">
-
-                                    <input type="hidden" name="description_addmore1[]" value="">
-                                    @for ($i = 0; $i < count($package_attribute_data); $i++)
-                                        <div class="row">
-                                            @if ($i != 0)
-                                                <hr>
-                                            @endif
-                                            <input type="hidden" name="updateid1xxx1[]"
-                                                id="updateid1xxx1{{ $i + 1 }}"
-                                                value="{{ $package_attribute_data[$i]->id }}">
-
-
-                                            <div class="col-md-4">
-                                                <div class="form-group"> <label for="categoryname">City</label>
-                                                    <select class="form-control" id="city_addmore_second"
-                                                        name="city_addmore_secondu[]">
-                                                        <option value="">Select City</option>
-                                                        @foreach ($allcity as $data)
-                                                            <option value="{{ $data->id }}"
-                                                                {{ $data->id == $package_attribute_data[$i]->city ? 'selected' : '' }}>
-                                                                {{ $data->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-
-                                                <div class="form-group"> <label for="categoryname">Title</label>
-                                                    <input type="text" id="title_addmoreu" name="title_addmoreu[]"
-                                                        class="form-control" placeholder="Enter  Title"
-                                                        value="{{ $package_attribute_data[$i]->title_addmore }}">
-                                                </div>
-
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="form-group"> <label for="categoryname">image</label>
-                                                    <input type="file" id="image" name="image_addmore1u[]"
-                                                        class="form-control">
-
-                                                    <img src="{{ url('public/upload/service/service_attr/large/' . $package_attribute_data[$i]->image) }}"
-                                                        style="width:35%;">
-
-                                                </div>
-                                            </div>
-                                            <div class="col-md-5">
-                                                <div class="form-group"> <label for="categoryname">Description</label>
-                                                    {{-- <input type="text" id="description_addmore1" name="description_addmore1[]"
-                                                    class="form-control" placeholder="Enter Description"> --}}
-                                                    <textarea id="description_addmoreu_{{ $package_attribute_data[$i]->id }}" name="description_addmoreu[]"
-                                                        class="form-control" placeholder="Enter Description">{{ $package_attribute_data[$i]->description_addmore }}</textarea>
-
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-
-                                                <div class="form-group"> <label for="categoryname">Image Alt tag</label>
-                                                    <input type="text" id="image_alt_tag_addmoreu"
-                                                        name="image_alt_tag_addmoreu[]" class="form-control"
-                                                        placeholder="Enter  Image Alt tag"
-                                                        value="{{ $package_attribute_data[$i]->image_alt_tag }}">
-                                                </div>
-
-                                            </div>
-
-                                            <a href="#"
-                                                onclick="singledelete('{{ route('removed_service_addmore_att', ['pid' => $package_attribute_data[$i]->pid, 'id' => $package_attribute_data[$i]->id]) }}')"
-                                                class="btn btn-danger pull-right remove_field1"
-                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
-                                        </div>
-                                        @php
-                                            $k++;
-                                        @endphp
-                                    @endfor
-                                @else
-                                    <input type="file" name="e_image1_0" value="" style="display: none;">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group"> <label for="categoryname">City</label>
-                                                <select class="form-control" id="city_addmore_second"
-                                                    name="city_addmore_second1[]">
-                                                    <option value="">Select City</option>
-                                                    @foreach ($allcity as $data)
-                                                        <option value="{{ $data->id }}">{{ $data->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-
-                                            <div class="form-group"> <label for="categoryname">Title</label>
-                                                <input type="text" id="title_addmore1" name="title_addmore1[]"
-                                                    class="form-control" placeholder="Enter  Title" value="">
-                                            </div>
-
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group"> <label for="categoryname">image</label>
-                                                <input type="file" id="image1" name="image_addmore1[]"
-                                                    class="form-control">
-
-                                            </div>
-                                        </div>
-                                        <div class="col-md-5">
-                                            <div class="form-group"> <label for="categoryname">Description</label>
-                                                {{-- <input type="text" id="description_addmore1" name="description_addmore1[]"
-                                                class="form-control" placeholder="Enter Description"> --}}
-                                                <textarea id="description_addmore1" name="description_addmore1[]" class="form-control"
-                                                    placeholder="Enter Description"></textarea>
-
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-
-                                            <div class="form-group"> <label for="categoryname">Image Alt tag</label>
-                                                <input type="text" id="image_alt_tag_addmore1"
-                                                    name="image_alt_tag_addmore1[]" class="form-control"
-                                                    placeholder="Enter  Image Alt tag" value="">
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                @endif
-
-
-                                <div class="input_fields_wrap01">
-
-                                </div>
-
-                                <div class="form-group">
-
-                                    <div class="col-sm-12">
-
-                                        <button
-                                            style="border: medium none;margin-right: -21px;line-height: 26px;margin-top: -62px;"
-                                            class="submit btn bg-purple pull-right" type="button"
-                                            id="add_field_button01">Add More </button>
-
-                                    </div>
-
-
-
-                                </div>
-
-
-
-                                @php
-                                    $k = 0;
-                                @endphp
-
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <h5>Add More Meta Section</h5>
-                                        <hr>
-                                    </div>
-                                </div>
-
-
-
-                                @if (!empty($service_contains_data))
-
-                                    <input type="hidden" name="city_addmore_third1[]" value="">
-                                    <input type="hidden" name="meta_title1[]" value="">
-                                    <input type="hidden" name="meta_keyword1[]" value="">
-                                    <input type="hidden" name="meta_description1[]" value="">
-                                    @for ($i = 0; $i < count($service_contains_data); $i++)
-                                        <div class="row">
-                                            @if ($i != 0)
-                                                <hr>
-                                            @endif
-                                            <input type="hidden" name="updateid1xxx2[]"
-                                                id="updateid1xxx2{{ $i + 1 }}"
-                                                value="{{ $service_contains_data[$i]->id }}">
-
-                                            <div class="col-md-4">
-                                                <div class="form-group"> <label for="categoryname">City</label>
-                                                    <select class="form-control" id="city_addmore_thirdu"
-                                                        name="city_addmore_thirdu[]">
-                                                        <option value="">Select City</option>
-                                                        @foreach ($allcity as $data)
-                                                            <option value="{{ $data->id }}"
-                                                                @if ($data->id == $service_contains_data[$i]->city) selected @endif>
-                                                                {{ $data->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <div class="form-group"> <label for="categoryname">Meta Title</label>
-                                                    <input type="text" id="meta_title" name="meta_titleu[]"
-                                                        class="form-control" placeholder=""
-                                                        value="{{ $service_contains_data[$i]->meta_title }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="form-group"> <label for="categoryname">Meta Keyword</label>
-                                                    <input type="text" id="meta_keyword" name="meta_keywordu[]"
-                                                        class="form-control" placeholder=""
-                                                        value="{{ $service_contains_data[$i]->meta_keyword }}">
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <div class="form-group"><label for="categoryname">Meta Description</label>
-                                                    <textarea id="meta_description" name="meta_descriptionu[]" class="form-control"
-                                                        placeholder="Enter Meta Description">{{ $service_contains_data[$i]->meta_description }}</textarea>
-                                                </div>
-                                            </div>
-                                            <a href="#"
-                                                onclick="singledeleteattr('{{ route('removed_service_contain_att', ['pid' => $service_contains_data[$i]->service_id, 'id' => $service_contains_data[$i]->id]) }}')"
-                                                class="btn btn-danger pull-right remove_field1"
-                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
-                                        </div>
-
-                                        @php
-                                            $k++;
-                                        @endphp
-                                    @endfor
-                                @else
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group"> <label for="categoryname">City</label>
-                                                <select class="form-control" id="city_addmore_third1"
-                                                    name="city_addmore_third1[]">
-                                                    <option value="">Select City</option>
-                                                    @foreach ($allcity as $data)
-                                                        <option value="{{ $data->id }}">{{ $data->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <div class="form-group"> <label for="categoryname">Meta Title</label>
-                                                <input type="text" id="meta_title" name="meta_title1[]"
-                                                    class="form-control" placeholder="">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group"> <label for="categoryname">Meta Keyword</label>
-                                                <input type="text" id="meta_keyword" name="meta_keyword1[]"
-                                                    class="form-control" placeholder="">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <div class="form-group"><label for="categoryname">Meta Description</label>
-                                                <textarea id="meta_description" name="meta_description1[]" class="form-control"
-                                                    placeholder="Enter Meta Description"></textarea>
-                                            </div>
-                                        </div>
-
-
-                                    </div>
-
-                                @endif
-                                <div class="input_fields_wrap02">
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <button style="border: medium none;margin-right: 0px;line-height: 25px;"
-                                            class="submit btn bg-purple pull-right" type="button"
-                                            id="add_field_button02">Add More </button>
-                                    </div>
-                                </div>
-
-
-
-
-
-
-
-                            </div>
-
-                            <div class="text-end mt-4">
-
-                                <a class="btn btn-primary" href="{{ route('service.index') }}"> Cancel</a>
-
-                                <button class="btn btn-primary mb-1" type="button" disabled id="spinner_button"
-                                    style="display: none;">
-
-                                    <span class="spinner-border spinner-border-sm" role="status"
-                                        aria-hidden="true"></span>
-
-                                    Loading...
-
-                                </button>
-
-
-
-                                <button type="button" class="btn btn-primary" id="submit_button"
-                                    onclick="javascript:service_validation()">Submit</button>
-
-                                <!-- <input type="submit" name="submit" value="Submit" class="btn btn-primary"> -->
-
-                            </div>
-
-                        </form>
-
-
+                        </div>
 
                     </div>
 
@@ -1707,5 +1580,7 @@
     </script>
 
 
+
+    </div>
 
 @stop

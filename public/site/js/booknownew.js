@@ -351,6 +351,19 @@ document.addEventListener("DOMContentLoaded", function () {
         if (stepNumber == 2) {
             initSplideSlider();
         }
+        
+        if (stepNumber == 5) {
+            $('#service_fee').val('9');
+            if (typeof updateSidebarCart === 'function') {
+                updateSidebarCart();
+            }
+        } else if (stepNumber < 5) {
+            $('#service_fee').val('0');
+            if (typeof updateSidebarCart === 'function') {
+                updateSidebarCart();
+            }
+        }
+
         currentStep = stepNumber;
 
         // Save to storage
@@ -1230,6 +1243,16 @@ function apply_promo(from) {
                 $('#wallet_used').val('0');
                 updateSidebarCart();
                 return true;
+            } else if (!isNaN(parseFloat(response)) && isFinite(response)) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'To apply this promo you need a minimum order of ' + response + ' AED',
+                    // text: '',
+                    confirmButtonColor: '#3085d6',
+                });
+
+                $('#promo_code' + from).val('');
+                return false;
             } else {
                 Swal.fire({
                     icon: 'error',

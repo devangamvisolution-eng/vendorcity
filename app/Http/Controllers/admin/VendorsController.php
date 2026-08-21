@@ -47,7 +47,7 @@ class VendorsController extends Controller
             $query->where('is_active', $request->status);
         }
 
-        $data['vendors_data'] = $query->orderBy('id', 'DESC')->paginate(10);
+        $data['vendors_data'] = $query->orderBy('id', 'DESC')->get();
 
         // Fetch data for filter dropdowns
         $data['services'] = DB::table('services')->where('is_active', 0)->orderBy('servicename', 'ASC')->get();
@@ -265,7 +265,10 @@ class VendorsController extends Controller
             $data['emirates_id'] = $fileName;
         }
 
-
+        $data['vat_certificate_expiry'] = $request->vat_certificate_expiry;
+        $data['trn_certificate_expiry'] = $request->trn_certificate_expiry;
+        $data['passport_expiry'] = $request->passport_expiry;
+        $data['emirates_id_expiry'] = $request->emirates_id_expiry;
 
         $vendors_id = DB::table('users')->insertGetId($data);
 
@@ -351,6 +354,7 @@ class VendorsController extends Controller
         // Fetch all subservices that belong to those selected services
         $data['subservice_data'] = DB::table('subservices')
             ->whereIn('serviceid', $selectedServices ?: [0])
+            ->where('is_active', 0)
             ->get();
 
 
@@ -397,6 +401,17 @@ class VendorsController extends Controller
         $data['short_description'] = $_POST['short_description'];
         // $data['password']=Hash::make ($_POST['password']);        
         $data['email'] = $_POST['email'];
+
+        $data['vat_certificate_expiry'] = $_POST['vat_certificate_expiry'] ?? null;
+        $data['trn_certificate_expiry'] = $_POST['trn_certificate_expiry'] ?? null;
+        $data['passport_expiry'] = $_POST['passport_expiry'] ?? null;
+        $data['emirates_id_expiry'] = $_POST['emirates_id_expiry'] ?? null;
+
+        $data['trn_certificate_number'] = $_POST['trn_certificate_number'] ?? null;
+        $data['trade_license_number'] = $_POST['trade_license_number'] ?? null;
+        $data['passport_number'] = $_POST['passport_number'] ?? null;
+        $data['emirates_id_number'] = $_POST['emirates_id_number'] ?? null;
+
         $data['country_code'] = $_POST['country_code_vendor'];
         if ($_POST['mobile'] != '') {
             $data['mobile'] = preg_replace('/\D/', '', $_POST['mobile']);
@@ -551,9 +566,14 @@ class VendorsController extends Controller
         //     print_r($data);
         //     echo"</pre>";exit;
 
+        $data['vat_certificate_expiry'] = $request->vat_certificate_expiry;
+        $data['trn_certificate_expiry'] = $request->trn_certificate_expiry;
+        $data['passport_expiry'] = $request->passport_expiry;
+        $data['emirates_id_expiry'] = $request->emirates_id_expiry;
 
         //    $vendors_id = DB::table('users')->insertGetId($data);
         DB::table('users')->where('id', $id)->update($data);
+
 
         if (count($_POST['poc1']) > 0 && $_POST['poc1'] != '') {
 
@@ -1220,9 +1240,259 @@ class VendorsController extends Controller
 
         $data['id'] = $subscription_id;
         $data['vendor_id'] = $data['subscription_data']->vendor_id;
+        header('Content-Disposition: attachment;filename="vendors_data.xlsx"');
+        header('Cache-Control: max-age=0');
 
-        // echo "<pre>";print_r($data['subscription_data']);echo"</pre>";exit;
+        // Write the file to the browser
+        $writer->save('php://output');
+    }
 
-        return view('admin.edit_international_subscription', $data);
+
+    public function manageContracts($id)
+    {
+        $vendor = DB::table('users')->where('id', $id)->first();
+        if (!$vendor) {
+            abort(404, 'Vendor not found.');
+        }
+
+        $contracts = DB::table('vendor_contracts')
+            ->where('vendor_id', $id)
+            ->orderBy('id', 'DESC')
+            ->get();
+
+        return view('admin.vendor_contracts', compact('vendor', 'contracts'));
+    }
+
+    public function manualContractUpload(Request $request, $id)
+    {
+        $request->validate([
+            'unsigned_contract' => 'required|mimes:pdf|max:10240',
+            'end_date' => 'required|date'
+        ]);
+
+        $vendor = DB::table('users')->where('id', $id)->first();
+        if (!$vendor) {
+            return back()->with('error', 'Vendor not found.');
+        }
+
+        if ($request->hasFile('unsigned_contract')) {
+            $file = $request->file('unsigned_contract');
+            $fileName = 'custom_contract_' . time() . '_' . $vendor->id . '.' . $file->getClientOriginalExtension();
+            $filePath = 'contracts/' . $fileName;
+
+            \Illuminate\Support\Facades\Storage::disk('public')->put($filePath, file_get_contents($file));
+
+            // Create row in vendor_contracts
+            DB::table('vendor_contracts')->insert([
+                'vendor_id' => $id,
+                'unsigned_pdf_path' => $filePath,
+                'end_date' => $request->end_date,
+                'status' => 'sent',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            // Update user status
+            DB::table('users')->where('id', $id)->update([
+                'contract_pdf_path' => $filePath,
+                'contract_status' => 'contract_sent'
+            ]);
+
+            // Send Email to vendor
+            $fullPath = storage_path('app/public/' . $filePath);
+            \Illuminate\Support\Facades\Mail::to($vendor->email)->send(new \App\Mail\VendorContractMail($vendor, $fullPath));
+
+            return back()->with('success', 'Custom contract uploaded and sent to vendor successfully.');
+        }
+
+        return back()->with('error', 'Failed to upload contract.');
+    }
+
+    public function showVerifyDocumentsForm(Request $request, $id)
+    {
+        if (Auth::user()->role_id != 1) {
+            return back()->with('error', 'Unauthorized.');
+        }
+
+        $vendor = DB::table('users')->where('id', $id)->first();
+        if (!$vendor) {
+            return back()->with('error', 'Vendor not found.');
+        }
+
+        return view('admin.verify_vendor_documents', compact('vendor'));
+    }
+
+    public function verifyDocumentsOnly(Request $request, $id)
+    {
+        if (Auth::user()->role_id != 1) {
+            return back()->with('error', 'Unauthorized.');
+        }
+
+        $vendor = DB::table('users')->where('id', $id)->first();
+        if (!$vendor) {
+            return back()->with('error', 'Vendor not found.');
+        }
+
+        DB::table('users')->where('id', $id)->update([
+            'document_status' => 'verified',
+            'is_active' => 0,
+            'suspension_reason' => null,
+            'document_expiration_date' => now()->addYear()->toDateString(),
+            'document_verified_by' => Auth::id(),
+            'updated_at' => now()
+        ]);
+
+        return redirect()->route('vendors.index')->with('success', 'Vendor documents have been verified and access restored.');
+    }
+
+    public function verifyDocumentAndSendContract($id)
+    {
+        $vendor = DB::table('users')->where('id', $id)->first();
+        if (!$vendor) {
+            return back()->with('error', 'Vendor not found.');
+        }
+
+        // Generate PDF using mPDF
+        $mpdf = new \Mpdf\Mpdf();
+        $html = "<h1>Vendor Contract</h1>
+                 <p>This is the contract for <strong>{$vendor->name}</strong>.</p>
+                 <p>By signing below, you agree to the terms and conditions of Vendor City.</p>
+                 <br><br><br>
+                 <p>Signature: ______________________</p>
+                 <p>Date: ______________________</p>";
+
+        $mpdf->WriteHTML($html);
+        $pdfContent = $mpdf->Output('', 'S');
+
+        $fileName = 'contract_' . time() . '_' . $vendor->id . '.pdf';
+        $filePath = 'contracts/' . $fileName;
+        \Illuminate\Support\Facades\Storage::disk('public')->put($filePath, $pdfContent);
+
+        // Update DB
+        DB::table('users')->where('id', $id)->update([
+            'document_verified_by' => Auth::id(),
+            'contract_pdf_path' => $filePath,
+            'contract_status' => 'contract_sent'
+        ]);
+
+        // Create row in vendor_contracts with default 1 year end date
+        DB::table('vendor_contracts')->insert([
+            'vendor_id' => $id,
+            'unsigned_pdf_path' => $filePath,
+            'end_date' => date('Y-m-d', strtotime('+1 year')),
+            'status' => 'sent',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        // Send Email
+        $fullPath = storage_path('app/public/' . $filePath);
+        \Illuminate\Support\Facades\Mail::to($vendor->email)->send(new \App\Mail\VendorContractMail($vendor, $fullPath));
+
+        return back()->with('success', 'Documents verified and automated contract sent.');
+    }
+
+    public function approveVendorContract($contract_id)
+    {
+        if (Auth::user()->role_id != 1) {
+            return back()->with('error', 'Unauthorized.');
+        }
+
+        $contract = DB::table('vendor_contracts')->where('id', $contract_id)->first();
+        if (!$contract) {
+            return back()->with('error', 'Contract not found.');
+        }
+
+        $endDate = $contract->end_date ? $contract->end_date : date('Y-m-d', strtotime('+1 year'));
+
+        DB::table('vendor_contracts')->where('id', $contract_id)->update([
+            'status' => 'approved',
+            'start_date' => date('Y-m-d'),
+            'updated_at' => now()
+        ]);
+
+        DB::table('users')->where('id', $contract->vendor_id)->update([
+            'contract_status' => 'approved',
+            'contract_end_date' => $endDate
+        ]);
+
+        return back()->with('success', 'Vendor contract approved successfully.');
+    }
+
+    public function rejectVendorContract($contract_id)
+    {
+        if (Auth::user()->role_id != 1) {
+            return back()->with('error', 'Unauthorized.');
+        }
+
+        $contract = DB::table('vendor_contracts')->where('id', $contract_id)->first();
+        if (!$contract) {
+            return back()->with('error', 'Contract not found.');
+        }
+
+        DB::table('vendor_contracts')->where('id', $contract_id)->update([
+            'status' => 'rejected',
+            'updated_at' => now()
+        ]);
+
+        DB::table('users')->where('id', $contract->vendor_id)->update([
+            'contract_status' => 'contract_rejected'
+        ]);
+
+        return back()->with('success', 'Vendor contract rejected successfully.');
+    }
+
+    public function uploadSignedContract(Request $request)
+    {
+        // (Legacy method)
+    }
+
+    public function showUploadForm(Request $request, $id)
+    {
+        $vendor = DB::table('users')->where('id', $id)->first();
+        if (!$vendor) {
+            abort(404, 'Vendor not found.');
+        }
+
+        return view('front.vendor_contract_upload', compact('vendor'));
+    }
+
+    public function submitUploadForm(Request $request, $id)
+    {
+        $vendor = DB::table('users')->where('id', $id)->first();
+        if (!$vendor) {
+            abort(404, 'Vendor not found.');
+        }
+
+        $request->validate([
+            'signed_contract' => 'required|mimes:pdf|max:10240',
+        ]);
+
+        if ($request->hasFile('signed_contract')) {
+            $file = $request->file('signed_contract');
+            $fileName = 'signed_contract_' . time() . '_' . $id . '.' . $file->getClientOriginalExtension();
+            $filePath = 'contracts/' . $fileName;
+
+            \Illuminate\Support\Facades\Storage::disk('public')->put($filePath, file_get_contents($file));
+
+            DB::table('users')->where('id', $id)->update([
+                'signed_contract_path' => $filePath,
+                'contract_status' => 'contract_uploaded'
+            ]);
+
+            // Update latest contract in vendor_contracts
+            $latestContract = DB::table('vendor_contracts')->where('vendor_id', $id)->orderBy('id', 'DESC')->first();
+            if ($latestContract) {
+                DB::table('vendor_contracts')->where('id', $latestContract->id)->update([
+                    'signed_pdf_path' => $filePath,
+                    'status' => 'uploaded',
+                    'updated_at' => now()
+                ]);
+            }
+
+            return back()->with('success', 'Your signed contract has been uploaded successfully! Our team will review and approve your account shortly.');
+        }
+
+        return back()->with('error', 'Please select a valid PDF file.');
     }
 }

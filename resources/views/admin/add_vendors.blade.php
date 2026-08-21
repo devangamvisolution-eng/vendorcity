@@ -101,12 +101,12 @@
                                     <div class="form-group">
                                         <label for="category">User Category</label>
                                         {{-- <select class="form-control" id="role_id" name="role_id" disabled>
-                                            @foreach ($permission_data as $permission)
-                                                <option value="{{ $permission->id }}" data-value="{{ $permission->id }}">
-                                                    {{ $permission->cname }}
-                                                </option>
-                                            @endforeach
-                                        </select> --}}
+                                        @foreach ($permission_data as $permission)
+                                        <option value="{{ $permission->id }}" data-value="{{ $permission->id }}">
+                                            {{ $permission->cname }}
+                                        </option>
+                                        @endforeach
+                                    </select> --}}
                                         <input type="hidden" name="hidden_role_id" id="hidden_role_id" value="10">
                                     </div>
                                 </div>
@@ -249,60 +249,114 @@
                                             class="form-control" placeholder="Select Establishment Date" />
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12 mt-4 mb-3">
+                                    <h4>Document Section</h4>
+                                    <hr>
+                                </div>
+                                <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="name">Company Logo (90px * 90px)</label>
                                         <input id="company_logo" name="company_logo" type="file" class="form-control"
                                             placeholder="Select Company Logo" />
-
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="name">VAT Certificate </label>
+                                        <label for="name">VAT Certificate<span class="text-danger">*</span></label>
                                         <input id="vatcertificate" name="vatcertificate" type="file"
                                             class="form-control" placeholder="Select VAT Certificate" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">TRN Certificate Number<span
+                                                class="text-danger">*</span></label>
+                                        <input id="trn_certificate_number" name="trn_certificate_number" type="text"
+                                            class="form-control" placeholder="Enter TRN Certificate Number" />
+                                    </div>
+                                </div>
 
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="name">TRN Certificate </label>
-                                        <input id="trncertificate" name="trncertificate" type="file"
-                                            class="form-control" placeholder="Select TRN Certificate" />
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="name">Trade License</label>
+                                        <label for="name">Trade License<span class="text-danger">*</span></label>
                                         <input id="tradelicense" name="tradelicense" type="file" class="form-control"
                                             placeholder="Select Trade License" />
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="name">Passport</label>
+                                        <label for="name">Trade License Number<span
+                                                class="text-danger">*</span></label>
+                                        <input id="trade_license_number" name="trade_license_number" type="text"
+                                            class="form-control" placeholder="Enter Trade License Number" />
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="name">Trade License Expiry Date<span
+                                                class="text-danger">*</span></label>
+                                        <input id="tlexpiry" name="tlexpiry" type="date" class="form-control"
+                                            placeholder="Select Trade License Expiry Date" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="name">Passport (authorized person)<span
+                                                class="text-danger">*</span></label>
                                         <input id="passport" name="passport" type="file" class="form-control"
                                             placeholder="Select Passport" />
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="name">Emirates ID</label>
+                                        <label for="name">Passport Number (authorized person)<span
+                                                class="text-danger">*</span></label>
+                                        <input id="passport_number" name="passport_number" type="text"
+                                            class="form-control" placeholder="Enter Passport Number" />
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="name">Passport Expiry Date (authorized person)<span
+                                                class="text-danger">*</span></label>
+                                        <input id="passport_expiry" name="passport_expiry" type="date"
+                                            class="form-control" placeholder="Select Passport Expiry Date" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="name">Emirates ID (authorized person)<span
+                                                class="text-danger">*</span></label>
                                         <input id="emirates_id" name="emirates_id" type="file" class="form-control"
                                             placeholder="Select Emirates Id" />
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="name">TL expiry date</label>
-                                        <input id="tlexpiry" name="tlexpiry" type="date" class="form-control"
-                                            placeholder="Select TL expiry date" />
+                                        <label for="name">Emirates ID Number (authorized person)<span
+                                                class="text-danger">*</span></label>
+                                        <input id="emirates_id_number" name="emirates_id_number" type="text"
+                                            class="form-control" placeholder="Enter Emirates ID Number" />
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="name">Emirates ID Expiry Date (authorized person)<span
+                                                class="text-danger">*</span></label>
+                                        <input id="emirates_id_expiry" name="emirates_id_expiry" type="date"
+                                            class="form-control" placeholder="Select Emirates ID Expiry Date" />
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-4 mb-3">
+                                    <h4>Additional Information</h4>
+                                    <hr>
+                                </div>
+
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        @php $maxStaff=20; @endphp
+                                        @php $maxStaff = 20; @endphp
                                         <label for="">No Of Staff</label>
                                         <select class="form-control" id="staff" name="staff">
                                             <option value="">Select No Of Staff</option>
@@ -332,7 +386,8 @@
                                         <input id="email" name="email" type="text" class="form-control"
                                             placeholder="Enter Email" />
                                         <p class="form-error-text" id="email_error"
-                                            style="color: red; margin-top: 10px;"></p>
+                                            style="color: red; margin-top: 10px;">
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -363,7 +418,8 @@
                                         <input id="mobile" name="mobile" type="text" class="form-control"
                                             placeholder="Enter Mobile No." onkeypress="return validateNumber(event)" />
                                         <p class="form-error-text" id="mobile_error"
-                                            style="color: red; margin-top: 10px;"></p>
+                                            style="color: red; margin-top: 10px;">
+                                        </p>
                                     </div>
                                 </div>
 
@@ -373,7 +429,8 @@
                                         <input id="rating" name="rating" type="number" class="form-control"
                                             placeholder="Enter Rating" />
                                         <p class="form-error-text" id="rating_error"
-                                            style="color: red; margin-top: 10px;"></p>
+                                            style="color: red; margin-top: 10px;">
+                                        </p>
                                     </div>
                                 </div>
 

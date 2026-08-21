@@ -4,10 +4,10 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\CleaningSubscriptionDuration;
-use App\Models\admin\CleaningSubscriptionPackage;
-use App\Models\admin\CleaningSubscriptionFrequency;
-use App\Models\admin\CleaningSubscriptionPricing;
+use App\Models\Admin\CleaningSubscriptionDuration;
+use App\Models\Admin\CleaningSubscriptionPackage;
+use App\Models\Admin\CleaningSubscriptionFrequency;
+use App\Models\Admin\CleaningSubscriptionPricing;
 
 class CleaningSubscriptionConfigController extends Controller
 {

@@ -551,8 +551,9 @@
         <div class="row">
             <div class="col-lg-7 mx-auto">
 
-                {{--  <div class="order-success-header">
-                    <img src="{{ asset('public/site/images/orderic.png') }}" alt="Success" class="mb-3" style="width: 60px;">
+                {{-- <div class="order-success-header">
+                    <img src="{{ asset('public/site/images/orderic.png') }}" alt="Success" class="mb-3"
+                        style="width: 60px;">
                     <h2>Order Confirmed!</h2>
                     <p class="text-muted">Your booking has been successfully placed and is being processed.</p>
                 </div> --}}
@@ -578,10 +579,14 @@
                                 @php
                                     $statuses = [
                                         'BK' => 'Booking Requested',
+                                        'BC' => 'Booking Confirmed',
                                         'P' => 'Booking Confirmed',
                                         'PA' => 'Vendor Assigned',
+                                        'OTW' => 'On the way',
+                                        'IP' => 'In progress',
                                         'CO' => 'Booking Completed',
                                         'CL' => 'Booking Cancelled',
+                                        'UP' => 'Unpaid',
                                     ];
                                     $currentStatusText = $statuses[$thank_order_data->order_status] ?? 'Processing';
                                 @endphp
@@ -592,11 +597,13 @@
                                 <span><i class="fa-regular fa-calendar-check text-primary"></i>
                                     {{ $thank_ci_order_data->month }} {{ $thank_ci_order_data->bookingdate }},
                                     {{ $thank_ci_order_data->bookingyear }}</span>
-                                <span><i class="fa-regular fa-clock text-primary"></i> {!! Helper::timeslotname($thank_ci_order_data->time_slot) !!}</span>
+                                <span><i class="fa-regular fa-clock text-primary"></i>
+                                    {!! Helper::timeslotname($thank_ci_order_data->time_slot) !!}</span>
                             </div>
                             <p class="text-muted small">Thank you. We'll match you with a top-rated Professional.</p>
                         </div>
-                        {{-- <img src="{{ asset('public/site/images/confirm.png') }}" width="60" class="rounded-circle shadow-sm"> --}}
+                        {{-- <img src="{{ asset('public/site/images/confirm.png') }}" width="60"
+                            class="rounded-circle shadow-sm"> --}}
                     </div>
                 </div>
 
@@ -709,7 +716,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <small class="d-block opacity-75 text-uppercase fw-bold"
-                                style="font-size: 0.65rem;">Payment via</small>
+                                style="font-size: 0.65rem;">Payment
+                                via</small>
                             <span class="fw-bold">@php
                                 $payment_modes = ['1' => 'Cash on Delivery', '2' => 'Online Payment'];
                                 echo $payment_modes[$thank_order_data->paymentmode] ?? 'N/A';

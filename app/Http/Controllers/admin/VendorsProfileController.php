@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
 use Image;
-use App\Models\admin\City;
-use App\Models\admin\UserPermission;
+use App\Models\Admin\City;
+use App\Models\Admin\UserPermission;
 
 class VendorsProfileController extends Controller
 {
@@ -66,12 +66,13 @@ class VendorsProfileController extends Controller
             ->first();
 
         $selectedServices = !empty($data['vendorsprofile']->serviceList)
-        ? explode(',', $data['vendorsprofile']->serviceList)
-        : [];
+            ? explode(',', $data['vendorsprofile']->serviceList)
+            : [];
 
         $data['subservice_data'] = DB::table('subservices')
-                                    ->whereIn('serviceid', $selectedServices ?: [0])
-                                    ->get();
+            ->whereIn('serviceid', $selectedServices ?: [0])
+            ->where('is_active', 0)
+            ->get();
 
         $data["attribute_data"] = DB::table("vendors_attribute")
             ->where("pid", $data["vendorsprofile"]->id)
@@ -112,13 +113,14 @@ class VendorsProfileController extends Controller
         } else {
             $data["city"] = "";
         }
-        $data["crole"] = $_POST["crole"];
-        $data["parentcname"] = $_POST["parentcname"];
-        $data["establishment_date"] = $_POST["establishment_date"];
-        $data["tlexpiry"] = $_POST["tlexpiry"];
-        $data["staff"] = $_POST["staff"];
-        $data["remarks"] = $_POST["remarks"];
-        $data["socialmedai"] = $_POST["socialmedai"];
+        $data["tlexpiry"] = $request->tlexpiry;
+        $data["staff"] = $request->staff;
+        $data["remarks"] = $request->remarks;
+
+        $data["trn_certificate_number"] = $request->trn_certificate_number;
+        $data["trade_license_number"] = $request->trade_license_number;
+        $data["passport_number"] = $request->passport_number;
+        $data["emirates_id_number"] = $request->emirates_id_number;
         $data["country_code"] = preg_replace('/\D+/', '', trim($_POST["country_code_vendor"]));
 
         // $data['password']=Hash::make ($_POST['password']);
@@ -131,54 +133,54 @@ class VendorsProfileController extends Controller
 
         if (isset($_POST['serviceList']) && !empty($_POST['serviceList'])) {
             $serviceList = $_POST['serviceList'];
-        
+
             if (is_array($serviceList) && count($serviceList) > 0) {
                 $data['serviceList'] = implode(',', $serviceList);
             } else {
                 $data['serviceList'] = '';
             }
-             $roleIds = [];
-			foreach($serviceList as $key => $value){
-				if($value == '45'){
-					$roleIds[] = 18;
-				}
-				if($value == '30'){
-					$roleIds[] = 19;
-				}
-				if($value == '44'){
-					$roleIds[] = 19;
-				}
-				if($value == '34'){
-					$roleIds[] = 20;
-				}
-				if($value == '47'){
-					$roleIds[] = 21;
-				}
-				if($value == '48'){
-					$roleIds[] = 17;
-				}
-                if($value == '50'){
-					$roleIds[] = 22;
-				}
-			}
-			
-			$commaSeparatedRoles = implode(',', $roleIds);
-			
-			$data['role_id'] = $commaSeparatedRoles;
+            $roleIds = [];
+            foreach ($serviceList as $key => $value) {
+                if ($value == '45') {
+                    $roleIds[] = 18;
+                }
+                if ($value == '30') {
+                    $roleIds[] = 19;
+                }
+                if ($value == '44') {
+                    $roleIds[] = 19;
+                }
+                if ($value == '34') {
+                    $roleIds[] = 20;
+                }
+                if ($value == '47') {
+                    $roleIds[] = 21;
+                }
+                if ($value == '48') {
+                    $roleIds[] = 17;
+                }
+                if ($value == '50') {
+                    $roleIds[] = 22;
+                }
+            }
+
+            $commaSeparatedRoles = implode(',', $roleIds);
+
+            $data['role_id'] = $commaSeparatedRoles;
         } else {
             $data['serviceList'] = null;
         }
 
         if (isset($_POST['subserviceList']) && !empty($_POST['subserviceList'])) {
             $subserviceList = $_POST['subserviceList'];
-        
+
             if (is_array($subserviceList) && count($subserviceList) > 0) {
                 $data['subserviceList'] = implode(',', $subserviceList);
             } else {
                 $data['subserviceList'] = '';
             }
-        } 
-        
+        }
+
         $data["vendor"] = 1;
 
         if ($request->hasfile("image") != "") {
@@ -233,17 +235,7 @@ class VendorsProfileController extends Controller
 
             $data["vatcertificate"] = $fileName;
         }
-        if ($request->hasFile("trncertificate")) {
-            $file = $request->file("trncertificate");
 
-            $path = public_path("upload/vendors/");
-
-            $fileName = uniqid() . "." . $file->getClientOriginalExtension();
-
-            $file->move($path, $fileName);
-
-            $data["trncertificate"] = $fileName;
-        }
         if ($request->hasFile("tradelicense")) {
             $file = $request->file("tradelicense");
 
@@ -255,6 +247,25 @@ class VendorsProfileController extends Controller
 
             $data["tradelicense"] = $fileName;
         }
+
+        if ($request->hasFile("passport")) {
+            $file = $request->file("passport");
+            $path = public_path("upload/vendors/");
+            $fileName = uniqid() . "." . $file->getClientOriginalExtension();
+            $file->move($path, $fileName);
+            $data["passport"] = $fileName;
+        }
+
+        if ($request->hasFile("emirates_id")) {
+            $file = $request->file("emirates_id");
+            $path = public_path("upload/vendors/");
+            $fileName = uniqid() . "." . $file->getClientOriginalExtension();
+            $file->move($path, $fileName);
+            $data["emirates_id"] = $fileName;
+        }
+
+        $data['passport_expiry'] = $request->passport_expiry;
+        $data['emirates_id_expiry'] = $request->emirates_id_expiry;
 
         if (isset($_POST["serviceList"]) && !empty($_POST["serviceList"])) {
             $serviceList = $_POST["serviceList"];

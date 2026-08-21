@@ -67,7 +67,8 @@
                         <i class="fa fa-file"></i><span>Subscription Details</span></a>
                 </li>
 
-                <li class="{{ request()->segment(2) == 'wallet' ? 'active' : '' }}"><a href="{{ route('wallet.index') }}"
+                <li class="{{ request()->segment(2) == 'wallet' ? 'active' : '' }}"><a
+                        href="{{ route('wallet.index') }}"
                         class="{{ request()->segment(2) == 'wallet' ? 'active' : '' }}">
                         <i class="fa fa-file"></i><span>Wallet</span></a>
                 </li>
@@ -194,8 +195,7 @@
                 </li> --}}
             @endif
             {{-- @if (Auth::user()->vendor != 1) --}}
-            @if (
-                    in_array('1', $permission1) ||
+            @if (in_array('1', $permission1) ||
                     in_array('2', $permission1) ||
                     in_array('3', $permission1) ||
                     in_array('4', $permission1) ||
@@ -204,8 +204,7 @@
                     in_array('35', $permission1) ||
                     in_array('43', $permission1) ||
                     in_array('70', $permission1) ||
-                    in_array('71', $permission1)
-                )
+                    in_array('71', $permission1))
                 <li class="submenu">
                     <a href="#"
                         class="{{ request()->segment(2) == 'country' || request()->segment(2) == 'state' || request()->segment(2) == 'city' || request()->segment(2) == 'service' || request()->segment(2) == 'subservice' || request()->segment(2) == 'bulk_upload_city' || request()->segment(2) == 'company-employees' || request()->segment(2) == 'company-profile' ? 'active' : '' }}">
@@ -281,7 +280,8 @@
             {{-- @if (Auth::user()->vendor != 1) --}}
 
             @if (in_array('8', $permission1))
-                <li class="{{ request()->segment(2) == 'vendors' ? 'active' : '' }}"><a href="{{ route('vendors.index') }}"
+                <li class="{{ request()->segment(2) == 'vendors' ? 'active' : '' }}"><a
+                        href="{{ route('vendors.index') }}"
                         class="{{ request()->segment(2) == 'vendors' ? 'active' : '' }}">
                         <i class="fa fa-users"></i><span>Vendors</span></a>
                 </li>
@@ -296,7 +296,8 @@
             @endif
 
             @if (in_array('9', $permission1))
-                <li class="{{ request()->segment(2) == 'price' ? 'active' : '' }}"><a href="{{ route('price.edit', 1) }}"
+                <li class="{{ request()->segment(2) == 'price' ? 'active' : '' }}"><a
+                        href="{{ route('price.edit', 1) }}"
                         class="{{ request()->segment(2) == 'price' ? 'active' : '' }}">
                         <i data-feather="credit-card"></i><span>Vendor Listing Price</span></a>
                 </li>
@@ -344,6 +345,8 @@
                 </li>
             @endif
 
+            <!-- Survey Orders moved to Package Orders submenu -->
+
             @if (in_array('31', $permission1))
                 <li class="{{ request()->segment(2) == 'enquiry-users' ? 'active' : '' }}">
                     <a href="{{ route('enquiry-users.index') }}"><i data-feather="clipboard"></i>
@@ -377,18 +380,17 @@
             @endif
 
 
-            @if (
-                    in_array('60', $permission1) ||
+            @if (in_array('60', $permission1) ||
                     in_array('61', $permission1) ||
                     in_array('62', $permission1) ||
                     in_array('63', $permission1) ||
                     in_array('64', $permission1) ||
-                    in_array('72', $permission1)
-                )
+                    in_array('72', $permission1))
                 <li class="submenu">
                     <a href="#"
                         class="{{ request()->segment(2) == 'erp_enquiry' || request()->segment(2) == 'erp_survey' || request()->segment(2) == 'erp_quote' || request()->segment(2) == 'erp_acceptedquote' || request()->segment(2) == 'erp_dog' || request()->segment(2) == 'erp_rejectedquote' ? 'active' : '' }}">
-                        <i data-feather="pie-chart"></i> <span> ERP Quotation</span> <span class="menu-arrow"></span></a>
+                        <i data-feather="pie-chart"></i> <span> ERP Quotation</span> <span
+                            class="menu-arrow"></span></a>
                     <ul>
 
                         @if (in_array('72', $permission1))
@@ -465,32 +467,38 @@
                 </li>
             @endif
 
-            @if (Auth::user()->vendor == 0 && (in_array('77', $permission1) || in_array('78', $permission1) || in_array('79', $permission1) || in_array('80', $permission1)))
+            @if (Auth::user()->vendor == 0 &&
+                    (in_array('77', $permission1) ||
+                        in_array('78', $permission1) ||
+                        in_array('79', $permission1) ||
+                        in_array('80', $permission1)))
                 <li class="submenu">
                     <a href="#"
                         class="{{ request()->segment(2) == 'cleaning-subscription-durations' || request()->segment(2) == 'cleaning-subscription-packages' || request()->segment(2) == 'cleaning-subscription-frequencies' || request()->segment(2) == 'cleaning-subscription-pricing' ? 'active' : '' }}">
-                        <i data-feather="settings"></i> <span> Cleaning Subscription</span> <span class="menu-arrow"></span>
+                        <i data-feather="settings"></i> <span> Cleaning Subscription</span> <span
+                            class="menu-arrow"></span>
                     </a>
-                    <ul style="display: {{ request()->segment(2) == 'cleaning-subscription-durations' || request()->segment(2) == 'cleaning-subscription-packages' || request()->segment(2) == 'cleaning-subscription-frequencies' || request()->segment(2) == 'cleaning-subscription-pricing' ? 'block' : 'none' }};">
-                        @if(in_array('77', $permission1))
-                        <li><a href="{{ route('cleaning-subscription-durations.index') }}"
-                                class="{{ request()->segment(2) == 'cleaning-subscription-durations' ? 'active' : '' }}">Manage
-                                Durations</a></li>
+                    <ul
+                        style="display: {{ request()->segment(2) == 'cleaning-subscription-durations' || request()->segment(2) == 'cleaning-subscription-packages' || request()->segment(2) == 'cleaning-subscription-frequencies' || request()->segment(2) == 'cleaning-subscription-pricing' ? 'block' : 'none' }};">
+                        @if (in_array('77', $permission1))
+                            <li><a href="{{ route('cleaning-subscription-durations.index') }}"
+                                    class="{{ request()->segment(2) == 'cleaning-subscription-durations' ? 'active' : '' }}">Manage
+                                    Durations</a></li>
                         @endif
-                        @if(in_array('78', $permission1))
-                        <li><a href="{{ route('cleaning-subscription-frequencies.index') }}"
-                                class="{{ request()->segment(2) == 'cleaning-subscription-frequencies' ? 'active' : '' }}">Manage
-                                Frequencies</a></li>
+                        @if (in_array('78', $permission1))
+                            <li><a href="{{ route('cleaning-subscription-frequencies.index') }}"
+                                    class="{{ request()->segment(2) == 'cleaning-subscription-frequencies' ? 'active' : '' }}">Manage
+                                    Frequencies</a></li>
                         @endif
-                        @if(in_array('79', $permission1))
-                        <li><a href="{{ route('cleaning-subscription-packages.index') }}"
-                                class="{{ request()->segment(2) == 'cleaning-subscription-packages' ? 'active' : '' }}">Manage
-                                Packages</a></li>
+                        @if (in_array('79', $permission1))
+                            <li><a href="{{ route('cleaning-subscription-packages.index') }}"
+                                    class="{{ request()->segment(2) == 'cleaning-subscription-packages' ? 'active' : '' }}">Manage
+                                    Packages</a></li>
                         @endif
-                        @if(in_array('80', $permission1))
-                        <li><a href="{{ route('cleaning-subscription-pricing.index') }}"
-                                class="{{ request()->segment(2) == 'cleaning-subscription-pricing' ? 'active' : '' }}">Manage
-                                Pricing Rule</a></li>
+                        @if (in_array('80', $permission1))
+                            <li><a href="{{ route('cleaning-subscription-pricing.index') }}"
+                                    class="{{ request()->segment(2) == 'cleaning-subscription-pricing' ? 'active' : '' }}">Manage
+                                    Pricing Rule</a></li>
                         @endif
                     </ul>
                 </li>
@@ -500,7 +508,8 @@
                 <li class="submenu">
                     <a href="#"
                         class="{{ request()->segment(2) == 'blog' || request()->segment(2) == 'blog_category' ? 'active' : '' }}">
-                        <i data-feather="pie-chart"></i> <span> Blog Management</span> <span class="menu-arrow"></span></a>
+                        <i data-feather="pie-chart"></i> <span> Blog Management</span> <span
+                            class="menu-arrow"></span></a>
                     <ul>
 
                         @if (in_array('21', $permission1))
@@ -556,7 +565,8 @@
                 <li class="submenu">
                     <a href="#"
                         class="{{ request()->segment(1) == 'enquiry' || request()->segment(1) == 'enquiry_page' || request()->segment(1) == 'enquiry_accept' || request()->segment(1) == 'enquiry_reject' || request()->segment(1) == 'enquiry-filter' || request()->segment(2) == 'vendorinquiry' || request()->segment(1) == 'vendor-enquiry-filter' || request()->segment(2) == 'acceptleads' || request()->segment(2) == 'rejectleads' || request()->segment(2) == 'add-enquiry' ? 'active' : '' }}">
-                        <i class="fa fa-file"></i><span>Moving & Storage Enquiry</span><span class="menu-arrow"></span></a>
+                        <i class="fa fa-file"></i><span>Moving & Storage Enquiry</span><span
+                            class="menu-arrow"></span></a>
                     <ul>
 
                         @if (in_array('17', $permission1))
@@ -618,7 +628,8 @@
                 <li class="submenu">
                     <a href="#"
                         class="{{ request()->segment(1) == 'garden-enquiry' || request()->segment(1) == 'garden-enquiry-view' || request()->segment(1) == 'garden_accept' || request()->segment(1) == 'garden_reject' || request()->segment(1) == 'garden-enquiry-filter' || request()->segment(2) == 'garden-inquiry' || request()->segment(1) == 'garden-enquiry-detail' || request()->segment(1) == 'garden_accpet_form' || request()->segment(2) == 'garden_acceptleads' || request()->segment(1) == 'garden-enquiry-view' || request()->segment(1) == 'garden_reject_leads' ? 'active' : '' }}">
-                        <i class="fa fa-file"></i><span>Garden & Mouse Enquiry</span><span class="menu-arrow"></span></a>
+                        <i class="fa fa-file"></i><span>Garden & Mouse Enquiry</span><span
+                            class="menu-arrow"></span></a>
                     <ul>
 
                         @if (in_array('38', $permission1))
@@ -678,7 +689,8 @@
                 <li class="submenu">
                     <a href="#"
                         class="{{ request()->segment(1) == 'painting-enquiry' || request()->segment(1) == 'painting-lead-detail' || request()->segment(2) == 'painting-inquiry' || request()->segment(1) == 'painting-enquiry-detail' ? 'active' : '' }}">
-                        <i class="fa fa-file"></i><span>Painting Leads Enquiry</span><span class="menu-arrow"></span></a>
+                        <i class="fa fa-file"></i><span>Painting Leads Enquiry</span><span
+                            class="menu-arrow"></span></a>
                     <ul>
 
                         @if (in_array('32', $permission1))
@@ -737,7 +749,8 @@
             @if (in_array('74', $permission1))
                 <li class="submenu">
                     <a href="#" class="{{ request()->segment(2) == 'evchargingleads' ? 'active' : '' }}">
-                        <i class="fa fa-file"></i><span>EV Charger Installation</span><span class="menu-arrow"></span></a>
+                        <i class="fa fa-file"></i><span>EV Charger Installation</span><span
+                            class="menu-arrow"></span></a>
                     <ul>
 
                         @if (in_array('74', $permission1))
@@ -755,7 +768,8 @@
 
             @if (Auth::user()->vendor == 1)
                 @if (in_array('67', $permission1))
-                    <li class="{{ Route::is('vendor-all-order') || Route::is('vendor-all-order-detail') ? 'active' : '' }}">
+                    <li
+                        class="{{ Route::is('vendor-all-order') || Route::is('vendor-all-order-detail') ? 'active' : '' }}">
                         <a href="{{ route('vendor-all-order') }}"
                             class="{{ Route::is('vendor-all-order') || Route::is('vendor-all-order-detail') ? 'active' : '' }}">
                             <i class="fa fa-file"></i><span>New Bookings</span></a>
@@ -766,6 +780,25 @@
 
 
             @php
+                // Get or Create Permission ID for Manpower Order dynamically
+                $manpower_perm = \Illuminate\Support\Facades\DB::table('permissions')
+                    ->where('pname', 'Manpower Order')
+                    ->first();
+                if (!$manpower_perm) {
+                    $manpower_perm_id = \Illuminate\Support\Facades\DB::table('permissions')->insertGetId([
+                        'pname' => 'Manpower Order',
+                    ]);
+                } else {
+                    $manpower_perm_id = $manpower_perm->id;
+                }
+
+                // Also dynamically add is_manpower_order column if missing
+                if (!\Illuminate\Support\Facades\Schema::hasColumn('ci_orders', 'is_manpower_order')) {
+                    \Illuminate\Support\Facades\Schema::table('ci_orders', function ($table) {
+                        $table->tinyInteger('is_manpower_order')->default(0)->after('is_survey_order');
+                    });
+                }
+
                 // 1. Centralized Module Configuration
                 $packageOrderModules = [
                     [
@@ -832,11 +865,7 @@
                         'label' => 'Handyman & Service',
                         'vendor_route' => 'handyman-and-service-listing',
                         'admin_route' => 'handyman-service-order',
-                        'extra_active' => [
-                            'handyman-detail',
-                            'handyman-service-admin-order',
-                            'handyman_order_edit',
-                        ],
+                        'extra_active' => ['handyman-detail', 'handyman-service-admin-order', 'handyman_order_edit'],
                     ],
                     [
                         'id' => '58',
@@ -875,19 +904,43 @@
                         'admin_route' => 'healthcare_at_home_package_order',
                         'extra_active' => ['vendor-healthcare-at-home-detail', 'healthcare_at_home_detail'],
                     ],
-                ];
+                    [
+                        'id' => '81', // Same permission ID as before for Survey Orders
+                        'label' => 'Survey Order',
+                        'vendor_route' => 'survey-orders.index', // Vendor doesn't have a separate route right now, so use same
+        'admin_route' => 'survey-orders.index',
+        'extra_active' => [
+            'survey-order-detail',
+            'survey-orders.edit',
+            'survey-orders.create',
+            'survey-orders.show',
+        ],
+    ],
+    [
+        'id' => $manpower_perm_id ?? '81',
+        'label' => 'Manpower Order',
+        'vendor_route' => 'manpower-orders.index',
+        'admin_route' => 'manpower-orders.index',
+        'extra_active' => [
+            'manpower-order-detail',
+            'manpower-orders.edit',
+            'manpower-orders.create',
+            'manpower-orders.show',
+        ],
+    ],
+];
 
-                $isVendor = Auth::user()->vendor == 1;
+$isVendor = Auth::user()->vendor == 1;
 
-                // Check if current route is any "Order" related page to activate the parent menu
-                // We use a wildcard check on the URL path for maximum reliability
-                $parentActive =
-                    request()->is('*order*') ||
-                    request()->is('*listing*') ||
-                    request()->is('*detail*') ||
-                    request()->routeIs('moving_package_order_edit')
-                    ? 'active'
-                    : '';
+// Check if current route is any "Order" related page to activate the parent menu
+// We use a wildcard check on the URL path for maximum reliability
+$parentActive =
+    request()->is('*order*') ||
+    request()->is('*listing*') ||
+    request()->is('*detail*') ||
+    request()->routeIs('moving_package_order_edit')
+        ? 'active'
+        : '';
             @endphp
 
             @if (array_intersect(array_column($packageOrderModules, 'id'), $permission1))
@@ -907,8 +960,7 @@
                                     // Check if current route matches the main route OR any of the extra detail/edit routes
                                     $isActive =
                                         request()->routeIs($mainRoute) ||
-                                        (isset($module['extra_active']) &&
-                                            request()->routeIs($module['extra_active']));
+                                        (isset($module['extra_active']) && request()->routeIs($module['extra_active']));
                                 @endphp
 
                                 <li class="{{ $isActive ? 'active' : '' }}">
@@ -958,14 +1010,12 @@
                     </ul>
                 </li>
             @endif
-            @if (
-                    in_array('22', $permission1) ||
+            @if (in_array('22', $permission1) ||
                     in_array('33', $permission1) ||
                     in_array('36', $permission1) ||
                     in_array('37', $permission1) ||
                     in_array('73', $permission1) ||
-                    in_array('50', $permission1)
-                )
+                    in_array('50', $permission1))
 
                 <li class="submenu">
                     <a href="#"
@@ -1049,12 +1099,10 @@
             @endif
 
 
-            @if (
-                    in_array('6', $permission1) ||
+            @if (in_array('6', $permission1) ||
                     in_array('7', $permission1) ||
                     in_array('52', $permission1) ||
-                    in_array('34', $permission1)
-                )
+                    in_array('34', $permission1))
                 <li class="submenu">
                     <a href="#"
                         class="{{ request()->segment(2) == 'userpermission' || request()->segment(2) == 'adminuser' || request()->segment(2) == 'driver' || request()->segment(2) == 'cleaners' ? 'active' : '' }}"><i

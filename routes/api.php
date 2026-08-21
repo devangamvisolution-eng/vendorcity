@@ -39,6 +39,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/address-list', [ServiceController::class, 'address_list']);
     Route::get('/home-cleanig-api', [Homecleaningapicontroller::class, 'home_cleaning_api']);
     Route::get('/home-cleaning-config', [Homecleaningapicontroller::class, 'home_cleaning_config']);
+    Route::post('/packages', [Homecleaningapicontroller::class, 'packages']);
     Route::get('/profile', [ProfileController::class, 'profile']);
 
     Route::put('/edit-address/{id}', [ServiceController::class, 'edit_address']);
@@ -54,4 +55,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/cancelpolicy', [Homecleaningapicontroller::class, 'cancelpolicy']);
     Route::post('/my-bookings', [BookingApiController::class, 'myBookings']);
     Route::post('/booking-details', [BookingApiController::class, 'bookingDetails']);
+    Route::post('/payment-intent', [BookingApiController::class, 'paymentIntent']);
+    Route::post('/home-cleaning-checkout', [Homecleaningapicontroller::class, 'store_checkout']);
+    Route::post('/package-cleaning-checkout', [Homecleaningapicontroller::class, 'package_checkout']);
 });

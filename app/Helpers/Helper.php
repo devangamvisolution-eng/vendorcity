@@ -12,7 +12,6 @@ class Helper
 {
 
     public static function get_user_data(string $string)
-
     {
         $query = DB::table("users")->where("id", $string);
         if ($query->count() > 0) {
@@ -23,7 +22,6 @@ class Helper
     }
 
     public static function get_front_user_data(string $string)
-
     {
         $query = DB::table("frontloginregisters")->where("id", $string);
         if ($query->count() > 0) {
@@ -34,7 +32,6 @@ class Helper
     }
 
     public static function get_product_data(string $string)
-
     {
         $query = DB::table("products")->where("id", $string);
         if ($query->count() > 0) {
@@ -605,15 +602,84 @@ class Helper
         Log::warning("Geo Fallback triggered (city not found). IP: {$ip}");
 
         return [
-            "city"         => null,
-            "state_prov"   => null,
+            "city" => null,
+            "state_prov" => null,
             "country_name" => null,
-            "latitude"     => null,
-            "longitude"    => null
+            "latitude" => null,
+            "longitude" => null
         ];
     }
 
-    public static function getUpcomingVisits($order_id, $limit = 5)
+    public static function getVisitTransaction($order_id, $visit_date)
+    {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('ci_visit_transactions')) {
+            \Illuminate\Support\Facades\Schema::create('ci_visit_transactions', function ($table) {
+                $table->id();
+                $table->integer('order_id');
+                $table->date('visit_date');
+                $table->string('transaction_id');
+                $table->decimal('amount_deducted', 10, 2);
+                $table->timestamps();
+            });
+        }
+
+        return DB::table('ci_visit_transactions')
+            ->where('order_id', $order_id)
+            ->where('visit_date', $visit_date)
+            ->first();
+    }
+
+    public static function getStripeCustomerId($user_id)
+    {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('ci_stripe_customers')) {
+            \Illuminate\Support\Facades\Schema::create('ci_stripe_customers', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->string('stripe_customer_id');
+                $table->timestamps();
+            });
+        }
+
+        $record = DB::table('ci_stripe_customers')->where('user_id', $user_id)->first();
+        return $record ? $record->stripe_customer_id : null;
+    }
+
+    public static function saveStripeCustomerId($user_id, $stripe_customer_id)
+    {
+        self::getStripeCustomerId($user_id); // Ensures table exists
+
+        $existing = DB::table('ci_stripe_customers')->where('user_id', $user_id)->first();
+        if ($existing) {
+            DB::table('ci_stripe_customers')
+                ->where('user_id', $user_id)
+                ->update(['stripe_customer_id' => $stripe_customer_id, 'updated_at' => now()]);
+        } else {
+            DB::table('ci_stripe_customers')->insert([
+                'user_id' => $user_id,
+                'stripe_customer_id' => $stripe_customer_id,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+    }
+
+    public static function getOrCreateStripeCustomer($user_id)
+    {
+        $stripe_customer_id = self::getStripeCustomerId($user_id);
+        if (!$stripe_customer_id) {
+            $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
+            $user_record = DB::table('frontloginregisters')->where('id', $user_id)->first();
+            $customer = $stripe->customers->create([
+                'name' => $user_record ? $user_record->name : 'Guest',
+                'email' => $user_record ? $user_record->email : 'guest@example.com',
+            ]);
+            $stripe_customer_id = $customer->id;
+            self::saveStripeCustomerId($user_id, $stripe_customer_id);
+        }
+        return $stripe_customer_id;
+    }
+
+    public static function getUpcomingVisits($order_id, $limit = 5, $type = 'upcoming')
     {
         $order = DB::table('ci_orders')->where('order_id', $order_id)->first();
         if (!$order) {
@@ -709,12 +775,14 @@ class Helper
                 ->get();
 
             foreach ($storedRecords as $rec) {
-                $storedVisits[$rec->visit_date] = (object)[
+                $storedVisits[$rec->visit_date] = (object) [
                     'id' => $rec->id,
                     'visit_status' => $rec->visit_status,
                     'payment_status' => $rec->payment_status,
                     'cleaner_id' => $rec->cleaner_id,
-                    'cleaner_name' => $rec->cleaner_name
+                    'cleaner_name' => $rec->cleaner_name,
+                    'extra_hours' => $rec->extra_hours,
+                    'extra_charge' => $rec->extra_charge
                 ];
             }
         }
@@ -737,12 +805,14 @@ class Helper
         foreach ($allGeneratedVisits as $gv) {
             $dateStr = $gv['visit_date'];
 
-            if ($dateStr >= $todayStr) {
+            if (($type === 'upcoming' && $dateStr >= $todayStr) || ($type === 'past' && $dateStr < $todayStr) || $type === 'all') {
                 $status = 'upcoming';
                 $id = null;
                 $payment_status = $gv['payment_status'];
                 $assigned_cleaner_id = $defaultCleanerId;
                 $assigned_cleaner_name = $defaultCleanerName;
+                $extra_hours = 0;
+                $extra_charge = 0;
 
                 if (isset($storedVisits[$dateStr])) {
                     $status = $storedVisits[$dateStr]->visit_status;
@@ -752,6 +822,8 @@ class Helper
                         $assigned_cleaner_id = $storedVisits[$dateStr]->cleaner_id;
                         $assigned_cleaner_name = $storedVisits[$dateStr]->cleaner_name;
                     }
+                    $extra_hours = $storedVisits[$dateStr]->extra_hours;
+                    $extra_charge = $storedVisits[$dateStr]->extra_charge;
                 }
 
                 $upcomingVisits[] = (object) [
@@ -762,7 +834,9 @@ class Helper
                     'payment_status' => $payment_status,
                     'visit_status' => $status,
                     'cleaner_id' => $assigned_cleaner_id,
-                    'cleaner_name' => $assigned_cleaner_name
+                    'cleaner_name' => $assigned_cleaner_name,
+                    'extra_hours' => $extra_hours,
+                    'extra_charge' => $extra_charge
                 ];
 
                 if (count($upcomingVisits) >= $limit) {
@@ -785,6 +859,319 @@ class Helper
         }
     }
 
+    public static function timeAgo($time_ago)
+    {
+        $time_ago = strtotime($time_ago);
+        $cur_time = time();
+        $time_elapsed = $cur_time - $time_ago;
+        $seconds = $time_elapsed;
+        $minutes = round($time_elapsed / 60);
+        $hours = round($time_elapsed / 3600);
+        $days = round($time_elapsed / 86400);
+        $weeks = round($time_elapsed / 604800);
+        $months = round($time_elapsed / 2600640);
+        $years = round($time_elapsed / 31207680);
+        // Seconds
+        if ($seconds <= 60) {
+            return "just now";
+        }
+        //Minutes
+        else if ($minutes <= 60) {
+            if ($minutes == 1) {
+                return "one minute ago";
+            } else {
+                return "$minutes minutes ago";
+            }
+        }
+        //Hours
+        else if ($hours <= 24) {
+            if ($hours == 1) {
+                return "an hour ago";
+            } else {
+                return "$hours hrs ago";
+            }
+        }
+        //Days
+        else if ($days <= 7) {
+            if ($days == 1) {
+                return "yesterday";
+            } else {
+                return "$days days ago";
+            }
+        }
+        //Weeks
+        else if ($weeks <= 4.3) {
+            if ($weeks == 1) {
+                return "a week ago";
+            } else {
+                return "$weeks weeks ago";
+            }
+        }
+        //Months
+        else if ($months <= 12) {
+            if ($months == 1) {
+                return "a month ago";
+            } else {
+                return "$months months ago";
+            }
+        }
+        //Years
+        else {
+            if ($years == 1) {
+                return "one year ago";
+            } else {
+                return "$years years ago";
+            }
+        }
+    }
+
+    public static function success_msg_whatsapp_allVendor($vendor_id, $order_number)
+    {
+        $vendors = DB::table('users')->where('id', $vendor_id)->where('is_active', 0)->first();
+        if (!$vendors)
+            return true;
+
+        $vendors_attribute = DB::table('vendors_attribute')->where('pid', $vendors->id)->get();
+
+        $firstItem = DB::table('ci_order_item')->where('order_id', $order_number)->first();
+        if (!$firstItem)
+            return true;
+
+        $subservice = self::subservicename((int) $firstItem->subservice_id);
+        if (empty($subservice)) {
+            $subservice = self::servicename((int) $firstItem->service_id);
+        }
+        if (empty($subservice)) {
+            $subservice = 'Service';
+        }
+        $phone = $vendors->country_code . '' . $vendors->mobile;
+
+        $headers = [
+            'Authorization: key_uTZeOXQPMd',
+            'accept: application/json',
+            'content-type: application/json'
+        ];
+
+        $payload = function ($toPhone) use ($subservice) {
+            return json_encode([
+                "messages" => [
+                    [
+                        "content" => [
+                            "language" => "en",
+                            "templateData" => [
+                                "body" => [
+                                    "placeholders" => [$subservice]
+                                ]
+                            ],
+                            "templateName" => "new_booking_alert"
+                        ],
+                        "from" => "+971503204846",
+                        "to" => $toPhone
+                    ]
+                ]
+            ]);
+        };
+
+        if (!empty($vendors->country_code) && !empty($vendors->mobile)) {
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $payload($phone),
+                CURLOPT_HTTPHEADER => $headers,
+            ));
+            curl_exec($curl);
+            curl_close($curl);
+        }
+
+        if ($vendors_attribute->isNotEmpty()) {
+            foreach ($vendors_attribute as $vendorAtt) {
+                $vendorAttphone = $vendorAtt->country_code . '' . $vendorAtt->telephone;
+                if (!empty($vendorAtt->country_code) && !empty($vendorAtt->telephone)) {
+                    $curl = curl_init();
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => '',
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $payload($vendorAttphone),
+                        CURLOPT_HTTPHEADER => $headers,
+                    ));
+                    curl_exec($curl);
+                    curl_close($curl);
+                }
+            }
+        }
+        return true;
+    }
+
+    public static function success_msg_whatsapp_customer($userid, $order_number)
+    {
+        $userdata = DB::table('frontloginregisters')
+            ->where('id', $userid)
+            ->first();
+
+        if (!$userdata) {
+            \Log::error('WhatsApp: User not found', [
+                'userid' => $userid,
+                'order_number' => $order_number,
+            ]);
+            return false;
+        }
+
+        $firstItem = DB::table('ci_order_item')
+            ->where('order_id', $order_number)
+            ->first();
+
+        if (!$firstItem) {
+            \Log::error('WhatsApp: Order item not found', [
+                'userid' => $userid,
+                'order_number' => $order_number,
+            ]);
+            return false;
+        }
+
+        $subservice = self::subservicename((int) $firstItem->subservice_id);
+
+        if (empty($subservice)) {
+            $subservice = self::servicename((int) $firstItem->service_id);
+        }
+
+        if (empty($subservice)) {
+            $subservice = 'Service';
+        }
+
+        $customer_name = !empty($userdata->name)
+            ? $userdata->name
+            : 'Customer';
+
+        /*
+         * IMPORTANT:
+         * Remove + from country code/mobile if database already stores
+         * only numeric values.
+         */
+        $countryCode = preg_replace('/[^0-9]/', '', $userdata->country_code);
+        $mobile = preg_replace('/[^0-9]/', '', $userdata->mobile);
+
+        $phone = $countryCode . $mobile;
+
+        if (empty($countryCode) || empty($mobile)) {
+            \Log::error('WhatsApp: Invalid customer phone', [
+                'userid' => $userid,
+                'country_code' => $userdata->country_code,
+                'mobile' => $userdata->mobile,
+                'final_phone' => $phone,
+            ]);
+
+            return false;
+        }
+
+        $payload = [
+            "messages" => [
+                [
+                    "content" => [
+                        "language" => "en",
+                        "templateData" => [
+                            "body" => [
+                                "placeholders" => [
+                                    $customer_name,
+                                    $subservice
+                                ]
+                            ],
+                            "buttons" => [
+                                [
+                                    "type" => "URL",
+                                    "parameter" => (string) $order_number
+                                ]
+                            ]
+                        ],
+                        "templateName" => "service_requested"
+                    ],
+                    "from" => "+971503204846",
+                    "to" => "+" . $phone
+                ]
+            ]
+        ];
+
+        \Log::info('WhatsApp request started', [
+            'userid' => $userid,
+            'order_number' => $order_number,
+            'phone' => '+' . $phone,
+            'customer_name' => $customer_name,
+            'subservice' => $subservice,
+            'template' => 'service_requested',
+            'payload' => $payload,
+        ]);
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($payload),
+            CURLOPT_HTTPHEADER => [
+                'Authorization: key_uTZeOXQPMd',
+                'Accept: application/json',
+                'Content-Type: application/json',
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+
+        $curlError = curl_error($curl);
+        $curlErrno = curl_errno($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+
+        \Log::info('WhatsApp API response', [
+            'userid' => $userid,
+            'order_number' => $order_number,
+            'phone' => '+' . $phone,
+            'http_code' => $httpCode,
+            'curl_errno' => $curlErrno,
+            'curl_error' => $curlError,
+            'response' => $response,
+        ]);
+
+        if ($curlError) {
+            \Log::error('WhatsApp CURL ERROR', [
+                'error' => $curlError,
+                'errno' => $curlErrno,
+            ]);
+
+            return false;
+        }
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            \Log::error('WhatsApp DoubleTick API ERROR', [
+                'http_code' => $httpCode,
+                'response' => $response,
+                'phone' => '+' . $phone,
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
     public static function get_front_url($path, $city_slug = 'dubai')
     {
         return url("/" . $city_slug . "/" . ltrim($path, '/'));
