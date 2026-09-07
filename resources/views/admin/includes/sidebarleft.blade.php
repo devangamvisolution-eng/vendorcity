@@ -39,7 +39,6 @@
             //     $permission1 = explode(',', $permission1);
             // } else {
             //     echo '';
-            //     // Handle the case where $get_permission_data is not an object or 'permission' property is empty.
             // }
         @endphp
 
@@ -345,6 +344,15 @@
                 </li>
             @endif
 
+            @if (in_array('86', $permission1))
+                <li class="{{ request()->segment(2) == 'customer-wallet' ? 'active' : '' }}">
+                    <a href="{{ route('customer-wallet.index') }}"
+                        class="{{ request()->segment(2) == 'customer-wallet' ? 'active' : '' }}">
+                        <i data-feather="dollar-sign"></i><span>Customer Wallets</span>
+                    </a>
+                </li>
+            @endif
+
             <!-- Survey Orders moved to Package Orders submenu -->
 
             @if (in_array('31', $permission1))
@@ -448,6 +456,10 @@
                                     class="{{ request()->segment(1) == 'cleaning_price' ? 'active' : '' }}">Cleaning
                                     Price</a>
                             </li>
+                            <li><a href="{{ route('cleaning_multiple_days_discounts.index') }}"
+                                    class="{{ request()->segment(1) == 'cleaning_multiple_days_discounts' ? 'active' : '' }}">Multiple
+                                    Days Discounts</a>
+                            </li>
                         @endif
 
                         @if (in_array('29', $permission1))
@@ -530,7 +542,7 @@
             @if (in_array('11', $permission1) || in_array('12', $permission1) || in_array('69', $permission1))
                 <li class="submenu">
                     <a href="#"
-                        class="{{ request()->segment(2) == 'packagecategory' || request()->segment(2) == 'packages' || request()->segment(2) == 'addons' ? 'active' : '' }}">
+                        class="{{ request()->segment(2) == 'packagecategory' || request()->segment(2) == 'packages' || request()->segment(2) == 'addons' || request()->segment(2) == 'packagegroup' ? 'active' : '' }}">
                         <i data-feather="pie-chart"></i> <span> Package Management</span> <span
                             class="menu-arrow"></span></a>
                     <ul>
@@ -539,11 +551,17 @@
                                     href="{{ route('packagecategory.index') }}">Package Category</a>
                             </li>
                         @endif
+                        @if (in_array('83', $permission1))
+                            <li class="{{ request()->segment(2) == 'packagegroup' ? 'active' : '' }}"><a
+                                    href="{{ route('packagegroup.index') }}"> Package Groups</a>
+                            </li>
+                        @endif
                         @if (in_array('12', $permission1))
                             <li class="{{ request()->segment(2) == 'packages' ? 'active' : '' }}"><a
                                     href="{{ route('packages.index') }}"> Packages</a>
                             </li>
                         @endif
+
                         @if (in_array('69', $permission1))
                             <li class="{{ request()->segment(2) == 'addons' ? 'active' : '' }}"><a
                                     href="{{ route('addons.lists') }}"> Add Ons</a>
@@ -928,19 +946,31 @@
             'manpower-orders.show',
         ],
     ],
-];
 
-$isVendor = Auth::user()->vendor == 1;
+    [
+        'id' => '85', // Same permission ID as before for Survey Orders
+        'label' => 'Car Services at Home',
+        'vendor_route' => 'survey-orders.index', // Vendor doesn't have a separate route right now, so use same
+                        'admin_route' => 'car-services-at-home-service-order',
+                        'extra_active' => [
+                            'car-services-at-home-detail',
+                            'car-services-at-home-service-admin-order',
+                            'car-services-at-home-order-edit',
+                        ],
+                    ],
+                ];
 
-// Check if current route is any "Order" related page to activate the parent menu
-// We use a wildcard check on the URL path for maximum reliability
-$parentActive =
-    request()->is('*order*') ||
-    request()->is('*listing*') ||
-    request()->is('*detail*') ||
-    request()->routeIs('moving_package_order_edit')
-        ? 'active'
-        : '';
+                $isVendor = Auth::user()->vendor == 1;
+
+                // Check if current route is any "Order" related page to activate the parent menu
+                // We use a wildcard check on the URL path for maximum reliability
+                $parentActive =
+                    request()->is('*order*') ||
+                    request()->is('*listing*') ||
+                    request()->is('*detail*') ||
+                    request()->routeIs('moving_package_order_edit')
+                        ? 'active'
+                        : '';
             @endphp
 
             @if (array_intersect(array_column($packageOrderModules, 'id'), $permission1))

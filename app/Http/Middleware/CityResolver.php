@@ -57,31 +57,25 @@ class CityResolver
         }
 
         /**
-         * 3. NO SLUG + NO SESSION → CALL API ONCE
+         * 3. NO SLUG + NO SESSION → CALL API ONCE (COMMENTED OUT AS PER REQUEST)
          */
-        if (!session()->has('user_geo_checked')) {
+        // if (!session()->has('user_geo_checked')) {
+        //     $geo  = Helper::getUserLocation();  // API CALL
+        //     $slug = Str::slug($geo['city'] ?? '');
+        //     session(['user_geo_checked' => true]); // Lock so API does NOT run again
 
-            $geo  = Helper::getUserLocation();  // API CALL
-            $slug = Str::slug($geo['city'] ?? '');
-
-            session(['user_geo_checked' => true]); // Lock so API does NOT run again
-
-            if (!empty($slug)) {
-
-                $city = City::whereRaw("LOWER(REPLACE(name,' ','-')) = ?", [$slug])->first();
-
-                if ($city) {
-                    $this->setCitySession($city, $slug);
-
-                    // Redirect ONLY from home
-                    if ($this->isHomepage($request, $baseFolders)) {
-                        return redirect()->to(url($slug));
-                    }
-
-                    return $next($request);
-                }
-            }
-        }
+        //     if (!empty($slug)) {
+        //         $city = City::whereRaw("LOWER(REPLACE(name,' ','-')) = ?", [$slug])->first();
+        //         if ($city) {
+        //             $this->setCitySession($city, $slug);
+        //             // Redirect ONLY from home
+        //             if ($this->isHomepage($request, $baseFolders)) {
+        //                 return redirect()->to(url($slug));
+        //             }
+        //             return $next($request);
+        //         }
+        //     }
+        // }
 
         /**
          * 4. FALLBACK → Dubai
