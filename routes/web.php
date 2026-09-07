@@ -6,29 +6,13 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
 
-Route::get('/renew-cleaning-packages', function () {
-    Artisan::call('payments:renew-packages');
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Renew cleaning packages command executed.',
-        'output' => Artisan::output(),
-    ]);
-});
-Route::get('/send-renew-mail-cleaning-packages', function () {
-    Artisan::call('payments:send-renewal-reminders');
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Send Renew cleaning packages mail command executed.',
-        'output' => Artisan::output(),
-    ]);
-});
 
 // Prevent missing static assets from being saved as 'intended' URLs
 Route::get('{file}.{ext}', function () {
     abort(404);
 })->where('file', '.*')->where('ext', 'ico|css|js|png|jpg|jpeg|gif|map|svg|woff|woff2|ttf|eot');
+
+Route::get('/insert-customer-wallet-permission', [\App\Http\Controllers\admin\DBInstallController::class, 'index']);
 
 Route::get('/run-expiries-cron', function () {
     \Illuminate\Support\Facades\Artisan::call('vendor:check-expiries');
@@ -156,6 +140,7 @@ use App\Http\Controllers\admin\Blog_categoryController;
 use App\Http\Controllers\admin\SalesReportController;
 use App\Http\Controllers\admin\DayReportController;
 use App\Http\Controllers\admin\SystemController;
+use App\Http\Controllers\admin\CleaningMultipleDaysDiscountController;
 use App\Http\Controllers\admin\Cleaning_PriceController;
 use App\Http\Controllers\admin\Time_Slot_PriceController;
 use App\Http\Controllers\admin\AdminpassController;
@@ -226,46 +211,6 @@ Route::get('/run-all-jobs', function () {
 
     return 'All jobs completed';
 });
-
-Route::get('/fix-db', function () {
-    if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'trn_certificate_number')) {
-        \Illuminate\Support\Facades\Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
-            $table->string('trn_certificate_number')->nullable();
-            $table->string('trade_license_number')->nullable();
-            $table->string('passport_number')->nullable();
-            $table->string('emirates_id_number')->nullable();
-        });
-        return 'Successfully added columns to users table!';
-    }
-    return 'Columns already exist!';
-});
-
-// Clear application cache:
-// Route::get('/clear-cache', function() {
-//     $exitCode = Artisan::call('cache:clear');
-//     return 'Application cache cleared';
-// });
-// // Clear view cache:
-// Route::get('/view-clear', function() {
-//     $exitCode = Artisan::call('view:clear');
-//     return 'View cache cleared';
-// });
-//  Route::get('/optimize-clear', function() {
-//     $exitCode = Artisan::call('optimize:clear');
-//     return 'Application cache cleared successfully';
-// });
-
-
-
-//Route::get('/edit-profile', '\App\Http\Controllers\front\MyaccountController@edit_profile');
-
-// Route::get('/checkout', '\App\Http\Controllers\front\checkoutcontroller@checkout');
-// Route::post('/order_place', '\App\Http\Controllers\front\checkoutcontroller@order_place')->name('order_place');
-// Route::get('thankyou', [checkoutcontroller::class, 'thankyou'])->name("thankyou");
-
-
-
-// Route::match(['get', 'post'], 'vendor-database', [FrontvendorController::class, 'vendor_database'])->name('vendor_database');
 
 
 /*------End Front routes  ------*/
@@ -371,6 +316,21 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::post('/calendar-sync', [GoogleCalendarController::class, 'sync'])
         ->name('admin.calendar.sync');
 
+    Route::get('/customer-wallet', [\App\Http\Controllers\admin\CustomerWalletController::class, 'index'])
+        ->name('customer-wallet.index');
+
+    Route::get('/customer-wallet/create', [\App\Http\Controllers\admin\CustomerWalletController::class, 'create'])
+        ->name('customer-wallet.create');
+
+    Route::post('/customer-wallet/store', [\App\Http\Controllers\admin\CustomerWalletController::class, 'store'])
+        ->name('customer-wallet.store');
+
+    Route::get('/customer-wallet/edit', [\App\Http\Controllers\admin\CustomerWalletController::class, 'edit'])
+        ->name('customer-wallet.edit');
+
+    Route::post('/customer-wallet/update', [\App\Http\Controllers\admin\CustomerWalletController::class, 'update'])
+        ->name('customer-wallet.update');
+
     Route::resource('/cleaning-subscription-durations', CleaningSubscriptionDurationController::class)->names([
         'index' => 'cleaning-subscription-durations.index',
         'create' => 'cleaning-subscription-durations.create',
@@ -413,6 +373,8 @@ Route::get('/debug-pricing-rules', function () {
 });
 
 Route::middleware('auth')->group(function () {
+
+
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -614,8 +576,13 @@ Route::middleware('auth')->group(function () {
 
 
     Route::resource('admin/packages', '\App\Http\Controllers\admin\PackagesController');
+    Route::resource('admin/packagegroup', '\App\Http\Controllers\admin\PackageGroupController');
+    Route::get('delete_packagegroup', [\App\Http\Controllers\admin\PackageGroupController::class, 'destroy'])->name('delete_packagegroup');
     Route::post('subservice_show', 'App\Http\Controllers\admin\PackagesController@subservice_show');
     Route::post('packagecategory_show', 'App\Http\Controllers\admin\PackagesController@packagecategory_show');
+    Route::post('packagegroup/change_status', [\App\Http\Controllers\admin\PackageGroupController::class, 'change_status'])->name('packagegroup.change_status');
+    Route::post('packagegroup/set_order', [\App\Http\Controllers\admin\PackageGroupController::class, 'set_order'])->name('packagegroup.set_order');
+    Route::post('packagegroup_show', 'App\Http\Controllers\admin\PackagesController@packagegroup_show');
     Route::get('delete_packages', [PackagesController::class, 'destroy'])->name('delete_packages');
     Route::get('editimage/{id}', [PackagesController::class, 'editimage'])->name('editimage');
     Route::post('editimage_store', [PackagesController::class, 'editimage_store'])->name('editimage_store');
@@ -827,12 +794,36 @@ Route::middleware('auth')->group(function () {
     Route::get('admin/order/survey-order-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('survey-order-detail');
     Route::get('admin/order/manpower-order-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('manpower-order-detail');
 
+
+
+    Route::get('car-services-at-home-service-order', '\App\Http\Controllers\admin\Ordercontroller@car_services_at_home_service_order')
+        ->name('car-services-at-home-service-order');
+
+    Route::get('car-services-at-home-service-admin-order', '\App\Http\Controllers\admin\Ordercontroller@car_services_at_home_service_admin_order')
+        ->name('car-services-at-home-service-admin-order');
+
+    Route::post('hacar-services-at-homendyman-service-order-store', '\App\Http\Controllers\admin\Ordercontroller@car_services_at_home_service_order_store')
+        ->name('car-services-at-home-service-order-store');
+
+    Route::put('car-services-at-home-package-order/update/{ci_order}', '\App\Http\Controllers\admin\Ordercontroller@car_services_at_home_order_update')
+        ->name('car_services_at_home_order_update');
+
+    Route::get('car-services-at-home-package-order/edit/{ci_order}', '\App\Http\Controllers\admin\Ordercontroller@car_services_at_home_order_edit')
+        ->name('car_services_at_home_order_edit');
+
+    Route::get('admin/order/car-services-at-home-detail/{order_id}', [Ordercontroller::class, 'detail'])->name('car-services-at-home-detail');
+
+    Route::get('vendor/car-services-at-home-and-service-listing', '\App\Http\Controllers\admin\VendorOrderController@car_services_at_home_and_service_listing')
+        ->name('car-services-at-home-and-service-listing');
+
     Route::get('cleaning-admin-order/add', '\App\Http\Controllers\admin\Ordercontroller@cleaning_admin_order')
         ->name('cleaning-admin-order');
     Route::post('cleaning-order-store', '\App\Http\Controllers\admin\Ordercontroller@cleaning_order_store')
         ->name('cleaning-order-store');
     Route::put('cleaning-order-update/{id}', '\App\Http\Controllers\admin\Ordercontroller@cleaning_order_update')
         ->name('cleaning-order-update');
+    Route::post('admin-promo-check', '\App\Http\Controllers\admin\Ordercontroller@admin_promo_check')
+        ->name('admin_promo_check');
 
     Route::get('moving-admin-order/add', '\App\Http\Controllers\admin\Ordercontroller@moving_admin_order')
         ->name('moving-admin-order');
@@ -1060,6 +1051,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('system', 'App\Http\Controllers\admin\SystemController');
     Route::get('removed_system_att/{pid}/{id}', [SystemController::class, 'removed_system_att'])->name('removed_system_att');
 
+    Route::resource('cleaning_multiple_days_discounts', 'App\Http\Controllers\admin\CleaningMultipleDaysDiscountController');
     Route::resource('cleaning_price', 'App\Http\Controllers\admin\Cleaning_PriceController');
 
     Route::resource('time_slot_price', 'App\Http\Controllers\admin\Time_Slot_PriceController');
@@ -1194,15 +1186,6 @@ Route::controller(EvcharginginstallationLeads::class)->prefix('admin')->middlewa
 });
 
 
-Route::resource('admin/packagegroup', '\App\Http\Controllers\admin\PackageGroupController');
-Route::get('delete_packagegroup', [\App\Http\Controllers\admin\PackageGroupController::class, 'destroy'])->name('delete_packagegroup');
-Route::post('subservice_show', 'App\Http\Controllers\admin\PackagesController@subservice_show');
-Route::post('packagecategory_show', 'App\Http\Controllers\admin\PackagesController@packagecategory_show');
-Route::post('packagegroup/change_status', [\App\Http\Controllers\admin\PackageGroupController::class, 'change_status'])->name('packagegroup.change_status');
-Route::post('packagegroup/set_order', [\App\Http\Controllers\admin\PackageGroupController::class, 'set_order'])->name('packagegroup.set_order');
-Route::post('packagegroup_show', 'App\Http\Controllers\admin\PackagesController@packagegroup_show');
-
-
 
 
 
@@ -1234,10 +1217,8 @@ Route::get('/request-accept/{enquiry_id}/{format_type}', [ErpQuotecontroller::cl
 Route::get('/', '\App\Http\Controllers\front\Homecontroller@redirectToCity')
     ->name('default.city');
 
-Route::match(['get', 'post'], 'lost-password', [AdminpassController::class, 'lost_password'])->name('lost_password');
+
 Route::post('email-check-login-admin', '\App\Http\Controllers\admin\AdminpassController@emailCheck');
-Route::get('reset-password-vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@reset_password')->name('reset_password');
-Route::post('set_password_vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@set_password_vendor')->name('set_password_vendor');
 
 Route::get('test-email/{order_id}', function ($order_id) {
     $orderdata = \Illuminate\Support\Facades\DB::table('ci_orders')->where('order_id', $order_id)->first();
@@ -1258,10 +1239,17 @@ Route::get('test-email/{order_id}', function ($order_id) {
     ]);
 });
 
+Route::match(['get', 'post'], 'lost-password', [AdminpassController::class, 'lost_password'])->name('lost_password');
+Route::get('reset-password-vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@reset_password')->name('reset_password');
+Route::post('set_password_vendor/{uid}', '\App\Http\Controllers\admin\AdminpassController@set_password_vendor')->name('set_password_vendor');
+
 Route::prefix('{city}')
     ->where(['city' => '^(?!admin|login|logout|config-cache|accept-quotation|request-accept).*$'])
     ->middleware('front.city')
     ->group(function () {
+
+
+
 
         Route::get('/payment_success_automobile', '\App\Http\Controllers\front\Automobilecontroller@payment_success')->name('payment_success_automobile');
         Route::get('/payment_fail_automobile', '\App\Http\Controllers\front\Automobilecontroller@payment_fail')->name('payment_fail_automobile');
@@ -1294,6 +1282,7 @@ Route::prefix('{city}')
         Route::get('/privacy-policy', '\App\Http\Controllers\front\Homecontroller@privacy_policy')->name('privacy_policy');
         Route::get('/terms-of-service', '\App\Http\Controllers\front\Homecontroller@term_condition')->name('term_condition');
         Route::get('/payment-and-refund-policy', '\App\Http\Controllers\front\Homecontroller@payment_refund_policy')->name('payment_refund_policy');
+        Route::get('/cancellations-policy', '\App\Http\Controllers\front\Homecontroller@cancellations_policy')->name('cancellations_policy');
         Route::get('/contact', '\App\Http\Controllers\front\Homecontroller@contact')->name('contact');
         Route::post('/contact_us_data', '\App\Http\Controllers\front\Homecontroller@contact_us_data');
         Route::get('/careers', '\App\Http\Controllers\front\Homecontroller@careers')->name('careers');
@@ -1495,8 +1484,6 @@ Route::prefix('{city}')
 
         Route::get('/my-account', '\App\Http\Controllers\front\MyaccountController@my_account')->name('front.myaccount');
         Route::get('/my-order', '\App\Http\Controllers\front\MyaccountController@my_order')->name('front.myorder');
-        Route::get('/subscriptions', '\App\Http\Controllers\front\MyaccountController@subscriptions')->name('front.subscriptions');
-        Route::get('/subscription/{id}', '\App\Http\Controllers\front\MyaccountController@subscription_detail')->name('front.subscription_detail');
         Route::get('/my-profile', '\App\Http\Controllers\front\MyaccountController@my_profile')->name('front.myprofile');
         Route::get('my-wallet', '\App\Http\Controllers\front\MyaccountController@my_wallet')->name('front.mywallet');
         // Route::get('/order-detail', '\App\Http\Controllers\front\MyaccountController@order_detail');
@@ -1581,15 +1568,7 @@ Route::prefix('{city}')
                 return response()->json(DB::table('ci_order_visits')->orderBy('id', 'desc')->take(20)->get());
             });
 
-            Route::get('/schema-update', function () {
-                if (!\Illuminate\Support\Facades\Schema::hasColumn('ci_order_visits', 'cleaner_id')) {
-                    \Illuminate\Support\Facades\Schema::table('ci_order_visits', function ($table) {
-                        $table->integer('cleaner_id')->nullable()->after('visit_status');
-                    });
-                    return "Column cleaner_id added.";
-                }
-                return "Column cleaner_id already exists.";
-            });
+
 
             // Route::get('/package-lists/{page_url}', '\App\Http\Controllers\front\Packagecontroller@package_lists')->name('package-lists');
 
@@ -1611,15 +1590,7 @@ Route::post('admin/adjust_visit_hours', '\App\Http\Controllers\admin\Ordercontro
 Route::post('admin/mark_visit_paid', '\App\Http\Controllers\admin\Ordercontroller@mark_visit_paid')->name('admin.mark_visit_paid');
 Route::post('cancel_recurring_visit', '\App\Http\Controllers\front\MyaccountController@cancel_recurring_visit')->name('front.cancel_recurring_visit');
 
-Route::get('/schema-update-now', function () {
-    if (!\Illuminate\Support\Facades\Schema::hasColumn('ci_order_visits', 'cleaner_id')) {
-        \Illuminate\Support\Facades\Schema::table('ci_order_visits', function ($table) {
-            $table->integer('cleaner_id')->nullable()->after('visit_status');
-        });
-        return "Column cleaner_id added.";
-    }
-    return "Column cleaner_id already exists.";
-});
+
 
 
 // General Enquiry Module
