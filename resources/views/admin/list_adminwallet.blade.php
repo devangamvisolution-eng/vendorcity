@@ -16,25 +16,25 @@
 
         $roleIds = explode(',', $get_user_data->role_id);
 
-			$edit_perm = [];
+        $edit_perm = [];
 
-			foreach ($roleIds as $roleId) {
-				$roleId = trim($roleId); // Clean any spaces
-				
-				$get_permission_data = Helper::get_permission_data($roleId);
+        foreach ($roleIds as $roleId) {
+            $roleId = trim($roleId); // Clean any spaces
 
-				if (
-					is_object($get_permission_data) &&
-					property_exists($get_permission_data, 'editperm') &&
-					$get_permission_data->editperm != ''
-				) {
-					$perms = explode(',', $get_permission_data->editperm);
-					$edit_perm = array_merge($edit_perm, $perms); // Combine permissions
-				}
-			}
+            $get_permission_data = Helper::get_permission_data($roleId);
 
-			// Optional: remove duplicates and reset array keys
-			$edit_perm = array_values(array_unique($edit_perm));
+            if (
+                is_object($get_permission_data) &&
+                property_exists($get_permission_data, 'editperm') &&
+                $get_permission_data->editperm != ''
+            ) {
+                $perms = explode(',', $get_permission_data->editperm);
+                $edit_perm = array_merge($edit_perm, $perms); // Combine permissions
+            }
+        }
+
+        // Optional: remove duplicates and reset array keys
+        $edit_perm = array_values(array_unique($edit_perm));
 
     @endphp
 
@@ -127,7 +127,7 @@
                         <a class="btn btn-primary me-2" href="javascript:void('0');" onclick="excel_download();">
                             Excel Download
                         </a>
-    
+
 
                     </div>
                 @endif
@@ -154,73 +154,79 @@
 
             <input type="hidden" name="enddate_fil" id="enddate_fil" value="{{ $enddate ?: '' }}">
 
-            <input type="hidden" name="filter_vendor_name_fil" id="filter_vendor_name_fil" value="{{ $filter_vendor_name ?: '' }}">
-            
+            <input type="hidden" name="filter_vendor_name_fil" id="filter_vendor_name_fil"
+                value="{{ $filter_vendor_name ?: '' }}">
+
         </form>
 
         @php
-        if(!empty($startdate) || !empty($enddate) || !empty($filter_vendor_name)){
-            $css = "display:block;";
-        }else{
-            $css = "display:none;";
-        }
+            if (!empty($startdate) || !empty($enddate) || !empty($filter_vendor_name)) {
+                $css = 'display:block;';
+            } else {
+                $css = 'display:none;';
+            }
         @endphp
 
         <!-- Search Filter -->
         <div id="filter_inputs" class="card filter-card" style="{{ $css }}">
 
             <div class="card-body pb-0">
-             <form id="filter_form" action="{{ route('admin_wallet_filter') }}" method="POST">
-                 @csrf
-                 <input type="hidden" name="action" value="filter">
+                <form id="filter_form" action="{{ route('admin_wallet_filter') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="action" value="filter">
 
-                <div class="row">
+                    <div class="row">
 
-                 <div class="col-sm-6 col-md-8">
-                     <div class="row">
+                        <div class="col-sm-6 col-md-8">
+                            <div class="row">
 
-                         <div class="col-lg-4">
-                             <div class="form-group">
-                                 <label>Start Date</label>
-                                 <input type="date" class="form-control" name="s_date" id="s_date" placeholder="Enter Start Date"
-                                     value="{{ $startdate ?: '' }}">
-                             </div>
-                         </div>
-     
-                         <div class="col-lg-4">
-                             <div class="form-group">
-                                 <label>End Date</label>
-                                 <input type="date" class="form-control" name="e_date" id="e_date" placeholder="Enter End Date"
-                                     value="{{ $enddate ?: '' }}">
-                             </div>
-                         </div>
-                         <div class="col-lg-4">
-                            <label>Vendor</label>
-                             <select class="select select2-hidden-accessible" id="vendor_id" name="vendor_id">
-                                 <option value ="">Select Vendor</option>
-                                 @if(!empty($all_vendor))
-                                     @foreach($all_vendor as $all_vendor_data)
-                                         <option value="{{ $all_vendor_data->id }}" @if($filter_vendor_name == $all_vendor_data->id ) {{ 'selected' }} @endif>{{ $all_vendor_data->name }}</option>
-                                     @endforeach
-                                 @endif
-                             </select>
-                         </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Start Date</label>
+                                        <input type="date" class="form-control" name="s_date" id="s_date"
+                                            placeholder="Enter Start Date" value="{{ $startdate ?: '' }}">
+                                    </div>
+                                </div>
 
-                    </div>
-                    <div class="col-sm-6 col-md-3">
-                         <div class="form-group">
-                             <a class="btn btn-primary filter-btn" href="javascript:void(0);" style="
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>End Date</label>
+                                        <input type="date" class="form-control" name="e_date" id="e_date"
+                                            placeholder="Enter End Date" value="{{ $enddate ?: '' }}">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label>Vendor</label>
+                                    <select class="select select2-hidden-accessible" id="vendor_id" name="vendor_id">
+                                        <option value ="">Select Vendor</option>
+                                        @if (!empty($all_vendor))
+                                            @foreach ($all_vendor as $all_vendor_data)
+                                                <option value="{{ $all_vendor_data->id }}"
+                                                    @if ($filter_vendor_name == $all_vendor_data->id) {{ 'selected' }} @endif>
+                                                    {{ $all_vendor_data->name }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="form-group">
+                                    <a class="btn btn-primary filter-btn" href="javascript:void(0);"
+                                        style="
                              margin-top: 22px;
-                         " onclick="filter_validation()">
-                                Submit
-                             </a>
-                             <a class="btn btn-primary filter-btn" href="{{ route('adminwallet.index') }}" style="
+                         "
+                                        onclick="filter_validation()">
+                                        Submit
+                                    </a>
+                                    <a class="btn btn-primary filter-btn" href="{{ route('adminwallet.index') }}"
+                                        style="
                              margin-top: 22px;">Reset</a>
-                         </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                </div>
-             </form>
+                </form>
             </div>
 
         </div>
@@ -243,6 +249,7 @@
                                             <th>Payment Type</th>
                                             <th>Add/Deduct</th>
                                             <th>Status</th>
+                                            <th>Notes</th>
                                             <th>Date</th>
                                         </tr>
                                     </thead>
@@ -283,35 +290,43 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                @if ($data->add_deduct === 0 && $data->payment !== 4)
-                                                {{ 'Add' }}
-                                                @elseif ($data->add_deduct === 1 || ($data->add_deduct === 0 && $data->payment === 4))
-                                                    {{ 'Deduct' }}
-                                                @else
-                                                    {{ '-' }}
-                                                @endif
-                                                
+                                                    @if ($data->add_deduct === 0 && $data->payment !== 4)
+                                                        {{ 'Add' }}
+                                                    @elseif ($data->add_deduct === 1 || ($data->add_deduct === 0 && $data->payment === 4))
+                                                        {{ 'Deduct' }}
+                                                    @else
+                                                        {{ '-' }}
+                                                    @endif
+
                                                 </td>
                                                 <td>
                                                     <div class="form-group">
                                                         @if ($data->add_deduct == 0)
-                                                        @if ($data->status == 0)
-                                                            <label class="toggle">
-                                                                <input type="checkbox" id="is_active_toggle"
-                                                                    {{ $data->status == 1 ? 'checked' : '' }}
-                                                                    onchange="fun_status('{{ $data->id }}','{{ $data->vendors_id }}', this.checked ? 1 : 0); return false;">
-                                                                <span class="slider"></span>
-                                                            </label>
+                                                            @if ($data->status == 0)
+                                                                <label class="toggle">
+                                                                    <input type="checkbox" id="is_active_toggle"
+                                                                        {{ $data->status == 1 ? 'checked' : '' }}
+                                                                        onchange="fun_status('{{ $data->id }}','{{ $data->vendors_id }}', this.checked ? 1 : 0); return false;">
+                                                                    <span class="slider"></span>
+                                                                </label>
                                                             @else
-                                                            <span class="badge badge-pill bg-success-light">
-                                                                {{ 'Approved' }}</span>
+                                                                <span class="badge badge-pill bg-success-light">
+                                                                    {{ 'Approved' }}</span>
                                                             @endif
                                                         @else
                                                             {{ '-' }}
-                                                        
                                                         @endif
-                                                       
+
                                                     </div>
+                                                </td>
+                                                <td>
+                                                    @if (!empty($data->notes))
+                                                        <a href="javascript:void(0);" class="btn btn-sm btn-info"
+                                                            onclick="showNoteModal(this)"
+                                                            data-note="{{ $data->notes }}">View Note</a>
+                                                    @else
+                                                        -
+                                                    @endif
                                                 </td>
                                                 <td>
                                                     {{-- {{ $data->created_at->toDateString() }} --}}
@@ -339,6 +354,21 @@
 @section('footer_js')
 
 
+    <!-- Note Modal -->
+    <div class="modal custom-modal fade" id="note_modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Note Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="note_modal_text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- set order Modal -->
 
     <div class="modal custom-modal fade" id="status_modell" role="dialog">
@@ -361,11 +391,13 @@
 
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
 
-                        <button type="button" class="btn btn-primary" onclick="fun_review_status();" id="modal_yes_button">Yes</button>
+                        <button type="button" class="btn btn-primary" onclick="fun_review_status();"
+                            id="modal_yes_button">Yes</button>
 
-                        <button class="btn btn-primary mb-1" type="button" disabled id="spinner_button" style="display: none;">
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        Loading...
+                        <button class="btn btn-primary mb-1" type="button" disabled id="spinner_button"
+                            style="display: none;">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
                         </button>
 
                     </div>
@@ -381,14 +413,20 @@
     <!-- /set orderModal -->
 
     <script>
-         function excel_download() {
+        function showNoteModal(element) {
+            var noteText = $(element).attr('data-note');
+            $('#note_modal_text').text(noteText);
+            $('#note_modal').modal('show');
+        }
+
+        function excel_download() {
             $('#filter_data').submit();
         }
 
-        function filter_validation(){
-                
-                $('#filter_form').submit();
-            }
+        function filter_validation() {
+
+            $('#filter_form').submit();
+        }
 
         function fun_status(id, vendor_id, value) {
 
@@ -401,54 +439,55 @@
 
         }
 
-    function fun_review_status() {
-    // Hide "Yes" button and show the spinner
-    $('#modal_yes_button').hide(); 
-    $('#spinner_button').show();
+        function fun_review_status() {
+            // Hide "Yes" button and show the spinner
+            $('#modal_yes_button').hide();
+            $('#spinner_button').show();
 
-    var id = $('#is_active_id').val();
-    var vendorid = $('#is_active_vendorid').val();
-    var value = $('#is_active_val').val();
+            var id = $('#is_active_id').val();
+            var vendorid = $('#is_active_vendorid').val();
+            var value = $('#is_active_val').val();
 
-    $.ajax({
-        type: "post",
-        url: "{{ url('change_status_wallet') }}",
-        data: {
-            "_token": "{{ csrf_token() }}",
-            "id": id,
-            "vendorid": vendorid,
-            "value": value,
-        },
-        success: function(returndata) {
-            if(returndata == 2){
-                $('#failed_message').text('The deducted amount is greater than the vendor wallet balance.');
-                $('.failed_show').show().delay(0).fadeIn('show');
-                $('.failed_show').show().delay(5000).fadeOut('show');
-                $('html, body').animate({
-                    scrollTop: $('#failed_message').offset().top - 150
-                }, 1000);
-                // $('#is_active_toggle').prop('checked', false);
-            }
-            if (returndata == 1) {
-                $('#success_message').text('Status has been Updated successfully');
-                $('.success_show').show().delay(0).fadeIn('show');
-                $('.success_show').show().delay(5000).fadeOut('show');
-                
-                // $('#is_active_toggle').prop('disabled', true);
-            }
-            
-            // Hide the spinner and modal after request completion
-            $('#spinner_button').hide();
-            $('#modal_yes_button').show(); // Optional: If you want to show the "Yes" button again.
-            $('#status_modell').modal('hide');
-        },
-        error: function() {
-            // Hide the spinner and show the "Yes" button again on error
-            $('#spinner_button').hide();
-            $('#modal_yes_button').show();
+            $.ajax({
+                type: "post",
+                url: "{{ url('change_status_wallet') }}",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": id,
+                    "vendorid": vendorid,
+                    "value": value,
+                },
+                success: function(returndata) {
+                    if (returndata == 2) {
+                        $('#failed_message').text(
+                            'The deducted amount is greater than the vendor wallet balance.');
+                        $('.failed_show').show().delay(0).fadeIn('show');
+                        $('.failed_show').show().delay(5000).fadeOut('show');
+                        $('html, body').animate({
+                            scrollTop: $('#failed_message').offset().top - 150
+                        }, 1000);
+                        // $('#is_active_toggle').prop('checked', false);
+                    }
+                    if (returndata == 1) {
+                        $('#success_message').text('Status has been Updated successfully');
+                        $('.success_show').show().delay(0).fadeIn('show');
+                        $('.success_show').show().delay(5000).fadeOut('show');
+
+                        // $('#is_active_toggle').prop('disabled', true);
+                    }
+
+                    // Hide the spinner and modal after request completion
+                    $('#spinner_button').hide();
+                    $('#modal_yes_button').show(); // Optional: If you want to show the "Yes" button again.
+                    $('#status_modell').modal('hide');
+                },
+                error: function() {
+                    // Hide the spinner and show the "Yes" button again on error
+                    $('#spinner_button').hide();
+                    $('#modal_yes_button').show();
+                }
+            });
         }
-    });
-}
     </script>
 
     <script>

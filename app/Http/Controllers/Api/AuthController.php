@@ -49,11 +49,11 @@ class AuthController extends Controller
             ], 400);
         }
 
-        // return response()->json([
-        //     'status' => true,
-        //     'message' => 'OTP Sent Successfully',
-        //     'otp' => $otp // remove in production
-        // ]);
+        return response()->json([
+            'status' => true,
+            'message' => 'OTP Sent Successfully',
+            // 'otp' => $otp // remove in production
+        ]);
     }
 
     function booknow_otp_sent($mobile, $country_code, $otp)

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
-use App\Models\admin\Packages;
+use App\Models\Admin\Packages;
 use DB;
 use Image;
 
@@ -49,6 +49,7 @@ class PackagesController extends Controller
         $data['service_id'] = $request->service_id;
         $data['subservice_id'] = $request->subservice_id;
         $data['packagecategory_id'] = $request->packagecategory_id;
+        $data['package_group_id'] = $request->package_group_id;
         $data['title'] = $request->title;
         $data['sub_title'] = $request->sub_title;
         $data['name'] = $request->name;
@@ -286,8 +287,9 @@ class PackagesController extends Controller
 
 
         $data['service_data'] = DB::table('services')->select('*')->orderBy('id', 'DESC')->get();
-        $data['subservice_data'] = DB::table('subservices')->select('*')->where('serviceid', $data['packages']->service_id)->orderBy('id', 'DESC')->get();
-        $data['packagecat_data'] = DB::table('package_categories')->select('*')->where('subservice_id', $data['packages']->subservice_id)->orderBy('id', 'DESC')->get();
+        $data['subservice_data'] = DB::table('subservices')->select('*')->where('serviceid', '=', $data['packages']->service_id)->orderBy('id', 'DESC')->get();
+        $data['packagecat_data'] = DB::table('package_categories')->select('*')->where('subservice_id', '=', $data['packages']->subservice_id)->orderBy('id', 'DESC')->get();
+        $data['packagegroup_data'] = DB::table('package_groups')->select('*')->where('packagecategory_id', '=', $data['packages']->packagecategory_id)->orderBy('id', 'DESC')->get();
         return view('admin.edit_packages', $data);
     }
     public function remove_others_att(Request $request)
@@ -350,6 +352,7 @@ class PackagesController extends Controller
         $data['service_id'] = $request->service_id;
         $data['subservice_id'] = $request->subservice_id;
         $data['packagecategory_id'] = $request->packagecategory_id;
+        $data['package_group_id'] = $request->package_group_id;
         $data['title'] = $request->title;
         $data['sub_title'] = $request->sub_title;
         $data['name'] = $request->name;
@@ -731,17 +734,33 @@ class PackagesController extends Controller
     function packagecategory_show()
     {
         $subservice_id = $_POST['subservice_id'];
-        // echo $service_id;exit;
 
         $result = DB::table('package_categories')->select('*')->where('subservice_id', '=', $subservice_id)->orderBy('id', 'DESC')->get();
 
         $result_new = $result->toArray();
 
-        $html = '<select class="form-control" id="packagecategory_id" name="packagecategory_id">';
+        $html = '<select class="form-control" id="packagecategory_id" name="packagecategory_id" onchange="packagegroup_change(this.value);">';
         $html .= '<option value="">Select Package Category</option>';
         if ($result != '' && count($result) > 0) {
             for ($i = 0; $i < count($result); $i++) {
-                // echo "<pre>";print_r($result[$i]->id);echo "</pre>";exit;
+                $html .= "<option value='" . $result[$i]->id . "'>" . $result[$i]->name . "</option>";
+            }
+        }
+        $html .= "</select>";
+
+        echo $html;
+    }
+
+    function packagegroup_show()
+    {
+        $packagecategory_id = $_POST['packagecategory_id'];
+
+        $result = DB::table('package_groups')->select('*')->where('packagecategory_id', '=', $packagecategory_id)->orderBy('id', 'DESC')->get();
+
+        $html = '<select class="form-control" id="package_group_id" name="package_group_id">';
+        $html .= '<option value="">Select Package Group (Optional)</option>';
+        if ($result != '' && count($result) > 0) {
+            for ($i = 0; $i < count($result); $i++) {
                 $html .= "<option value='" . $result[$i]->id . "'>" . $result[$i]->name . "</option>";
             }
         }

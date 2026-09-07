@@ -6,6 +6,56 @@
 
 <head>
 
+    <!-- Google Tag Manager (Delayed) -->
+    <!-- <script>
+        var gtmLoaded = false;
+
+        function loadGTM() {
+            if (gtmLoaded) return;
+            gtmLoaded = true;
+            (function(w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({
+                    'gtm.start': new Date().getTime(),
+                    event: 'gtm.js'
+                });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s),
+                    dl = l != 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-ML9CL33C');
+        }
+        ['mouseover', 'keydown', 'scroll', 'touchstart'].forEach(function(e) {
+            window.addEventListener(e, loadGTM, {
+                once: true,
+                passive: true
+            });
+        });
+        setTimeout(loadGTM, 5000);
+    </script> -->
+    <!-- End Google Tag Manager -->
+
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start': new Date().getTime(),
+                event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s),
+                dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-ML9CL33C');
+    </script>
+    <!-- End Google Tag Manager -->
+
     <meta name="DC.title" content="https://www.vendorscity.com/" />
 
     <meta name="geo.region" content="AE" />
@@ -35,11 +85,13 @@
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    {{-- <meta name="viewport" content="width=device-width, initial-scale=1"> --}}
+    {{--
+    <meta name="viewport" content="width=device-width, initial-scale=1"> --}}
 
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    {{-- <meta name="keywords"content="">
+    {{--
+    <meta name="keywords" content="">
 
     <meta name="description" content=""> --}}
 
@@ -67,8 +119,9 @@
     <!-- Removed intlTelInput globally for Step 1 -->
     <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}">
 
-    @if (!request()->is('/'))
-        <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}">
+    @if (!request()->is('/') && !request()->is('*/booknow/cleaning/cleaning-subscription'))
+        <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}" media="print"
+            onload="this.media='all'">
     @endif
 
     <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}">
@@ -81,8 +134,12 @@
     <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}">
     <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('public/site/css/owl.carousel.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('public/site/css/owl.theme.default.min.css') }}">
+    @if (!request()->is('*/booknow/cleaning/cleaning-subscription'))
+        <link rel="stylesheet" href="{{ asset('public/site/css/owl.carousel.min.css') }}" media="print"
+            onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/owl.theme.default.min.css') }}" media="print"
+            onload="this.media='all'">
+    @endif
 
     @stack('styles')
 
@@ -102,13 +159,13 @@
 
 
     @if (!empty($meta_keyword))
-        <meta name="keywords"content="{{ $meta_keyword }}">
+        <meta name="keywords" content="{{ $meta_keyword }}">
     @endif
 
 
 
     @if (!empty($meta_description))
-        <meta name="description"content="{{ $meta_description }}">
+        <meta name="description" content="{{ $meta_description }}">
 
         <meta property="og:description" content="{{ $meta_description }}" />
     @endif
@@ -173,14 +230,13 @@
 
     <link rel="stylesheet" href="{{ asset('public/site/css/customstyle.css') }}">
 
-    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-
+    {{--
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-
         crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
 
-    {{-- <link href="https://db.onlinewebfonts.com/c/060fd297f19446447a9a1325ad5b889b?family=SF+Pro+Rounded"
-
+    {{--
+    <link href="https://db.onlinewebfonts.com/c/060fd297f19446447a9a1325ad5b889b?family=SF+Pro+Rounded"
         rel="stylesheet"> --}}
 
     <style>
@@ -2706,7 +2762,32 @@
     </style>
 
 
-
+    <!-- Meta Pixel Code (Delayed) -->
+    <script>
+        ! function(f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function() {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = !0;
+            n.version = '2.0';
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '483748947894350');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+            src="https://www.facebook.com/tr?id=483748947894350&ev=PageView&noscript=1" /></noscript>
+    <!-- End Meta Pixel Code -->
 
 </head>
 
@@ -2717,11 +2798,8 @@
 
 
     <!-- Google Tag Manager (noscript) -->
-
-    {{-- <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-ML9CL33C"
-
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript> --}}
-
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-ML9CL33C" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
 
@@ -2949,10 +3027,9 @@
                                 <ul class="ace-responsive-menu" data-menu-style="horizontal">
 
                                     {{-- <li class="visible_list"> <a class="list-item" href="{{ url('/') }}"><span
-
                                                 class="title">Home</span></a>
 
-                                       
+
 
 
 
@@ -2967,7 +3044,6 @@
 
 
                                     {{-- <li class="visible_list"> <a class="list-item "
-
                                             href="{{ url('/services') }}">Services</a>
 
                                     </li> --}}
@@ -2975,7 +3051,6 @@
 
 
                                     {{-- <li class="visible_list"> <a class="list-item "
-
                                             href="{{ url('/our-vendors') }}">Our Vendors</a>
 
 
@@ -2983,7 +3058,6 @@
                                     </li> --}}
 
                                     {{-- <li class="visible_list"> <a class="list-item "
-
                                             href="{{ url('/blog') }}">Blogs</a>
 
 
@@ -3146,19 +3220,18 @@
 
                                     {{-- <div class="col-md-3 col-lg-2 col-xl-3">
 
-                                    <div class="text-center text-xl-start">
+                                        <div class="text-center text-xl-start">
 
-                                        <button class="ud-btn btn-thm w-100 bdrs60 mgtop20" type="button"
-
-                                            onclick="search_banner_header()" style="
+                                            <button class="ud-btn btn-thm w-100 bdrs60 mgtop20" type="button"
+                                                onclick="search_banner_header()" style="
 
                                             padding: 0;
 
                                         ">Search</button>
 
-                                    </div>
+                                        </div>
 
-                                </div> --}}
+                                    </div> --}}
 
                                 </div>
 
@@ -3187,7 +3260,7 @@
 
                             ">
 
-                            <i class="fa-solid fa-phone custom_font_awesome"></i>056 836 3677</a>
+                                    <i class="fa-solid fa-phone custom_font_awesome"></i>056 836 3677</a>
 
                             </div>
 
@@ -3213,7 +3286,6 @@
                                     <i class="fa-solid fa-phone custom_font_awesome"></i>056 836 3677</a>
 
                                 {{-- <a class="login-info" data-bs-toggle="modal" href="#exampleModalToggle"
-
                                     role="button"><span class="flaticon-loupe"></span></a> --}}
 
                                 <a class="login-info mx10-lg mx30"
@@ -3229,7 +3301,8 @@
                                 @endphp
 
                                 @if ($userData == '')
-                                    {{-- <a class="login-info mr10-lg mr30" href="{{ url('Sign-Up') }}">Registration</a> --}}
+                                    {{-- <a class="login-info mr10-lg mr30" href="{{ url('Sign-Up') }}">Registration</a>
+                                    --}}
 
                                     {{-- <a class="login-info mr10-lg mr30" href="{{ route('Sign-in') }}">Log
 
@@ -3269,7 +3342,8 @@
 
                                     </ul>
                                 @else
-                                    {{-- <a class="login-info mr10-lg mr30" href="{{ route('user_signout') }}">Log out</a> --}}
+                                    {{-- <a class="login-info mr10-lg mr30" href="{{ route('user_signout') }}">Log out</a>
+                                    --}}
 
 
 
@@ -3290,7 +3364,8 @@
                                                             class="far fa-home"></i>Dashboard </a></li>
 
                                                 <li><a href="{{ route('front.myleads') }}"><i
-                                                            class="far fa-file-alt"></i>My Quotes</a></li>
+                                                            class="far fa-file-alt"></i>My
+                                                        Quotes</a></li>
 
                                                 <li><a href="{{ route('front.myorder') }}"><i
                                                             class="far fa-file-alt"></i>My
@@ -3329,7 +3404,8 @@
 
                                 {{-- <a class="ud-btn btn-thm2 add-joining" href="{{ url('/services') }}">Book Now!</a>
 
-                                <a class="ud-btn btn-thm2 add-joining ml10 btn-thm2-custom" href="{{ url('/cart') }}" style="
+                                <a class="ud-btn btn-thm2 add-joining ml10 btn-thm2-custom" href="{{ url('/cart') }}"
+                                    style="
 
                                     padding: 5px 18px !important;
 
@@ -3492,23 +3568,24 @@
 
                                             {{-- <div class="box-search">
 
-                                               
 
-                                                <input class="form-control bordermob" type="text" name="search" value="{{ session('search_content') }}"
 
-                                                    placeholder="What service are you looking for?" id="search_auto_header" autocomplete="off" style="
+                                                <input class="form-control bordermob" type="text" name="search"
+                                                    value="{{ session('search_content') }}"
+                                                    placeholder="What service are you looking for?" id="search_auto_header"
+                                                    autocomplete="off" style="
 
-                                                    padding: 4px;
+                                                                                                    padding: 4px;
 
-                                                    height: 30px;
+                                                                                                    height: 30px;
 
-                                                    font-size: 13px;
+                                                                                                    font-size: 13px;
 
-                                                ">
+                                                                                                ">
 
-        
 
-                                                  
+
+
 
                                             </div> --}}
 
@@ -3524,11 +3601,11 @@
                                                 <ul class="dropdown-list-mobile list_mobile"
                                                     style="
 
-                                                padding: 0;
+                                                                                                padding: 0;
 
-                                                margin: 0;
+                                                                                                margin: 0;
 
-                                            ">
+                                                                                            ">
 
 
 
@@ -3602,29 +3679,29 @@
 
 
 
-                                        $city_head = DB::table('cities')->get();
+                                    $city_head = DB::table('cities')->get();
 
                                     @endphp
 
-        
+
 
                                     <div class="bselect-style1 bdrl1 bdrn-sm bordermob custom_button">
 
-                                        <select class="selectpicker" data-width="100%" onchange="search_city_header(this.value);">
+                                        <select class="selectpicker" data-width="100%"
+                                            onchange="search_city_header(this.value);">
 
                                             <option>Choose City</option>
 
                                             @if ($city_head != '')
 
-                                                @foreach ($city_head as $city_head_data)
+                                            @foreach ($city_head as $city_head_data)
 
-                                                    <option data-tokens="{{ $city_head_data->name }}"
+                                            <option data-tokens="{{ $city_head_data->name }}"
+                                                value="{{ $city_head_data->id }}" @if ($city_head_data->id == session('search_city_id')){{ 'selected' }}@endif>{{ $city_head_data->name }}
 
-                                                        value="{{ $city_head_data->id }}" @if ($city_head_data->id == session('search_city_id')){{ 'selected' }}@endif>{{ $city_head_data->name }}
+                                            </option>
 
-                                                    </option>
-
-                                                @endforeach
+                                            @endforeach
 
                                             @endif
 
@@ -3632,7 +3709,7 @@
 
                                     </div>
 
-        
+
 
                                 </div> --}}
 
@@ -3641,12 +3718,11 @@
                                     <div class="text-center text-xl-start">
 
                                         <button class="ud-btn btn-thm w-100 bdrs60 mgtop20" type="button"
-
                                             onclick="search_banner_header()" style="
 
-                                            padding: 0;
+                                                                                            padding: 0;
 
-                                        ">Search</button>
+                                                                                        ">Search</button>
 
                                     </div>
 
@@ -3662,7 +3738,7 @@
 
                         </p>
 
-                         <ul class="list_header"></ul> --}}
+                        <ul class="list_header"></ul> --}}
 
                     </div>
 

@@ -32,7 +32,10 @@ class Salespersonreportcontroller extends Controller
         $query = DB::table('ci_order_item')
             ->join('ci_orders', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
             ->where('ci_orders.order_status', 'CO')
-            ->where('ci_orders.is_delete', '0');
+            ->where('ci_orders.is_delete', '0')
+            ->whereNotNull('ci_order_item.salesperson_id')
+            ->where('ci_order_item.salesperson_id', '!=', '')
+            ->where('ci_order_item.salesperson_id', '!=', '0');
 
         // ❌ REMOVE old date filter (IMPORTANT)
         // because now we filter on visit_date, not cdate
@@ -56,9 +59,7 @@ class Salespersonreportcontroller extends Controller
             $query->where('salesperson_id', $user_data->id);
         }
 
-        $orders = !empty($salesperson_id)
-            ? $query->orderBy('ci_order_item.id', 'DESC')->get()
-            : collect();
+        $orders = $query->orderBy('ci_order_item.id', 'DESC')->get();
 
         // ✅ FINAL VISIT BASED DATA
         $final_data = [];
@@ -203,7 +204,10 @@ class Salespersonreportcontroller extends Controller
         $query = DB::table('ci_order_item')
             ->join('ci_orders', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
             ->where('ci_orders.order_status', 'CO')
-            ->where('ci_orders.is_delete', '0');
+            ->where('ci_orders.is_delete', '0')
+            ->whereNotNull('ci_order_item.salesperson_id')
+            ->where('ci_order_item.salesperson_id', '!=', '')
+            ->where('ci_order_item.salesperson_id', '!=', '0');
 
         // ❌ REMOVE old date filter (IMPORTANT)
         // because now we filter on visit_date, not cdate
@@ -227,9 +231,7 @@ class Salespersonreportcontroller extends Controller
             $query->where('salesperson_id', $user_data->id);
         }
 
-        $orders = !empty($salesperson_id)
-            ? $query->orderBy('ci_order_item.id', 'DESC')->get()
-            : collect();
+        $orders = $query->orderBy('ci_order_item.id', 'DESC')->get();
 
         // ✅ FINAL VISIT BASED DATA
         $final_data = [];
@@ -325,6 +327,7 @@ class Salespersonreportcontroller extends Controller
         });
 
         $service_wise_sales = [];
+        $salesperson_service_grouping = [];
         $total_invoice_amt = 0;
         $total_service_charge = 0;
         $total_vendor_charges = 0;
@@ -385,6 +388,31 @@ class Salespersonreportcontroller extends Controller
             $service_wise_sales[$sName]['invoice_amount'] += $invoice_amount;
             $service_wise_sales[$sName]['jobs'] += 1;
             $service_wise_sales[$sName]['profit'] += $order_profit;
+
+            // Grouping by Salesperson and Service
+            $spName = Helper::salesperson($row->salesperson_id);
+            if (!isset($salesperson_service_grouping[$spName])) {
+                $salesperson_service_grouping[$spName] = [
+                    'services' => [],
+                    'total_invoice' => 0,
+                    'total_profit' => 0,
+                    'total_jobs' => 0
+                ];
+            }
+            if (!isset($salesperson_service_grouping[$spName]['services'][$sName])) {
+                $salesperson_service_grouping[$spName]['services'][$sName] = [
+                    'invoice_amount' => 0,
+                    'profit' => 0,
+                    'jobs' => 0
+                ];
+            }
+            $salesperson_service_grouping[$spName]['services'][$sName]['invoice_amount'] += $invoice_amount;
+            $salesperson_service_grouping[$spName]['services'][$sName]['profit'] += $order_profit;
+            $salesperson_service_grouping[$spName]['services'][$sName]['jobs'] += 1;
+
+            $salesperson_service_grouping[$spName]['total_invoice'] += $invoice_amount;
+            $salesperson_service_grouping[$spName]['total_profit'] += $order_profit;
+            $salesperson_service_grouping[$spName]['total_jobs'] += 1;
         }
 
         // Profit calculation
@@ -481,6 +509,56 @@ class Salespersonreportcontroller extends Controller
 
         $row_num += 2; // Leave a blank row
 
+        $roleIds = explode(',', $user_data->role_id);
+        if (in_array('1', $roleIds)) {
+            // 3rd Table: Salesperson Service wise Sales
+            if (count($salesperson_service_grouping) > 0) {
+                foreach ($salesperson_service_grouping as $spName => $spData) {
+                    $sheet->mergeCells("A{$row_num}:E{$row_num}");
+                    $sheet->setCellValue("A{$row_num}", strip_tags($spName) . ' - Service Wise Sales');
+                    $sheet->getStyle("A{$row_num}")->getFont()->setBold(true)->setSize(14);
+                    $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312');
+                    $sheet->getStyle("A{$row_num}")->getAlignment()->setHorizontal('center');
+                    $row_num++;
+
+                    $sheet->setCellValue("A{$row_num}", 'Services');
+                    $sheet->setCellValue("B{$row_num}", 'Invoice Amount');
+                    $sheet->setCellValue("C{$row_num}", 'Profit');
+                    $sheet->setCellValue("D{$row_num}", 'Percentage %');
+                    $sheet->setCellValue("E{$row_num}", 'No. of Jobs');
+                    $sheet->getStyle("A{$row_num}:E{$row_num}")->getFont()->setBold(true);
+                    $row_num++;
+
+                    foreach ($spData['services'] as $sName => $data) {
+                        $percentage = 0;
+                        if ($data['invoice_amount'] > 0) {
+                            $percentage = ($data['profit'] / $data['invoice_amount']) * 100;
+                        }
+                        $sheet->setCellValue("A{$row_num}", strip_tags($sName));
+                        $sheet->setCellValue("B{$row_num}", number_format($data['invoice_amount'], 2));
+                        $sheet->setCellValue("C{$row_num}", number_format($data['profit'], 2));
+                        $sheet->setCellValue("D{$row_num}", number_format($percentage, 2) . '%');
+                        $sheet->setCellValue("E{$row_num}", $data['jobs']);
+                        $row_num++;
+                    }
+
+                    $total_percentage = 0;
+                    if ($spData['total_invoice'] > 0) {
+                        $total_percentage = ($spData['total_profit'] / $spData['total_invoice']) * 100;
+                    }
+
+                    $sheet->setCellValue("A{$row_num}", "Total Sales");
+                    $sheet->setCellValue("B{$row_num}", number_format($spData['total_invoice'], 2));
+                    $sheet->setCellValue("C{$row_num}", number_format($spData['total_profit'], 2));
+                    $sheet->setCellValue("D{$row_num}", number_format($total_percentage, 2) . '%');
+                    $sheet->setCellValue("E{$row_num}", $spData['total_jobs']);
+                    $sheet->getStyle("A{$row_num}:E{$row_num}")->getFont()->setBold(true);
+                    $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312');
+                    $row_num += 2;
+                }
+            }
+        }
+
         // ✅ 3. START ORDER LISTING BELOW SUMMARY
         // Table Header for Orders
         $order_headers = ['Booking Date', 'Service Type', 'Order Id', 'Sales Person', 'Customer', 'Vendor', 'Vendor Charge', 'Profit'];
@@ -513,11 +591,19 @@ class Salespersonreportcontroller extends Controller
 
             $order_profit = $invoice_amount - $vat_amount - $vendor_payout;
 
+            $customer_order_count = \DB::table('ci_orders')
+                ->where('user_id', $order->user_info_id)
+                ->where('order_status', 'CO')
+                ->count();
+
+            $customer_status = ($customer_order_count > 1) ? ' (Repeated Customer)' : ' (New Customer)';
+            $customer_name = ($order->name ?? 'N/A') . $customer_status;
+
             $sheet->setCellValue("A{$row_num}", $order->visit_date);
             $sheet->setCellValue("B{$row_num}", Helper::servicename($order->service_id));
             $sheet->setCellValue("C{$row_num}", $order->format_order_id);
             $sheet->setCellValue("D{$row_num}", Helper::salesperson($order->salesperson_id));
-            $sheet->setCellValue("E{$row_num}", $order->name ?? 'N/A');
+            $sheet->setCellValue("E{$row_num}", $customer_name);
             $sheet->setCellValue("F{$row_num}", ($order->vendor_id != 0) ? Helper::vendorsname($order->vendor_id) : '-');
             $sheet->setCellValue("G{$row_num}", number_format($vendor_payout, 2, '.', ''));
             $sheet->setCellValue("H{$row_num}", number_format($order_profit, 2, '.', ''));

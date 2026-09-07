@@ -21,9 +21,9 @@
             <b>Error &nbsp;: </b><span id="error_msg1"></span>
         </div>
         <!-- <div id="validate" class="alert alert-danger alert-dismissible fade show" style="display: none;">
-                                                                                                                        <span id="login_error"></span>
-                                                                                                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                                                                                                    </div> -->
+                                                                                                                                <span id="login_error"></span>
+                                                                                                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                                                                                            </div> -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -36,24 +36,28 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Coupon Name</label>
-                                        <input type="text" class="form-control" id="coupan_name" name="coupan_name" placeholder="Enter Coupan Name">
+                                        <input type="text" class="form-control" id="coupan_name" name="coupan_name"
+                                            placeholder="Enter Coupan Name">
                                         <p id="coupan_name_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Coupon Code</label>
-                                        <input type="text" class="form-control" placeholder="Enter Coupan Code"id="coupan_code" name="coupan_code">
+                                        <input type="text" class="form-control" placeholder="Enter Coupan Code"
+                                            id="coupan_code" name="coupan_code">
                                         <p id="coupan_code_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="service_id">Service</label>
-                                        <select class="form-control" multiple="multiple"  id="service_id" name="service_id[]" onchange="coupan_subservice_change(this.value);">
+                                        <select class="form-control" multiple="multiple" id="service_id" name="service_id[]"
+                                            onchange="coupan_subservice_change(this.value);">
                                             <option value="">Select Service</option>
                                             @foreach ($service as $service_data)
-                                                <option value="{{ $service_data->id }}">{{ $service_data->servicename }}</option>
+                                                <option value="{{ $service_data->id }}">{{ $service_data->servicename }}
+                                                </option>
                                             @endforeach
                                         </select>
                                         <p id="service_id_error" style="display: none;color: red"></p>
@@ -63,10 +67,10 @@
                                     <div class="form-group">
                                         <label for="subservice_id">Subservice</label>
                                         <div id="subservice_change">
-                                        <select class="form-control" multiple="multiple" id="subservice_id"
-                                            name="subservice_id[]">
-                                            <option value="">Select Subservice</option>
-                                        </select>
+                                            <select class="form-control" multiple="multiple" id="subservice_id"
+                                                name="subservice_id[]">
+                                                <option value="">Select Subservice</option>
+                                            </select>
                                         </div>
                                         <p id="subservice_id_error" style="display: none;color: red"></p>
                                     </div>
@@ -74,8 +78,8 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Discount</label>
-                                        <input type="text" class="form-control" id="discount" name="discount"placeholder="Enter Discount Amount"
-                                            onkeypress="return numbersonly(event)">
+                                        <input type="text" class="form-control" id="discount" name="discount"
+                                            placeholder="Enter Discount Amount" onkeypress="return numbersonly(event)">
                                         <p id="discount_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
@@ -83,35 +87,37 @@
                                     <div class="form-group">
                                         <label for="coupanvalue">Coupon Value:</label><br>
                                         <input type="radio" value="1" name="coupanvalue" id="coupanvalue"
-                                            class="">&nbsp; Price &nbsp;&nbsp;
-                                        <input type="radio"value="0" name="coupanvalue" id="coupanvalue"
-                                            class="">&nbsp; Percentage &nbsp;&nbsp;
+                                            class="">&nbsp;
+                                        Price &nbsp;&nbsp;
+                                        <input type="radio" value="0" name="coupanvalue" id="coupanvalue"
+                                            class="">&nbsp;
+                                        Percentage &nbsp;&nbsp;
                                         <p id="coupanvalue_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="coupan_apply_wallet_lable">Coupon Apply/Wallet:</label><br>
-                                        <input type="radio" value="1" name="coupan_apply_wallet" id="coupan_apply_wallet"
-                                            class="">&nbsp; Apply &nbsp;&nbsp;
-                                        <input type="radio" value="0" name="coupan_apply_wallet" id="coupan_apply_wallet"
-                                            class="" >&nbsp; Add to User Wallet &nbsp;&nbsp;
+                                        <input type="radio" value="1" name="coupan_apply_wallet"
+                                            id="coupan_apply_wallet" class="">&nbsp; Apply &nbsp;&nbsp;
+                                        <input type="radio" value="0" name="coupan_apply_wallet"
+                                            id="coupan_apply_wallet" class="">&nbsp; Add to User Wallet &nbsp;&nbsp;
                                         <p id="coupan_apply_wallet_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="minimum_order">Minimum Order</label>
-                                        <input id="minimum_order" name="minimum_order" type="text" class="form-control"
-                                            placeholder="Enter Minimum Order" />
+                                        <input id="minimum_order" name="minimum_order" type="text"
+                                            class="form-control" placeholder="Enter Minimum Order" />
                                         <p id="minimum_order_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="no_of_coupons">No. Of Coupons</label>
-                                        <input id="no_of_coupons" name="no_of_coupons" type="text" class="form-control"
-                                            placeholder="Enter No. Of Coupons" />
+                                        <input id="no_of_coupons" name="no_of_coupons" type="text"
+                                            class="form-control" placeholder="Enter No. Of Coupons" />
                                         <p id="no_of_coupons_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
@@ -139,8 +145,42 @@
                                         <p id="enddate_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
-                                
-                                
+                                <div class="col-md-6">
+                                    <div class="form-group mt-3">
+                                        <label>Active for Web:</label>
+                                        <input type="checkbox" name="active_for_web" value="1">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mt-3">
+                                        <label>Active for App:</label>
+                                        <input type="checkbox" name="active_for_app" value="1">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Where to display image</label>
+                                        <select class="form-control" name="display_image" id="display_image"
+                                            onchange="toggleImageUpload()">
+                                            <option value="Horizontal" selected>Horizontal</option>
+                                            <option value="Vertical">Vertical</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="horizontal_image_div">
+                                    <div class="form-group">
+                                        <label>Horizontal Image</label>
+                                        <input type="file" name="horizontal_image" id="horizontal_image"
+                                            class="form-control" accept="image/*">
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="vertical_image_div" style="display:none;">
+                                    <div class="form-group">
+                                        <label>Vertical Image</label>
+                                        <input type="file" name="vertical_image" id="vertical_image"
+                                            class="form-control" accept="image/*">
+                                    </div>
+                                </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="description" style="margin:15px 0 5px 0px; width:100%;">
@@ -169,6 +209,17 @@
 @stop
 @section('footer_js')
     <script>
+        function toggleImageUpload() {
+            var display = document.getElementById('display_image').value;
+            if (display === 'Horizontal') {
+                document.getElementById('horizontal_image_div').style.display = 'block';
+                document.getElementById('vertical_image_div').style.display = 'none';
+            } else {
+                document.getElementById('horizontal_image_div').style.display = 'none';
+                document.getElementById('vertical_image_div').style.display = 'block';
+            }
+        }
+
         function validation() {
             var coupan_name = $("#coupan_name").val();
             if (coupan_name == '') {
@@ -283,7 +334,7 @@
                 return false;
             }
             var service_id = $("#service_id").val();
-            if(service_id == ''){
+            if (service_id == '') {
                 //alert('Please Enter Category ');
                 $("#service_id_error").html("Please Select Service.");
                 //$("#validator").css("display","block");
@@ -295,7 +346,7 @@
                 return false;
             }
             var subservice_id = $("#subservice_id").val();
-            if(subservice_id == ''){
+            if (subservice_id == '') {
                 //alert('Please Enter Category ');
                 $("#subservice_id_error").html("Please Select SubService.");
                 //$("#validator").css("display","block");
@@ -319,7 +370,6 @@
             });
     </script>
     <script>
-    
         $(document).ready(function() {
             $('#service_id').select2({
                 placeholder: 'Select Service', // Add your desired placeholder text here
@@ -330,6 +380,7 @@
                 placeholder: 'Select Subservice', // Add your desired placeholder text here
             });
         });
+
         function numbersonly(e) {
             var unicode = e.charCode ? e.charCode : e.keyCode
             if (unicode != 8) { //if the key isn't the backspace key (which we should allow)
@@ -349,30 +400,29 @@
                 }
             });
         });
-        
     </script>
- 
+
     <script type="text/javascript">
-       function coupan_subservice_change() {
-        // alert(value);
-        var value = $("#service_id").val();
-        var selectedSubservices = $("#subservice_id").val();
-               var url = '{{ url('coupan_subservice_change') }}';
-               $.ajax({
-                   url: url,
-                   type: 'post',
-                   data: {
-                       "_token": "{{ csrf_token() }}",
-                       "service_id": value,
-                       "selected_subservice_ids": selectedSubservices
-                   },
-                   success: function(msg) {
-                       document.getElementById('subservice_change').innerHTML = msg;
-                       $("#subservice_id").select2({
-                           placeholder: "Select a Subservice"
-                       });
-                   }
-               });
-           }
+        function coupan_subservice_change() {
+            // alert(value);
+            var value = $("#service_id").val();
+            var selectedSubservices = $("#subservice_id").val();
+            var url = '{{ url('coupan_subservice_change') }}';
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "service_id": value,
+                    "selected_subservice_ids": selectedSubservices
+                },
+                success: function(msg) {
+                    document.getElementById('subservice_change').innerHTML = msg;
+                    $("#subservice_id").select2({
+                        placeholder: "Select a Subservice"
+                    });
+                }
+            });
+        }
     </script>
 @stop

@@ -46,11 +46,12 @@
                                         <p id="coupan_code_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
-                                 
+
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="service_id">Service</label>
-                                        <select class="form-control" multiple="multiple"  id="service_id" name="service_id[]" onchange="coupan_subservice_change(this.value);">
+                                        <select class="form-control" multiple="multiple" id="service_id" name="service_id[]"
+                                            onchange="coupan_subservice_change(this.value);">
                                             @php $in_service_id = explode(",",$coupan_data->service_id); @endphp
                                             <option value="">Select Service</option>
                                             @foreach ($service as $service_data)
@@ -66,21 +67,21 @@
                                     <div class="form-group">
                                         <label for="subservice_id">Sub service</label>
                                         <div id="subservice_change">
-                                        <select class="form-control" multiple="multiple" id="subservice_id"
-                                            name="subservice_id[]">
-                                            @php $in_subservice_id = explode(",",$coupan_data->subservice_id); @endphp
-                                            <option value="">Select Subservice</option>
-                                            @foreach ($subservice as $subcat_data)
-                                                <option value="{{ $subcat_data->id }}"
-                                                    @if (in_array($subcat_data->id, $in_subservice_id)) {{ 'selected' }} @endif>
-                                                    {{ $subcat_data->subservicename }}</option>
-                                            @endforeach
-                                        </select>
+                                            <select class="form-control" multiple="multiple" id="subservice_id"
+                                                name="subservice_id[]">
+                                                @php $in_subservice_id = explode(",",$coupan_data->subservice_id); @endphp
+                                                <option value="">Select Subservice</option>
+                                                @foreach ($subservice as $subcat_data)
+                                                    <option value="{{ $subcat_data->id }}"
+                                                        @if (in_array($subcat_data->id, $in_subservice_id)) {{ 'selected' }} @endif>
+                                                        {{ $subcat_data->subservicename }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <p id="subservice_id_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
-                               
+
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Discount</label>
@@ -107,27 +108,31 @@
                                     <div class="form-group">
                                         <label for="coupan_apply_wallet">Coupon Apply/Wallet:</label><br>
                                         <input type="radio" value="1"
-                                            {{ $coupan_data->coupan_apply_wallet == 1 ? 'checked' : '' }} name="coupan_apply_wallet"
-                                            id="coupan_apply_wallet" class="">&nbsp; Apply  &nbsp;&nbsp;
+                                            {{ $coupan_data->coupan_apply_wallet == 1 ? 'checked' : '' }}
+                                            name="coupan_apply_wallet" id="coupan_apply_wallet" class="">&nbsp;
+                                        Apply &nbsp;&nbsp;
                                         <input type="radio" value="0"
-                                            {{ $coupan_data->coupan_apply_wallet === 0 ? 'checked' : '' }} name="coupan_apply_wallet"
-                                            id="coupan_apply_wallet" class="">&nbsp; Add to User Wallet &nbsp;&nbsp;
+                                            {{ $coupan_data->coupan_apply_wallet === 0 ? 'checked' : '' }}
+                                            name="coupan_apply_wallet" id="coupan_apply_wallet" class="">&nbsp; Add
+                                        to User Wallet &nbsp;&nbsp;
                                         <p id="coupan_apply_wallet_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="minimum_order">Minimum Order</label>
-                                        <input id="minimum_order" name="minimum_order" type="text" class="form-control"
-                                            placeholder="Enter Minimum Order" value="{{ $coupan_data->minimum_order }}" />
+                                        <input id="minimum_order" name="minimum_order" type="text"
+                                            class="form-control" placeholder="Enter Minimum Order"
+                                            value="{{ $coupan_data->minimum_order }}" />
                                         <p id="minimum_order_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="no_of_coupons">No. Of Coupons</label>
-                                        <input id="no_of_coupons" name="no_of_coupons" type="text" class="form-control"
-                                            placeholder="Enter No. Of Coupons" value="{{ $coupan_data->no_of_coupons }}" />
+                                        <input id="no_of_coupons" name="no_of_coupons" type="text"
+                                            class="form-control" placeholder="Enter No. Of Coupons"
+                                            value="{{ $coupan_data->no_of_coupons }}" />
                                         <p id="no_of_coupons_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
@@ -158,8 +163,58 @@
                                         <p id="enddate_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
-                                
-                               
+                                <div class="col-md-6">
+                                    <div class="form-group mt-3">
+                                        <label>Active for Web:</label>
+                                        <input type="checkbox" name="active_for_web" value="1"
+                                            {{ $coupan_data->active_for_web ? 'checked' : '' }}>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mt-3">
+                                        <label>Active for App:</label>
+                                        <input type="checkbox" name="active_for_app" value="1"
+                                            {{ $coupan_data->active_for_app ? 'checked' : '' }}>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Where to display image</label>
+                                        <select class="form-control" name="display_image" id="display_image"
+                                            onchange="toggleImageUpload()">
+                                            <option value="Horizontal"
+                                                {{ $coupan_data->display_image == 'Horizontal' ? 'selected' : '' }}>
+                                                Horizontal</option>
+                                            <option value="Vertical"
+                                                {{ $coupan_data->display_image == 'Vertical' ? 'selected' : '' }}>Vertical
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="horizontal_image_div"
+                                    style="{{ $coupan_data->display_image == 'Vertical' ? 'display:none;' : '' }}">
+                                    <div class="form-group">
+                                        <label>Horizontal Image</label>
+                                        <input type="file" name="horizontal_image" id="horizontal_image"
+                                            class="form-control" accept="image/*">
+                                        @if ($coupan_data->horizontal_image)
+                                            <img src="{{ asset('public/upload/coupans/' . $coupan_data->horizontal_image) }}"
+                                                width="50" class="mt-2">
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="vertical_image_div"
+                                    style="{{ $coupan_data->display_image == 'Vertical' ? '' : 'display:none;' }}">
+                                    <div class="form-group">
+                                        <label>Vertical Image</label>
+                                        <input type="file" name="vertical_image" id="vertical_image"
+                                            class="form-control" accept="image/*">
+                                        @if ($coupan_data->vertical_image)
+                                            <img src="{{ asset('public/upload/coupans/' . $coupan_data->vertical_image) }}"
+                                                width="50" class="mt-2">
+                                        @endif
+                                    </div>
+                                </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="description" style="margin:15px 0 5px 0px; width:100%;">
@@ -189,6 +244,17 @@
 @stop
 @section('footer_js')
     <script>
+        function toggleImageUpload() {
+            var display = document.getElementById('display_image').value;
+            if (display === 'Horizontal') {
+                document.getElementById('horizontal_image_div').style.display = 'block';
+                document.getElementById('vertical_image_div').style.display = 'none';
+            } else {
+                document.getElementById('horizontal_image_div').style.display = 'none';
+                document.getElementById('vertical_image_div').style.display = 'block';
+            }
+        }
+
         function validation() {
             var coupan_name = $("#coupan_name").val();
             if (coupan_name == '') {
@@ -213,7 +279,7 @@
                 return false;
             }
             var service_id = $("#service_id").val();
-            if(service_id == ''){
+            if (service_id == '') {
                 //alert('Please Enter Category ');
                 $("#service_id_error").html("Please Select Service.");
                 //$("#validator").css("display","block");
@@ -225,7 +291,7 @@
                 return false;
             }
             var subservice_id = $("#subservice_id").val();
-            if(subservice_id == ''){
+            if (subservice_id == '') {
                 //alert('Please Enter Category ');
                 $("#subservice_id_error").html("Please Select SubService.");
                 //$("#validator").css("display","block");
@@ -350,6 +416,7 @@
                 placeholder: 'Select SubCategory', // Add your desired placeholder text here
             });
         });
+
         function numbersonly(e) {
             var unicode = e.charCode ? e.charCode : e.keyCode
             if (unicode != 8) { //if the key isn't the backspace key (which we should allow)
@@ -381,32 +448,32 @@
             });
         });
     </script>
-   
-      <script type="text/javascript">
+
+    <script type="text/javascript">
         function coupan_subservice_change() {
- 
-         // alert(value);
-         var value = $("#service_id").val();
-         var selectedSubservices = $("#subservice_id").val();
- 
- 
- 
-                var url = '{{ url('coupan_subservice_change') }}';
-                $.ajax({
-                    url: url,
-                    type: 'post',
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "service_id": value,
-                        "selected_subservice_ids": selectedSubservices
-                    },
-                    success: function(msg) {
-                        document.getElementById('subservice_change').innerHTML = msg;
-                        $("#subservice_id").select2({
-                            placeholder: "Select a Subservice"
-                        });
-                    }
-                });
-            }
-     </script>
+
+            // alert(value);
+            var value = $("#service_id").val();
+            var selectedSubservices = $("#subservice_id").val();
+
+
+
+            var url = '{{ url('coupan_subservice_change') }}';
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "service_id": value,
+                    "selected_subservice_ids": selectedSubservices
+                },
+                success: function(msg) {
+                    document.getElementById('subservice_change').innerHTML = msg;
+                    $("#subservice_id").select2({
+                        placeholder: "Select a Subservice"
+                    });
+                }
+            });
+        }
+    </script>
 @stop

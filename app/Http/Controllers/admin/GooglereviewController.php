@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-use App\Models\admin\Googlereview;
+use App\Models\Admin\Googlereview;
 
 
 
@@ -32,10 +32,9 @@ class GooglereviewController extends Controller
 
     {
 
-        $data['country_data']=Googlereview::orderBy('id','desc')->get();
+        $data['country_data'] = Googlereview::orderBy('id', 'desc')->get();
 
-        return view('admin.list_googlereview',$data);
-
+        return view('admin.list_googlereview', $data);
     }
 
 
@@ -55,7 +54,6 @@ class GooglereviewController extends Controller
     {
 
         return view('admin.add_googlereview');
-
     }
 
 
@@ -76,18 +74,17 @@ class GooglereviewController extends Controller
 
     {
 
-        $country= new Googlereview;
+        $country = new Googlereview;
 
-        $country->label=$request->label;
-        $country->description=$request->description;
-        $country->name=$request->name;
+        $country->label = $request->label;
+        $country->description = $request->description;
+        $country->name = $request->name;
 
-        
+
 
         $country->save();
 
-        return redirect()->route('google_review.index')->with('success','Google Review Added Successfully');
-
+        return redirect()->route('google_review.index')->with('success', 'Google Review Added Successfully');
     }
 
 
@@ -131,12 +128,11 @@ class GooglereviewController extends Controller
     {
 
         //echo "sd".$id;exit;
-         $googlereview = Googlereview::findOrFail($id);
+        $googlereview = Googlereview::findOrFail($id);
 
-         //echo "<pre>";print_r($Googlereview);echo"</pre>";exit;
+        //echo "<pre>";print_r($Googlereview);echo"</pre>";exit;
 
-       return view('admin.edit_googlereview',compact('googlereview'));
-
+        return view('admin.edit_googlereview', compact('googlereview'));
     }
 
 
@@ -165,14 +161,13 @@ class GooglereviewController extends Controller
         $country->description     = $request->description;
         $country->name     = $request->name;
 
-       
+
 
         $country->save();
 
 
 
         return redirect()->route('google_review.index')->with('success', 'Google Review Updated Successfully');
-
     }
 
 
@@ -195,12 +190,10 @@ class GooglereviewController extends Controller
 
         $delete_id = $request->selected;
 
-      
 
-        Googlereview::whereIn('id',$delete_id)->delete();
 
-        return redirect()->route('google_review.index')->with('success','Google Review Deleted Successfully');
+        Googlereview::whereIn('id', $delete_id)->delete();
 
+        return redirect()->route('google_review.index')->with('success', 'Google Review Deleted Successfully');
     }
-
 }

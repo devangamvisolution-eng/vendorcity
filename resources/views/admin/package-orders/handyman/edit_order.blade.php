@@ -192,53 +192,43 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Service Required</label>
-                                                <input type="text" name="manpower_service_required"
-                                                    class="form-control" placeholder="e.g. Cleaning, Helper"
-                                                    value="{{ isset($order->items[0]) ? $order->items[0]->manpower_service_required : '' }}">
+                                                <input type="text" name="manpower_service_required" class="form-control" placeholder="e.g. Cleaning, Helper" value="{{ isset($order->items[0]) ? $order->items[0]->manpower_service_required : '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Number of Workers Required</label>
-                                                <input type="text" name="manpower_workers_required"
-                                                    class="form-control" placeholder="e.g. 2, 5"
-                                                    value="{{ isset($order->items[0]) ? $order->items[0]->manpower_workers_required : '' }}">
+                                                <input type="text" name="manpower_workers_required" class="form-control" placeholder="e.g. 2, 5" value="{{ isset($order->items[0]) ? $order->items[0]->manpower_workers_required : '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Duration / Per Day</label>
-                                                <input type="text" name="manpower_duration" class="form-control"
-                                                    placeholder="e.g. 8 Hours, 1 Month"
-                                                    value="{{ isset($order->items[0]) ? $order->items[0]->manpower_duration : '' }}">
+                                                <input type="text" name="manpower_duration" class="form-control" placeholder="e.g. 8 Hours, 1 Month" value="{{ isset($order->items[0]) ? $order->items[0]->manpower_duration : '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Start Date</label>
-                                                <input type="date" name="manpower_start_date" class="form-control"
-                                                    value="{{ isset($order->items[0]) ? $order->items[0]->manpower_start_date : '' }}">
+                                                <input type="date" name="manpower_start_date" class="form-control" value="{{ isset($order->items[0]) ? $order->items[0]->manpower_start_date : '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>End Date</label>
-                                                <input type="date" name="manpower_end_date" class="form-control"
-                                                    value="{{ isset($order->items[0]) ? $order->items[0]->manpower_end_date : '' }}">
+                                                <input type="date" name="manpower_end_date" class="form-control" value="{{ isset($order->items[0]) ? $order->items[0]->manpower_end_date : '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Job Description / Requirements</label>
-                                                <textarea name="manpower_job_description" class="form-control" rows="3"
-                                                    placeholder="Enter job description...">{{ isset($order->items[0]) ? $order->items[0]->manpower_job_description : '' }}</textarea>
+                                                <textarea name="manpower_job_description" class="form-control" rows="3" placeholder="Enter job description...">{{ isset($order->items[0]) ? $order->items[0]->manpower_job_description : '' }}</textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Additional Notes</label>
-                                                <textarea name="manpower_additional_notes" class="form-control" rows="3"
-                                                    placeholder="Enter any additional notes...">{{ isset($order->items[0]) ? $order->items[0]->manpower_additional_notes : '' }}</textarea>
+                                                <textarea name="manpower_additional_notes" class="form-control" rows="3" placeholder="Enter any additional notes...">{{ isset($order->items[0]) ? $order->items[0]->manpower_additional_notes : '' }}</textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
@@ -768,7 +758,7 @@
                     if (!isPageLoad) {
                         $('.add_to_cart').find('input, select, textarea').val('');
                     }
-                } else if (subservice_id == 102) {
+                } else if(subservice_id == 102) {
                     $('.ev_charger_form').hide();
                     $('.add_to_cart').hide();
                     $('#manual_price_div').show();

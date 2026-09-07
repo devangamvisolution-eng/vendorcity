@@ -140,12 +140,9 @@ class Croncontroller extends Controller
 
                 try {
                     // Send email
-                    Mail::send([], [], function ($message) use ($vendor_data, $subject, $html, $ccRecipients) {
-                        $message->to($vendor_data->email, 'VendorsCity');
+                    Mail::send([], [], function ($message) use ($subject, $html, $ccRecipients) {
+                        $message->to($ccRecipients);
                         $message->subject($subject);
-                        foreach ($ccRecipients as $ccRecipient) {
-                            $message->bcc($ccRecipient);
-                        }
                         $message->html($html);
                     });
 

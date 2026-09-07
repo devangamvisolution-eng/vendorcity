@@ -13,31 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class GeneralEnquiryController extends Controller
 {
-    public function __construct()
-    {
-        if (!\Illuminate\Support\Facades\Schema::hasColumn('general_enquiries', 'notes')) {
-            \Illuminate\Support\Facades\Schema::table('general_enquiries', function ($table) {
-                $table->text('notes')->nullable();
-            });
-        }
-
-        if (!\Illuminate\Support\Facades\Schema::hasColumn('general_enquiries', 'other_service')) {
-            \Illuminate\Support\Facades\Schema::table('general_enquiries', function ($table) {
-                $table->string('other_service')->nullable();
-            });
-        }
-
-        if (!\Illuminate\Support\Facades\Schema::hasTable('general_enquiry_notes')) {
-            \Illuminate\Support\Facades\Schema::create('general_enquiry_notes', function ($table) {
-                $table->id();
-                $table->integer('general_enquiry_id');
-                $table->date('note_date')->nullable();
-                $table->text('note')->nullable();
-                $table->integer('created_by')->nullable();
-                $table->timestamps();
-            });
-        }
-    }
+    public function __construct() {}
 
     public function index(Request $request)
     {
@@ -166,7 +142,13 @@ class GeneralEnquiryController extends Controller
 
         $subservices = [];
         if ($request->filled('service_id')) {
-            $subservices = Subservice::where('serviceid', $request->service_id)->where('is_active', 0)->orderBy('subservicename', 'ASC')->get();
+            $subservices = Subservice::where('serviceid', $request->service_id)
+                ->where(function ($query) {
+                    $query->where('is_active', 0)
+                        ->orWhereIn('id', [101])
+                        ->orWhere('subservicename', 'like', '%Commercial Cleaning%');
+                })
+                ->orderBy('subservicename', 'ASC')->get();
         }
 
         return view('admin.general_enquiries.index', compact('enquiries', 'salespersons', 'customers', 'source_leads', 'services', 'subservices', 'subservice_summary', 'source_summary', 'status_summary'));
@@ -269,6 +251,8 @@ class GeneralEnquiryController extends Controller
         $enquiry->customer_email = $request->customer_email;
         $enquiry->customer_phone = $request->customer_phone;
         $enquiry->country_code = $request->country_code;
+        $enquiry->service_date = $request->service_date;
+        $enquiry->frequency = $request->frequency;
         $enquiry->notes = $request->notes;
         if ($request->has('status') && $request->status) {
             $enquiry->status = $request->status;
@@ -297,7 +281,13 @@ class GeneralEnquiryController extends Controller
         $enquiry = GeneralEnquiry::findOrFail($id);
         $customers = FrontLoginRegister::orderBy('name', 'ASC')->get();
         $services = Service::where('is_active', 0)->orderBy('servicename', 'ASC')->get();
-        $subservices = Subservice::where('serviceid', $enquiry->service_id)->where('is_active', 0)->orderBy('subservicename', 'ASC')->get();
+        $subservices = Subservice::where('serviceid', $enquiry->service_id)
+            ->where(function ($query) {
+                $query->where('is_active', 0)
+                    ->orWhereIn('id', [101])
+                    ->orWhere('subservicename', 'like', '%Commercial Cleaning%');
+            })
+            ->orderBy('subservicename', 'ASC')->get();
 
         $source_leads = [];
         if (DB::getSchemaBuilder()->hasTable('source_leads')) {
@@ -360,6 +350,8 @@ class GeneralEnquiryController extends Controller
         $enquiry->customer_email = $request->customer_email;
         $enquiry->customer_phone = $request->customer_phone;
         $enquiry->country_code = $request->country_code;
+        $enquiry->service_date = $request->service_date;
+        $enquiry->frequency = $request->frequency;
         $enquiry->notes = $request->notes;
         if ($request->has('status') && $request->status) {
             $enquiry->status = $request->status;
@@ -404,6 +396,7 @@ class GeneralEnquiryController extends Controller
         $subservices = Subservice::where('serviceid', $request->service_id)
             ->where(function ($query) {
                 $query->whereIn('id', [101])
+                    ->orWhere('subservicename', 'like', '%Commercial Cleaning%')
                     ->orWhere('is_active', 0);
             })
             ->orderBy('subservicename', 'ASC')

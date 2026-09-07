@@ -121,6 +121,22 @@
                                 </div>
 
                                 <div class="col-md-4 mb-3">
+                                    <label class="form-label">Service Date</label>
+                                    <input type="date" class="form-control" name="service_date" id="service_date">
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Frequency</label>
+                                    <select class="form-select select2" name="frequency" id="frequency">
+                                        <option value="">-- Select Frequency --</option>
+                                        <option value="One Time">One Time</option>
+                                        <option value="Weekly">Weekly</option>
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Yearly">Yearly</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Source of Lead</label>
                                     <select class="form-select select2" name="source_lead_id[]" id="source_lead_id"
                                         multiple>
@@ -141,6 +157,7 @@
                                         <option value="Invalid">Invalid</option>
                                         <option value="Vendor">Vendor</option>
                                         <option value="Job">Job</option>
+                                        <option value="Lead Sold">Lead Sold</option>
                                     </select>
                                 </div>
                             </div>

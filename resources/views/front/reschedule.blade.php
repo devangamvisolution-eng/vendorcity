@@ -1833,11 +1833,9 @@
                     <div class="tab2" id="tab2-div">
 
                         @php
-                            $subservice_data = DB::table('subservices')
-                                ->where('id', $ci_order_item->subservice_id)
-                                ->first();
+                            $subservice_data = DB::table('subservices')->where('id', $ci_order_item->subservice_id)->first();
                         @endphp
-                        @if (!empty($subservice_data) && !empty($subservice_data->cancel_policy))
+                        @if(!empty($subservice_data) && !empty($subservice_data->cancel_policy))
                             <div class="addonsinstruction">
                                 <h5 class=""> <i class="fas fa-info-circle tabby-banner-info-icon ms-2"></i>
                                     Enjoy free cancellation up to 6 hours before your booking start time.</h5>
@@ -1848,6 +1846,8 @@
                                         Policy</a>
                                 </div>
                             </div>
+
+
                         @endif
 
                         @php
@@ -2079,25 +2079,29 @@
 @php
     $subservice_service_fee_popup = DB::table('subservices')->where('id', $ci_order_item->subservice_id)->first();
 @endphp
-@if (!empty($subservice_service_fee_popup) && !empty($subservice_service_fee_popup->cancel_policy))
-    <div class="modal subservice-read-more-model fade" id="cancelPolicyModal" tabindex="-1" aria-hidden="true"
-        style="z-index: 9999;">
+@if(!empty($subservice_service_fee_popup) && !empty($subservice_service_fee_popup->cancel_policy))
+    <div class="modal subservice-read-more-model fade" id="cancelPolicyModal" tabindex="-1"
+        aria-hidden="true" style="z-index: 9999;">
         <div class="modal-dialog modal-dialog-scrollable" id="modal-digi" role="document">
             <div class="modal-content">
-                <div class="modal-drag-handle" style="padding:10px 0 4px; text-align:center;">
-                    <div style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;">
+                <div class="modal-drag-handle"
+                    style="padding:10px 0 4px; text-align:center;">
+                    <div
+                        style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;">
                     </div>
                 </div>
                 <div class="modal-header"
                     style="border-bottom:1px solid #f0f0f0; padding:12px 20px; display:flex; align-items:center; justify-content:space-between;">
-                    <h5 class="modal-title" style="margin:0; font-size:1rem; font-weight:800; color:#111;">
+                    <h5 class="modal-title"
+                        style="margin:0; font-size:1rem; font-weight:800; color:#111;">
                         Cancellation Policy</h5>
                     <button type="button" data-bs-dismiss="modal" aria-label="Close"
                         style="background:#f4f4f4; border:none; width:32px; height:32px; border-radius:50%; font-size:1.1rem; color:#555; cursor:pointer; display:flex; align-items:center; justify-content:center;">
                         &times;
                     </button>
                 </div>
-                <div class="modal-body" style="padding:20px; overflow-y:scroll; -webkit-overflow-scrolling:touch;">
+                <div class="modal-body"
+                    style="padding:20px; overflow-y:scroll; -webkit-overflow-scrolling:touch;">
                     {!! $subservice_service_fee_popup->cancel_policy !!}
                 </div>
             </div>

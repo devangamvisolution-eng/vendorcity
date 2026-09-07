@@ -244,6 +244,24 @@
                                     </p>
                                 </div>
                             </div>
+                            
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="app_icon">App Icon</label>
+                                    <input id="app_icon" name="app_icon" type="file" class="form-control" value="" />
+                                    <p class="form-error-text" id="app_icon_error" style="color: red; margin-top: 10px;"></p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="display_top_dropdown">Display Top Dropdown</label>
+                                    <select class="form-control" id="display_top_dropdown" name="display_top_dropdown">
+                                        <option value="1">Yes</option>
+                                        <option value="0" selected>No</option>
+                                    </select>
+                                </div>
+                            </div>
 
                             <div class="col-lg-4">
                                 <div class="form-group">

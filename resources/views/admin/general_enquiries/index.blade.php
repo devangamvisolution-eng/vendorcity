@@ -41,6 +41,11 @@
             color: #fff !important;
         }
 
+        .badge-lead-sold {
+            background-color: #17a2b8 !important;
+            color: #fff !important;
+        }
+
         .premium-card {
             border: none;
             border-radius: 12px;
@@ -207,6 +212,9 @@
                                             </option>
                                             <option value="Job" {{ request('status') == 'Job' ? 'selected' : '' }}>Job
                                             </option>
+                                            <option value="Lead Sold"
+                                                {{ request('status') == 'Lead Sold' ? 'selected' : '' }}>Lead Sold
+                                            </option>
                                         </select>
                                     </div>
                                     <div class="col-md-2 mb-3">
@@ -304,11 +312,22 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="px-3 py-2 text-muted text-center" style="font-size: 13px;">No Data
+                                            <td colspan="2" class="px-3 py-2 text-muted text-center"
+                                                style="font-size: 13px;">No Data
                                                 Found
                                             </td>
                                         </tr>
                                     @endforelse
+                                    @if (count($subservice_summary) > 0)
+                                        <tr style="background-color: #f8f9fa;">
+                                            <td class="px-3 py-2 fw-bold text-uppercase"
+                                                style="font-size: 13px; color: #333;">
+                                                Total
+                                            </td>
+                                            <td class="px-3 py-2 text-end fw-bold" style="font-size: 14px; color: #333;">
+                                                {{ collect($subservice_summary)->sum('total') }}</td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -339,11 +358,22 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="px-3 py-2 text-muted text-center" style="font-size: 13px;">No Data
+                                            <td colspan="2" class="px-3 py-2 text-muted text-center"
+                                                style="font-size: 13px;">No Data
                                                 Found
                                             </td>
                                         </tr>
                                     @endforelse
+                                    @if (count($source_summary) > 0)
+                                        <tr style="background-color: #f8f9fa;">
+                                            <td class="px-3 py-2 fw-bold text-uppercase"
+                                                style="font-size: 13px; color: #333;">
+                                                Total
+                                            </td>
+                                            <td class="px-3 py-2 text-end fw-bold" style="font-size: 14px; color: #333;">
+                                                {{ collect($source_summary)->sum('total') }}</td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -369,7 +399,8 @@
                                             <td class="px-3 py-2 border-bottom" style="font-size: 13px; color: #555;">
                                                 @php
                                                     $statusName = $summary->name ?? 'Pending';
-                                                    $badgeClass = 'badge-' . strtolower($statusName);
+                                                    $badgeClass =
+                                                        'badge-' . strtolower(str_replace(' ', '-', $statusName));
                                                 @endphp
                                                 <span class="badge {{ $badgeClass }}">{{ ucfirst($statusName) }}</span>
                                             </td>
@@ -378,11 +409,22 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="px-3 py-2 text-muted text-center" style="font-size: 13px;">No Data
+                                            <td colspan="2" class="px-3 py-2 text-muted text-center"
+                                                style="font-size: 13px;">No Data
                                                 Found
                                             </td>
                                         </tr>
                                     @endforelse
+                                    @if (count($status_summary) > 0)
+                                        <tr style="background-color: #f8f9fa;">
+                                            <td class="px-3 py-2 fw-bold text-uppercase"
+                                                style="font-size: 13px; color: #333;">
+                                                Total
+                                            </td>
+                                            <td class="px-3 py-2 text-end fw-bold" style="font-size: 14px; color: #333;">
+                                                {{ collect($status_summary)->sum('total') }}</td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -405,6 +447,8 @@
                                         <th>Source of Lead</th>
                                         <th>Status</th>
                                         <th>Salesperson</th>
+                                        <th>Service Date</th>
+                                        <th>Frequency</th>
                                         <th>Created At</th>
                                         <th>Action</th>
                                     </tr>
@@ -471,6 +515,9 @@
                                                         {{ $currentStatus == 'Vendor' ? 'selected' : '' }}>Vendor</option>
                                                     <option value="Job"
                                                         {{ $currentStatus == 'Job' ? 'selected' : '' }}>Job</option>
+                                                    <option value="Lead Sold"
+                                                        {{ $currentStatus == 'Lead Sold' ? 'selected' : '' }}>Lead Sold
+                                                    </option>
                                                 </select>
                                             </td>
                                             <td>
@@ -479,6 +526,16 @@
                                                 @else
                                                     <span class="text-muted">Not Assigned</span>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                @if ($enquiry->service_date)
+                                                    {{ date('d M Y', strtotime($enquiry->service_date)) }}
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{ $enquiry->frequency ?: '-' }}
                                             </td>
                                             <td>{{ date('d M Y', strtotime($enquiry->created_at)) }}</td>
                                             <td>
@@ -748,7 +805,7 @@
                 var notesList = $('#modal_notes_list');
                 notesList.html(
                     '<div class="text-center p-3"><span class="spinner-border spinner-border-sm"></span> Loading notes...</div>'
-                    );
+                );
 
                 $.ajax({
                     url: "{{ url('admin/general-enquiries') }}/" + enquiryId + "/notes",
@@ -758,7 +815,7 @@
                             if (response.notes.length === 0) {
                                 notesList.html(
                                     '<div class="text-muted text-center p-3">No notes available.</div>'
-                                    );
+                                );
                             } else {
                                 var html = '';
                                 response.notes.forEach(function(note) {

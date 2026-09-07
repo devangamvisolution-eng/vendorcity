@@ -596,21 +596,23 @@ class Packagecontroller extends Controller
             $data['emiratesShow'] = false;
         }
 
+        $data['cleaning_multiple_days_discounts'] = DB::table('cleaning_multiple_days_discounts')
+            ->where('is_active', 1)
+            ->get();
+
         if ($subservice_id == 101) { // cleaning subscription
-            $data['durations'] = DB::table('cleaning_subscription_durations')->where('is_active_web', 1)->orderBy('set_order')->get();
-            $data['frequencies'] = DB::table('cleaning_subscription_frequencies')->where('is_active_web', 1)->orderBy('set_order')->get();
-            $data['packages'] = DB::table('cleaning_subscription_packages')->where('is_active_web', 1)->orderBy('set_order')->get();
-            $data['pricing_rules'] = DB::table('cleaning_subscription_pricing')->where('is_active_web', 1)->get();
-            $user_id = Session::get('user')['userid'] ?? '';
-            $data['is_first_time_user'] = DB::table('ci_order_item')->where('user_info_id', $user_id)->where('subservice_id', '101')->first();
-            $data['promo'] = $request->query('promo', '');
-            $data['session_coupon_applied'] = session()->has('coupan_data') ? session('coupan_data.coupancode', '') : '';
-            return view('front.cleaningsubscription', $data);
-        } elseif ($subservice_id == 101) { // cleaning subscription
-            $data['durations'] = DB::table('cleaning_subscription_durations')->where('is_active_web', 1)->orderBy('set_order')->get();
-            $data['frequencies'] = DB::table('cleaning_subscription_frequencies')->where('is_active_web', 1)->orderBy('set_order')->get();
-            $data['packages'] = DB::table('cleaning_subscription_packages')->where('is_active_web', 1)->orderBy('set_order')->get();
-            $data['pricing_rules'] = DB::table('cleaning_subscription_pricing')->where('is_active_web', 1)->get();
+            $data['durations'] = Cache::remember('cleaning_subscription_durations', 86400, function () {
+                return DB::table('cleaning_subscription_durations')->where('is_active_web', 1)->orderBy('set_order')->get();
+            });
+            $data['frequencies'] = Cache::remember('cleaning_subscription_frequencies', 86400, function () {
+                return DB::table('cleaning_subscription_frequencies')->where('is_active_web', 1)->orderBy('set_order')->get();
+            });
+            $data['packages'] = Cache::remember('cleaning_subscription_packages', 86400, function () {
+                return DB::table('cleaning_subscription_packages')->where('is_active_web', 1)->orderBy('set_order')->get();
+            });
+            $data['pricing_rules'] = Cache::remember('cleaning_subscription_pricing', 86400, function () {
+                return DB::table('cleaning_subscription_pricing')->where('is_active_web', 1)->get();
+            });
             $user_id = Session::get('user')['userid'] ?? '';
             $data['is_first_time_user'] = DB::table('ci_order_item')->where('user_info_id', $user_id)->where('subservice_id', '101')->first();
             $data['promo'] = $request->query('promo', '');
@@ -1477,12 +1479,11 @@ class Packagecontroller extends Controller
     public function package_inquiry(Request $request)
     {
 
-        //   echo"<pre>";print_r($request->all());echo"</pre>";exit;
-
+        // echo "<pre>";
+        // print_r($request->all());
+        // echo "</pre>";
+        // exit;
         $userdata = Session::get('user');
-
-        //    echo "<pre>";print_r($userdata);echo "</pre>";exit;
-
 
         if (isset($userdata) && $userdata != "" && !empty($userdata)) {
             //echo "if";exit;
@@ -1494,8 +1495,6 @@ class Packagecontroller extends Controller
             $data['email'] = $email = '';
             $data['mobile'] = $mobile = '';
         }
-
-        // echo "<pre>";print_r($request->all());echo "</pre>";exit;
 
         //$data['name']=$request->name;
         if ($request->pakage_id != '') {
@@ -1590,7 +1589,7 @@ class Packagecontroller extends Controller
         $year = date('y');
         $data_u = []; // Initialize to prevent undefined variable error
 
-        if ($request->subservice_id == 23 || $request->subservice_id == 26 || $request->subservice_id == 53 || $request->subservice_id == 94 || $request->subservice_id == 100 || $request->subservice_id == 98) { //apartment moving,villa moving,office moving, international moving, studio moving
+        if ($request->subservice_id == 23 || $request->subservice_id == 26 || $request->subservice_id == 53 || $request->subservice_id == 94 || $request->subservice_id == 100 || $request->subservice_id == 98 || $request->subservice_id == 99) { //apartment moving,villa moving,office moving, international moving, studio moving
 
             if ($request->form_type == 'Local Move') {
 
@@ -2291,6 +2290,8 @@ class Packagecontroller extends Controller
                 $message->html($message_bodyy);
             });
         }
+
+
 
         if (isset($packageEnquiryFormId) && $packageEnquiryFormId != '') {
             session()->forget('packages_enquiry_form_id');

@@ -125,11 +125,41 @@
 
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="name">Company Name</label>
-                                    <input id="name" name="name" type="text" class="form-control"
-                                        placeholder="Enter Name" value="{{ $vendors->name }}" />
-                                    <p class="form-error-text" id="name_error" style="color: red; margin-top: 10px;"></p>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="name">Company Name<span class="text-danger">*</span></label>
+                                        <input id="name" name="name" type="text" class="form-control"
+                                            placeholder="Enter Name" value="{{ $vendors->name }}" />
+                                        <p class="form-error-text" id="name_error" style="color: red; margin-top: 10px;">
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="company_reg_city">Company Reg City<span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control" id="company_reg_city" name="company_reg_city">
+                                            <option value="">Select Company Reg City</option>
+                                            @foreach ($city_data as $city)
+                                                <option value="{{ $city->id }}"
+                                                    @if (isset($vendors->company_reg_city) && $vendors->company_reg_city == $city->id) selected @endif>{{ $city->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <p class="form-error-text" id="company_reg_city_error"
+                                            style="color: red; margin-top: 10px;"></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="vendor_register_date">Vendor Register Date<span
+                                                class="text-danger">*</span></label>
+                                        <input id="vendor_register_date" name="vendor_register_date" type="date"
+                                            class="form-control" placeholder="Select Date"
+                                            value="{{ $vendors->vendor_register_date ?? '' }}" />
+                                        <p class="form-error-text" id="vendor_register_date_error"
+                                            style="color: red; margin-top: 10px;"></p>
+                                    </div>
                                 </div>
 
 
@@ -158,8 +188,9 @@
 
                                             <div class="col-md-2">
                                                 <div class="form-group"> <label for="poc">POC Full</label>
-                                                    <input type="text" id="pocu" name="pocu[]" class="form-control"
-                                                        placeholder="Enter POC" value="{{ $attribute_data[$i]->poc }}">
+                                                    <input type="text" id="pocu" name="pocu[]"
+                                                        class="form-control" placeholder="Enter POC"
+                                                        value="{{ $attribute_data[$i]->poc }}">
                                                 </div>
                                             </div>
                                             <div class="col-md-2">
@@ -257,7 +288,7 @@
                                     <div class="form-group">
                                         <label class="form-label" for="category">What services do you
                                             offer?
-                                            (Click all that apply)</label>
+                                            (Click all that apply)<span class="text-danger">*</span></label>
 
                                         <select class="form-control multiple" id="serviceList" name="serviceList[]"
                                             multiple="multiple">
@@ -284,7 +315,7 @@
 
                                         <label class="form-label" for="category">What Sub Services do you
                                             offer?
-                                            (Click all that apply)</label>
+                                            (Click all that apply)<span class="text-danger">*</span></label>
 
                                         <select class="form-control multiple" id="subserviceList" name="subserviceList[]"
                                             multiple="multiple">
@@ -370,7 +401,7 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label for="name">VAT Certificate<span class="text-danger">*</span></label>
+                                        <label for="name">VAT Certificate</label>
                                         <input id="vatcertificate" name="vatcertificate" type="file"
                                             class="form-control" placeholder="Select VAT Certificate" />
                                         @if ($vendors->vatcertificate != '')
@@ -381,8 +412,7 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label for="name">TRN Certificate Number<span
-                                                class="text-danger">*</span></label>
+                                        <label for="name">TRN Certificate Number</label>
                                         <input id="trn_certificate_number" name="trn_certificate_number" type="text"
                                             class="form-control" placeholder="Enter TRN Certificate Number"
                                             value="{{ $vendors->trn_certificate_number ?? '' }}" />
@@ -391,7 +421,7 @@
 
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Trade License<span class="text-danger">*</span></label>
+                                        <label for="name">Trade License</label>
                                         <input id="tradelicense" name="tradelicense" type="file" class="form-control"
                                             placeholder="Select Trade License" />
                                         @if ($vendors->tradelicense != '')
@@ -402,8 +432,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Trade License Number<span
-                                                class="text-danger">*</span></label>
+                                        <label for="name">Trade License Number</label>
                                         <input id="trade_license_number" name="trade_license_number" type="text"
                                             class="form-control" placeholder="Enter Trade License Number"
                                             value="{{ $vendors->trade_license_number ?? '' }}" />
@@ -411,8 +440,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Trade License Expiry Date<span
-                                                class="text-danger">*</span></label>
+                                        <label for="name">Trade License Expiry Date</label>
                                         <input id="tlexpiry" name="tlexpiry" type="date" class="form-control"
                                             placeholder="Select Trade License Expiry Date"
                                             value="{{ $vendors->tlexpiry }}" />
@@ -421,8 +449,7 @@
 
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Passport (authorized person)<span
-                                                class="text-danger">*</span></label>
+                                        <label for="name">Passport (authorized person)</label>
                                         <input id="passport" name="passport" type="file" class="form-control"
                                             placeholder="Select Passport" />
                                         @if ($vendors->passport != '')
@@ -433,8 +460,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Passport Number (authorized person)<span
-                                                class="text-danger">*</span></label>
+                                        <label for="name">Passport Number (authorized person)</label>
                                         <input id="passport_number" name="passport_number" type="text"
                                             class="form-control" placeholder="Enter Passport Number"
                                             value="{{ $vendors->passport_number ?? '' }}" />
@@ -442,8 +468,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Passport Expiry Date (authorized person)<span
-                                                class="text-danger">*</span></label>
+                                        <label for="name">Passport Expiry Date (authorized person)</label>
                                         <input id="passport_expiry" name="passport_expiry" type="date"
                                             class="form-control" placeholder="Select Passport Expiry Date"
                                             value="{{ $vendors->passport_expiry }}" />
@@ -452,8 +477,7 @@
 
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Emirates ID (authorized person)<span
-                                                class="text-danger">*</span></label>
+                                        <label for="name">Emirates ID (authorized person)</label>
                                         <input id="emirates_id" name="emirates_id" type="file" class="form-control"
                                             placeholder="Select emirates_id" />
                                         @if ($vendors->emirates_id != '')
@@ -464,8 +488,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Emirates ID Number (authorized person)<span
-                                                class="text-danger">*</span></label>
+                                        <label for="name">Emirates ID Number (authorized person)</label>
                                         <input id="emirates_id_number" name="emirates_id_number" type="text"
                                             class="form-control" placeholder="Enter Emirates ID Number"
                                             value="{{ $vendors->emirates_id_number ?? '' }}" />
@@ -473,8 +496,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label for="name">Emirates ID Expiry Date (authorized person)<span
-                                                class="text-danger">*</span></label>
+                                        <label for="name">Emirates ID Expiry Date (authorized person)</label>
                                         <input id="emirates_id_expiry" name="emirates_id_expiry" type="date"
                                             class="form-control" placeholder="Select Emirates ID Expiry Date"
                                             value="{{ $vendors->emirates_id_expiry }}" />
@@ -522,7 +544,7 @@
                                 <div class="col-lg-6">
                                     <div class="form-group">
 
-                                        <label for="name">Email for Login</label>
+                                        <label for="name">Email for Login<span class="text-danger">*</span></label>
 
                                         <input id="email" name="email" type="text" class="form-control"
                                             placeholder="Enter Email" value="{{ $vendors->email }}" />
@@ -568,6 +590,20 @@
                                             value="{{ $vendors->number_of_review }}" />
                                         <p class="form-error-text" id="number_of_review_error"
                                             style="color: red; margin-top: 10px;"></p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="salesperson_id">Salesperson</label>
+                                        <select class="form-control" id="salesperson_id" name="salesperson_id">
+                                            <option value="">Select Salesperson</option>
+                                            @foreach ($salespersons as $salesperson)
+                                                <option value="{{ $salesperson->id }}"
+                                                    {{ $vendors->salesperson_id == $salesperson->id ? 'selected' : '' }}>
+                                                    {{ $salesperson->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
 
@@ -688,6 +724,34 @@
                 jQuery('#name_error').show().delay(2000).fadeOut('show');
                 $('html, body').animate({
                     scrollTop: $('#name').offset().top - 150
+                }, 1000);
+                return false;
+
+            }
+
+            var company_reg_city = jQuery("#company_reg_city").val();
+
+            if (company_reg_city == '') {
+
+                jQuery('#company_reg_city_error').html("Please Enter Company Reg City");
+                jQuery('#company_reg_city_error').show().delay(0).fadeIn('show');
+                jQuery('#company_reg_city_error').show().delay(2000).fadeOut('show');
+                $('html, body').animate({
+                    scrollTop: $('#company_reg_city').offset().top - 150
+                }, 1000);
+                return false;
+
+            }
+
+            var vendor_register_date = jQuery("#vendor_register_date").val();
+
+            if (vendor_register_date == '') {
+
+                jQuery('#vendor_register_date_error').html("Please Select Vendor Register Date");
+                jQuery('#vendor_register_date_error').show().delay(0).fadeIn('show');
+                jQuery('#vendor_register_date_error').show().delay(2000).fadeOut('show');
+                $('html, body').animate({
+                    scrollTop: $('#vendor_register_date').offset().top - 150
                 }, 1000);
                 return false;
 

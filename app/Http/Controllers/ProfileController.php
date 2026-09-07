@@ -8,10 +8,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use App\Models\Admin\CompanyProfile;
-use App\Models\Admin\CompanyProfileDocument;
-use App\Models\Admin\CompanyEmployee;
-use App\Models\Admin\CompanyEmpDocument;
+use App\Models\admin\CompanyProfile;
+use App\Models\admin\CompanyProfileDocument;
+use App\Models\admin\CompanyEmployee;
+use App\Models\admin\CompanyEmpDocument;
 use App\Enums\EmployeeType;
 use Illuminate\View\View;
 use ZipArchive;
@@ -34,10 +34,10 @@ class ProfileController extends Controller
 
         return view('profile.edit', [
             'user' => $request->user(),
-            'comapny_profile'     => $profile,
-            'company_document'    => $profiledocument,
-            'companydrivers'      => $companydrivers,
-            'companypackers'      => $companypackers,
+            'comapny_profile' => $profile,
+            'company_document' => $profiledocument,
+            'companydrivers' => $companydrivers,
+            'companypackers' => $companypackers,
             'companyofficestaffs' => $companyofficestaffs,
         ]);
     }

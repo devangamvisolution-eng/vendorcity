@@ -163,6 +163,8 @@
                             Package Order - Storage
                         @elseif(Route::currentRouteName() == 'healthcare_at_home_package_order')
                             Package Order - Healthcare At Home
+                        @elseif(Route::currentRouteName() == 'car-services-at-home-service-order')
+                            Package Order - Car Service At Home
                         @else
                             Package Order - Moving
                         @endif
@@ -180,6 +182,7 @@
                         in_array('45', $edit_perm) ||
                         in_array('42', $edit_perm) ||
                         in_array('75', $edit_perm) ||
+                        in_array('85', $edit_perm) ||
                         in_array('59', $edit_perm))
                     <div class="col-auto">
                         @php
@@ -204,6 +207,10 @@
                                 'healthcare_at_home_package_order' => [
                                     'route' => 'healthcare_at_home_admin_order',
                                     'label' => 'Healthcare At Home',
+                                ],
+                                'car-services-at-home-service-order' => [
+                                    'route' => 'car-services-at-home-service-admin-order',
+                                    'label' => 'Car Service At Home',
                                 ],
                             ];
                             $curr = Route::currentRouteName();
@@ -249,9 +256,10 @@
                             @if (isset($orders_list) && count($orders_list))
                                 @foreach ($orders_list as $orders)
                                     {{-- @php
-                                        echo '<pre>';
-                                        print_r($orders);
-                                    @endphp --}}
+                                echo '
+                                <pre>';
+                                                                                                                                                                                                                                                                print_r($orders);
+                                                                                                                                                                                                                                                            @endphp --}}
                                     @if (!empty($orders->items))
                                         <tr>
                                             @if (Route::currentRouteName() == 'cleaning_package_order')
@@ -271,36 +279,42 @@
                                                 <span class="stack-bottom">{!! isset($orders->items[0]) ? Helper::subservicename($orders->items[0]->subservice_id) : '-' !!}</span>
                                             </td>
                                             <td>
+
                                                 <select class="form-select form-select-sm mb-1 fw-bold"
                                                     style="font-size: 12px;"
                                                     onchange="order_status_change({{ $orders->order_id }}, this)">
                                                     <option value="BK"
                                                         {{ $orders->order_status === 'BK' ? 'selected' : '' }}>Booking
-                                                        Requested
+                                                        Requested</option>
+                                                    <option value="BC"
+                                                        {{ in_array($orders->order_status, ['BC', 'P', 'PA']) ? 'selected' : '' }}>
+                                                        Booking Confirmed</option>
+                                                    <option value="OTW"
+                                                        {{ $orders->order_status === 'OTW' ? 'selected' : '' }}>On the way
                                                     </option>
-                                                    <option value="P"
-                                                        {{ $orders->order_status === 'P' ? 'selected' : '' }}>Booking
-                                                        Confirmed
-                                                    </option>
-                                                    <option value="PA"
-                                                        {{ $orders->order_status === 'PA' ? 'selected' : '' }}>Vendor
-                                                        Assigned
+                                                    <option value="IP"
+                                                        {{ $orders->order_status === 'IP' ? 'selected' : '' }}>In progress
                                                     </option>
                                                     <option value="CO"
                                                         {{ $orders->order_status === 'CO' ? 'selected' : '' }}>Booking
-                                                        Completed
-                                                    </option>
+                                                        Completed</option>
                                                     <option value="CL"
-                                                        {{ $orders->order_status === 'CL' ? 'selected' : '' }}>
-                                                        Booking Cancelled</option>
+                                                        {{ $orders->order_status === 'CL' ? 'selected' : '' }}>Booking
+                                                        Cancelled</option>
+                                                    <option value="UP"
+                                                        {{ $orders->order_status === 'UP' ? 'selected' : '' }}>Unpaid
+                                                    </option>
                                                 </select>
+
                                                 <div class="d-flex align-items-center">
-                                                    <input type="text"
-                                                        value="{{ $orders->items[0]->subservice_booking_percentage }}"
-                                                        onchange="updateorder_booking_percentage(this.value, '{{ $orders->items[0]->id }}');"
-                                                        class="form-control form-control-sm text-center"
-                                                        style="width: 45px; height: 22px; font-size: 11px;">
-                                                    <span class="ms-1 small text-muted">Comm %</span>
+                                                    @if (isset($orders->items[0]))
+                                                        <input type="text"
+                                                            value="{{ $orders->items[0]->subservice_booking_percentage }}"
+                                                            onchange="updateorder_booking_percentage(this.value, '{{ $orders->items[0]->id }}');"
+                                                            class="form-control form-control-sm text-center"
+                                                            style="width: 45px; height: 22px; font-size: 11px;">
+                                                        <span class="ms-1 small text-muted">Comm %</span>
+                                                    @endif
                                                 </div>
                                             </td>
                                             <td class="text-center">
@@ -338,12 +352,12 @@
                                                             @else
                                                                 <button type="button" class="btn-utility"
                                                                     onclick="assign_multi_cleaner(
-                                                                                        '{{ $orders->order_id }}',
-                                                                                        '{{ $orders->items[0]->service_id }}',
-                                                                                        '{{ $orders->items[0]->subservice_id }}',
-                                                                                        '{{ $orders->items[0]->how_many_cleaners_do_you_need }}',
-                                                                                        '{{ $orders->items[0]->cleaner_id }}'
-                                                                                    ); event.preventDefault();"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '{{ $orders->order_id }}',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '{{ $orders->items[0]->service_id }}',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '{{ $orders->items[0]->subservice_id }}',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '{{ $orders->items[0]->how_many_cleaners_do_you_need }}',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '{{ $orders->items[0]->cleaner_id }}'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ); event.preventDefault();"
                                                                     title="Assign Multiple Crew">
 
                                                                     <i
@@ -355,27 +369,27 @@
                                                         @endif
 
                                                         {{-- @if (isset($orders->items[0]))
-                                                    @if (!empty($orders->items[0]->cleaner_id))
-                                                    <a href="{{ url('mark-attendance/' . $orders->order_id) }}" class="btn-utility"
-                                                        data-bs-toggle="tooltip" title="Attendance">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @if (!empty($orders->items[0]->cleaner_id))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <a href="{{ url('mark-attendance/' . $orders->order_id) }}" class="btn-utility"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                data-bs-toggle="tooltip" title="Attendance">
 
-                                                        <i class="fas fa-calendar-check"></i>
-                                                    </a>
-                                                    @endif
-                                                    @endif --}}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="fas fa-calendar-check"></i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @endif
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @endif --}}
 
                                                         {{-- ================= ADD PER CREW PRICE ================= --}}
                                                         {{-- @if ($orders->items[0]->subservice_id != 28) --}}
                                                         {{-- @if (!empty($orders->items[0]->cleaner_id))
-                                                    @if (empty($orders->items[0]->cleaner_price) && $orders->items[0]->cleaner_price == null)
-                                                    <button type="button" class="btn-utility"
-                                                        onclick="add_cleaner_price('{{ $orders->order_id }}');" data-bs-toggle="tooltip"
-                                                        data-bs-placement="top" title="Add Per Crew Price">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @if (empty($orders->items[0]->cleaner_price) && $orders->items[0]->cleaner_price == null)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <button type="button" class="btn-utility"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                onclick="add_cleaner_price('{{ $orders->order_id }}');" data-bs-toggle="tooltip"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                data-bs-placement="top" title="Add Per Crew Price">
 
-                                                        <i class="fas fa-dollar-sign"></i>
-                                                    </button>
-                                                    @endif
-                                                    @endif --}}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="fas fa-dollar-sign"></i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </button>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @endif
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @endif --}}
                                                         {{-- @endif --}}
                                                     @endif
 
@@ -461,6 +475,11 @@
                                                                 //     'route' => 'healthcare_at_home_order_edit',
                                                                 //     'param' => 'id',
                                                                 // ],
+
+                                                                'car-services-at-home-service-order' => [
+                                                                    'route' => 'car_services_at_home_order_edit',
+                                                                    'param' => 'ci_order',
+                                                                ],
                                                             ];
                                                             $currentRoute = Route::currentRouteName();
                                                         @endphp
@@ -480,33 +499,42 @@
                                                                 @elseif($orders->items[0]->service_id == 71)
                                                                     <a class="dropdown-item"
                                                                         href="{{ route('handyman-detail', [$orders->order_id]) }}">
-                                                                    @elseif($orders->items[0]->service_id == 54)
+                                                                    @elseif($orders->items[0]->service_id == 38)
                                                                         <a class="dropdown-item"
-                                                                            href="{{ route('healthcare_at_home_detail', [$orders->order_id]) }}">
-                                                                        @else
+                                                                            href="{{ route('car-services-at-home-detail', [$orders->order_id]) }}">
+                                                                        @elseif($orders->items[0]->service_id == 54)
                                                                             <a class="dropdown-item"
-                                                                                href="{{ route('moving-detail', [$orders->order_id]) }}">
+                                                                                href="{{ route('healthcare_at_home_detail', [$orders->order_id]) }}">
+                                                                            @elseif($currentRoute == 'storage_package_order')
+                                                                                <a class="dropdown-item"
+                                                                                    href="{{ route('storage-detail', [$orders->order_id]) }}">
+                                                                                @elseif($currentRoute == 'storage_package_order')
+                                                                                    <a class="dropdown-item"
+                                                                                        href="{{ route('storage-detail', [$orders->order_id]) }}"></a>
+                                                                                @else
+                                                                                    <a class="dropdown-item"
+                                                                                        href="{{ route('moving-detail', [$orders->order_id]) }}">
                                                         @endif
                                                         <i class="far fa-eye me-2"></i>Details
                                                         </a>
 
                                                         <button type="button" class="dropdown-item"
                                                             onclick="add_comm_model(
-        '{{ $orders->order_id }}',
-        '{{ $orders->order_total }}',
-        '{{ $orders->sub_total }}',
-        '{{ $orders->items[0]->subservice_booking_percentage ?? 0 }}',
-        '{{ $orders->items[0]->subservice_booking_amount ?? 0 }}'
-    )">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    '{{ $orders->order_id }}',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    '{{ $orders->order_total }}',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    '{{ $orders->sub_total }}',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    '{{ $orders->items[0]->subservice_booking_percentage ?? 0 }}',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    '{{ $orders->items[0]->subservice_booking_amount ?? 0 }}'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                )">
                                                             <i class="fas fa-coins me-2"></i>Add Commission
                                                         </button>
 
                                                         @if ($orders->vendor_id != 0 && $orders->vendor_id != '')
                                                             <button type="button" class="dropdown-item"
                                                                 onclick="add_amount_model(
-                                                                                        '{{ $orders->order_id }}',
-                                                                                        '{{ $orders->order_total }}'
-                                                                                    )">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    '{{ $orders->order_id }}',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    '{{ $orders->order_total }}'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                )">
                                                                 <i class="fas fa-money-bill-wave me-2"></i>Add Amount
                                                             </button>
                                                         @endif

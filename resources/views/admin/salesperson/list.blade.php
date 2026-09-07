@@ -353,7 +353,7 @@
                                             class="btn btn-sm btn-light border px-3 rounded"><i class="fas fa-sync"></i>
                                             Reset</a>
 
-                                        @if (in_array('73', $edit_perm) && $filter_salesperson_id != '')
+                                        @if (in_array('73', $edit_perm))
                                             <a href="javascript:void('0');" onclick="excel_download();" id="excel_btn"
                                                 class="btn btn-sm btn-success px-3 rounded ms-2"><i
                                                     class="fas fa-file-excel"></i> Download Excel</a>
@@ -387,12 +387,13 @@
                                             <th>Customer Details</th>
                                             <th>Vendor Name</th>
                                             <th>Vendor Charge</th>
-                                            <th>Agent Comm.</th>
-                                            <th>Other Expenses</th>
+
                                             <th>Vat %</th>
                                             <th>Service Charge</th>
                                             <th>Invoice Amount</th>
                                             <th>Profit</th>
+                                            <th>Agent Comm.</th>
+                                            <th>Other Expenses</th>
 
                                         </tr>
                                     </thead>
@@ -403,6 +404,12 @@
                                                     $user_data = DB::table('frontloginregisters')
                                                         ->where('id', $salesperson_order->user_info_id)
                                                         ->first();
+
+                                                    $customer_order_count = DB::table('ci_orders')
+                                                        ->where('user_id', $salesperson_order->user_info_id)
+                                                        ->where('order_status', 'CO')
+                                                        ->count();
+
                                                     $address = '';
                                                     if ($salesperson_order->service_id == '45') {
                                                         // cleaning
@@ -487,10 +494,19 @@
                                                         <br>
                                                         {!! Helper::subservicename($salesperson_order->subservice_id) !!}
                                                     </td>
-                                                    <td>{{ $salesperson_order->format_order_id ?? '' }}</td>
+                                                    <td>{{ $salesperson_order->format_order_id ?? '' }}
+                                                        <br>
+                                                        @if (isset($customer_order_count) && $customer_order_count > 1)
+                                                            <span class="badge bg-info mt-1">Repeated CX</span>
+                                                        @else
+                                                            <span class="badge bg-success mt-1">New CX</span>
+                                                        @endif
+                                                    </td>
                                                     <td>{!! Helper::salesperson($salesperson_order->salesperson_id) !!}</td>
                                                     <td>
-                                                        {{ $user_data->name }}<br>
+                                                        {{ $user_data->name ?? '' }}
+
+                                                        <br>
                                                         {{ $user_data->country_code ?? '' }}
                                                         {{ $user_data->mobile ?? '' }}<br>
                                                         {{ $address }}
@@ -504,8 +520,7 @@
                                                     </td>
 
                                                     <td>{{ number_format($vendor_payout, 2, '.', '') }}</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
+
                                                     <td>{{ number_format($vat_amount, 2, '.', '') }}</td>
                                                     <td>{{ !empty($salesperson_order->service_charge) && $salesperson_order->service_charge > 0
                                                         ? $salesperson_order->service_charge
@@ -513,6 +528,8 @@
                                                     </td>
                                                     <td>{{ number_format($invoice_amount, 2, '.', '') }}</td>
                                                     <td>{{ number_format($profit, 2, '.', '') }}</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
 
                                                 </tr>
                                             @endforeach
@@ -554,6 +571,7 @@
                                     $total_vendor_payout = 0;
                                     $total_vat = 0;
                                     $service_grouping = [];
+                                    $salesperson_service_grouping = [];
 
                                     if (isset($salesperson_order_data)) {
                                         foreach ($salesperson_order_data as $order) {
@@ -618,6 +636,35 @@
                                             $service_grouping[$sName]['invoice_amount'] += $invoice_amount;
                                             $service_grouping[$sName]['jobs'] += 1;
                                             $service_grouping[$sName]['profit'] += $order_profit;
+
+                                            // Grouping by Salesperson and Service
+                                            $spName = Helper::salesperson($order->salesperson_id);
+                                            if (!isset($salesperson_service_grouping[$spName])) {
+                                                $salesperson_service_grouping[$spName] = [
+                                                    'services' => [],
+                                                    'total_invoice' => 0,
+                                                    'total_profit' => 0,
+                                                    'total_jobs' => 0,
+                                                ];
+                                            }
+                                            if (!isset($salesperson_service_grouping[$spName]['services'][$sName])) {
+                                                $salesperson_service_grouping[$spName]['services'][$sName] = [
+                                                    'invoice_amount' => 0,
+                                                    'profit' => 0,
+                                                    'jobs' => 0,
+                                                ];
+                                            }
+                                            $salesperson_service_grouping[$spName]['services'][$sName][
+                                                'invoice_amount'
+                                            ] += $invoice_amount;
+                                            $salesperson_service_grouping[$spName]['services'][$sName][
+                                                'profit'
+                                            ] += $order_profit;
+                                            $salesperson_service_grouping[$spName]['services'][$sName]['jobs'] += 1;
+
+                                            $salesperson_service_grouping[$spName]['total_invoice'] += $invoice_amount;
+                                            $salesperson_service_grouping[$spName]['total_profit'] += $order_profit;
+                                            $salesperson_service_grouping[$spName]['total_jobs'] += 1;
                                         }
                                     }
 
@@ -710,7 +757,87 @@
             </div>
         </div>
 
+        <!-- Salesperson Service Wise Sales -->
+        @if (in_array('1', $roleIds))
+            <div class="row mb-4">
+                @if (isset($salesperson_service_grouping) && count($salesperson_service_grouping) > 0)
+                    @foreach ($salesperson_service_grouping as $spName => $spData)
+                        <div class="col-md-12 mb-4">
+                            <div class="card premium-card h-100">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table premium-table">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="5" class="py-2 text-center"
+                                                        style="font-size: 16px; text-transform: uppercase;">
+                                                        {!! $spName !!} - Service Wise Sales
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Services</th>
+                                                    <th>Invoice Amount</th>
+                                                    <th>Profit</th>
+                                                    <th>Percentage %</th>
+                                                    <th>No. of Jobs</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (count($spData['services']) > 0)
+                                                    @foreach ($spData['services'] as $sName => $data)
+                                                        @php
+                                                            $percentage = 0;
+                                                            if ($data['invoice_amount'] > 0) {
+                                                                $percentage =
+                                                                    ($data['profit'] / $data['invoice_amount']) * 100;
+                                                            }
+                                                        @endphp
+                                                        <tr>
+                                                            <td class="text-start ps-3">{!! $sName !!}</td>
+                                                            <td class="text-end pe-3">
+                                                                {{ number_format($data['invoice_amount'], 2) }}</td>
+                                                            <td class="text-end pe-3">
+                                                                {{ number_format($data['profit'], 2) }}</td>
+                                                            <td class="text-end pe-3">{{ number_format($percentage, 2) }}%
+                                                            </td>
+                                                            <td class="text-center">{{ $data['jobs'] }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                @else
+                                                    <tr>
+                                                        <td colspan="5" class="text-center">No Data Found</td>
+                                                    </tr>
+                                                @endif
+                                                <tr style="font-weight: bold; background-color: #f8f9fa;">
+                                                    <td class="text-start ps-3">Total Sales</td>
+                                                    <td class="text-end pe-3">
+                                                        {{ number_format($spData['total_invoice'], 2) }}</td>
+                                                    <td class="text-end pe-3">
+                                                        {{ number_format($spData['total_profit'], 2) }}</td>
+                                                    @php
+                                                        $total_percentage = 0;
+                                                        if ($spData['total_invoice'] > 0) {
+                                                            $total_percentage =
+                                                                ($spData['total_profit'] / $spData['total_invoice']) *
+                                                                100;
+                                                        }
+                                                    @endphp
+                                                    <td class="text-end pe-3">{{ number_format($total_percentage, 2) }}%
+                                                    </td>
+                                                    <td class="text-center">{{ $spData['total_jobs'] }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+        @endif
     </div>
+    <!-- /Page Wrapper -->
 
 @stop
 @section('footer_js')

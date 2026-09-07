@@ -156,13 +156,24 @@ class GoogleCalendarController extends Controller
             $oldEvents = json_decode($order->google_event_id, true);
 
             if (is_array($oldEvents)) {
-                foreach ($oldEvents as $eventId) {
+                $client->setUseBatch(true);
+                foreach (array_chunk($oldEvents, 50) as $chunk) {
+                    $batch = $service->createBatch();
+                    foreach ($chunk as $eventId) {
+                        try {
+                            $request = $service->events->delete('primary', $eventId);
+                            $batch->add($request, "del_{$eventId}");
+                        } catch (\Exception $e) {
+                            \Log::error("Batch Delete Add Failed: " . $e->getMessage());
+                        }
+                    }
                     try {
-                        $service->events->delete('primary', $eventId);
+                        $batch->execute();
                     } catch (\Exception $e) {
-                        \Log::error("Delete Failed: " . $e->getMessage());
+                        \Log::error("Batch Delete Execute Failed: " . $e->getMessage());
                     }
                 }
+                $client->setUseBatch(false);
             }
         }
 
@@ -187,16 +198,16 @@ class GoogleCalendarController extends Controller
         }
 
         // 🔥 BASIC DATA
-        $subserviceName = Helper::subservicename((string)$item->subservice_id) . " " . $Material;
-        $Userdata = Helper::get_front_user_data((string)$order->user_id);
+        $subserviceName = Helper::subservicename((string) $item->subservice_id) . " " . $Material;
+        $Userdata = Helper::get_front_user_data((string) $order->user_id);
         $salespersonName = !empty($item->salesperson_id)
-            ? Helper::salesperson((string)$item->salesperson_id)
+            ? Helper::salesperson((string) $item->salesperson_id)
             : "";
 
         $origin_country = !empty($item->origin_country) ? Helper::countryname($item->origin_country) : "";
-        $desti_country  = !empty($item->desti_country) ? Helper::countryname($item->desti_country) : "";
+        $desti_country = !empty($item->desti_country) ? Helper::countryname($item->desti_country) : "";
 
-        $vendorsname  = !empty($order->vendor_id) ? Helper::vendorsname($order->vendor_id) : "";
+        $vendorsname = !empty($order->vendor_id) ? Helper::vendorsname($order->vendor_id) : "";
         $crewNames = '';
 
         if (!empty($item->cleaner_id)) {
@@ -310,103 +321,164 @@ class GoogleCalendarController extends Controller
 
         // 🔥 CREATE EVENTS
         $eventIds = [];
+        $client->setUseBatch(true);
 
-        foreach ($visitDates as $date) {
-            try {
+        foreach (array_chunk($visitDates, 50) as $chunkIndex => $chunk) {
+            $batch = $service->createBatch();
+
+            foreach ($chunk as $index => $date) {
+                try {
 
 
-                // 🔥 DESCRIPTION
-                $description = ""
-                    . "<b>Job Type</b>: {$subserviceName}\n <br><br>"
-                    . "<b>Sales Person</b>: {$salespersonName}\n"
-                    . "<b>Customer Name</b>: {$Userdata->name}\n"
-                    . "<b>Customer Email</b>: {$Userdata->email}\n"
-                    . "<b>Customer Mobile</b>: {$Userdata->mobile}\n";
+                    // 🔥 DESCRIPTION
+                    $description = ""
+                        . "<b>Job Type</b>: {$subserviceName}\n <br><br>"
+                        . "<b>Sales Person</b>: {$salespersonName}\n"
+                        . "<b>Customer Name</b>: {$Userdata->name}\n"
+                        . "<b>Customer Email</b>: {$Userdata->email}\n"
+                        . "<b>Customer Mobile</b>: {$Userdata->mobile}\n";
 
-                if (!empty($extraAddress)) {
-                    $description .= "<b>Service Address:</b> {$extraAddress}\n";
-                }
+                    if (!empty($item->how_often_do_you_need_cleaning)) {
+                        $noOfCleaners = isset($item->how_many_cleaners_do_you_need) ? $item->how_many_cleaners_do_you_need : '-';
+                        $noOfHours = isset($item->how_many_hours_should_they_stay) ? $item->how_many_hours_should_they_stay : '-';
+                        $freq = isset($item->how_often_do_you_need_cleaning) ? $item->how_often_do_you_need_cleaning : '-';
+                        $days = isset($item->which_day_of_the_week_do_you_want_the_service) && !empty($item->which_day_of_the_week_do_you_want_the_service) ? $item->which_day_of_the_week_do_you_want_the_service : '-';
+                        $materials = isset($item->do_you_need_cleaning_material) ? $item->do_you_need_cleaning_material : '-';
 
-                if (!empty($LocationLink)) {
-                    $description .= "<b>Location Link:</b> {$LocationLink}\n";
-                }
 
-                if (!empty($originFull)) {
-                    $description .= "<br><b>Origin:</b> {$originFull}<br>";
-                }
-
-                if (!empty($destiFull)) {
-                    $description .= "<br><b>Destination:</b> {$destiFull}<br>";
-                }
-                if (!empty($crewNames)) {
-                    $description .= "<br><b>Crew:</b> {$crewNames}\n";
-                    $description .= "<b>Driver:</b> \n";
-                }
-                $description .= "<br><b>Date:</b> {$date}\n";
-                $description .= "<b>Time:</b> {$timeSlot}\n";
-                if (!empty($vendorsname)) {
-                    $description .= "<br><b>Vendor:</b> {$vendorsname}\n";
-                    $description .= "<br><b>VendorsCity:</b> {$profit}\n";
-                    $description .= "<b>Vendor:</b> {$vendor_payout}\n";
-                    $description .= "<b>VAT :</b> {$order->vatcharge}\n";
-                    $description .= "<b>Order Amount :</b> {$order->order_total}\n";
-                }
-
-                if (isset($order->paymentmode)) {
-                    if ($order->paymentmode == 1) {
-                        $PaymentMode = "COD";
+                        $description .= "<br><b>No. of Cleaners:</b> {$noOfCleaners}<br>";
+                        $description .= "<b>No. of Hours:</b> {$noOfHours}<br>";
+                        $description .= "<b>Frequency:</b> {$freq}<br>";
+                        $description .= "<b>Days of the week:</b> {$days}<br>";
+                        $description .= "<b>Materials Provided:</b> {$materials}<br>";
                     } else {
-                        $PaymentMode = "Online";
+                        $order_item_package_data = DB::table('ci_order_item_packages')
+                            ->where('order_id', $order->order_id)
+                            ->where('order_item_id', $item->id)
+                            ->get();
+                        $order_item_addonspackage_data = DB::table('ci_order_item_addons')
+                            ->where('order_id', $order->order_id)
+                            ->where('order_item_id', $item->id)
+                            ->get();
+
+                        if ($order_item_package_data->count() > 0) {
+                            $description .= "<br><b>Services:</b><br>";
+                            foreach ($order_item_package_data as $pkg) {
+                                $description .= "- {$pkg->package_item_name} * {$pkg->package_quantity}<br>";
+                            }
+                        }
+
+                        if ($order_item_addonspackage_data->count() > 0) {
+                            $description .= "<br><b>Addons Services:</b><br>";
+                            foreach ($order_item_addonspackage_data as $addon) {
+                                $description .= "- {$addon->package_item_name} * {$addon->package_quantity}<br>\n";
+                            }
+                        }
                     }
-                    $description .= "<b>Payment Terms :</b> {$PaymentMode}\n";
+                    $additionalNotes = !empty($item->manpower_additional_notes) ? $item->manpower_additional_notes : '-';
+                    $specialInstruction = !empty($item->any_special_instruction) ? $item->any_special_instruction : '-';
+                    $description .= "<br><b>Additional Notes:</b> {$additionalNotes}<br>";
+                    $description .= "<b>Instruction:</b> {$specialInstruction}<br><br>";
+
+                    if (!empty($extraAddress)) {
+                        $description .= "<b>Service Address:</b> {$extraAddress}\n";
+                    }
+
+                    if (!empty($LocationLink)) {
+                        $description .= "<b>Location Link:</b> {$LocationLink}\n";
+                    }
+
+                    if (!empty($originFull)) {
+                        $description .= "<br><b>Origin:</b> {$originFull}<br>";
+                    }
+
+                    if (!empty($destiFull)) {
+                        $description .= "<br><b>Destination:</b> {$destiFull}<br>";
+                    }
+                    if (!empty($crewNames)) {
+                        $description .= "<br><b>Crew:</b> {$crewNames}\n";
+                        $description .= "<b>Driver:</b> \n";
+                    }
+                    $description .= "<br><b>Date:</b> {$date}\n";
+                    $description .= "<b>Time:</b> {$timeSlot}\n";
+                    if (!empty($vendorsname)) {
+                        $description .= "<br><b>Vendor:</b> {$vendorsname}\n";
+                        $description .= "<br><b>VendorsCity:</b> {$profit}\n";
+                        $description .= "<b>Vendor:</b> {$vendor_payout}\n";
+                        $description .= "<b>VAT :</b> {$order->vatcharge}\n";
+                        $description .= "<b>Service Fee :</b> {$order->service_fee}\n";
+                        $description .= "<b>Order Amount :</b> {$order->order_total}\n";
+                    }
+
+                    if (isset($order->paymentmode)) {
+                        if ($order->paymentmode == 1) {
+                            $PaymentMode = "COD";
+                        } else {
+                            $PaymentMode = "Online";
+                        }
+                        $description .= "<b>Payment Terms :</b> {$PaymentMode}\n";
+                    }
+                    $description .= "{$amountHistory}\n";
+
+                    if (isset($item->any_special_instruction)) {
+
+                        $description .= "<b>Important Notes :</b> {$item->any_special_instruction}\n";
+                    }
+
+
+                    // ✅ TIME-BASED EVENT (HOME CLEANING)
+                    if (!empty($startTime) && $hasHours) {
+
+                        $start = Carbon::parse($date . ' ' . $startTime, 'Asia/Dubai');
+                        $end = $start->copy()->addHours($hours);
+
+                        $event = new Google_Service_Calendar_Event([
+                            'summary' => $vendorsname . ' - ' . $Userdata->name . ' - Order #' . $order->format_order_id,
+                            'description' => $description,
+                            'start' => [
+                                'dateTime' => $start->toRfc3339String(),
+                                'timeZone' => 'Asia/Dubai',
+                            ],
+                            'end' => [
+                                'dateTime' => $end->toRfc3339String(),
+                                'timeZone' => 'Asia/Dubai',
+                            ],
+                        ]);
+                    } else {
+                        // ✅ FULL DAY EVENT (OTHER SERVICES)
+                        $event = new Google_Service_Calendar_Event([
+                            'summary' => $vendorsname . ' - ' . $Userdata->name . ' - Order #' . $order->format_order_id,
+                            'description' => $description,
+                            'start' => ['date' => $date],
+                            'end' => [
+                                'date' => date('Y-m-d', strtotime($date . ' +1 day')),
+                            ],
+                        ]);
+                    }
+
+                    $request = $service->events->insert('primary', $event);
+                    $batch->add($request, "insert_{$chunkIndex}_{$index}");
+                } catch (\Exception $e) {
+                    \Log::error("Batch Insert Add Failed: " . $e->getMessage());
                 }
-                $description .= "{$amountHistory}\n";
+            }
 
-                if (isset($item->any_special_instruction)) {
-
-                    $description .= "<b>Important Notes :</b> {$item->any_special_instruction}\n";
+            try {
+                $results = $batch->execute();
+                foreach ($results as $result) {
+                    if ($result instanceof \Exception) {
+                        \Log::error("Batch Insert Error: " . $result->getMessage());
+                    } else if (isset($result->id)) {
+                        $eventIds[] = $result->id;
+                    } else if (is_array($result) && isset($result['id'])) {
+                        $eventIds[] = $result['id'];
+                    }
                 }
-
-
-                // ✅ TIME-BASED EVENT (HOME CLEANING)
-                if (!empty($startTime) && $hasHours) {
-
-                    $start = Carbon::parse($date . ' ' . $startTime, 'Asia/Dubai');
-                    $end   = $start->copy()->addHours($hours);
-
-                    $event = new Google_Service_Calendar_Event([
-                        'summary' => $vendorsname . ' - ' . $Userdata->name . ' - Order #' . $order->format_order_id,
-                        'description' => $description,
-                        'start' => [
-                            'dateTime' => $start->toRfc3339String(),
-                            'timeZone' => 'Asia/Dubai',
-                        ],
-                        'end' => [
-                            'dateTime' => $end->toRfc3339String(),
-                            'timeZone' => 'Asia/Dubai',
-                        ],
-                    ]);
-                } else {
-                    // ✅ FULL DAY EVENT (OTHER SERVICES)
-                    $event = new Google_Service_Calendar_Event([
-                        'summary' => $vendorsname . ' - ' . $Userdata->name . ' - Order #' . $order->format_order_id,
-                        'description' => $description,
-                        'start' => ['date' => $date],
-                        'end' => [
-                            'date' => date('Y-m-d', strtotime($date . ' +1 day')),
-                        ],
-                    ]);
-                }
-
-                $createdEvent = $service->events->insert('primary', $event);
-                $eventIds[] = $createdEvent->id;
             } catch (\Exception $e) {
-                return response()->json([
-                    'status' => 0,
-                    'message' => 'Google Error: ' . $e->getMessage()
-                ]);
+                \Log::error("Batch Insert Execute Failed: " . $e->getMessage());
             }
         }
+        $client->setUseBatch(false);
 
         // 🔥 SAVE EVENT IDS
         DB::table('ci_orders')

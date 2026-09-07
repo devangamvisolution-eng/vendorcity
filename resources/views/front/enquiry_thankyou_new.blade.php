@@ -340,6 +340,18 @@
                             <span class="detail-label">Move/Job Type</span>
                             <span class="detail-value">{{ $enquiry->form_type }}</span>
                         </li>
+                        @if ($enquiry->email)
+                            <li>
+                                <span class="detail-label">Email Address</span>
+                                <span class="detail-value">{{ $enquiry->email }}</span>
+                            </li>
+                        @endif
+                        @if ($enquiry->mobile)
+                            <li>
+                                <span class="detail-label">Phone Number</span>
+                                <span class="detail-value">{{ $enquiry->mobile }}</span>
+                            </li>
+                        @endif
                         @foreach ($submittedFields as $field)
                             @if ($field->formfield_value != '')
                                 @php

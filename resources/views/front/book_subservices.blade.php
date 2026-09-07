@@ -134,7 +134,7 @@
     }
 
     .cta-service-v3 {
-        height: 440px !important;
+        height: 340px !important;
     }
 
     .list-content h5 {
@@ -152,7 +152,7 @@
 
     .banner-content-center {
         position: absolute;
-        top: 65%;
+        top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
@@ -200,8 +200,44 @@
     .booking_desc li {
         list-style-type: inherit !important;
     }
+
+    .booking_desc h1 {
+        color: #4a4a4a !important;
+        font-weight: 700 !important;
+        letter-spacing: 0 !important;
+        font-size: 30px !important;
+        line-height: 64px !important;
+    }
+
+    .booking_desc h1 span,
+    .booking_desc h2 span,
+    .booking_desc h3 span {
+        color: #4a4a4a !important;
+    }
+
+    .booking_desc h2 {
+        color: #4a4a4a !important;
+        font-size: 1.5em !important;
+    }
+
+    .booking_desc p {
+        font-size: 18px !important;
+        font-stretch: normal !important;
+        font-style: normal !important;
+        font-weight: 400 !important;
+        letter-spacing: normal !important;
+        line-height: 1.33 !important;
+        color: #4a4a4a !important;
+    }
+
+    @media (min-width: 992px) {
+        .col-lg-custom-5 {
+            flex: 0 0 auto;
+            width: 20%;
+        }
+    }
 </style>
-<section class="breadcumb-section pt0 mt120">
+<section class="breadcumb-section pt0" style="margin-top: 60px;">
     <div>
 
         <div
@@ -280,21 +316,21 @@
                                     </li>
                                 </ul>
                             </div>
-                            <div class="pcs_dropdown dark-color pr10 text-center text-md-end"><span>Sort
+                            <!-- <div class="pcs_dropdown dark-color pr10 text-center text-md-end"><span>Sort
                                     by</span>
                                 <select class="selectpicker show-tick">
                                     <option>Best Selling</option>
                                     <option>Recommended</option>
                                     <option>New Arrivals</option>
                                 </select>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
                 <div class="row">
 
                     @foreach ($subservice_data as $subservice)
-                        <div class="col-sm-6 col-xl-3 col-6 col-lg-3">
+                        <div class="col-sm-6 col-6 col-lg-custom-5">
                             <div class="listing-style1">
 
                                 <div class="list-thumb bdrs12">
@@ -396,11 +432,12 @@
 
                                 {{-- ✅ Image always comes first in HTML so mobile sees image → description --}}
                                 {{-- <div class="col-12 col-md-5 p-0">
-                                    <div class="placeholder rect bg-primary rounded" style="background: url('{{ asset('public/upload/service/service_attr/large/' . $package_attribut->image) }}');
-                                                           background-size: cover;
-                                                           background-position:center;
-                                                           width: 100%;
-                                                           height: 300px;">
+                                    <div class="placeholder rect bg-primary rounded"
+                                        style="background: url('{{ asset('public/upload/service/service_attr/large/' . $package_attribut->image) }}');
+                                                                                                                                                                                                                                   background-size: cover;
+                                                                                                                                                                                                                                   background-position:center;
+                                                                                                                                                                                                                                   width: 100%;
+                                                                                                                                                                                                                                   height: 300px;">
                                     </div>
                                 </div> --}}
 

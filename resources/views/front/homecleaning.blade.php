@@ -784,6 +784,12 @@
                                             onclick="calculation();">
                                         <label for="Sunday">Sunday</label>
                                     </div>
+                                    <div id="dynamic_discount_alert" class="alert alert-success mt-3"
+                                        style="display: none; background-color: #cbeea2; color: #333; border: none; border-radius: 8px;">
+                                        <i class="fas fa-tag"></i> Congrats! You saved <b
+                                            id="dynamic_discount_text"></b>% by choosing <b
+                                            id="dynamic_days_text"></b> days.
+                                    </div>
 
                                     <p class="form-error-text"
                                         id="which_day_of_the_week_do_you_want_the_service_error"
@@ -1714,6 +1720,8 @@
                     <input type="hidden" name="no_of_cleaners" id="no_of_cleaners" value="1">
                     <input type="hidden" name="frequency" id="frequency" value="Once">
                     <input type="hidden" name="days_of_the_week" id="days_of_the_week" value="">
+                    <input type="hidden" name="applied_discount_percentage" id="applied_discount_percentage"
+                        value="0">
 
                 </form>
             </div>
@@ -2448,6 +2456,15 @@
                         </span>
                     </div>
 
+                    <div class="d-flex justify-content-between py-1 d-none multiple_days_discount_div">
+                        <span style="font-size:0.85rem; color:#555;" id="dynamic_discount_label">Weekly Discount
+                            (0%)</span>
+                        <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
+                            − <span class="currency_dhiramnew">AED</span><span
+                                class="multiple_days_discount_amount">0.00</span>
+                        </span>
+                    </div>
+
                     <div class="d-flex justify-content-between py-1 d-none vat-div">
                         <span style="font-size:0.85rem; color:#555;">VAT
                             ({{ \App\Enums\VC_ChargiesEnum::VAT_PERCENT->percentage() }}%)</span>
@@ -2857,11 +2874,12 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
 
-<script src="{{ asset('public/site/js/homecleaning.js') }}"></script>
+<script src="{{ asset('public/site/js/homecleaning.js?v=11') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
 
 <script>
+    window.multipleDaysDiscounts = @json($cleaning_multiple_days_discounts ?? []);
     let codCharge = window.Enums.vcCharges.COD.value;
     let vatPercent = window.Enums.vcCharges.VAT_PERCENT.value;
     window.isUserLoggedIn = {{ Session::get('user') ? 'true' : 'false' }};
@@ -4180,8 +4198,36 @@
 
                     if (frequency === 'Weekly') {
                         cleaning_discount = {{ $weekly_discout_1 }};
+                        $('#dynamic_discount_alert').hide();
+                        $('.multiple_days_discount_div').hide();
+                        $('#applied_discount_percentage').val(cleaning_discount);
                     } else if (frequency === 'Multiple times a week') {
-                        cleaning_discount = {{ $multiple_time_week_discout_1 }};
+                        let selectedDaysCount = selectedDays.length;
+                        let foundDiscount = window.multipleDaysDiscounts.find(d => parseInt(d
+                            .number_of_days) === selectedDaysCount);
+                        if (foundDiscount) {
+                            cleaning_discount = parseFloat(foundDiscount.discount_value);
+                        } else {
+                            cleaning_discount = {{ $multiple_time_week_discout_1 }};
+                        }
+
+                        if (selectedDaysCount >= 2 && cleaning_discount > 0) {
+                            $('#dynamic_discount_text').text(cleaning_discount);
+                            $('#dynamic_days_text').text(selectedDaysCount);
+                            $('#dynamic_discount_alert').show();
+
+                            $('#dynamic_discount_label').text('Weekly Discount (' + cleaning_discount +
+                                '%)');
+                            $('.multiple_days_discount_div').show();
+                        } else {
+                            $('#dynamic_discount_alert').hide();
+                            $('.multiple_days_discount_div').hide();
+                        }
+                        $('#applied_discount_percentage').val(cleaning_discount);
+                    } else {
+                        $('#dynamic_discount_alert').hide();
+                        $('.multiple_days_discount_div').hide();
+                        $('#applied_discount_percentage').val(0);
                     }
 
                     let percleanprice_new = percleanprice;
@@ -4193,6 +4239,10 @@
                         const additional_discount = (additional_charge * cleaning_discount) / 100;
 
                         percleanprice_new -= cleaning_discount_amount;
+                        additional_charge_new -= additional_discount;
+
+                        let total_discount_amount = cleaning_discount_amount + additional_discount;
+                        $('.multiple_days_discount_amount').text(total_discount_amount.toFixed(2));
                         additional_charge_new -= additional_discount;
 
                         $('.cross_amount_div').show();
@@ -4399,7 +4449,15 @@
                 if (frequency === 'Weekly') {
                     var frequencyDiscount = {{ $weekly_discout_1 }};
                 } else if (frequency === 'Multiple times a week') {
-                    var frequencyDiscount = {{ $multiple_time_week_discout_1 }};
+                    var selectedDaysCount = $(
+                        "input[name='which_day_of_the_week_do_you_want_the_service[]']:checked").length;
+                    var foundDiscount = window.multipleDaysDiscounts.find(d => parseInt(d.number_of_days) ===
+                        selectedDaysCount);
+                    if (foundDiscount) {
+                        var frequencyDiscount = parseFloat(foundDiscount.discount_value);
+                    } else {
+                        var frequencyDiscount = {{ $multiple_time_week_discout_1 }};
+                    }
                 }
                 if (frequencyDiscount > 0) {
                     $(".cross_amount_div").show();

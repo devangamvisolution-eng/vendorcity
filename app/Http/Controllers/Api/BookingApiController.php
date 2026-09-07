@@ -825,7 +825,6 @@ class BookingApiController extends Controller
             'data' => $response
         ]);
     }
-
     public function paymentIntent(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -857,18 +856,18 @@ class BookingApiController extends Controller
 
                 // 2. Create Ephemeral Key
                 $ephemeralKey = $stripe->ephemeralKeys->create(
-                    ['customer' => $customer->id],
-                    ['stripe_version' => '2022-08-01']
+                  ['customer' => $customer->id],
+                  ['stripe_version' => '2022-08-01']
                 );
 
                 // 3. Create Payment Intent
                 $paymentIntent = $stripe->paymentIntents->create([
-                    'amount' => intval($amount * 100), // Amount must be in cents/fils
-                    'currency' => 'aed',
-                    'customer' => $customer->id,
-                    'automatic_payment_methods' => [
-                        'enabled' => 'true',
-                    ],
+                  'amount' => intval($amount * 100), // Amount must be in cents/fils
+                  'currency' => 'aed',
+                  'customer' => $customer->id,
+                  'automatic_payment_methods' => [
+                    'enabled' => 'true',
+                  ],
                 ]);
 
                 return response()->json([
@@ -881,13 +880,16 @@ class BookingApiController extends Controller
                         'publishableKey' => config('stripe.stripe_pk')
                     ]
                 ]);
+
             } catch (\Exception $e) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Stripe Error: ' . $e->getMessage()
                 ], 500);
             }
-        } elseif ($paymentMethod === 'tabby') {
+        } 
+        
+        elseif ($paymentMethod === 'tabby') {
             // Mock Tabby Integration for now, until Tabby API credentials are provided
             // Usually involves a server-to-server request to Tabby API to create a session
             return response()->json([
@@ -898,7 +900,9 @@ class BookingApiController extends Controller
                     'payment_url' => 'https://checkout.tabby.ai/test'
                 ]
             ]);
-        } elseif ($paymentMethod === 'cod') {
+        } 
+        
+        elseif ($paymentMethod === 'cod') {
             return response()->json([
                 'status' => true,
                 'payment_method' => 'cod',

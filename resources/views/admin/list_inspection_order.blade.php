@@ -619,7 +619,7 @@
                                     <label>Date</label>
                                     <input type="date" name="update_inspection_date" id="update_inspection_date"
                                         class="form-control" value="">
-                                    <p class="form-error-text" id="add_amount_error{{ $orders->order_id }}"
+                                    <p class="form-error-text" id="update_date_error"
                                         style="color: red; margin-top: 10px;"></p>
                                 </div>
                             </div>
@@ -634,7 +634,7 @@
                                         @endforeach
 
                                     </select>
-                                    <p class="form-error-text" id="add_amount_error{{ $orders->order_id }}"
+                                    <p class="form-error-text" id="update_time_error"
                                         style="color: red; margin-top: 10px;"></p>
                                 </div>
                             </div>

@@ -10,17 +10,12 @@
 @php
     $userData = Session::get('user');
     if ($userData && isset($userData['userid'])) {
-        $wallet_plus_amount = DB::table('front_user_wallet')
+        $wallet_amount = DB::table('front_user_wallet')
             ->where('refer_id', $userData['userid'])
-            ->where('added_from', 0)
-            ->sum('wallet_amount');
-
-        $wallet_minus_amount = DB::table('front_user_wallet')
-            ->where('refer_id', $userData['userid'])
-            ->where('added_from', 1)
-            ->sum('wallet_amount');
-
-        $wallet_amount = $wallet_plus_amount - $wallet_minus_amount;
+            ->selectRaw(
+                'COALESCE(SUM(CASE WHEN added_from = 0 THEN wallet_amount ELSE -wallet_amount END), 0) as total',
+            )
+            ->value('total');
     } else {
         $wallet_amount = 0;
     }
@@ -31,9 +26,12 @@
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <div class="step-header-main mb-4">
                     <div class="step-header" style="font-size: 24px; font-weight: 700; color: #111;">
-                        <span id="backArrow" style="cursor: pointer; display: none; margin-right: 8px;" onclick="goBack()">&larr;</span> 
-                        <span style="font-size: 16px; color: #555;">Step <span id="currentStepNum">1</span> of <span id="totalStepNum">6</span></span> <br>
-                        <span id="stepHeaderTitle" style="display: block; margin-top: 5px; font-size: 18px;">Cleaning Subscription</span>
+                        <span id="backArrow" style="cursor: pointer; display: none; margin-right: 8px;"
+                            onclick="goBack()">&larr;</span>
+                        <span style="font-size: 16px; color: #555;">Step <span id="currentStepNum">1</span> of <span
+                                id="totalStepNum">6</span></span> <br>
+                        <span id="stepHeaderTitle" style="display: block; margin-top: 5px; font-size: 18px;">Cleaning
+                            Subscription</span>
                     </div>
                 </div>
             </div>
@@ -48,304 +46,362 @@
                         <input type="hidden" id="service_id" name="service_id" value="{{ $service_id }}">
                         <input type="hidden" id="subservice_id" name="subservice_id" value="{{ $subservice_id }}">
 
-                    <!-- STEP 1 -->
-                    <div class="step-content active" id="step1">
-                    @include('front.partials.subscription.subscription-hours')
-                    @include('front.partials.subscription.subscription-packages')
-                    @include('front.partials.subscription.subscription-frequency')
-                    
-                    <div class="step-buttons mt-4">
-                        <div class="sticky-footer-btn">
-                            <div class="row">
-                                <div class="col-md-8 col-lg-6 col-sm-6 col-8">
-                                    <div class="mobile_totalnew">
-                                        <div class="font-weight-bold">
-                                            <span class="totaltext">Total</span>
-                                            <div class="mobile_price price-wrapper">
-                                                <span class="currency_dhiramnew">AED</span>
-                                                <span class="total_to_pay">0.00</span>
-                                                <i style="margin-left: 5px;" class="fa-solid fa-angle-up arrow-toggle-mobile" id="aerrowicon"></i>
+                        <!-- STEP 1 -->
+                        <div class="step-content active" id="step1">
+                            @include('front.partials.subscription.subscription-hours')
+                            @include('front.partials.subscription.subscription-packages')
+                            @include('front.partials.subscription.subscription-frequency')
+
+                            <div class="step-buttons mt-4">
+                                <div class="sticky-footer-btn">
+                                    <div class="row">
+                                        <div class="col-md-8 col-lg-6 col-sm-6 col-8">
+                                            <div class="mobile_totalnew">
+                                                <div class="font-weight-bold">
+                                                    <span class="totaltext">Total</span>
+                                                    <div class="mobile_price price-wrapper">
+                                                        <span class="currency_dhiramnew">AED</span>
+                                                        <span class="total_to_pay">0.00</span>
+                                                        <i style="margin-left: 5px;"
+                                                            class="fa-solid fa-angle-up arrow-toggle-mobile"
+                                                            id="aerrowicon"></i>
+                                                    </div>
+                                                </div>
                                             </div>
+                                        </div>
+                                        <div class="col-md-4 col-lg-6 col-sm-6 col-4">
+                                            <button class="btn btn-primary custome-black" type="button"
+                                                onclick="nextStep(2)">Next</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-lg-6 col-sm-6 col-4">
-                                    <button class="btn btn-primary custome-black" type="button" onclick="nextStep(2)">Next</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: Choose Date & Time -->
+                        <div class="step-content" id="step2">
+                            <div class="booking-step">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="form-label fw500 dark-color mb-0" style="font-size: 18px;">Which
+                                            days do you prefer?</label>
+                                        <span class="badge" id="daysLabel"
+                                            style="background-color: #f1f1f1; color: #555; padding: 6px 10px; border-radius: 12px; font-weight: 500;">Choose
+                                            1 day</span>
+                                    </div>
+                                    <style>
+                                        .slider-container {
+                                            position: relative;
+                                            display: flex;
+                                            align-items: center;
+                                            width: 100%;
+                                            margin-bottom: 20px;
+                                        }
+
+                                        .slider-btn {
+                                            background: white;
+                                            border: none;
+                                            font-size: 14px;
+                                            cursor: pointer;
+                                            z-index: 10;
+                                            position: absolute;
+                                            top: 50%;
+                                            transform: translateY(-50%);
+                                            height: 32px;
+                                            width: 32px;
+                                            border-radius: 50%;
+                                            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+                                            color: #333;
+                                            display: none;
+                                            /* JS will toggle to flex */
+                                            align-items: center;
+                                            justify-content: center;
+                                        }
+
+                                        .slider-btn:hover {
+                                            color: #000;
+                                            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+                                        }
+
+                                        .slider-btn.left {
+                                            left: -5px;
+                                        }
+
+                                        .slider-btn.right {
+                                            right: -5px;
+                                        }
+
+                                        #daysSelection {
+                                            display: flex;
+                                            flex-wrap: nowrap !important;
+                                            overflow-x: auto;
+                                            gap: 10px;
+                                            -ms-overflow-style: none;
+                                            /* IE and Edge */
+                                            scrollbar-width: none;
+                                            /* Firefox */
+                                            scroll-behavior: smooth;
+                                            width: 100%;
+                                            padding-left: 15px;
+                                            padding-right: 15px;
+                                            margin-bottom: 0 !important;
+                                        }
+
+                                        #daysSelection::-webkit-scrollbar {
+                                            display: none;
+                                            /* Chrome, Safari and Opera */
+                                        }
+
+                                        #daysSelection .day-pill {
+                                            flex: 0 0 auto;
+                                        }
+                                    </style>
+                                    <div class="slider-container">
+                                        <button type="button" class="slider-btn left" id="slideLeftBtn"
+                                            onclick="slideDays(-150)"><i class="fa fa-chevron-left"></i></button>
+                                        <div class="days-pills" id="daysSelection" onscroll="updateSliderBtns()">
+                                            @php
+                                                date_default_timezone_set('Asia/Dubai');
+                                                // Start from tomorrow
+                                                $startDay = \Carbon\Carbon::now()->addDay();
+                                            @endphp
+                                            @for ($i = 0; $i < 7; $i++)
+                                                @php $dayName = $startDay->copy()->addDays($i)->format('l'); @endphp
+                                                <div class="pill day-pill" data-val="{{ $dayName }}">
+                                                    {{ $dayName }}</div>
+                                            @endfor
+                                        </div>
+                                        <button type="button" class="slider-btn right" id="slideRightBtn"
+                                            onclick="slideDays(150)"><i class="fa fa-chevron-right"></i></button>
+                                    </div>
+
+                                    <script>
+                                        function slideDays(offset) {
+                                            const container = document.getElementById('daysSelection');
+                                            container.scrollLeft += offset;
+                                        }
+
+                                        function updateSliderBtns() {
+                                            const container = document.getElementById('daysSelection');
+                                            const leftBtn = document.getElementById('slideLeftBtn');
+                                            const rightBtn = document.getElementById('slideRightBtn');
+
+                                            if (container.scrollLeft > 0) {
+                                                leftBtn.style.display = 'flex';
+                                            } else {
+                                                leftBtn.style.display = 'none';
+                                            }
+
+                                            if (container.scrollLeft < (container.scrollWidth - container.clientWidth - 1)) {
+                                                rightBtn.style.display = 'flex';
+                                            } else {
+                                                rightBtn.style.display = 'none';
+                                            }
+                                        }
+
+                                        // Update buttons whenever the container becomes visible (e.g. changing steps)
+                                        const observer = new IntersectionObserver((entries) => {
+                                            if (entries[0].isIntersecting) {
+                                                updateSliderBtns();
+                                            }
+                                        }, {
+                                            threshold: 0.1
+                                        });
+                                        observer.observe(document.getElementById('daysSelection'));
+
+                                        window.addEventListener('resize', updateSliderBtns);
+                                    </script>
+                                    <p class="form-error-text" id="days_error" style="color: red; margin-top: 10px;">
+                                    </p>
+                                </div>
+
+                                <div class="form-group mb-3 mt-4">
+                                    <label class="form-label fw500 dark-color" for="country">What time would you like
+                                        us to start?</label>
+                                    <div class="radio-group time-slot-grid time_replace_ab">
+                                        @php
+                                            use Carbon\Carbon;
+                                            date_default_timezone_set('Asia/Dubai');
+                                            $i = 1;
+                                            $timeslot = DB::table('time_slots')
+                                                ->orderBy('set_order', 'asc')
+                                                ->get()
+                                                ->toArray();
+                                        @endphp
+
+                                        @foreach ($timeslot as $timeslot_data)
+                                            @php
+                                                $timeslot_service = DB::table('subservice_timeslot_price')
+                                                    ->where('service_id', $subservice_data->serviceid)
+                                                    ->where('subservice_id', $subservice_data->id)
+                                                    ->where('time_slot_id', $timeslot_data->id)
+                                                    ->where('is_active', 1)
+                                                    ->first();
+
+                                                $timeslot_service_price =
+                                                    $timeslot_service && $timeslot_service->price > 0
+                                                        ? $timeslot_service->price
+                                                        : 0;
+                                            @endphp
+
+                                            @if ($timeslot_service && $timeslot_service->is_active == 1)
+                                                <div class="surcharge-badge-timeslot items">
+                                                    @if ($timeslot_service_price > 0)
+                                                        <span class="badgespantime">
+                                                            <span>+</span>
+                                                            <span class="currency_dhiramnew">AED</span>
+                                                            <span>{{ $timeslot_service_price }}</span>
+                                                        </span>
+                                                    @endif
+                                                    <input type="radio" id="time{{ $i }}" name="time_slot"
+                                                        value="{{ $timeslot_data->id }}"
+                                                        onclick="timeSlotClick('{{ $timeslot_service_price }}','{{ $timeslot_data->name }}')">
+                                                    <label class="labeltime" for="time{{ $i }}"
+                                                        style="border-radius: 50px;">
+                                                        {{ $timeslot_data->name }}
+                                                    </label>
+                                                </div>
+                                            @endif
+                                            @php $i++; @endphp
+                                        @endforeach
+                                    </div>
+                                    <p class="form-error-text" id="time_slot_error"
+                                        style="color: red; margin-top: 10px;"></p>
+                                </div>
+
+                                <div class="form-group mb-3 mt-4">
+                                    <label class="form-label fw500 dark-color" style="font-size: 16px;">Need cleaning
+                                        materials? <i class="fa fa-info-circle text-muted"></i></label>
+                                    <div class="d-flex gap-2" id="materialsSelection">
+                                        <div class="pill material-pill selected" data-val="No"
+                                            style="border: 1px solid #ddd; padding: 8px 16px; border-radius: 20px; cursor: pointer;">
+                                            No, I have them</div>
+                                        <div class="pill material-pill" data-val="Yes"
+                                            style="border: 1px solid #ddd; padding: 8px 16px; border-radius: 20px; cursor: pointer;">
+                                            Yes, please</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-3 mt-4">
+                                    <label class="form-label fw500 dark-color" style="font-size: 16px;">Any
+                                        instructions or special requirements?</label>
+                                    <div style="position: relative;">
+                                        <textarea class="form-control" id="special_instructions" rows="3"
+                                            placeholder="Example: Key under the mat, ironing, window cleaning, etc." maxlength="150"
+                                            style="resize: none; border-radius: 12px; background: #f9f9f9; padding: 15px; border: 1px solid #eaeaea;"></textarea>
+                                        <span id="charCount"
+                                            style="position: absolute; bottom: 10px; right: 15px; font-size: 12px; color: #999;">0/150</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- STEP 2: Choose Date & Time -->
-                <div class="step-content" id="step2">
-                    <div class="booking-step">
-                        <div class="form-group mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label fw500 dark-color mb-0" style="font-size: 18px;">Which days do you prefer?</label>
-                                <span class="badge" id="daysLabel" style="background-color: #f1f1f1; color: #555; padding: 6px 10px; border-radius: 12px; font-weight: 500;">Choose 1 day</span>
-                            </div>
-                            <style>
-                                .slider-container {
-                                    position: relative;
-                                    display: flex;
-                                    align-items: center;
-                                    width: 100%;
-                                    margin-bottom: 20px;
-                                }
-                                .slider-btn {
-                                    background: white;
-                                    border: none;
-                                    font-size: 14px;
-                                    cursor: pointer;
-                                    z-index: 10;
-                                    position: absolute;
-                                    top: 50%;
-                                    transform: translateY(-50%);
-                                    height: 32px;
-                                    width: 32px;
-                                    border-radius: 50%;
-                                    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-                                    color: #333;
-                                    display: none; /* JS will toggle to flex */
-                                    align-items: center;
-                                    justify-content: center;
-                                }
-                                .slider-btn:hover {
-                                    color: #000;
-                                    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-                                }
-                                .slider-btn.left {
-                                    left: -5px;
-                                }
-                                .slider-btn.right {
-                                    right: -5px;
-                                }
-                                #daysSelection {
-                                    display: flex;
-                                    flex-wrap: nowrap !important;
-                                    overflow-x: auto;
-                                    gap: 10px;
-                                    -ms-overflow-style: none;  /* IE and Edge */
-                                    scrollbar-width: none;  /* Firefox */
-                                    scroll-behavior: smooth;
-                                    width: 100%;
-                                    padding-left: 15px;
-                                    padding-right: 15px;
-                                    margin-bottom: 0 !important;
-                                }
-                                #daysSelection::-webkit-scrollbar {
-                                    display: none; /* Chrome, Safari and Opera */
-                                }
-                                #daysSelection .day-pill {
-                                    flex: 0 0 auto;
-                                }
-                            </style>
-                            <div class="slider-container">
-                                <button type="button" class="slider-btn left" id="slideLeftBtn" onclick="slideDays(-150)"><i class="fa fa-chevron-left"></i></button>
-                                <div class="days-pills" id="daysSelection" onscroll="updateSliderBtns()">
-                                    @php
-                                        date_default_timezone_set('Asia/Dubai');
-                                        // Start from tomorrow
-                                        $startDay = \Carbon\Carbon::now()->addDay();
-                                    @endphp
-                                    @for ($i = 0; $i < 7; $i++)
-                                        @php $dayName = $startDay->copy()->addDays($i)->format('l'); @endphp
-                                        <div class="pill day-pill" data-val="{{ $dayName }}">{{ $dayName }}</div>
-                                    @endfor
-                                </div>
-                                <button type="button" class="slider-btn right" id="slideRightBtn" onclick="slideDays(150)"><i class="fa fa-chevron-right"></i></button>
-                            </div>
-                            
-                            <script>
-                                function slideDays(offset) {
-                                    const container = document.getElementById('daysSelection');
-                                    container.scrollLeft += offset;
-                                }
-                                function updateSliderBtns() {
-                                    const container = document.getElementById('daysSelection');
-                                    const leftBtn = document.getElementById('slideLeftBtn');
-                                    const rightBtn = document.getElementById('slideRightBtn');
-                                    
-                                    if (container.scrollLeft > 0) {
-                                        leftBtn.style.display = 'flex';
-                                    } else {
-                                        leftBtn.style.display = 'none';
-                                    }
-                                    
-                                    if (container.scrollLeft < (container.scrollWidth - container.clientWidth - 1)) {
-                                        rightBtn.style.display = 'flex';
-                                    } else {
-                                        rightBtn.style.display = 'none';
-                                    }
-                                }
-                                
-                                // Update buttons whenever the container becomes visible (e.g. changing steps)
-                                const observer = new IntersectionObserver((entries) => {
-                                    if(entries[0].isIntersecting) {
-                                        updateSliderBtns();
-                                    }
-                                }, { threshold: 0.1 });
-                                observer.observe(document.getElementById('daysSelection'));
-
-                                window.addEventListener('resize', updateSliderBtns);
-                            </script>
-                            <p class="form-error-text" id="days_error" style="color: red; margin-top: 10px;"></p>
-                        </div>
-
-                        <div class="form-group mb-3 mt-4">
-                            <label class="form-label fw500 dark-color" for="country">What time would you like us to start?</label>
-                            <div class="radio-group time-slot-grid time_replace_ab">
-                                @php
-                                    use Carbon\Carbon;
-                                    date_default_timezone_set('Asia/Dubai');
-                                    $i = 1;
-                                    $timeslot = DB::table('time_slots')->orderBy('set_order','asc')->get()->toArray();
-                                @endphp
-
-                                @foreach ($timeslot as $timeslot_data)
-                                    @php
-                                        $timeslot_service = DB::table('subservice_timeslot_price')
-                                            ->where('service_id', $subservice_data->serviceid)
-                                            ->where('subservice_id', $subservice_data->id)
-                                            ->where('time_slot_id', $timeslot_data->id)
-                                            ->where('is_active', 1)
-                                            ->first();
-
-                                        $timeslot_service_price = $timeslot_service && $timeslot_service->price > 0 ? $timeslot_service->price : 0;
-                                    @endphp
-
-                                        @if ($timeslot_service && $timeslot_service->is_active == 1)
-                                            <div class="surcharge-badge-timeslot items">
-                                        @if ($timeslot_service_price > 0)
-                                            <span class="badgespantime">
-                                                <span>+</span>
-                                                <span class="currency_dhiramnew">AED</span>
-                                                <span>{{ $timeslot_service_price }}</span>
-                                            </span>
-                                        @endif
-                                        <input type="radio" id="time{{ $i }}" name="time_slot" value="{{ $timeslot_data->id }}" onclick="timeSlotClick('{{ $timeslot_service_price }}','{{ $timeslot_data->name }}')">
-                                        <label class="labeltime" for="time{{ $i }}" style="border-radius: 50px;">
-                                            {{ $timeslot_data->name }}
-                                        </label>
+                            <div class="step-buttons mt-4">
+                                <button class="btn btn-secondary custome-black" type="button"
+                                    onclick="prevStep(1)">Back</button>
+                                <div class="sticky-footer-btn">
+                                    <div class="row">
+                                        <div class="col-md-8 col-lg-6 col-sm-6 col-8">
+                                            <div class="mobile_totalnew">
+                                                <div class="font-weight-bold">
+                                                    <span class="totaltext">Total</span>
+                                                    <div class="mobile_price price-wrapper">
+                                                        <span class="currency_dhiramnew">AED</span>
+                                                        <span class="total_to_pay">0.00</span>
+                                                        <i style="margin-left: 5px;"
+                                                            class="fa-solid fa-angle-up arrow-toggle-mobile"
+                                                            id="aerrowicon"></i>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        @endif
-                                        @php $i++; @endphp
-                                @endforeach
-                            </div>
-                            <p class="form-error-text" id="time_slot_error" style="color: red; margin-top: 10px;"></p>
-                        </div>
-
-                        <div class="form-group mb-3 mt-4">
-                            <label class="form-label fw500 dark-color" style="font-size: 16px;">Need cleaning materials? <i class="fa fa-info-circle text-muted"></i></label>
-                            <div class="d-flex gap-2" id="materialsSelection">
-                                <div class="pill material-pill selected" data-val="No" style="border: 1px solid #ddd; padding: 8px 16px; border-radius: 20px; cursor: pointer;">No, I have them</div>
-                                <div class="pill material-pill" data-val="Yes" style="border: 1px solid #ddd; padding: 8px 16px; border-radius: 20px; cursor: pointer;">Yes, please</div>
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-3 mt-4">
-                            <label class="form-label fw500 dark-color" style="font-size: 16px;">Any instructions or special requirements?</label>
-                            <div style="position: relative;">
-                                <textarea class="form-control" id="special_instructions" rows="3" placeholder="Example: Key under the mat, ironing, window cleaning, etc." maxlength="150" style="resize: none; border-radius: 12px; background: #f9f9f9; padding: 15px; border: 1px solid #eaeaea;"></textarea>
-                                <span id="charCount" style="position: absolute; bottom: 10px; right: 15px; font-size: 12px; color: #999;">0/150</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="step-buttons mt-4">
-                        <button class="btn btn-secondary custome-black" type="button" onclick="prevStep(1)">Back</button>
-                        <div class="sticky-footer-btn">
-                            <div class="row">
-                                <div class="col-md-8 col-lg-6 col-sm-6 col-8">
-                                    <div class="mobile_totalnew">
-                                        <div class="font-weight-bold">
-                                            <span class="totaltext">Total</span>
-                                            <div class="mobile_price price-wrapper">
-                                                <span class="currency_dhiramnew">AED</span>
-                                                <span class="total_to_pay">0.00</span>
-                                                <i style="margin-left: 5px;" class="fa-solid fa-angle-up arrow-toggle-mobile" id="aerrowicon"></i>
-                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-lg-6 col-sm-6 col-4">
+                                            <button class="btn btn-primary custome-black" type="button"
+                                                onclick="nextStep(3)">Next</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-lg-6 col-sm-6 col-4">
-                                    <button class="btn btn-primary custome-black" type="button" onclick="nextStep(3)">Next</button>
-                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- STEP 3: Address -->
-                <div class="step-content" id="step3">
-                    @include('front.partials.subscription.subscription-address')
-                    <div class="step-buttons mt-4">
-                        <button class="btn btn-secondary custome-black" type="button" onclick="prevStep(2)">Back</button>
-                        <div class="sticky-footer-btn">
-                            <div class="row">
-                                <div class="col-md-8 col-lg-6 col-sm-6 col-8">
-                                    <div class="mobile_totalnew">
-                                        <div class="font-weight-bold">
-                                            <span class="totaltext">Total</span>
-                                            <div class="mobile_price price-wrapper">
-                                                <span class="currency_dhiramnew">AED</span>
-                                                <span class="total_to_pay">0.00</span>
-                                                <i style="margin-left: 5px;" class="fa-solid fa-angle-up arrow-toggle-mobile" id="aerrowicon"></i>
+                        <!-- STEP 3: Address -->
+                        <div class="step-content" id="step3">
+                            @include('front.partials.subscription.subscription-address')
+                            <div class="step-buttons mt-4">
+                                <button class="btn btn-secondary custome-black" type="button"
+                                    onclick="prevStep(2)">Back</button>
+                                <div class="sticky-footer-btn">
+                                    <div class="row">
+                                        <div class="col-md-8 col-lg-6 col-sm-6 col-8">
+                                            <div class="mobile_totalnew">
+                                                <div class="font-weight-bold">
+                                                    <span class="totaltext">Total</span>
+                                                    <div class="mobile_price price-wrapper">
+                                                        <span class="currency_dhiramnew">AED</span>
+                                                        <span class="total_to_pay">0.00</span>
+                                                        <i style="margin-left: 5px;"
+                                                            class="fa-solid fa-angle-up arrow-toggle-mobile"
+                                                            id="aerrowicon"></i>
+                                                    </div>
+                                                </div>
                                             </div>
+                                        </div>
+                                        <div class="col-md-4 col-lg-6 col-sm-6 col-4">
+                                            <button class="btn btn-primary custome-black" type="button"
+                                                onclick="nextStep(4)">Next</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-lg-6 col-sm-6 col-4">
-                                    <button class="btn btn-primary custome-black" type="button" onclick="nextStep(4)">Next</button>
-                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- STEP 4: Payment Information -->
-                <div class="step-content" id="step4">
-                    @include('front.partials.subscription.subscription-payment')
-                    <div class="step-buttons mt-4">
-                        <button class="btn btn-secondary custome-black" type="button" onclick="prevStep(3)">Back</button>
-                        <div class="sticky-footer-btn">
-                            <div class="row">
-                                <div class="col-md-8 col-lg-6 col-sm-6 col-8">
-                                    <div class="mobile_totalnew">
-                                        <div class="font-weight-bold">
-                                            <span class="totaltext">Total</span>
-                                            <div class="mobile_price price-wrapper">
-                                                <span class="currency_dhiramnew">AED</span>
-                                                <span class="total_to_pay">0.00</span>
-                                                <i style="margin-left: 5px;" class="fa-solid fa-angle-up arrow-toggle-mobile" id="aerrowicon"></i>
+                        <!-- STEP 4: Payment Information -->
+                        <div class="step-content" id="step4">
+                            @include('front.partials.subscription.subscription-payment')
+                            <div class="step-buttons mt-4">
+                                <button class="btn btn-secondary custome-black" type="button"
+                                    onclick="prevStep(3)">Back</button>
+                                <div class="sticky-footer-btn">
+                                    <div class="row">
+                                        <div class="col-md-8 col-lg-6 col-sm-6 col-8">
+                                            <div class="mobile_totalnew">
+                                                <div class="font-weight-bold">
+                                                    <span class="totaltext">Total</span>
+                                                    <div class="mobile_price price-wrapper">
+                                                        <span class="currency_dhiramnew">AED</span>
+                                                        <span class="total_to_pay">0.00</span>
+                                                        <i style="margin-left: 5px;"
+                                                            class="fa-solid fa-angle-up arrow-toggle-mobile"
+                                                            id="aerrowicon"></i>
+                                                    </div>
+                                                </div>
                                             </div>
+                                        </div>
+                                        <div class="col-md-4 col-lg-6 col-sm-6 col-4">
+                                            <button class="btn btn-primary custome-black" type="button"
+                                                id="confirmBookingBtn" onclick="submitForm()"
+                                                style="background-color:#0046fd; border:none;">Confirm & Pay</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-lg-6 col-sm-6 col-4">
-                                    <button class="btn btn-primary custome-black" type="button" id="confirmBookingBtn" onclick="submitForm()" style="background-color:#0046fd; border:none;">Confirm & Pay</button>
-                                </div>
                             </div>
                         </div>
-                    </div>
+
+                        <!-- Wallet & Promo Hidden State -->
+                        <input type="hidden" id="wallet_balance" name="wallet_balance"
+                            value="{{ $wallet_amount ?? 0 }}">
+                        <input type="hidden" id="wallet_used" name="wallet_used" value="0.00">
+                        <input type="hidden" id="promo_discount" name="promo_discount" value="0.00">
+                        <input type="hidden" id="promo_name" name="promo_name" value="">
+                        <input type="hidden" id="wallet_reward_amount" name="wallet_reward_amount" value="0.00">
+                    </form>
                 </div>
+            </div>
 
-                <!-- Wallet & Promo Hidden State -->
-                <input type="hidden" id="wallet_balance" name="wallet_balance" value="{{ $wallet_amount ?? 0 }}">
-                <input type="hidden" id="wallet_used" name="wallet_used" value="0.00">
-                <input type="hidden" id="promo_discount" name="promo_discount" value="0.00">
-                <input type="hidden" id="promo_name" name="promo_name" value="">
-                <input type="hidden" id="wallet_reward_amount" name="wallet_reward_amount" value="0.00">
-            </form>
-        </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-lg-4 col-md-4 col-sm-12">
-            @include('front.partials.subscription.booking-summary')
+            <!-- Sidebar -->
+            <div class="col-lg-4 col-md-4 col-sm-12">
+                @include('front.partials.subscription.booking-summary')
+            </div>
         </div>
     </div>
-</div>
 
 </section>
 
@@ -385,7 +441,8 @@
                     <div
                         style="font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#bbb; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid #f0f0f0;">
                         Package Details</div>
-                    <div class="sidebar-cart mobile-sidebar-cart" id="mobile_package_details" style="margin:0; font-size:0.88rem;">
+                    <div class="sidebar-cart mobile-sidebar-cart" id="mobile_package_details"
+                        style="margin:0; font-size:0.88rem;">
                         <!-- Will be populated by JS -->
                     </div>
                 </div>
@@ -456,22 +513,302 @@
     const packagesData = @json($packages);
     var hasAddons = {{ isset($addons) && count($addons) > 0 ? 'true' : 'false' }};
     const ajaxTimeslotUrl = "{{ route('package.package_get_timeslots') }}";
-    
+
     // Auth and Pricing Variables
     window.isUserLoggedIn = {{ session()->has('user') ? 'true' : 'false' }};
-    window.codFeeAmount = typeof window.Enums !== 'undefined' && window.Enums.vcCharges ? window.Enums.vcCharges.COD.value : 10;
+    window.codFeeAmount = typeof window.Enums !== 'undefined' && window.Enums.vcCharges ? window.Enums.vcCharges.COD
+        .value : 10;
+
+    var promoCode = @json($promo ?? '');
+    var sessionCoupon = @json($session_coupon_applied ?? '');
+    window.lastValidPromoCode = promoCode || sessionCoupon;
+    window.currentAppliedCoupon = sessionCoupon;
+    window.lastPromoAttemptTotal = 0;
+    window.showPromoApplied = function(promoCode) {
+        if (!promoCode) return;
+        $('#promo_name').val(promoCode);
+        $('.promo_code_name').text(promoCode);
+        $('#promo_code_input_section').addClass('d-none');
+        $('.promo_dicount_replace_div').removeClass('d-none');
+        if (typeof window.hidePromoAddMoreBanner === 'function') {
+            window.hidePromoAddMoreBanner();
+        }
+    };
+
+    window.removePromoUI = function() {
+        $('#promo_name').val('');
+        $('.promo_code_name').text('');
+        $('#promo_discount').val('0.00');
+        $('.promo_code').text('0.00');
+        $('.promo_code_summary').text('0.00');
+        $('.promo_dicount_replace_div').addClass('d-none');
+        $('.promo_dicount_summary_div').hide();
+        $('#promo_code_input_section').removeClass('d-none');
+        if (typeof window.hidePromoAddMoreBanner === 'function') {
+            window.hidePromoAddMoreBanner();
+        }
+    };
+
+    if (window.lastValidPromoCode) {
+        window.showPromoApplied(window.lastValidPromoCode);
+    }
 </script>
 
 <!-- Hidden State inputs moved inside form -->
 
-<script>
-    function showPromoToast(type, title, message) {
-        if (typeof showToast === 'function') {
-            showToast(type, title, message);
-        } else {
-            Swal.fire({ icon: type, title: title, text: message });
-        }
+<style>
+    .custom-toast-popup {
+        margin-top: 80px !important;
     }
+</style>
+<script>
+    function showToast(type, title, message) {
+        let bgColor = '#28a745';
+        let iconChar = '%';
+        if (type === 'error') {
+            bgColor = '#dc3545';
+            iconChar = 'X';
+        } else if (type === 'warning' || type === 'info') {
+            bgColor = '#fd7e14';
+            iconChar = '!';
+        } else if (type === 'success' && title !== 'Promo Code Applied') {
+            iconChar = '✓';
+        }
+
+        Swal.fire({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            showCloseButton: true,
+            html: '<div style="text-align: left; display: flex; flex-direction: column; padding-right: 15px;">' +
+                '  <div style="display: flex; align-items: center; gap: 10px;">' +
+                '    <div style="background-color: ' + bgColor +
+                '; min-width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">' +
+                '      <span style="color: white; font-size: 14px; font-weight:bold; line-height: 1;">' +
+                iconChar + '</span>' +
+                '    </div>' +
+                '    <span style="font-size: 15px; font-weight: 700; color: #000; margin: 0;">' + title +
+                '</span>' +
+                '  </div>' +
+                '  <div style="font-size: 13px; color: #666; margin-top: 4px; padding-left: 34px;">' + message +
+                '</div>' +
+                '</div>',
+            customClass: {
+                popup: 'custom-toast-popup',
+                htmlContainer: 'm-0 p-2'
+            }
+        });
+    }
+    const showPromoToast = showToast;
+
+    // ---- Promo "Add More" Banner Helpers ----
+    window.showPromoAddMoreBanner = function(code, minOrder, baseTotal) {
+        let needed = Math.max(0, minOrder - baseTotal).toFixed(2);
+        let pct = minOrder > 0 ? Math.min(100, (baseTotal / minOrder) * 100) : 0;
+
+        // Payment step banner
+        let banner = document.getElementById('promo_add_more_banner');
+        if (banner) {
+            document.getElementById('promo_add_more_code').textContent = code;
+            document.getElementById('promo_add_more_msg').textContent =
+                'Add AED ' + needed + ' more to unlock this promo!';
+            document.getElementById('promo_add_more_progress').textContent =
+                'AED ' + parseFloat(baseTotal).toFixed(2) + ' / AED ' + minOrder;
+            document.getElementById('promo_progress_bar').style.width = pct + '%';
+            banner.style.display = 'block';
+        }
+        // Sidebar banner
+        let sidebarBanner = document.getElementById('sidebar_promo_add_more_banner');
+        if (sidebarBanner) {
+            let sName = document.getElementById('sidebar_promo_code_name');
+            if (sName) sName.textContent = code;
+            let sMsg = document.getElementById('sidebar_promo_add_more_msg');
+            if (sMsg) sMsg.textContent = 'Add AED ' + needed + ' more to unlock!';
+            let sBar = document.getElementById('sidebar_promo_progress_bar');
+            if (sBar) sBar.style.width = pct + '%';
+            sidebarBanner.style.display = 'block';
+        }
+        // Hide the promo input / applied sections when "add more" is shown
+        $('#promo_code_input_section').addClass('d-none');
+        $('.promo_dicount_replace_div').addClass('d-none');
+    };
+
+    window.hidePromoAddMoreBanner = function() {
+        let banner = document.getElementById('promo_add_more_banner');
+        if (banner) banner.style.display = 'none';
+        let sidebarBanner = document.getElementById('sidebar_promo_add_more_banner');
+        if (sidebarBanner) sidebarBanner.style.display = 'none';
+    };
+
+    // Tracks the minimum order of the pending promo so updateUI can recheck it
+    window.pendingPromoMinOrder = 0;
+    // Tracks whether this is the first silent auto-apply (suppresses toast)
+    window.promoAutoApplied = false;
+
+    window.maybeAutoApplyPromo = function(baseTotal, silent) {
+        if (!window.lastValidPromoCode) {
+            window.hidePromoAddMoreBanner();
+            return;
+        }
+        if (baseTotal <= 0) return; // wait for valid total
+
+        // If the exact same promo is already applied in session — just refresh UI
+        if (window.currentAppliedCoupon === window.lastValidPromoCode) {
+            window.hidePromoAddMoreBanner();
+            window.showPromoApplied(window.lastValidPromoCode);
+
+            // Re-check minimum order if we know it (e.g. after price change)
+            if (window.pendingPromoMinOrder > 0 && baseTotal < window.pendingPromoMinOrder) {
+                // Total dropped below min — auto-remove
+                window.currentAppliedCoupon = null;
+                $.ajax({
+                    url: "{{ route('homecleaning.remove_coupon') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function() {
+                        window.removePromoUI();
+                        window.showPromoAddMoreBanner(window.lastValidPromoCode, window
+                            .pendingPromoMinOrder, baseTotal);
+                        window.lastPromoAttemptTotal = 0; // allow retry on next update
+                        if (typeof updateUI === 'function') updateUI();
+                    }
+                });
+                return;
+            }
+            return;
+        }
+
+        // If a DIFFERENT promo is already applied — don't override
+        if (window.currentAppliedCoupon && window.currentAppliedCoupon !== window.lastValidPromoCode) {
+            window.hidePromoAddMoreBanner();
+            return;
+        }
+
+        // If already showing "add more" and total still hasn't changed enough — skip AJAX
+        if (window.pendingPromoMinOrder > 0 && baseTotal < window.pendingPromoMinOrder) {
+            window.showPromoAddMoreBanner(window.lastValidPromoCode, window.pendingPromoMinOrder, baseTotal);
+            return;
+        }
+
+        if (window.lastPromoAttemptTotal === baseTotal) return;
+        window.lastPromoAttemptTotal = baseTotal;
+
+        $.ajax({
+            url: "{{ route('home_promo_check') }}",
+            type: 'POST',
+            data: {
+                'promo_code': window.lastValidPromoCode,
+                'service': @json($service_id ?? ''),
+                'sub_service': @json($subservice_id ?? ''),
+                'sub_total': baseTotal,
+                '_token': "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                if (response === 'success') {
+                    window.hidePromoAddMoreBanner();
+                    window.pendingPromoMinOrder = 0;
+                    window.showPromoApplied(window.lastValidPromoCode);
+                    $.get("{{ route('homecleaning.get_coupon') }}", function(couponData) {
+                        let toastMsg = 'Your promo code has been applied.';
+                        if (typeof couponData === 'string') {
+                            try {
+                                couponData = JSON.parse(couponData);
+                            } catch (e) {}
+                        }
+                        if (couponData && typeof couponData === 'object' && couponData
+                            .coupancode) {
+                            window.currentAppliedCoupon = couponData.coupancode;
+                            window.lastValidPromoCode = couponData.coupancode;
+                            window.pendingPromoMinOrder = parseFloat(couponData
+                                .minimum_order) || 0;
+
+                            let coupanApplyWallet = parseInt(couponData.coupan_apply_wallet) ||
+                                0;
+                            let discountVal = parseFloat(couponData.discount) || 0;
+                            let calculatedAmount = 0;
+
+                            if (couponData.coupanvalue == '0') {
+                                calculatedAmount = (discountVal / 100) * baseTotal;
+                            } else {
+                                calculatedAmount = discountVal;
+                            }
+
+                            if (coupanApplyWallet === 0) {
+                                $('#wallet_reward_amount').val(calculatedAmount.toFixed(2));
+                                $('#promo_discount').val('0.00');
+
+                                $(".wallet_reward_summary_div").removeClass('d-none');
+                                $(".wallet_reward_code_amount").text(calculatedAmount.toFixed(
+                                    2));
+
+                                let valStr = couponData.coupanvalue == '0' ? couponData
+                                    .discount + '%' :
+                                    '<span class="price-wrapper"><span class="currency_dhiramnew">AED</span>' +
+                                    couponData.discount + '</span>';
+                                toastMsg = 'Coupon applied successfully. ' + valStr +
+                                    ' will be credited to your wallet after successful order completion.';
+                            } else {
+                                $('#promo_discount').val(calculatedAmount.toFixed(2));
+                                $('#wallet_reward_amount').val('0.00');
+
+                                $(".wallet_reward_summary_div").addClass('d-none');
+
+                                let rewardMsg = couponData.coupanvalue == '0' ? couponData
+                                    .discount + '%' :
+                                    '<span class="price-wrapper"><span class="currency_dhiramnew">AED</span>' +
+                                    couponData.discount + '</span>';
+                                toastMsg = rewardMsg + ' off applied successfully.';
+                            }
+                            $('#promo_name').val(couponData.coupancode);
+                            $('.promo_code_name').text(couponData.coupancode);
+                            $('#promo_code_input_section').addClass('d-none');
+                            $('.promo_dicount_replace_div').removeClass('d-none');
+                        }
+                        // Show toast on successful apply (both manual and auto-apply)
+                        showPromoToast('success', 'Promo Code Applied', toastMsg);
+                        window.promoAutoApplied = true;
+
+                        $(".wallet_apply_new").show();
+                        $(".wallet_cancel_new").hide();
+                        $('#wallet_used').val('0.00');
+
+                        if (typeof updateUI === 'function') updateUI();
+                    });
+                } else if (response === 'invalid' || response === 'Already' || response ===
+                    'Already Used' || response === 'invalid_user_count') {
+                    // Truly invalid — clear everything
+                    window.lastValidPromoCode = null;
+                    window.currentAppliedCoupon = null;
+                    window.pendingPromoMinOrder = 0;
+                    window.hidePromoAddMoreBanner();
+                    if (typeof window.removePromoUI === 'function') {
+                        window.removePromoUI();
+                    }
+                } else if (response === 'grater') {
+                    // Discount greater than total — clear
+                    window.lastValidPromoCode = null;
+                    window.currentAppliedCoupon = null;
+                    window.pendingPromoMinOrder = 0;
+                    window.hidePromoAddMoreBanner();
+                    if (typeof window.removePromoUI === 'function') {
+                        window.removePromoUI();
+                    }
+                } else {
+                    // Numeric response = minimum order amount not met
+                    let minOrder = parseFloat(response) || 0;
+                    if (minOrder > 0) {
+                        window.pendingPromoMinOrder = minOrder;
+                        window.showPromoAddMoreBanner(window.lastValidPromoCode, minOrder, baseTotal);
+                    }
+                }
+            }
+        });
+    };
+
 
     function apply_coupon() {
         var home_promo_check = "{{ route('home_promo_check') }}";
@@ -484,9 +821,9 @@
         let sumSubtotal = parseFloat($('#summarySubtotal').text()) || 0;
         let packageDiscount = parseFloat($('#summaryDiscount').text()) || 0;
         let sub_total = sumSubtotal - packageDiscount;
-        if(sub_total < 0) sub_total = 0;
+        if (sub_total < 0) sub_total = 0;
 
-        if(sub_total === 0) {
+        if (sub_total === 0) {
             showPromoToast('warning', 'Warning', 'Please select a package first.');
             return false;
         }
@@ -501,7 +838,7 @@
                 'sub_total': sub_total,
                 '_token': "{{ csrf_token() }}"
             },
-            success: function (response) {
+            success: function(response) {
                 if (response === 'invalid') {
                     showPromoToast('error', 'Error', 'Invalid Promo Code');
                     $('#coupon_code').val('');
@@ -519,16 +856,18 @@
                     $('#coupon_code').val('');
                     return false;
                 } else if (response === 'success') {
-                    $.get("{{ route('homecleaning.get_coupon') }}", function (couponData) {
+                    $.get("{{ route('homecleaning.get_coupon') }}", function(couponData) {
                         let toastMsg = 'Your promo code has been applied.';
                         if (typeof couponData === 'string') {
-                            try { couponData = JSON.parse(couponData); } catch (e) { }
+                            try {
+                                couponData = JSON.parse(couponData);
+                            } catch (e) {}
                         }
                         if (couponData && typeof couponData === 'object' && couponData.coupancode) {
                             let coupanApplyWallet = parseInt(couponData.coupan_apply_wallet) || 0;
                             let discountVal = parseFloat(couponData.discount) || 0;
                             let calculatedAmount = 0;
-                            
+
                             if (couponData.coupanvalue == '0') {
                                 calculatedAmount = (discountVal / 100) * sub_total;
                             } else {
@@ -538,23 +877,26 @@
                             if (coupanApplyWallet === 0) {
                                 $('#wallet_reward_amount').val(calculatedAmount.toFixed(2));
                                 $('#promo_discount').val('0.00');
-                                
-                                $(".promo_dicount_replace_div").find('.wallet-label').html('Coupon Applied: <span class="promo_code_name">' + couponData.coupancode + '</span>');
-                                $(".promo_dicount_replace_div").find('.price-wrapper').html('<div style="font-size:0.95rem; font-weight:800; color:#16a34a; display:inline-flex; align-items:center; gap:4px; margin-top:2px; text-align:left;"><span class="currency_dhiramnew" style="font-size:0.95rem; font-weight:700; position:relative; ">AED</span><span class="wallet_reward_amount_display">' + calculatedAmount.toFixed(2) + '</span></div><span style="font-size:0.82rem; font-weight:normal; color:#16a34a; line-height: 1.3; margin-top:2px; display:block; text-align:left;">Reward credited after booking completion.</span>');
+
                                 $(".wallet_reward_summary_div").removeClass('d-none');
                                 $(".wallet_reward_code_amount").text(calculatedAmount.toFixed(2));
-                                
-                                let valStr = couponData.coupanvalue == '0' ? couponData.discount + '%' : '<span class="price-wrapper"><span class="currency_dhiramnew">AED</span>' + couponData.discount + '</span>';
-                                toastMsg = 'Coupon applied successfully. ' + valStr + ' will be credited to your wallet after successful order completion.';
+
+                                let valStr = couponData.coupanvalue == '0' ? couponData.discount +
+                                    '%' :
+                                    '<span class="price-wrapper"><span class="currency_dhiramnew">AED</span>' +
+                                    couponData.discount + '</span>';
+                                toastMsg = 'Coupon applied successfully. ' + valStr +
+                                    ' will be credited to your wallet after successful order completion.';
                             } else {
                                 $('#promo_discount').val(calculatedAmount.toFixed(2));
                                 $('#wallet_reward_amount').val('0.00');
-                                
-                                $(".promo_dicount_replace_div").find('.wallet-label').html('Coupon Applied: <span class="promo_code_name">' + couponData.coupancode + '</span>');
-                                $(".promo_dicount_replace_div").find('.price-wrapper').html('<div style="font-size:0.95rem; font-weight:800; color:#16a34a; display:inline-flex; align-items:center; gap:4px; margin-top:2px; text-align:left;"><span class="currency_dhiramnew" style="font-size:0.85rem; font-weight:700; position:relative; top:-1px;">AED</span><span class="promo_code">' + calculatedAmount.toFixed(2) + '</span></div>');
+
                                 $(".wallet_reward_summary_div").addClass('d-none');
-                                
-                                let rewardMsg = couponData.coupanvalue == '0' ? couponData.discount + '%' : '<span class="price-wrapper"><span class="currency_dhiramnew">AED</span>' + couponData.discount + '</span>';
+
+                                let rewardMsg = couponData.coupanvalue == '0' ? couponData
+                                    .discount + '%' :
+                                    '<span class="price-wrapper"><span class="currency_dhiramnew">AED</span>' +
+                                    couponData.discount + '</span>';
                                 toastMsg = rewardMsg + ' off applied successfully.';
                             }
                             $('#promo_name').val(couponData.coupancode);
@@ -563,16 +905,35 @@
                             $('.promo_dicount_replace_div').removeClass('d-none');
                         }
                         showPromoToast('success', 'Promo Code Applied', toastMsg);
-                        
+
+                        // Update state to prevent re-applying old coupons or re-running auto apply
+                        window.currentAppliedCoupon = couponData && couponData.coupancode ?
+                            couponData.coupancode : null;
+                        if (window.currentAppliedCoupon) {
+                            window.lastValidPromoCode = window.currentAppliedCoupon;
+                            window.pendingPromoMinOrder = parseFloat(couponData.minimum_order) || 0;
+                        }
+                        window.hidePromoAddMoreBanner();
+
                         $(".wallet_apply_new").show();
                         $(".wallet_cancel_new").hide();
                         $('#wallet_used').val('0.00');
-                        
+
                         if (typeof updateUI === 'function') updateUI();
                     });
                 } else {
-                    showPromoToast('error', 'Error', 'Something went wrong');
-                    $('#coupon_code').val('');
+                    // Minimum order not met — show "add more" banner instead of just a toast
+                    let minOrder = parseFloat(response) || 0;
+                    if (minOrder > 0) {
+                        window.lastValidPromoCode = promo_code;
+                        window.currentAppliedCoupon = null;
+                        window.pendingPromoMinOrder = minOrder;
+                        window.showPromoAddMoreBanner(promo_code, minOrder, sub_total);
+                        $('#coupon_code').val('');
+                    } else {
+                        showPromoToast('warning', 'Notice', 'Minimum order amount is AED ' + response);
+                        $('#coupon_code').val('');
+                    }
                 }
             }
         });
@@ -591,21 +952,27 @@
                 $.ajax({
                     url: "{{ route('homecleaning.remove_coupon') }}",
                     type: "POST",
-                    data: { _token: "{{ csrf_token() }}" },
-                    success: function () {
-                        $('#promo_name').val('');
-                        $('#promo_discount').val('0.00');
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function() {
+                        if (typeof window.removePromoUI === 'function') {
+                            window.removePromoUI();
+                        }
                         $('#wallet_reward_amount').val('0.00');
                         $('#coupon_code').val('');
-                        $('.promo_code').text('0.00');
-                        $('.promo_code_name').text('');
-                        
-                        $('#promo_code_input_section').removeClass('d-none');
-                        $('.promo_dicount_replace_div').addClass('d-none');
                         $('.wallet_reward_summary_div').addClass('d-none');
-                        
+
+                        window.currentAppliedCoupon = null;
+                        window.lastValidPromoCode = null;
+                        window.pendingPromoMinOrder = 0;
+                        window.hidePromoAddMoreBanner();
+                        // Show promo input again since user manually removed
+                        $('#promo_code_input_section').removeClass('d-none');
+
                         if (typeof updateUI === 'function') updateUI();
-                        showPromoToast('success', 'Coupon Removed!', 'Coupon Removed!');
+                        showPromoToast('info', 'Coupon Removed',
+                            'Your promo code has been removed successfully.');
                     }
                 });
             }
@@ -626,42 +993,47 @@
                 let sumSubtotal = parseFloat($('#summarySubtotal').text()) || 0;
                 let packageDiscount = parseFloat($('#summaryDiscount').text()) || 0;
                 let promoDiscount = parseFloat($('#promo_discount').val()) || 0;
-                
+
                 // Only consider COD fee if it's currently being applied
                 let codFee = 0;
                 let paymentType = document.querySelector('input[name="payment_type"]:checked');
                 if (paymentType && paymentType.value === 'COD' && typeof window.codFeeAmount !== 'undefined') {
                     codFee = parseFloat(window.codFeeAmount);
                 }
-                
+
                 let maxWalletApplicable = sumSubtotal - packageDiscount - promoDiscount + codFee;
                 if (maxWalletApplicable < 0) maxWalletApplicable = 0;
-                
+
                 let walletUsed = 0;
                 if (walletBalance >= maxWalletApplicable) {
                     walletUsed = maxWalletApplicable;
                 } else {
                     walletUsed = walletBalance;
                 }
-                
+
                 $("#wallet_used").val(walletUsed.toFixed(2));
                 $(".wallet_apply_new").hide();
                 $(".wallet_cancel_new").show();
-                
+
                 // If a coupon is applied, silently remove it
                 if ($('#promo_name').val() !== '') {
                     $.ajax({
                         url: "{{ route('homecleaning.remove_coupon') }}",
                         type: "POST",
-                        data: { _token: "{{ csrf_token() }}" },
-                        success: function () {
-                            $('#promo_name').val('');
-                            $('#promo_discount').val('0.00');
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function() {
+                            if (typeof window.removePromoUI === 'function') {
+                                window.removePromoUI();
+                            }
                             $('#wallet_reward_amount').val('0.00');
                             $('#coupon_code').val('');
-                            $('#promo_code_input_section').removeClass('d-none');
-                            $('.promo_dicount_replace_div').addClass('d-none');
                             $('.wallet_reward_summary_div').addClass('d-none');
+
+                            window.currentAppliedCoupon = null;
+                            window.lastValidPromoCode = null;
+
                             if (typeof updateUI === 'function') updateUI();
                         }
                     });
@@ -669,7 +1041,12 @@
                     if (typeof updateUI === 'function') updateUI();
                 }
 
-                Swal.fire({ icon: "success", title: "Wallet balance applied successfully", showConfirmButton: false, timer: 1200 });
+                Swal.fire({
+                    icon: "success",
+                    title: "Wallet balance applied successfully",
+                    showConfirmButton: false,
+                    timer: 1200
+                });
             }
         });
     }
@@ -687,12 +1064,50 @@
                 $("#wallet_used").val('0.00');
                 $(".wallet_apply_new").show();
                 $(".wallet_cancel_new").hide();
-                
+
                 if (typeof updateUI === 'function') updateUI();
-                
-                Swal.fire({ icon: "success", title: "Wallet balance removed successfully", showConfirmButton: false, timer: 1200 });
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Wallet balance removed successfully",
+                    showConfirmButton: false,
+                    timer: 1200
+                });
             }
         });
     }
 </script>
-<script src="{{ asset('public/assets/frontend/js/cleaning-subscription.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('public/assets/frontend/js/cleaning-subscription.js') }}?v={{ time() }}" defer></script>
+
+@php
+    $subservice_service_fee_popup = DB::table('subservices')->where('id', $subservice_id)->first();
+@endphp
+
+@if (isset($subservice_service_fee_popup) && $subservice_service_fee_popup->service_fee_popup != '')
+    <!--- Service Fee Popup Start ---->
+    <div class="modal subservice-read-more-model" id="service_fee_popup_{{ $subservice_id }}" tabindex="-1"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-drag-handle" style="padding:10px 0 4px; text-align:center;">
+                    <div style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;"></div>
+                </div>
+                <div class="modal-header"
+                    style="border-bottom:1px solid #f0f0f0; padding:12px 20px; display:flex; align-items:center; justify-content:space-between;">
+                    <h5 style="margin:0; font-size:1rem; font-weight:800; color:#111;">Service Fee</h5>
+                    <button type="button" data-bs-dismiss="modal" aria-label="Close"
+                        style="background:#f0f0f0; border:none; min-width:44px; min-height:44px; width:44px; height:44px; border-radius:50%; font-size:1.3rem; line-height:1; color:#333; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; -webkit-tap-highlight-color:transparent;">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body"
+                    style="padding:20px; overflow-y:auto; -webkit-overflow-scrolling:touch; max-height:60vh;">
+                    <p style="color:#444; line-height:1.7; font-size:0.95rem; margin:0;">
+                        {{ $subservice_service_fee_popup->service_fee_popup }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--- Service Fee Popup End ---->
+@endif

@@ -240,16 +240,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const dayNum = date.getDate();
         const monthName = months[date.getMonth()];
 
-        // Check weekend
+        // Check weekend and subservice logic for Car Wash
+        const isCarWash = window.currentSubserviceUrl === 'car-wash';
         const isWeekend = dayName === "Sa" || dayName === "Su";
-        const price = isWeekend ? 5 : 0;
+        const showSurcharge = isWeekend && !isCarWash;
+        const price = showSurcharge ? 5 : 0;
         // Create date item
         const div = document.createElement("div");
         div.classList.add("date-item");
         //if (i === 0) div.classList.add("active"); // first date active
 
         // Badge for weekend
-        if (isWeekend) {
+        if (showSurcharge) {
             const badge = document.createElement("span");
             badge.classList.add("price-badge");
             badge.innerHTML = `<span>+ </span><span class="currency_dhiramnew">AED</span> <span>5</span>`;
@@ -353,7 +355,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         
         if (stepNumber == 5) {
-            $('#service_fee').val('9');
+            if (window.currentSubserviceUrl === 'car-wash') {
+                $('#service_fee').val('3.5');
+            } else {
+                $('#service_fee').val('9');
+            }
             if (typeof updateSidebarCart === 'function') {
                 updateSidebarCart();
             }

@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\Homecleaningapicontroller;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\BookingApiController;
+use App\Http\Controllers\Api\MyAccountApiController;
+use App\Http\Controllers\Api\HomeControllerApi;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,6 +34,8 @@ Route::post(
     [AuthController::class, 'verifyOtp']
 );
 
+Route::post('/contact-us', [HomeControllerApi::class, 'contactUsStore']);
+Route::get('/faqs', [HomeControllerApi::class, 'getFaqs']);
 Route::middleware('auth:api')->group(function () {
 
     Route::get('/services', [ServiceController::class, 'index']);
@@ -58,4 +62,15 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/payment-intent', [BookingApiController::class, 'paymentIntent']);
     Route::post('/home-cleaning-checkout', [Homecleaningapicontroller::class, 'store_checkout']);
     Route::post('/package-cleaning-checkout', [Homecleaningapicontroller::class, 'package_checkout']);
+
+    Route::get('/home-subservice', [ServiceController::class, 'homesubservice']);
+    Route::post('/wallet-amount-check', [MyAccountApiController::class, 'walletAmountCheck']);
+    Route::post('/rating-order', [MyAccountApiController::class, 'ratingOrder']);
+    Route::post('/wallet-transactions', [MyAccountApiController::class, 'walletTransactions']);
+    Route::post('/moving-service', [HomeControllerApi::class, 'movingService']);
+    Route::post('/search-service', [HomeControllerApi::class, 'searchSubservice']);
+    Route::post('/store-moving-service', [HomeControllerApi::class, 'storeMovingServiceInquiry']);
+
+    Route::post('/my-quotes', [MyAccountApiController::class, 'myQuotes']);
+    Route::post('/my-quote-detail', [MyAccountApiController::class, 'myQuoteDetail']);
 });

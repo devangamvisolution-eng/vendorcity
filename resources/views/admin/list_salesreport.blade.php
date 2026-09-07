@@ -32,6 +32,101 @@
 			$edit_perm = array_values(array_unique($edit_perm));
    
     @endphp
+    <style>
+    .premium-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        background: #fff;
+        margin-bottom: 24px;
+    }
+    .premium-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    .premium-table thead th {
+        background-color: #f8f9fa;
+        color: #333;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #eef2f5;
+        padding: 16px;
+        white-space: nowrap;
+    }
+    .premium-table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        color: #555;
+        border-bottom: 1px solid #f1f3f5;
+        font-size: 14px;
+    }
+    .premium-table tbody tr {
+        transition: all 0.2s ease;
+    }
+    .premium-table tbody tr:hover {
+        background-color: #fcfcfc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .btn-premium {
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 10px 20px;
+        transition: all 0.3s;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+    }
+    .page-title {
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 24px;
+    }
+    /* PREMIUM PAGINATION STYLE */
+    .dataTables_wrapper .dataTables_paginate {
+        padding-top: 20px;
+        display: flex;
+        gap: 5px;
+        justify-content: flex-end;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        background: #fff !important;
+        border-radius: 50px !important;
+        color: #0f172a !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #2563eb !important;
+        color: #fff !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+    .table-responsive::-webkit-scrollbar {
+        height: 8px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+    </style>
     <div class="content container-fluid">
         <!-- Page Header -->
         <div class="page-header">
@@ -65,13 +160,13 @@
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <div class="card card-table">
+                <div class="card premium-card">
                     <div class="card-body">
                         <form id="form" action="{{ route('delete_order') }}" enctype="multipart/form-data">
                             <INPUT TYPE="hidden" NAME="hidPgRefRan" VALUE="<?php echo rand(); ?>">
                             @csrf
                             <div class="table-responsive">
-                                <table class="table table-center table-hover datatable" id="example">
+                                <table class="table premium-table" id="example">
                                     <thead class="thead-light">
                                         <tr>
                                             <!-- <th>select</th> -->
@@ -153,7 +248,7 @@
 														   
 														   
                                                 <td class="text-right">
-                                                    <a class="btn btn-primary" href="{{ route('details', [$orders->order_id]) }}"><i class="far fa-eye me-2"></i>Details</a>
+                                                    <a class="btn btn-primary btn-premium" href="{{ route('details', [$orders->order_id]) }}"><i class="far fa-eye me-2"></i>Details</a>
                                                 </td>
                                             </tr>
                                             @php
@@ -322,14 +417,20 @@
 </script>
 <script>
     $(document).ready(function() {
-        // Check if the DataTable instance already exists
-        if ($.fn.DataTable.isDataTable('#example')) {
-            // Destroy the existing DataTable before reinitializing
-            $('#example').DataTable().destroy();
-        }
-        // Initialize DataTable with the new options
-        $('#example').dataTable({
-            "searching": true
+        $('#example').DataTable({
+            "searching": true,
+            "paging": true,
+            "pageLength": 10,
+            "info": false,
+            "language": {
+                "search": "",
+                "searchPlaceholder": "Quick Search...",
+                "paginate": {
+                    "next": '<i class="fas fa-chevron-right"></i>',
+                    "previous": '<i class="fas fa-chevron-left"></i>'
+                }
+            },
+            "dom": '<"top"f>rt<"bottom"p><"clear">'
         });
     });
 </script>

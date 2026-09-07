@@ -194,22 +194,19 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Service Required</label>
-                                                <input type="text" name="manpower_service_required"
-                                                    class="form-control" placeholder="e.g. Cleaning, Helper">
+                                                <input type="text" name="manpower_service_required" class="form-control" placeholder="e.g. Cleaning, Helper">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Number of Workers Required</label>
-                                                <input type="text" name="manpower_workers_required"
-                                                    class="form-control" placeholder="e.g. 2, 5">
+                                                <input type="text" name="manpower_workers_required" class="form-control" placeholder="e.g. 2, 5">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Duration / Per Day</label>
-                                                <input type="text" name="manpower_duration" class="form-control"
-                                                    placeholder="e.g. 8 Hours, 1 Month">
+                                                <input type="text" name="manpower_duration" class="form-control" placeholder="e.g. 8 Hours, 1 Month">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -227,23 +224,19 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Job Description / Requirements</label>
-                                                <textarea name="manpower_job_description" class="form-control" rows="3"
-                                                    placeholder="Enter job description..."></textarea>
+                                                <textarea name="manpower_job_description" class="form-control" rows="3" placeholder="Enter job description..."></textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Additional Notes</label>
-                                                <textarea name="manpower_additional_notes" class="form-control" rows="3"
-                                                    placeholder="Enter any additional notes..."></textarea>
+                                                <textarea name="manpower_additional_notes" class="form-control" rows="3" placeholder="Enter any additional notes..."></textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>Subtotal (AED)</label>
-                                                <input type="number" name="manual_price" id="manual_price"
-                                                    class="form-control" placeholder="Enter Price"
-                                                    onkeyup="package_calculation()" onchange="package_calculation()">
+                                                <input type="number" name="manual_price" id="manual_price" class="form-control" placeholder="Enter Price" onkeyup="package_calculation()" onchange="package_calculation()">
                                             </div>
                                         </div>
                                     </div>

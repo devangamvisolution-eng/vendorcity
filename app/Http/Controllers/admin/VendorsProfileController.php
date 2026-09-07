@@ -116,7 +116,7 @@ class VendorsProfileController extends Controller
         $data["tlexpiry"] = $request->tlexpiry;
         $data["staff"] = $request->staff;
         $data["remarks"] = $request->remarks;
-
+        
         $data["trn_certificate_number"] = $request->trn_certificate_number;
         $data["trade_license_number"] = $request->trade_license_number;
         $data["passport_number"] = $request->passport_number;
@@ -299,7 +299,8 @@ class VendorsProfileController extends Controller
                     $content["c_email"] = $_POST["c_email1"][$i];
 
                     $content["telephone"] = $_POST["telephone1"][$i];
-                    $content["country_code"] = str_replace(' ', '', trim($_POST["country_code1"][$i]));;
+                    $content["country_code"] = str_replace(' ', '', trim($_POST["country_code1"][$i]));
+                    ;
 
                     $this->insert_attribute($content);
                 }

@@ -4178,13 +4178,13 @@ class checkoutcontroller extends Controller
         $payment_type = $request->payment_type;
 
         if ($payment_type == 'COD') {
-            $order_status = 'P';
+            $order_status = 'BK';
             $paymentmode = 1;
             $list_order_status = '0';
             $payment_status = 'Success';
             $payment_mode = "COD";
         } else {
-            $order_status = 'P';
+            $order_status = 'BK';
             $paymentmode = 2;
             $list_order_status = '0';
             $payment_status = 'FAILED';
@@ -4334,7 +4334,7 @@ class checkoutcontroller extends Controller
             'additional_charge' => "",
             'sub_total' => $request->sub_total,
             'cod_charge' => $request->cod_charge,
-            'service_fee' => 0,
+            'service_fee' => $request->service_fee ?? 0,
             'order_from' => $order_from,
             'front_wallet_amount' => $walletAmount,
             'subservice_code' => $subserviceCode,
@@ -4508,13 +4508,13 @@ class checkoutcontroller extends Controller
         $payment_type = $request->payment_type;
 
         if ($payment_type == 'COD') {
-            $order_status = 'P';
+            $order_status = 'BK';
             $paymentmode = 1;
             $list_order_status = '0';
             $payment_status = 'Success';
             $payment_mode = "COD";
         } else {
-            $order_status = 'P';
+            $order_status = 'BK';
             $paymentmode = 2;
             $list_order_status = '0';
             $payment_status = 'FAILED';
@@ -5107,6 +5107,8 @@ class checkoutcontroller extends Controller
             'bookingyear' => date('Y'),
             'month' => $request->month,
             'time_slot' => $request->time_slot,
+            'selected_days' => $request->days_of_the_week,
+            'applied_discount_percentage' => $request->applied_discount_percentage,
             'end_date' => $end_date,
             'plate_source' => ($request->subservice_id == 93) ? $request->plate_source : '',
             'plate_code' => ($request->subservice_id == 93) ? $request->plate_code : '',
@@ -5304,7 +5306,7 @@ class checkoutcontroller extends Controller
 
         $payment_mode = ($orderdata->paymentmode == 1) ? "COD" : "Online";
 
-        $subject = "Service Booking Confirmation " . $orderdata->format_order_id;
+        $subject = "We have received your booking " . $orderdata->format_order_id;
         $to = $user->email;
         $bccRecipients = ['hello@vendorscity.com'];
 

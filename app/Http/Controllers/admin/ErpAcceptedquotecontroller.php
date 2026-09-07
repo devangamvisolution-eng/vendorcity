@@ -8,7 +8,7 @@ use DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
 use Route;
-use App\Models\admin\Erpdescriptionofgoods;
+use App\Models\Admin\Erpdescriptionofgoods;
 use Mpdf\Mpdf;
 
 class ErpAcceptedquotecontroller extends Controller
@@ -32,7 +32,7 @@ class ErpAcceptedquotecontroller extends Controller
 
         $inquiry_id = base64_encode($accept_inquiry->id);
 
-        $payment_url = URL::to('/paymentstripe') . '/' . $inquiry_id;
+        $payment_url = \App\Helpers\Helper::get_front_url('paymentstripe/' . $inquiry_id);
 
         // echo "<pre>";print_r($payment_url);
         // echo "<pre>";print_r($accept_inquiry);exit;

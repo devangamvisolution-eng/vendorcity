@@ -1046,36 +1046,71 @@ class Homecleaningapicontroller extends Controller
             return response()->json(['status' => false, 'message' => 'Tabby payment initialization failed.'], 500);
         } else {
             // STRIPE
-            $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
-            $response = $stripe->checkout->sessions->create([
-                'line_items' => [
-                    [
-                        'price_data' => [
-                            'currency' => 'aed',
-                            'product_data' => ['name' => 'Your Total'],
-                            'unit_amount' => $order_total_new * 100,
-                        ],
-                        'quantity' => 1,
-                    ]
-                ],
-                'mode' => 'payment',
-                'success_url' => route('payment_success'), // Or a deep link for mobile
-                'cancel_url' => route('payment_fail'),
-            ]);
+            try {
+                $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
 
-            if (isset($response->id) && $response->id != '') {
-                DB::table('ci_orders')->where('order_id', $arrOrderId)->update(['stripe_session_id' => $response->id]);
+                $customerEmail = $user->email ?? 'test@example.com';
+                $customerId = null;
+
+                // 1. Check local DB
+                if (!empty($user->stripe_customer_id)) {
+                    $customerId = $user->stripe_customer_id;
+                } else {
+                    // 2. Fallback: Search Stripe by email
+                    $existingCustomers = $stripe->customers->all(['email' => $customerEmail, 'limit' => 1]);
+
+                    if (count($existingCustomers->data) > 0) {
+                        $customerId = $existingCustomers->data[0]->id;
+                    } else {
+                        // 3. Create new Stripe Customer
+                        $newCustomer = $stripe->customers->create([
+                            'email' => $customerEmail,
+                            'name'  => $user->name ?? 'Mobile App User',
+                        ]);
+                        $customerId = $newCustomer->id;
+                    }
+
+                    // 4. Save to local DB permanently
+                    DB::table('frontloginregisters')->where('id', $userid)->update(['stripe_customer_id' => $customerId]);
+                }
+
+                // Create Ephemeral Key
+                $ephemeralKey = $stripe->ephemeralKeys->create(
+                    ['customer' => $customerId],
+                    ['stripe_version' => '2022-08-01']
+                );
+
+                // Create Payment Intent
+                $paymentIntent = $stripe->paymentIntents->create([
+                    'amount' => intval($order_total_new * 100), // Amount must be in cents/fils
+                    'currency' => 'aed',
+                    'customer' => $customerId,
+                    'automatic_payment_methods' => [
+                        'enabled' => 'true',
+                    ],
+                    'metadata' => [
+                        'order_id' => $arrOrderId,
+                        'format_order_id' => $formatOrderId
+                    ]
+                ]);
+
+                // Store intent ID in database
+                DB::table('ci_orders')->where('order_id', $arrOrderId)->update(['stripe_session_id' => $paymentIntent->id]);
+
                 return response()->json([
                     'status' => true,
-                    'message' => 'Stripe Session created',
+                    'message' => 'Stripe Payment Intent created',
                     'data' => [
                         'order_id' => $arrOrderId,
                         'format_order_id' => $formatOrderId,
-                        'payment_url' => $response->url
+                        'clientSecret' => $paymentIntent->client_secret,
+                        'customerId' => $customerId,
+                        'ephemeralKeySecret' => $ephemeralKey->secret,
+                        'publishableKey' => config('stripe.stripe_pk')
                     ]
                 ]);
-            } else {
-                return response()->json(['status' => false, 'message' => 'Stripe payment initialization failed.'], 500);
+            } catch (\Exception $e) {
+                return response()->json(['status' => false, 'message' => 'Stripe payment initialization failed: ' . $e->getMessage()], 500);
             }
         }
     }
@@ -1109,7 +1144,7 @@ class Homecleaningapicontroller extends Controller
             });
 
             \Helper::success_msg_whatsapp_customer($user->id, $order_id);
-        })->afterResponse();
+        });
 
         return true;
     }
@@ -1240,11 +1275,10 @@ class Homecleaningapicontroller extends Controller
                     \Log::error('Vendor mail failed (' . $vendor->email . '): ' . $e->getMessage());
                 }
             }
-        })->afterResponse();
+        });
 
         return true;
     }
-
     public function package_checkout(Request $request)
     {
         $user = $request->user();
@@ -1357,7 +1391,7 @@ class Homecleaningapicontroller extends Controller
         $content = array(
             'user_id' => $userid,
             'order_number' => $order_number,
-            'order_total' => $order_total,
+            'order_total' => $order_total_new,
             'front_wallet_amount' => $front_wallet_amount_new,
             'vatcharge' => $request->vat_total,
             'order_currency' => 'AED',
@@ -1603,36 +1637,71 @@ class Homecleaningapicontroller extends Controller
             return response()->json(['status' => false, 'message' => 'Tabby payment initialization failed.'], 500);
         } else {
             // STRIPE
-            $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
-            $response = $stripe->checkout->sessions->create([
-                'line_items' => [
-                    [
-                        'price_data' => [
-                            'currency' => 'aed',
-                            'product_data' => ['name' => 'Your Total'],
-                            'unit_amount' => $order_total_new * 100,
-                        ],
-                        'quantity' => 1,
-                    ]
-                ],
-                'mode' => 'payment',
-                'success_url' => route('payment_success'),
-                'cancel_url' => route('payment_fail'),
-            ]);
+            try {
+                $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
 
-            if (isset($response->id) && $response->id != '') {
-                DB::table('ci_orders')->where('order_id', $arrOrderId)->update(['stripe_session_id' => $response->id]);
+                $customerEmail = $user->email ?? 'test@example.com';
+                $customerId = null;
+
+                // 1. Check local DB
+                if (!empty($user->stripe_customer_id)) {
+                    $customerId = $user->stripe_customer_id;
+                } else {
+                    // 2. Fallback: Search Stripe by email
+                    $existingCustomers = $stripe->customers->all(['email' => $customerEmail, 'limit' => 1]);
+
+                    if (count($existingCustomers->data) > 0) {
+                        $customerId = $existingCustomers->data[0]->id;
+                    } else {
+                        // 3. Create new Stripe Customer
+                        $newCustomer = $stripe->customers->create([
+                            'email' => $customerEmail,
+                            'name'  => $user->name ?? 'Mobile App User',
+                        ]);
+                        $customerId = $newCustomer->id;
+                    }
+
+                    // 4. Save to local DB permanently
+                    DB::table('frontloginregisters')->where('id', $userid)->update(['stripe_customer_id' => $customerId]);
+                }
+
+                // Create Ephemeral Key
+                $ephemeralKey = $stripe->ephemeralKeys->create(
+                    ['customer' => $customerId],
+                    ['stripe_version' => '2022-08-01']
+                );
+
+                // Create Payment Intent
+                $paymentIntent = $stripe->paymentIntents->create([
+                    'amount' => intval($order_total_new * 100), // Amount must be in cents/fils
+                    'currency' => 'aed',
+                    'customer' => $customerId,
+                    'automatic_payment_methods' => [
+                        'enabled' => 'true',
+                    ],
+                    'metadata' => [
+                        'order_id' => $arrOrderId,
+                        'format_order_id' => $formatOrderId
+                    ]
+                ]);
+
+                // Store intent ID in database
+                DB::table('ci_orders')->where('order_id', $arrOrderId)->update(['stripe_session_id' => $paymentIntent->id]);
+
                 return response()->json([
                     'status' => true,
-                    'message' => 'Stripe Session created',
+                    'message' => 'Stripe Payment Intent created',
                     'data' => [
                         'order_id' => $arrOrderId,
                         'format_order_id' => $formatOrderId,
-                        'payment_url' => $response->url
+                        'clientSecret' => $paymentIntent->client_secret,
+                        'customerId' => $customerId,
+                        'ephemeralKeySecret' => $ephemeralKey->secret,
+                        'publishableKey' => config('stripe.stripe_pk')
                     ]
                 ]);
-            } else {
-                return response()->json(['status' => false, 'message' => 'Stripe payment initialization failed.'], 500);
+            } catch (\Exception $e) {
+                return response()->json(['status' => false, 'message' => 'Stripe payment initialization failed: ' . $e->getMessage()], 500);
             }
         }
     }

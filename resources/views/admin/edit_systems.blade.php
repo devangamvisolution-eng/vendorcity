@@ -84,10 +84,12 @@
 
                                     <label for="name">Weekly Discount in Percentage</label>
 
-                                    <input id="weekly_percentage" name="weekly_percentage" type="text" class="form-control"
-                                        placeholder="Enter Weekly discount in  Percentage" value="{{ $systems->weekly_percentage }}" />
+                                    <input id="weekly_percentage" name="weekly_percentage" type="text"
+                                        class="form-control" placeholder="Enter Weekly discount in  Percentage"
+                                        value="{{ $systems->weekly_percentage }}" />
 
-                                    <p class="form-error-text" id="weekly_percentage_error" style="color: red; margin-top: 10px;">
+                                    <p class="form-error-text" id="weekly_percentage_error"
+                                        style="color: red; margin-top: 10px;">
                                     </p>
 
                                 </div>
@@ -96,10 +98,12 @@
 
                                     <label for="name">Multiple time a week In Percentage</label>
 
-                                    <input id="multiple_time_week" name="multiple_time_week" type="text" class="form-control"
-                                        placeholder="Enter Multiple time a week In Percentage" value="{{ $systems->multiple_time_week }}" />
+                                    <input id="multiple_time_week" name="multiple_time_week" type="text"
+                                        class="form-control" placeholder="Enter Multiple time a week In Percentage"
+                                        value="{{ $systems->multiple_time_week }}" />
 
-                                    <p class="form-error-text" id="multiple_time_week_error" style="color: red; margin-top: 10px;">
+                                    <p class="form-error-text" id="multiple_time_week_error"
+                                        style="color: red; margin-top: 10px;">
                                     </p>
 
                                 </div>
@@ -108,7 +112,57 @@
 
                             </div>
 
-                            <div class="row">
+                            <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <h5>Weather Alert Settings</h5>
+                                    <hr>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>
+                                        <input type="checkbox" name="weather_is_web_active" value="1"
+                                            {{ $systems->weather_is_web_active ? 'checked' : '' }}> Active on Web
+                                    </label>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>
+                                        <input type="checkbox" name="weather_is_app_active" value="1"
+                                            {{ $systems->weather_is_app_active ? 'checked' : '' }}> Active on App
+                                    </label>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Web Icon</label>
+                                    <input type="file" name="weather_web_icon" class="form-control" accept="image/*" />
+                                    @if ($systems->weather_web_icon)
+                                        <img src="{{ asset('public/upload/weather/' . $systems->weather_web_icon) }}"
+                                            width="50" class="mt-2">
+                                    @endif
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>App Icon</label>
+                                    <input type="file" name="weather_app_icon" class="form-control" accept="image/*" />
+                                    @if ($systems->weather_app_icon)
+                                        <img src="{{ asset('public/upload/weather/' . $systems->weather_app_icon) }}"
+                                            width="50" class="mt-2">
+                                    @endif
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    <label>Alt Tag</label>
+                                    <input type="text" name="weather_alt_tag" class="form-control"
+                                        placeholder="Enter Alt Tag" value="{{ $systems->weather_alt_tag }}" />
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    <label>Title</label>
+                                    <input type="text" name="weather_title" class="form-control"
+                                        placeholder="Enter Title (e.g. Weather Alert)"
+                                        value="{{ $systems->weather_title }}" />
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    <label>Short Description</label>
+                                    <textarea name="weather_short_description" class="form-control" placeholder="Enter Short Description">{{ $systems->weather_short_description }}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
                                 <div class="col-md-12">
                                     <h5>Add More Meta Section Home Page</h5>
                                     <hr>
@@ -117,101 +171,107 @@
 
                             @if (!empty($system_attribute))
 
-                            <input type="hidden" name="city_addmore_third1[]" value="">
-                                    <input type="hidden" name="meta_title_addmore1[]" value="">
-                                    <input type="hidden" name="meta_keyword_addmore1[]" value="">
-                                    <input type="hidden" name="meta_description_addmore1[]" value="">
-                                    @for ($i = 0; $i < count($system_attribute); $i++)
+                                <input type="hidden" name="city_addmore_third1[]" value="">
+                                <input type="hidden" name="meta_title_addmore1[]" value="">
+                                <input type="hidden" name="meta_keyword_addmore1[]" value="">
+                                <input type="hidden" name="meta_description_addmore1[]" value="">
+                                @for ($i = 0; $i < count($system_attribute); $i++)
                                     <div class="row">
                                         <input type="hidden" name="updateid1xxx2[]"
-                                                id="updateid1xxx2{{ $i + 1 }}"
-                                                value="{{ $system_attribute[$i]->id }}">
-                                    
-                                                 <div class="col-md-4">
-                                        <div class="form-group"> <label for="categoryname">City</label>
-                                        <select class="form-control" id="city_addmore_thirdu" name="city_addmore_thirdu[]">
-                                            <option value="">Select City</option>
-                                            @foreach ($allcity as $data)
-                                                <option value="{{ $data->id }}"@if($data->id == $system_attribute[$i]->city) selected @endif>{{ $data->name }}
-                                                </option>
-                                            @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
+                                            id="updateid1xxx2{{ $i + 1 }}"
+                                            value="{{ $system_attribute[$i]->id }}">
 
-                                    <div class="col-md-4">
-                                        <div class="form-group"> <label for="categoryname">Meta Title</label>
-                                            <input type="text" id="meta_title_addmoreu" name="meta_title_addmoreu[]" class="form-control"
-                                                placeholder="" value="{{ $system_attribute[$i]->meta_title }}">
+                                        <div class="col-md-4">
+                                            <div class="form-group"> <label for="categoryname">City</label>
+                                                <select class="form-control" id="city_addmore_thirdu"
+                                                    name="city_addmore_thirdu[]">
+                                                    <option value="">Select City</option>
+                                                    @foreach ($allcity as $data)
+                                                        <option
+                                                            value="{{ $data->id }}"@if ($data->id == $system_attribute[$i]->city) selected @endif>
+                                                            {{ $data->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group"> <label for="categoryname">Meta Keyword</label>
-                                            <input type="text" id="meta_keyword_addmoreu" name="meta_keyword_addmoreu[]" class="form-control"
-                                                placeholder="" value="{{ $system_attribute[$i]->meta_keyword }}">
-                                        </div>
-                                    </div>
 
-                                    <div class="col-md-4">
-                                        <div class="form-group"><label for="categoryname">Meta Description</label>
-                                            <textarea id="meta_description_addmoreu" name="meta_description_addmoreu[]" class="form-control"
-                                                placeholder="Enter Meta Description">{{ $system_attribute[$i]->meta_description }}</textarea>
+                                        <div class="col-md-4">
+                                            <div class="form-group"> <label for="categoryname">Meta Title</label>
+                                                <input type="text" id="meta_title_addmoreu"
+                                                    name="meta_title_addmoreu[]" class="form-control" placeholder=""
+                                                    value="{{ $system_attribute[$i]->meta_title }}">
+                                            </div>
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group"> <label for="categoryname">Meta Keyword</label>
+                                                <input type="text" id="meta_keyword_addmoreu"
+                                                    name="meta_keyword_addmoreu[]" class="form-control" placeholder=""
+                                                    value="{{ $system_attribute[$i]->meta_keyword }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group"><label for="categoryname">Meta Description</label>
+                                                <textarea id="meta_description_addmoreu" name="meta_description_addmoreu[]" class="form-control"
+                                                    placeholder="Enter Meta Description">{{ $system_attribute[$i]->meta_description }}</textarea>
+                                            </div>
+                                        </div>
+                                        <a href="#"
+                                            onclick="singledeleteattr('{{ route('removed_system_att', ['pid' => $system_attribute[$i]->system_id, 'id' => $system_attribute[$i]->id]) }}')"
+                                            class="btn btn-danger pull-right remove_field1"
+                                            style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
                                     </div>
-                                     <a href="#"
-                                                onclick="singledeleteattr('{{ route('removed_system_att', ['pid' => $system_attribute[$i]->system_id, 'id' => $system_attribute[$i]->id]) }}')"
-                                                class="btn btn-danger pull-right remove_field1"
-                                                style="margin-right: 0;margin-top: 23px;width: 10%;float: right;height: 38px;margin-left: 30px;">Remove</a>
-                                    </div>
-                                  
-                                 
-                                    @endfor
+                                @endfor
 
                             @endif
 
                             <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group"> <label for="categoryname">City</label>
-                                        <select class="form-control" id="city_addmore_third1" name="city_addmore_third1[]">
+                                <div class="col-md-4">
+                                    <div class="form-group"> <label for="categoryname">City</label>
+                                        <select class="form-control" id="city_addmore_third1"
+                                            name="city_addmore_third1[]">
                                             <option value="">Select City</option>
                                             @foreach ($allcity as $data)
                                                 <option value="{{ $data->id }}">{{ $data->name }}
                                                 </option>
                                             @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="form-group"> <label for="categoryname">Meta Title</label>
-                                            <input type="text" id="meta_title_addmore1" name="meta_title_addmore1[]" class="form-control"
-                                                placeholder="">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group"> <label for="categoryname">Meta Keyword</label>
-                                            <input type="text" id="meta_keyword_addmore1" name="meta_keyword_addmore1[]" class="form-control"
-                                                placeholder="">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="form-group"><label for="categoryname">Meta Description</label>
-                                            <textarea id="meta_description_addmore1" name="meta_description_addmore1[]" class="form-control"
-                                                placeholder="Enter Meta Description"></textarea>
-                                        </div>
-                                    </div>
-                                     
-
-                                </div>
-
-                                <div class="input_fields_wrap02">
-                                </div>
-                                 <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <button style="border: medium none;margin-right: 0px;line-height: 25px;" class="submit btn bg-purple pull-right" type="button"  id="add_field_button02">Add More </button>
+                                        </select>
                                     </div>
                                 </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group"> <label for="categoryname">Meta Title</label>
+                                        <input type="text" id="meta_title_addmore1" name="meta_title_addmore1[]"
+                                            class="form-control" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group"> <label for="categoryname">Meta Keyword</label>
+                                        <input type="text" id="meta_keyword_addmore1" name="meta_keyword_addmore1[]"
+                                            class="form-control" placeholder="">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group"><label for="categoryname">Meta Description</label>
+                                        <textarea id="meta_description_addmore1" name="meta_description_addmore1[]" class="form-control"
+                                            placeholder="Enter Meta Description"></textarea>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <div class="input_fields_wrap02">
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <button style="border: medium none;margin-right: 0px;line-height: 25px;"
+                                        class="submit btn bg-purple pull-right" type="button"
+                                        id="add_field_button02">Add More </button>
+                                </div>
+                            </div>
 
 
 
@@ -224,7 +284,8 @@
                                 <button class="btn btn-primary mb-1" type="button" disabled id="spinner_button"
                                     style="display: none;">
 
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span class="spinner-border spinner-border-sm" role="status"
+                                        aria-hidden="true"></span>
 
                                     Loading...
 
@@ -302,7 +363,7 @@
 
         }
 
-         $(document).ready(function() {
+        $(document).ready(function() {
             var max_fields = 50;
             var wrapper = $(".input_fields_wrap02");
             var add_button = $("#add_field_button02");
@@ -317,7 +378,7 @@
                     );
 
                     $(wrapper).append(newField);
-                   
+
                 }
             });
 
@@ -327,9 +388,9 @@
                 b--;
             });
 
-             });
+        });
 
-              function singledeleteattr(url) {
+        function singledeleteattr(url) {
             var t = confirm('Are You Sure To Delete The Attribute ?');
 
             if (t) {

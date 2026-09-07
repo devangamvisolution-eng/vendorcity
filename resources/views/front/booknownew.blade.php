@@ -7,6 +7,7 @@
     window.isUserLoggedIn = {{ Session::has('user') ? 'true' : 'false' }};
     window.packageImageBase = "{{ asset('public/upload/packages/large/') }}/";
     window.addonImageBase = "{{ asset('public/upload/addons/') }}/";
+    window.currentSubserviceUrl = "{{ $subservice_data->page_url ?? '' }}";
 </script>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
@@ -412,6 +413,12 @@
     .package-description-popup p {
         color: #000000de;
     }
+
+    @media (max-width: 767px) {
+        .subservice-read-more-model .modal-body {
+            padding-bottom: 100px !important;
+        }
+    }
 </style>
 
 
@@ -507,7 +514,7 @@
                             @foreach ($package_cat as $package_cat_data)
                                 <div id="sofa{{ $package_cat_data->id }}" class="section-packages" style="">
                                     <!-- <div id="sofa{{ $package_cat_data->id }}" class="section-packages"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    style="padding-top: 40px;"> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        style="padding-top: 40px;"> -->
 
                                     @php
                                         $package = DB::table('packages')
@@ -527,7 +534,7 @@
                                     <h4 class="packagecatHeading" style="">
                                         {{ $package_cat_data->name }}
                                     </h4>
-                                    @if ($package_cat_data->image != '')
+                                    @if ($package_cat_data->image != '' && file_exists(public_path('upload/packagecategory/' . $package_cat_data->image)))
                                         <img src="{{ url('public/upload/packagecategory/' . $package_cat_data->image) }}"
                                             alt="{{ $package_cat_data->name }}" class="w-100 rounded mb-4 bannerimage"
                                             style="object-fit: cover; max-height: 200px;border-radius: 5px !important;">
@@ -536,164 +543,276 @@
 
                                     @if (!empty($package))
                                         <div class="package-list-container">
-                                            @if (count($package) > 3)
-                                                @php
-                                                    $lowest_price = PHP_INT_MAX;
-                                                    $lowest_price_image = '';
-                                                    foreach ($package as $p_data) {
-                                                        $p_price = $p_data->price;
+                                            @php
+                                                $package_groups = DB::table('package_groups')
+                                                    ->where('packagecategory_id', $package_cat_data->id)
+                                                    ->where('is_active', 0)
+                                                    ->orderBy('set_order', 'ASC')
+                                                    ->get();
+
+                                                $active_group_ids = $package_groups->pluck('id')->toArray();
+
+                                                $has_groups = false;
+                                                $ungrouped_packages = [];
+
+                                                if (count($package_groups) > 0) {
+                                                    foreach ($package as $p) {
                                                         if (
-                                                            !empty($p_data->discount) &&
-                                                            isset($p_data->discount_type)
+                                                            empty($p->package_group_id) ||
+                                                            !in_array($p->package_group_id, $active_group_ids)
                                                         ) {
-                                                            $disc =
-                                                                $p_data->discount_type == 0
-                                                                    ? ($p_data->discount / 100) * $p_data->price
-                                                                    : $p_data->discount;
-                                                            $p_price -= $disc;
-                                                        }
-                                                        if ($p_price < $lowest_price) {
-                                                            $lowest_price = $p_price;
-                                                            $lowest_price_image = $p_data->image;
+                                                            $ungrouped_packages[] = $p;
                                                         }
                                                     }
-                                                @endphp
+                                                    $has_groups = true;
+                                                } else {
+                                                    $ungrouped_packages = $package;
+                                                }
+                                            @endphp
 
-                                                <div class="grouped-category-card entrance-anim"
-                                                    style="cursor: pointer;" data-bs-toggle="modal"
-                                                    data-bs-target="#category-modal-{{ $package_cat_data->id }}">
-                                                    <div class="grouped-category-header">
-                                                        @if (!empty($package_cat_data->slider_image))
-                                                            <img src="{{ url('public/upload/packagecategory/' . $package_cat_data->slider_image) }}"
-                                                                alt="{{ $package_cat_data->name }}"
-                                                                class="grouped-category-img"
-                                                                style="background-color: transparent;">
-                                                        @elseif ($package_cat_data->image != '')
-                                                            <img src="{{ url('public/upload/packagecategory/' . $package_cat_data->image) }}"
-                                                                alt="{{ $package_cat_data->name }}"
-                                                                class="grouped-category-img">
-                                                        @else
-                                                            <div class="package-list-no-img"
-                                                                style="width:100px; height:100px; border-radius:12px;">
-                                                                <i class="fa-solid fa-list"
-                                                                    style="font-size:32px; margin-bottom:5px;"></i>
-                                                                Options
-                                                            </div>
-                                                        @endif
-                                                        <div class="grouped-category-info">
-                                                            <h3 class="grouped-category-title">
-                                                                {{ $package_cat_data->name }}
-                                                            </h3>
-                                                            <p class="grouped-category-desc">Multiple customized options
-                                                                available for your specific needs.</p>
-                                                            <div class="options-badge">{{ count($package) }} Options
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="grouped-category-footer">
-                                                        <div class="grouped-category-price">
-                                                            Starts at
-                                                            <span class="price-wrapper">
-                                                                <span class="currency_dhiramnew">AED</span>
-                                                                <strong>
-                                                                    {{ number_format($lowest_price, 2) }}</strong>
-                                                            </span>
-                                                        </div>
-                                                        <button type="button" class="btn select-options-btn"
-                                                            onclick="event.stopPropagation();" data-bs-toggle="modal"
-                                                            data-bs-target="#category-modal-{{ $package_cat_data->id }}">Add
-                                                            +</button>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                @if (count($package) > 3)
-                                                @endif
-                                                @if (count($package) > 3)
-                                                @endif
-                                                @foreach ($package as $package_data)
+                                            @if ($has_groups)
+                                                @foreach ($package_groups as $group)
                                                     @php
-                                                        $price = $package_data->price;
-                                                        $discount_price = 0;
-
-                                                        if (
-                                                            !empty($package_data->discount) &&
-                                                            isset($package_data->discount_type)
+                                                        $group_packages = array_filter($package, function ($p) use (
+                                                            $group,
                                                         ) {
-                                                            $discount_price =
-                                                                $package_data->discount_type == 0
-                                                                    ? ($package_data->discount / 100) *
-                                                                        $package_data->price
-                                                                    : $package_data->discount;
-                                                            $price -= $discount_price;
+                                                            return $p->package_group_id == $group->id;
+                                                        });
+                                                        if (count($group_packages) == 0) {
+                                                            continue;
+                                                        }
+
+                                                        $lowest_price = PHP_INT_MAX;
+                                                        foreach ($group_packages as $p_data) {
+                                                            $p_price = $p_data->price;
+                                                            if (
+                                                                !empty($p_data->discount) &&
+                                                                isset($p_data->discount_type)
+                                                            ) {
+                                                                $disc =
+                                                                    $p_data->discount_type == 0
+                                                                        ? ($p_data->discount / 100) * $p_data->price
+                                                                        : $p_data->discount;
+                                                                $p_price -= $disc;
+                                                            }
+                                                            if ($p_price < $lowest_price) {
+                                                                $lowest_price = $p_price;
+                                                            }
+                                                        }
+                                                    @endphp
+                                                    <div class="grouped-category-card entrance-anim"
+                                                        style="cursor: pointer; margin-bottom: 20px;"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#group-modal-{{ $group->id }}">
+                                                        <div class="grouped-category-header">
+                                                            @if ($group->image != '' && file_exists(public_path('upload/package_groups/' . $group->image)))
+                                                                <img src="{{ url('public/upload/package_groups/' . $group->image) }}"
+                                                                    alt="{{ $group->name }}"
+                                                                    class="grouped-category-img">
+                                                            @endif
+                                                            <div class="grouped-category-info">
+                                                                <h3 class="grouped-category-title">
+                                                                    {{ $group->name }}
+                                                                </h3>
+                                                                @if (isset($group->short_description) && $group->short_description != '')
+                                                                    <p class="grouped-category-desc"
+                                                                        style="color: #666; font-size: 14px; margin-bottom: 5px;">
+                                                                        {{ $group->short_description }}
+                                                                    </p>
+                                                                @endif
+                                                                <p class="grouped-category-desc">
+                                                                    {{ $group->description }}
+                                                                </p>
+                                                                <div class="options-badge">{{ count($group_packages) }}
+                                                                    Options
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="grouped-category-footer">
+                                                            <div class="grouped-category-price">
+                                                                Starts at
+                                                                <span class="price-wrapper">
+                                                                    <span class="currency_dhiramnew">AED</span>
+                                                                    <strong>
+                                                                        {{ number_format($lowest_price, 2) }}</strong>
+                                                                </span>
+                                                            </div>
+                                                            <button type="button" class="btn select-options-btn"
+                                                                onclick="event.stopPropagation();"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#group-modal-{{ $group->id }}">Add
+                                                                +</button>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @endif
+
+                                            @if (!$has_groups || count($ungrouped_packages) > 0)
+                                                @if (count($ungrouped_packages) > 0 && $has_groups)
+                                                    <div style="margin-top: 30px;">
+                                                        <h5 style="margin-bottom: 15px;">Other Options</h5>
+                                                    </div>
+                                                @endif
+                                                @if (!$has_groups && count($package) > 3)
+                                                    @php
+                                                        $lowest_price = PHP_INT_MAX;
+                                                        $lowest_price_image = '';
+                                                        foreach ($package as $p_data) {
+                                                            $p_price = $p_data->price;
+                                                            if (
+                                                                !empty($p_data->discount) &&
+                                                                isset($p_data->discount_type)
+                                                            ) {
+                                                                $disc =
+                                                                    $p_data->discount_type == 0
+                                                                        ? ($p_data->discount / 100) * $p_data->price
+                                                                        : $p_data->discount;
+                                                                $p_price -= $disc;
+                                                            }
+                                                            if ($p_price < $lowest_price) {
+                                                                $lowest_price = $p_price;
+                                                                $lowest_price_image = $p_data->image;
+                                                            }
                                                         }
                                                     @endphp
 
-                                                    <div class="package-list-row entrance-anim">
-                                                        @if (!empty($package_data->image))
-                                                            <div class="package-list-img-wrapper">
-                                                                <img src="{{ asset('public/upload/packages/large/' . $package_data->image) }}"
-                                                                    alt="{{ $package_data->name }}"
-                                                                    class="package-list-img">
-                                                            </div>
-                                                        @else
-                                                            <div class="package-list-no-img">
-                                                                <span>{{ $loop->iteration }}</span>
-                                                                Option
-                                                            </div>
-                                                        @endif
-
-                                                        <div class="package-list-body">
-                                                            <a href="javascript:void(0)"
-                                                                style="text-decoration: none;" data-bs-toggle="modal"
-                                                                id="package_detail"
-                                                                data-bs-target="#package-detail-model_{{ $package_data->id }}">
-                                                                <h3 class="package-list-title">
-                                                                    {{ $package_data->name }}
+                                                    <div class="grouped-category-card entrance-anim"
+                                                        style="cursor: pointer;" data-bs-toggle="modal"
+                                                        data-bs-target="#category-modal-{{ $package_cat_data->id }}">
+                                                        <div class="grouped-category-header">
+                                                            @if (
+                                                                !empty($package_cat_data->card_image) &&
+                                                                    file_exists(public_path('upload/packagecategory/' . $package_cat_data->card_image)))
+                                                                <img src="{{ url('public/upload/packagecategory/' . $package_cat_data->card_image) }}"
+                                                                    alt="{{ $package_cat_data->name }}"
+                                                                    class="grouped-category-img">
+                                                            @elseif ($package_cat_data->image != '' && file_exists(public_path('upload/packagecategory/' . $package_cat_data->image)))
+                                                                <img src="{{ url('public/upload/packagecategory/' . $package_cat_data->image) }}"
+                                                                    alt="{{ $package_cat_data->name }}"
+                                                                    class="grouped-category-img">
+                                                            @elseif (
+                                                                !empty($package_cat_data->slider_image) &&
+                                                                    file_exists(public_path('upload/packagecategory/' . $package_cat_data->slider_image)))
+                                                                <img src="{{ url('public/upload/packagecategory/' . $package_cat_data->slider_image) }}"
+                                                                    alt="{{ $package_cat_data->name }}"
+                                                                    class="grouped-category-img"
+                                                                    style="background-color: transparent;">
+                                                            @endif
+                                                            <div class="grouped-category-info">
+                                                                <h3 class="grouped-category-title">
+                                                                    {{ $package_cat_data->name }}
                                                                 </h3>
-                                                            </a>
-                                                            <p class="package-list-desc">
-                                                                {{ $package_data->short_description }}
-                                                            </p>
-                                                            <div class="package-list-price-wrap">
-                                                                <div>
-                                                                    <div class="price price-wrapper">
-                                                                        <span class="currency_dhiramnew">AED</span>
-                                                                        <span>{{ number_format($price, 2) }}</span>
-                                                                    </div>
-                                                                    @if ($discount_price > 0)
-                                                                        <div class="old-price price-wrapper">
-                                                                            <span class="currency_dhiramnew">AED</span>
-                                                                            <span>{{ number_format($package_data->price, 2) }}</span>
-                                                                        </div>
-                                                                    @endif
-                                                                </div>
-                                                                <div class="package-list-action">
-                                                                    <button type="button" class="addbutton"
-                                                                        data-id="{{ $package_data->id }}"
-                                                                        data-name="{{ $package_data->name }}"
-                                                                        data-price="{{ $price }}"
-                                                                        data-oldprice="{{ $package_data->price }}"
-                                                                        data-image="{{ !empty($package_data->image) ? asset('public/upload/packages/large/' . $package_data->image) : '' }}"
-                                                                        data-service="{{ $service_id }}"
-                                                                        data-subservice_id="{{ $subservice_id }}"
-                                                                        data-type="package">Add +</button>
-
-                                                                    <div class="quantity-control"
-                                                                        data-id="{{ $package_data->id }}"
-                                                                        style="display:none;">
-                                                                        <button class="minus-btn" type="button"><i
-                                                                                class="fa-solid fa-minus"></i></button>
-                                                                        <span class="quantity">1</span>
-                                                                        <button class="plus-btn" type="button"><i
-                                                                                class="fa-solid fa-plus"></i></button>
-                                                                    </div>
+                                                                <p class="grouped-category-desc">Multiple customized
+                                                                    options
+                                                                    available for your specific needs.</p>
+                                                                <div class="options-badge">{{ count($package) }}
+                                                                    Options
                                                                 </div>
                                                             </div>
                                                         </div>
-
-
+                                                        <div class="grouped-category-footer">
+                                                            <div class="grouped-category-price">
+                                                                Starts at
+                                                                <span class="price-wrapper">
+                                                                    <span class="currency_dhiramnew">AED</span>
+                                                                    <strong>
+                                                                        {{ number_format($lowest_price, 2) }}</strong>
+                                                                </span>
+                                                            </div>
+                                                            <button type="button" class="btn select-options-btn"
+                                                                onclick="event.stopPropagation();"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#category-modal-{{ $package_cat_data->id }}">Add
+                                                                +</button>
+                                                        </div>
                                                     </div>
-                                                @endforeach
+                                                @else
+                                                    @if (count($package) > 3)
+                                                    @endif
+                                                    @if (count($package) > 3)
+                                                    @endif
+                                                    @foreach ($package as $package_data)
+                                                        @php
+                                                            $price = $package_data->price;
+                                                            $discount_price = 0;
+
+                                                            if (
+                                                                !empty($package_data->discount) &&
+                                                                isset($package_data->discount_type)
+                                                            ) {
+                                                                $discount_price =
+                                                                    $package_data->discount_type == 0
+                                                                        ? ($package_data->discount / 100) *
+                                                                            $package_data->price
+                                                                        : $package_data->discount;
+                                                                $price -= $discount_price;
+                                                            }
+                                                        @endphp
+
+                                                        <div class="package-list-row entrance-anim">
+                                                            @if (!empty($package_data->image) && file_exists(public_path('upload/packages/large/' . $package_data->image)))
+                                                                <div class="package-list-img-wrapper">
+                                                                    <img src="{{ asset('public/upload/packages/large/' . $package_data->image) }}"
+                                                                        alt="{{ $package_data->name }}"
+                                                                        class="package-list-img">
+                                                                </div>
+                                                            @endif
+
+                                                            <div class="package-list-body">
+                                                                <a href="javascript:void(0)"
+                                                                    style="text-decoration: none;"
+                                                                    data-bs-toggle="modal" id="package_detail"
+                                                                    data-bs-target="#package-detail-model_{{ $package_data->id }}">
+                                                                    <h3 class="package-list-title">
+                                                                        {{ $package_data->name }}
+                                                                    </h3>
+                                                                </a>
+                                                                <p class="package-list-desc">
+                                                                    {{ $package_data->short_description }}
+                                                                </p>
+                                                                <div class="package-list-price-wrap">
+                                                                    <div>
+                                                                        <div class="price price-wrapper">
+                                                                            <span class="currency_dhiramnew">AED</span>
+                                                                            <span>{{ number_format($price, 2) }}</span>
+                                                                        </div>
+                                                                        @if ($discount_price > 0)
+                                                                            <div class="old-price price-wrapper">
+                                                                                <span
+                                                                                    class="currency_dhiramnew">AED</span>
+                                                                                <span>{{ number_format($package_data->price, 2) }}</span>
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                    <div class="package-list-action">
+                                                                        <button type="button" class="addbutton"
+                                                                            data-id="{{ $package_data->id }}"
+                                                                            data-name="{{ $package_data->name }}"
+                                                                            data-price="{{ $price }}"
+                                                                            data-oldprice="{{ $package_data->price }}"
+                                                                            data-image="{{ !empty($package_data->image) ? asset('public/upload/packages/large/' . $package_data->image) : '' }}"
+                                                                            data-service="{{ $service_id }}"
+                                                                            data-subservice_id="{{ $subservice_id }}"
+                                                                            data-type="package">Add +</button>
+
+                                                                        <div class="quantity-control"
+                                                                            data-id="{{ $package_data->id }}"
+                                                                            style="display:none;">
+                                                                            <button class="minus-btn"
+                                                                                type="button"><i
+                                                                                    class="fa-solid fa-minus"></i></button>
+                                                                            <span class="quantity">1</span>
+                                                                            <button class="plus-btn" type="button"><i
+                                                                                    class="fa-solid fa-plus"></i></button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                        </div>
+                                                    @endforeach
+                                                @endif
                                             @endif
                                         </div>
                                     @endif
@@ -1044,8 +1163,7 @@
                                     <label class="form-label fw500 dark-color">Car Details</label>
                                     <div class="row">
                                         <div class="col-md-4 col-4 mb-2" style="padding-right: 5px;">
-                                            <select class="form-control" name="plate_source" id="plate_source"
-                                                style="padding: 0.375rem 0.5rem; font-size: 13px;">
+                                            <select class="form-control" name="plate_source" id="plate_source">
                                                 <option value="">Plate Source</option>
                                                 <option value="Dubai">Dubai</option>
                                                 <option value="Abu Dhabi">Abu Dhabi</option>
@@ -1060,17 +1178,15 @@
                                         <div class="col-md-4 col-4 mb-2"
                                             style="padding-right: 5px; padding-left: 5px;">
                                             <input type="text" class="form-control" name="plate_code"
-                                                id="plate_code" placeholder="Plate Code"
-                                                style="padding: 0.375rem 0.5rem; font-size: 13px;">
+                                                id="plate_code" placeholder="Plate Code">
                                         </div>
                                         <div class="col-md-4 col-4 mb-2" style="padding-left: 5px;">
                                             <input type="text" class="form-control" name="plate_number"
-                                                id="plate_number" placeholder="Plate Number"
-                                                style="padding: 0.375rem 0.5rem; font-size: 13px;">
+                                                id="plate_number" placeholder="Plate Number">
                                         </div>
                                         <div class="col-md-12 mb-2">
                                             <textarea class="form-control" name="car_description" id="car_description"
-                                                placeholder="add some sentence add your car model and data"></textarea>
+                                                placeholder="Car is a White Nissan Patrol"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -1434,8 +1550,8 @@
                                                                 <div id="wallet_amount" class="price-wrapper">
                                                                     <span class="currency_dhiramnew"
                                                                         style="
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    style=&quot;font-size: 0.95rem; font-weight:700; position:relative;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ">AED</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        style=&quot;font-size: 0.95rem; font-weight:700; position:relative;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ">AED</span>
                                                                     <span>{{ $wallet_amount }}</span>
                                                                 </div>
                                                             </div>
@@ -1649,7 +1765,15 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-between d-none service-fee-div">
-                        <div>Service Fee</div>
+                        <div>Service Fee
+                            @if ($subservice_data->service_fee_popup != '')
+                                <a data-bs-toggle="modal" data-bs-target="#service_fee_popup_{{ $subservice_id }}"
+                                    style="cursor:pointer; line-height:1;">
+                                    <img src="{{ asset('public/site/images/infoicon.svg') }}"
+                                        style="height:14px; width:14px; vertical-align:middle;">
+                                </a>
+                            @endif
+                        </div>
                         <div class="font-weight-bold sm-summary price-wrapper">
                             <span class="currency_dhiramnew">AED</span>
                             <span class="service_fee">0.00</span>
@@ -1891,7 +2015,8 @@
                                             <button class="accordion-button collapsed" type="button"
                                                 data-bs-toggle="collapse"
                                                 data-bs-target="#faqCollapse{{ $faq_index }}"
-                                                aria-expanded="false" aria-controls="faqCollapse{{ $faq_index }}">
+                                                aria-expanded="false"
+                                                aria-controls="faqCollapse{{ $faq_index }}">
                                                 {{ $faq_item->question }}
                                             </button>
                                         </h2>
@@ -2337,7 +2462,8 @@
                         </span>
                     </div>
                     <div class="d-flex justify-content-between py-1 d-none service-fee-div align-items-center">
-                        <span style="font-size:0.85rem; color:#555; display:flex; align-items:center; gap:5px;">Service
+                        <span
+                            style="font-size:0.85rem; color:#555; display:flex; align-items:center; gap:5px;">Service
                             Fee
                             @if ($subservice_data->service_fee_popup != '')
                                 <a data-bs-toggle="modal" data-bs-target="#service_fee_popup_{{ $subservice_id }}"
@@ -2481,7 +2607,6 @@
             ->where('service_id', $service_id)
             ->where('subservice_id', $subservice_id)
             ->where('packagecategory_id', $package_cat_data->id)
-            ->where('is_active', 0)
             ->get()
             ->toArray();
     @endphp
@@ -2493,7 +2618,7 @@
         <!-- Category Modal -->
         <div class="modal fade subservice-read-more-model" id="category-modal-{{ $package_cat_data->id }}"
             tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 600px;">
                 <div class="modal-content">
                     <div class="modal-drag-handle">
                         <div style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;">
@@ -2521,15 +2646,10 @@
                                     }
                                 @endphp
                                 <div class="package-list-row">
-                                    @if (!empty($package_data->image))
+                                    @if (!empty($package_data->image) && file_exists(public_path('upload/packages/large/' . $package_data->image)))
                                         <div class="package-list-img-wrapper">
                                             <img src="{{ asset('public/upload/packages/large/' . $package_data->image) }}"
                                                 alt="{{ $package_data->name }}" class="package-list-img">
-                                        </div>
-                                    @else
-                                        <div class="package-list-no-img">
-                                            <span>{{ $loop->iteration }}</span>
-                                            Option
                                         </div>
                                     @endif
 
@@ -2545,36 +2665,37 @@
                                             {{ $package_data->short_description }}
                                         </p>
                                         <div class="package-list-price-wrap">
-                                            <div class="price price-wrapper">
-                                                <span class="currency_dhiramnew">AED</span>
-                                                <span>{{ number_format($price, 2) }}</span>
-                                            </div>
-                                            @if ($discount_price > 0)
-                                                <div class="old-price price-wrapper">
+                                            <div>
+                                                <div class="price price-wrapper">
                                                     <span class="currency_dhiramnew">AED</span>
-                                                    <span>{{ number_format($package_data->price, 2) }}</span>
+                                                    <span>{{ number_format($price, 2) }}</span>
                                                 </div>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <div class="package-list-action">
-                                        <button type="button" class="addbutton"
-                                            data-id="{{ $package_data->id }}"
-                                            data-name="{{ $package_data->name }}"
-                                            data-price="{{ $price }}"
-                                            data-oldprice="{{ $package_data->price }}"
-                                            data-image="{{ !empty($package_data->image) ? asset('public/upload/packages/large/' . $package_data->image) : '' }}"
-                                            data-service="{{ $service_id }}"
-                                            data-subservice_id="{{ $subservice_id }}" data-type="package">Add
-                                            +</button>
-                                        <div class="quantity-control" data-id="{{ $package_data->id }}"
-                                            style="display:none;">
-                                            <button class="minus-btn" type="button"><i
-                                                    class="fa-solid fa-minus"></i></button>
-                                            <span class="quantity">1</span>
-                                            <button class="plus-btn" type="button"><i
-                                                    class="fa-solid fa-plus"></i></button>
+                                                @if ($discount_price > 0)
+                                                    <div class="old-price price-wrapper">
+                                                        <span class="currency_dhiramnew">AED</span>
+                                                        <span>{{ number_format($package_data->price, 2) }}</span>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="package-list-action">
+                                                <button type="button" class="addbutton"
+                                                    data-id="{{ $package_data->id }}"
+                                                    data-name="{{ $package_data->name }}"
+                                                    data-price="{{ $price }}"
+                                                    data-oldprice="{{ $package_data->price }}"
+                                                    data-image="{{ !empty($package_data->image) ? asset('public/upload/packages/large/' . $package_data->image) : '' }}"
+                                                    data-service="{{ $service_id }}"
+                                                    data-subservice_id="{{ $subservice_id }}"
+                                                    data-type="package">Add +</button>
+                                                <div class="quantity-control" data-id="{{ $package_data->id }}"
+                                                    style="display:none;">
+                                                    <button class="minus-btn" type="button"><i
+                                                            class="fa-solid fa-minus"></i></button>
+                                                    <span class="quantity">1</span>
+                                                    <button class="plus-btn" type="button"><i
+                                                            class="fa-solid fa-plus"></i></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2585,6 +2706,112 @@
             </div>
         </div>
     @endif
+    @php
+        $package_groups_for_modal = DB::table('package_groups')
+            ->where('packagecategory_id', $package_cat_data->id)
+            ->where('is_active', 0)
+            ->orderBy('set_order', 'ASC')
+            ->get();
+    @endphp
+    @foreach ($package_groups_for_modal as $group_modal_data)
+        @php
+            $group_packages_modal = DB::table('packages')
+                ->where('service_id', $service_id)
+                ->where('subservice_id', $subservice_id)
+                ->where('packagecategory_id', $package_cat_data->id)
+                ->where('package_group_id', $group_modal_data->id)
+                ->where('is_active', 0)
+                ->orderBy('set_order', 'asc')
+                ->get()
+                ->toArray();
+        @endphp
+        @if (count($group_packages_modal) > 0)
+            <!-- Group Modal -->
+            <div class="modal fade subservice-read-more-model" id="group-modal-{{ $group_modal_data->id }}"
+                tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 600px;">
+                    <div class="modal-content">
+                        <div class="modal-drag-handle">
+                            <div style="width:36px; height:4px; border-radius:99px; background:#ddd; margin:0 auto;">
+                            </div>
+                        </div>
+                        <div class="modal-header bn-modal-header">
+                            <h5 class="modal-title" style="font-weight: 700;">
+                                {{ $group_modal_data->name }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" style="padding: 15px; background: #f9f9f9;">
+                            <div class="package-list-container" style="margin-top: 0;">
+                                @foreach ($group_packages_modal as $package_data)
+                                    @php
+                                        $price = $package_data->price;
+                                        $discount_price = 0;
+                                        if (!empty($package_data->discount) && isset($package_data->discount_type)) {
+                                            $discount_price =
+                                                $package_data->discount_type == 0
+                                                    ? ($package_data->discount / 100) * $package_data->price
+                                                    : $package_data->discount;
+                                            $price -= $discount_price;
+                                        }
+                                    @endphp
+                                    <div class="package-list-row">
+                                        @if (!empty($package_data->image) && file_exists(public_path('upload/packages/large/' . $package_data->image)))
+                                            <div class="package-list-img-wrapper">
+                                                <img src="{{ asset('public/upload/packages/large/' . $package_data->image) }}"
+                                                    alt="{{ $package_data->name }}" class="package-list-img">
+                                            </div>
+                                        @endif
+                                        <div class="package-list-body">
+                                            <a href="javascript:void(0)" style="text-decoration: none;"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#package-detail-model_{{ $package_data->id }}">
+                                                <h3 class="package-list-title">{{ $package_data->name }}</h3>
+                                            </a>
+                                            <p class="package-list-desc">{{ $package_data->short_description }}</p>
+                                            <div class="package-list-price-wrap">
+                                                <div>
+                                                    <div class="price price-wrapper">
+                                                        <span class="currency_dhiramnew">AED</span>
+                                                        <span>{{ number_format($price, 2) }}</span>
+                                                    </div>
+                                                    @if ($discount_price > 0)
+                                                        <div class="old-price price-wrapper">
+                                                            <span class="currency_dhiramnew">AED</span>
+                                                            <span>{{ number_format($package_data->price, 2) }}</span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="package-list-action">
+                                                    <button type="button" class="addbutton"
+                                                        data-id="{{ $package_data->id }}"
+                                                        data-name="{{ $package_data->name }}"
+                                                        data-price="{{ $price }}"
+                                                        data-oldprice="{{ $package_data->price }}"
+                                                        data-image="{{ !empty($package_data->image) ? asset('public/upload/packages/large/' . $package_data->image) : '' }}"
+                                                        data-service="{{ $service_id }}"
+                                                        data-subservice_id="{{ $subservice_id }}"
+                                                        data-type="package">Add +</button>
+                                                    <div class="quantity-control"
+                                                        data-id="{{ $package_data->id }}" style="display:none;">
+                                                        <button class="minus-btn" type="button"><i
+                                                                class="fa-solid fa-minus"></i></button>
+                                                        <span class="quantity">1</span>
+                                                        <button class="plus-btn" type="button"><i
+                                                                class="fa-solid fa-plus"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
     @foreach ($package as $package_data)
         @php
             $price = $package_data->price;
@@ -2601,7 +2828,7 @@
         @endphp
         <div class="modal fade subservice-read-more-model" id="package-detail-model_{{ $package_data->id }}"
             tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 600px;">
                 <div class="modal-content">
                     <div class="modal-header bn-modal-header" style="padding: 1rem 1.5rem;">
                         <h5 class="modal-title">{{ $package_data->name }}</h5>
@@ -3225,7 +3452,7 @@
     let vatPercent = window.Enums.vcCharges.VAT_PERCENT.value;
 </script>
 
-<script src="{{ asset('public/site/js/booknownew.js?v=10') }}"></script>
+<script src="{{ asset('public/site/js/booknownew.js?v=12') }}"></script>
 
 <script>
     var emiratesShow = <?= isset($emiratesShow) && $emiratesShow ? 'true' : 'false' ?>;
@@ -4202,7 +4429,11 @@
 
         $('.address_replace').html(address);
 
-        $('#service_fee').val('9');
+        if (window.currentSubserviceUrl === 'car-wash') {
+            $('#service_fee').val('3.5');
+        } else {
+            $('#service_fee').val('9');
+        }
         updateSidebarCart();
 
         return true;

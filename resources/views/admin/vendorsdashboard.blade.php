@@ -185,6 +185,60 @@
             </div>
         </div>
 
+        @if ($message = Session::get('error'))
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" style="border-radius: 15px;">
+                <strong>Error!</strong> {{ $message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        @if ($message = Session::get('success'))
+            <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" style="border-radius: 15px;">
+                <strong>Success!</strong> {{ $message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(Auth::user()->contract_status == 'contract_sent' || Auth::user()->contract_status == 'contract_uploaded')
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0" style="border-radius: 20px; border-left: 5px solid var(--vc-blue) !important;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">Vendor Contract</h5>
+                                <p class="text-muted mb-0">Please check your email for the secure link to upload your signed vendor contract.</p>
+                            </div>
+                            <div>
+                                @if(Auth::user()->contract_status == 'contract_sent')
+                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Pending Signature</span>
+                                @elseif(Auth::user()->contract_status == 'contract_uploaded')
+                                    <span class="badge bg-info text-dark px-3 py-2 rounded-pill">Awaiting Approval</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @elseif(Auth::user()->contract_status == 'approved')
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0 bg-success-subtle" style="border-radius: 20px;">
+                    <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold text-success mb-1"><i class="fas fa-check-circle me-2"></i> Contract Approved</h5>
+                            <p class="text-success-emphasis mb-0">Your vendor contract is approved and valid until {{ Auth::user()->contract_end_date ? date('d M, Y', strtotime(Auth::user()->contract_end_date)) : 'N/A' }}.</p>
+                        </div>
+                        <a href="{{ asset('public/storage/'.Auth::user()->signed_contract_path) }}" target="_blank" class="btn btn-success rounded-pill px-4">
+                            <i class="fas fa-file-pdf me-2"></i> View Contract
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+
         {{-- <div class="row mb-4">
             <div class="col-12">
                 <h5 class="fw-bold mb-3">Your Top Services</h5>

@@ -1,4 +1,5 @@
 @font-face {
+    font-display: swap;
     font-family: "flaticon";
     src: url("../fonts/flaticon_freelancer.ttf?be43da0eae20259fbb3268bef959b04a") format("truetype"),
 url("../fonts/flaticon_freelancer.woff?be43da0eae20259fbb3268bef959b04a") format("woff"),

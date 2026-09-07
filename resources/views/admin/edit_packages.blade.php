@@ -80,7 +80,7 @@
                                     <div class="form-group">
                                         <label for="state">Package Category</label>
                                         <span id="packagecategory_chang">
-                                            <select class="form-control" id="packagecategory_id" name="packagecategory_id">
+                                            <select class="form-control" id="packagecategory_id" name="packagecategory_id" onchange="packagegroup_change(this.value);">
                                                 <option value="">Select Package Category</option>
                                                 @foreach ($packagecat_data as $packagecat)
                                                     <option value="{{ $packagecat->id }}"
@@ -91,6 +91,27 @@
                                             </select>
                                         </span>
                                         <p class="form-error-text" id="packagecategory_error"
+                                            style="color: red; margin-top: 10px;">
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="state">Package Group</label>
+                                        <span id="packagegroup_chang">
+                                            <select class="form-control" id="package_group_id" name="package_group_id">
+                                                <option value="">Select Package Group (Optional)</option>
+                                                @if(isset($packagegroup_data))
+                                                    @foreach ($packagegroup_data as $packagegroup)
+                                                        <option value="{{ $packagegroup->id }}"
+                                                            {{ $packagegroup->id == $packages->package_group_id ? 'selected' : '' }}>
+                                                            {{ $packagegroup->name }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </span>
+                                        <p class="form-error-text" id="packagegroup_error"
                                             style="color: red; margin-top: 10px;">
                                         </p>
                                     </div>
@@ -662,6 +683,23 @@
                 },
                 success: function(msg) {
                     document.getElementById('packagecategory_chang').innerHTML = msg;
+                }
+            });
+
+        }
+
+        function packagegroup_change(packagecategory_id) {
+
+            var url = '{{ url('packagegroup_show') }}';
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "packagecategory_id": packagecategory_id
+                },
+                success: function(msg) {
+                    document.getElementById('packagegroup_chang').innerHTML = msg;
                 }
             });
 

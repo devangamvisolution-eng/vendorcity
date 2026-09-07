@@ -31,14 +31,15 @@ class VendorAuthController extends Controller
                                 // ->whereIn('role_id', [16, 15, 8])
                                 ->first();
 
-            // echo "<pre>";print_r($user);echo"</pre>";die;
+            if (!$user) {
+                throw ValidationException::withMessages([
+                    'email' => 'You are not authorized as a vendor.',
+                ]);
+            }
+
             if ($user->is_active == 1) {
                 throw ValidationException::withMessages([
                     'email' => 'This vendor is not active.',
-                ]);
-            }            if (!$user) {
-                throw ValidationException::withMessages([
-                    'email' => 'You are not authorized as a vendor.',
                 ]);
             }
 
@@ -47,11 +48,33 @@ class VendorAuthController extends Controller
                 throw ValidationException::withMessages([
                     'email' => 'Invalid credentials.',
                 ]);
+            }
 
-}
-            if (!$user) {
+            // Check for expiration
+            if ($user->contract_status == 'approved' && $user->contract_end_date && strtotime($user->contract_end_date) < time()) {
+                // Mark as expired
+                $user->contract_status = 'expired';
+                $user->save();
+                
+                // Update latest contract in vendor_contracts table
+                $latestContract = \Illuminate\Support\Facades\DB::table('vendor_contracts')->where('vendor_id', $user->id)->orderBy('id', 'DESC')->first();
+                if ($latestContract) {
+                    \Illuminate\Support\Facades\DB::table('vendor_contracts')->where('id', $latestContract->id)->update([
+                        'status' => 'expired',
+                        'updated_at' => now()
+                    ]);
+                }
+            }
+
+            if ($user->contract_status == 'expired') {
                 throw ValidationException::withMessages([
-                    'email' => 'You are not authorized as a vendor.',
+                    'email' => 'Your contract has expired. Please contact the administrator to renew your contract.',
+                ]);
+            }
+
+            if ($user->contract_status && $user->contract_status !== 'approved') {
+                throw ValidationException::withMessages([
+                    'email' => 'Your account is pending contract approval. Please check your email for the contract upload link or await admin review.',
                 ]);
             }
 

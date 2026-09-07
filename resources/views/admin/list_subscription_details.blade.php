@@ -2,7 +2,7 @@
 
    @section('content')
 
-       @php
+       {{-- @php
 
            $userId = Auth::id();
 
@@ -18,7 +18,7 @@
                $edit_perm = explode(',', $edit_perm);
            }
 
-       @endphp
+       @endphp --}}
 
        <style type="text/css">
            .modal-dialog {
@@ -280,8 +280,8 @@
 
                                <div class="modal-text text-center">
 
-                                <div id="div_replace_{{ $data->id }}">
-                                </div>
+                                   <div id="div_replace_{{ $data->id }}">
+                                   </div>
 
                                </div>
 
@@ -289,11 +289,11 @@
 
                            <!-- <div class="modal-footer text-center">
 
-                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 
-                               <button type="button" class="btn btn-primary" onclick="form_sub();">Delete</button>
+                                                   <button type="button" class="btn btn-primary" onclick="form_sub();">Delete</button>
 
-                           </div> -->
+                                               </div> -->
 
                        </div>
 
@@ -343,20 +343,20 @@
 
 
 
-            var url = '{{ url('subscription_replace') }}';
+               var url = '{{ url('subscription_replace') }}';
 
-                $.ajax({
-                    url: url,
-                    type: 'post',
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "id": id
-                    },
-                    success: function(msg) {
-                        document.getElementById('div_replace_'+ id).innerHTML = msg;
-                        $('#delete_model_' + id).modal('show');
-                    }
-                });
+               $.ajax({
+                   url: url,
+                   type: 'post',
+                   data: {
+                       "_token": "{{ csrf_token() }}",
+                       "id": id
+                   },
+                   success: function(msg) {
+                       document.getElementById('div_replace_' + id).innerHTML = msg;
+                       $('#delete_model_' + id).modal('show');
+                   }
+               });
 
 
            }

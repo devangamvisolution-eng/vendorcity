@@ -128,6 +128,8 @@
                             Package Order - Storage
                         @elseif(Route::currentRouteName() == 'healthcare_at_home_listing')
                             Package Order - Healthcare At Home
+                        @elseif(Route::currentRouteName() == 'car-services-at-home-and-service-listing')
+                            Package Order - Car Service At Home
                         @else
                             Package Order - Moving
                         @endif
@@ -203,17 +205,13 @@
                                         <td>{{ number_format($vendororders->order_total, 2) }}</td>
 
                                         <td class="text-center">
-                                            @if ($vendororders->order_status === 'P')
-                                                <span class="badge bg-success">Booking Confirmed</span>
-                                            @elseif($vendororders->order_status == 'PA')
-                                                <span class="badge bg-info">Vendor Assigned</span>
-                                            @elseif($vendororders->order_status == 'CO')
-                                                <span class="badge bg-success">Booking Completed</span>
-                                            @elseif($vendororders->order_status == 'CL')
-                                                <span class="badge bg-danger">Booking Cancelled</span>
-                                            @elseif($vendororders->order_status == 'BK')
-                                                <span class="badge bg-info">Booking Requested</span>
-                                            @endif
+                                            @php
+                                                $statusDetails = \App\Helpers\Helper::getOrderStatusDetails(
+                                                    $vendororders->order_status,
+                                                );
+                                            @endphp
+                                            <span
+                                                class="badge {{ $statusDetails['color'] }}">{{ $statusDetails['text'] }}</span>
                                         </td>
 
                                         <td class="text-end">

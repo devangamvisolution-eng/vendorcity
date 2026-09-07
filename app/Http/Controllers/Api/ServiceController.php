@@ -131,7 +131,7 @@ class ServiceController extends Controller
         $cityId = 17;
 
         $services = Service::where('is_active', 0)
-            ->whereRaw('FIND_IN_SET(?, country)', [$countryId])
+            ->whereRaw("FIND_IN_SET(?, city)", [$cityId])
             ->orderBy('set_order', 'ASC')
             ->get();
 
@@ -155,7 +155,7 @@ class ServiceController extends Controller
 
             $subServices = Subservice::where('is_active', 0)
                 ->where('serviceid', $service->id)
-                ->whereRaw('FIND_IN_SET(?, country)', [$countryId])
+                ->whereRaw('FIND_IN_SET(?, city)', $cityId)
                 ->orderBy('set_order', 'ASC')
                 ->get();
 
@@ -203,6 +203,8 @@ class ServiceController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'userid' => 'required|integer',
+            'name' => 'required|string|max:255',
+            'mobile' => 'required|string|max:20',
             'apt_flr_villa_no' => 'required|string|max:255',
             'building_cluster_name' => 'required|string|max:255',
             'street' => 'required|string|max:255',
@@ -230,6 +232,8 @@ class ServiceController extends Controller
 
         $data = [
             'user_id' => $request->userid,
+            'name' => $request->name,
+            'mobile' => $request->mobile,
             'apt_flr_villa_no' => $request->apt_flr_villa_no,
             'building_cluster_name' => $request->building_cluster_name,
             'street' => $request->street,
@@ -252,6 +256,8 @@ class ServiceController extends Controller
     public function edit_address(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'mobile' => 'required',
             'apt_flr_villa_no' => 'required',
             'building_cluster_name' => 'required',
             'street' => 'required',
@@ -282,6 +288,8 @@ class ServiceController extends Controller
         DB::table('appuser_address')
             ->where('id', $id)
             ->update([
+                'name' => $request->name,
+                'mobile' => $request->mobile,
                 'apt_flr_villa_no' => $request->apt_flr_villa_no,
                 'building_cluster_name' => $request->building_cluster_name,
                 'street' => $request->street,
@@ -342,6 +350,49 @@ class ServiceController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Address deleted successfully.'
+        ]);
+    }
+
+    function homesubservice()
+    {
+
+        $countryId = 22;
+        $cityId = 17;
+
+        $subservices = Subservice::where('is_active', 0)
+            ->whereRaw('FIND_IN_SET(?, country)', [$countryId])
+            ->where('display_top_dropdown', 1)
+            ->orderBy('set_order', 'ASC')
+            ->get();
+
+        if ($subservices->isEmpty()) {
+
+            return response()->json([
+                'status' => false,
+                'message' => 'No Sub services found',
+                'data' => []
+            ], 404);
+        }
+
+        $data = [];
+
+        foreach ($subservices as $subservicesData) {
+
+
+
+            $data[] = [
+                'id' => $subservicesData->id,
+                'name' => $subservicesData->subservicename,
+                'appicon' => !empty($subservicesData->app_icon)
+                    ? asset('public/upload/subservice/app_icon/' . $subservicesData->app_icon)
+                    : '',
+            ];
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Sub service data fetched successfully',
+            'data' => $data
         ]);
     }
 }

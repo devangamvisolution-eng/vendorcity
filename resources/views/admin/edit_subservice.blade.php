@@ -279,6 +279,26 @@
 
                                     </div>
                                 </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="app_icon">App Icon</label>
+                                        <input id="app_icon" name="app_icon" type="file" class="form-control" value="" />
+                                        @if ($subservice->app_icon != '')
+                                            <img src="{{ asset('public/upload/subservice/app_icon/' . $subservice->app_icon) }}" style="width: 50px; margin-top: 10px;" />
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="display_top_dropdown">Display Top Dropdown</label>
+                                        <select class="form-control" id="display_top_dropdown" name="display_top_dropdown">
+                                            <option value="1" @if($subservice->display_top_dropdown == 1) selected @endif>Yes</option>
+                                            <option value="0" @if($subservice->display_top_dropdown == 0) selected @endif>No</option>
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div class="col-lg-4">
                                     <div class="form-group">

@@ -166,6 +166,18 @@ class Homecontroller extends Controller
         // echo "<pre>";print_r($data);echo "</pre>";exit;
         return view('front.privacy_policy', $data);
     }
+    public function cancellations_policy()
+    {
+
+        $data['cms_data'] = DB::table('cms')->where('id', 4)->first();
+
+        // $data['meta_title'] = "";
+        // $data['meta_keyword'] = "";
+        // $data['meta_description'] = "";    
+
+        // echo "<pre>";print_r($data);echo "</pre>";exit;
+        return view('front.privacy_policy', $data);
+    }
     public function contact()
     {
         $data['meta_title'] = "Contact VendorsCity UAE | Customer Support Help";
@@ -2063,7 +2075,7 @@ class Homecontroller extends Controller
 
                 // -------- CITY CHECK --------
                 $vendorCityIDs = explode(',', $vendor->city); // e.g. 27,29
-
+    
                 // Convert Vendor City IDs → Names
                 $vendorCityNames = [];
                 foreach ($vendorCityIDs as $cid) {

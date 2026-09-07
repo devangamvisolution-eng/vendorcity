@@ -1484,8 +1484,7 @@
                                     <option>Choose City</option>
                                     @if ($city != '')
                                         @foreach ($city as $city_data)
-                                            <option value="{{ strtolower(str_replace(' ', '-', $city_data->name)) }}"
-                                                @if ($city_data->id == session('search_city_id')) selected @endif>
+                                            <option value="{{ strtolower(str_replace(' ', '-', $city_data->name)) }}" @if ($city_data->id == session('search_city_id')) selected @endif>
                                                 {{ $city_data->name }}
                                             </option>
                                         @endforeach
@@ -1517,7 +1516,8 @@
                                             onchange="search_city_new(this.value);">
                                             @if ($city != '')
                                             @foreach ($city as $city_data)
-                                            <option value="{{ $city_data->id }}" @if ($city_data->id == session('search_city_id')) selected @endif>
+                                            <option value="{{ $city_data->id }}" @if ($city_data->id ==
+                                                session('search_city_id')) selected @endif>
                                                 {{ $city_data->name }}
                                             </option>
                                             @endforeach
@@ -1643,25 +1643,25 @@
                                             <a
                                                 href="{{ route('front.subservices', ['city' => session('search_city_name'), 'page_url' => $service_data->page_url]) }}">
                                                 @if (isset($service_data->home_icon))
-                                                    <img class="bdrs20"
-                                                        src="{{ asset('public/upload/service/' . $service_data->home_icon) }}"
-                                                        alt="{{ $service_data->homeicon_alt_tag ?? $service_data->servicename }}"
-                                                        width="60px;">
-                                            </a>
-                        @endif
-                </div>
-            </div>
-            <div class="details">
-                <a
-                    href="{{ route('front.subservices', ['city' => session('search_city_name'), 'page_url' => $service_data->page_url]) }}">
-                    <p class="title mb-3 subservice-title">{{ $service_data->servicename }}</p>
-                </a>
-            </div>
-        </div>
-        </li>
-@endforeach
+                                                        <img class="bdrs20"
+                                                            src="{{ asset('public/upload/service/' . $service_data->home_icon) }}"
+                                                            alt="{{ $service_data->homeicon_alt_tag ?? $service_data->servicename }}"
+                                                            width="60px;">
+                                                    </a>
+                                                @endif
+                                        </div>
+                                    </div>
+                                    <div class="details">
+                                        <a
+                                            href="{{ route('front.subservices', ['city' => session('search_city_name'), 'page_url' => $service_data->page_url]) }}">
+                                            <p class="title mb-3 subservice-title">{{ $service_data->servicename }}</p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        @endforeach
 
-{{-- <li class="splide__slide text-center">
+                        {{-- <li class="splide__slide text-center">
                             <div class="iconbox-style1 border-less p-0">
                                 <div class="icon before-none">
                                     <div class="details">
@@ -1785,14 +1785,14 @@
                             </div>
                         </li> --}}
 
-<!-- Add more slides as needed -->
+                        <!-- Add more slides as needed -->
 
-</ul>
-</div>
-</div>
+                    </ul>
+                </div>
+            </div>
 
-</div>
-</section>
+        </div>
+    </section>
 @endif
 
 
@@ -1801,7 +1801,7 @@
         <div class="row align-items-center custom_marquee"> --}}
 
 
-{{-- <marquee width="100%" direction="left">| 15,000+ Customers | <span class="flaticon-star custom_icon">
+            {{-- <marquee width="100%" direction="left">| 15,000+ Customers | <span class="flaticon-star custom_icon">
                 </span>Rated 4.8 out of 5 | <span class="flaticon-call custom_icon"> </span>Live Customer Support |
                 15,000+ Customers | <span class="flaticon-star custom_icon"> </span>Rated 4.8 out of 5 | <span
                     class="flaticon-call custom_icon"> </span>Live Customer Support | 15,000+ Customers | <span
@@ -1815,7 +1815,7 @@
                     class="flaticon-call custom_icon"> </span>Live Customer Support |
             </marquee> --}}
 
-{{-- <div class="ticker-container">
+            {{-- <div class="ticker-container">
                 <div class="ticker-items">
                     <div class="ticker-item"><span class="fa-regular fa-message-pen custom_icon"></span> Up to 5 Free
                         Quotes </div>
@@ -1825,7 +1825,7 @@
                     <!-- Add more items as needed -->
                 </div>
             </div> --}}
-{{--
+            {{--
         </div>
     </div>
 </section> --}}
@@ -1871,8 +1871,7 @@
                     </div>
 
                     @if ($subservice_data != '')
-                        <div id="splide_{{ $service_data->id }}"
-                            class="custom_splide splide mobile-splide row wow fadeInUp main-title"
+                        <div id="splide_{{ $service_data->id }}" class="custom_splide splide mobile-splide row wow fadeInUp main-title"
                             data-wow-delay="300ms" data-subservice-count="{{ $subservice_count }}">
                             <div class="splide__track">
                                 <ul class="splide__list">
@@ -1882,44 +1881,43 @@
                                                 <div class="listing-style1">
                                                     <div class="list-thumb bdrs12">
                                                         @if ($service_data->id == 50 && $subservice->id == 92)
-                                                            <a
-                                                                href="{{ route('automobile.listing', ['page_url' => $subservice->page_url]) }}">
-                                                            @else
+                                                            <a href="{{ route('automobile.listing', ['page_url' => $subservice->page_url]) }}">
+                                                        @else
                                                                 {{-- <a
                                                                     href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $subservice->page_url]) }}">
                                                                     --}}
-                                                                @if ($subservice->is_bookable == 1)
-                                                                    <a
-                                                                        href="{{ route('enquiry', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id]) }}">
-                                                                    @else
-                                                                        @php
-                                                                            $category_id = $_GET['category'] ?? '';
-                                                                        @endphp
+                                                                    @if ($subservice->is_bookable == 1)
                                                                         <a
-                                                                            href="{{ route('booknow', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}">
-                                                                @endif
-                                                        @endif
-                                                        <img src="{{ asset('public/upload/subservice/' . $subservice->image) }}"
-                                                            alt="{{ $subservice->image_alt_tag ?? $subservice->subservicename }}"
-                                                            class="serviceimage_desktop">
-                                                        <img src="{{ asset('public/upload/subservice/' . $subservice->image) }}"
-                                                            alt="{{ $subservice->image_alt_tag ?? $subservice->subservicename }}"
-                                                            class="serviceimage_mobile">
-                                                        </a>
+                                                                            href="{{ route('enquiry', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id]) }}">
+                                                                    @else
+                                                                            @php
+                                                                                $category_id = $_GET['category'] ?? '';
+                                                                            @endphp
+                                                                            <a
+                                                                                href="{{ route('booknow', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}">
+                                                                        @endif
+                                                            @endif
+                                                                        <img src="{{ asset('public/upload/subservice/' . $subservice->image) }}"
+                                                                            alt="{{ $subservice->image_alt_tag ?? $subservice->subservicename }}"
+                                                                            class="serviceimage_desktop">
+                                                                        <img src="{{ asset('public/upload/subservice/' . $subservice->image) }}"
+                                                                            alt="{{ $subservice->image_alt_tag ?? $subservice->subservicename }}"
+                                                                            class="serviceimage_mobile">
+                                                                    </a>
                                                     </div>
                                                 </div>
                                                 <div class="list-content">
                                                     @if ($service_data->id == 50)
                                                         <a href="{{ route('automobile.listing', ['page_url' => $subservice->page_url]) }}"
                                                             class="fw500">
-                                                        @else
+                                                    @else
                                                             <a href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $subservice->page_url]) }}"
                                                                 class="fw500">
-                                                    @endif
-                                                    {{ strlen($subservice->subservicename . ' in ' . $formattedCity) > 24
-                                                        ? substr($subservice->subservicename . ' in ' . $formattedCity, 0, 24) . '...'
-                                                        : $subservice->subservicename . ' in ' . $formattedCity }}
-                                                    </a>
+                                                        @endif
+                                                            {{ strlen($subservice->subservicename . ' in ' . $formattedCity) > 24
+                                            ? substr($subservice->subservicename . ' in ' . $formattedCity, 0, 24) . '...'
+                                            : $subservice->subservicename . ' in ' . $formattedCity }}
+                                                        </a>
                                                 </div>
 
                                             </div>
@@ -1930,72 +1928,7 @@
                         </div>
                     @endif
 
-                    @if ($service_data->image != '')
-                        <section class="our-about bgc-thm2 pb0 pt0 mb30 hideDiv">
-                            {{-- <div class="container">
-                                <div class="row align-items-center">
 
-                                    <div class="col-xl-6 services_banner_text">
-                                        <div class="position-relative wow fadeInLeft pl50" data-wow-delay="300ms">
-                                            @if ($service_data->title1 != '')
-                                            <h4 class="">{{ $service_data->title1 }}</h4>
-                                            @endif
-
-                                            @if ($service_data->title2 != '')
-                                            <h2 class=" mb35">{{ $service_data->title2 }}</h2>
-                                            @endif
-
-                                            @if ($service_data->banner_url != '')
-                                            <a href="{{ $service_data->banner_url }}" class="ud-btn btn-thm">Get up to 5 Free Quotes
-                                                Today!</a>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6">
-                                        <div class="position-relative">
-
-                                            <div class="about-img wow fadeInRight services_banner_image" data-wow-delay="300ms">
-                                                @if ($service_data->image != '')
-                                                <img class="" src="{{ asset('public/upload/service/' . $service_data->image) }}" alt="">
-                                                @endif
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
-
-
-
-
-                            {{-- <div class="row align-items-center">
-                                <div class="col-xl-12">
-                                    <div class="position-relative mb30-lg mrgb0">
-                                        <div class="about-img wow fadeInRight" data-wow-delay="300ms" style="position: relative;">
-                                            @if (isset($service_data->image))
-                                            <img style="width: 100%;" class="bdrs16 desktop_img"
-                                                src="{{ asset('public/upload/service/' . $service_data->image) }}" alt="">
-
-                                            <div id="banner_url" style="position: absolute; bottom: 10px; left: 20px; padding: 10px;">
-                                                @if ($service_data->banner_url != '')
-                                                <a href="{{ $service_data->banner_url }}" class="learn-more-btn"
-                                                    style="padding: 15px 20px; display: inline-block;">Learn More</a>
-                                                @endif
-                                            </div>
-
-
-                                            @else
-                                            <img style="width: 100%;" class="bdrs16"
-                                                src="{{ asset('public/upload/subservice/banner/no_image_subservice.png') }}" alt="">
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
-
-
-                        </section>
-                    @endif
 
                 </div>
             @endif
@@ -2224,72 +2157,72 @@
 </section>
 
 {{-- <section class="pb30 pb30-md"> --}}
-<div class="container mt25">
-    <div class="row align-items-center wow fadeInUp">
-        <div class="col-lg-9">
-            <div class="main-title">
-                <h2 class="title mobile-head-text">Read Our Verified Reviews</h2>
-                {{-- <p class="paragraph">Most viewed and all-time top-selling services</p> --}}
+    <div class="container mt25">
+        <div class="row align-items-center wow fadeInUp">
+            <div class="col-lg-9">
+                <div class="main-title">
+                    <h2 class="title mobile-head-text">Read Our Verified Reviews</h2>
+                    {{-- <p class="paragraph">Most viewed and all-time top-selling services</p> --}}
+                </div>
             </div>
-        </div>
-        {{-- <div class="col-lg-3">
+            {{-- <div class="col-lg-3">
                 <div class="text-lg-end mb-3">
                     <a href="page-freelancer-v1.html" class="ud-btn2">All Freelancers <i
                             class="fal fa-arrow-right-long"></i></a>
                 </div>
             </div> --}}
-    </div>
-    <div class="row wow fadeInUp" data-wow-delay="300ms">
-        <div class="col-lg-12">
+        </div>
+        <div class="row wow fadeInUp" data-wow-delay="300ms">
+            <div class="col-lg-12">
 
-            <div id="review-slider" class="splide">
-                <div class="splide__track">
-                    <ul class="splide__list">
-                        @if (!empty($googleReview))
-                            @foreach ($googleReview as $googleReview_data)
-                                <li class="splide__slide text-center">
-                                    <div
-                                        class="freelancer-style1 text-center bdr1 bdrs16 hover-box-shadow review-card-fixed">
+                <div id="review-slider" class="splide">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+                            @if (!empty($googleReview))
+                                @foreach ($googleReview as $googleReview_data)
+                                    <li class="splide__slide text-center">
+                                        <div
+                                            class="freelancer-style1 text-center bdr1 bdrs16 hover-box-shadow review-card-fixed">
 
-                                        <div class="details">
-                                            @if ($googleReview_data->name != '')
-                                                <h5 class="title mb-1">{{ $googleReview_data->name }}</h5>
-                                            @endif
+                                            <div class="details">
+                                                @if ($googleReview_data->name != '')
+                                                    <h5 class="title mb-1">{{ $googleReview_data->name }}</h5>
+                                                @endif
 
-                                            <div class="review">
-                                                @if ($googleReview_data->label != '')
-                                                    <div class="d-flex review-stars">
-                                                        @for ($i = 1; $i <= 5; $i++)
-                                                            @if ($i <= $googleReview_data->label)
-                                                                <i class="fas fa-star review-color"></i>
-                                                            @else
-                                                                <i class="far fa-star review-color ms-2"></i>
-                                                            @endif
-                                                        @endfor
-                                                    </div>
+                                                <div class="review">
+                                                    @if ($googleReview_data->label != '')
+                                                        <div class="d-flex review-stars">
+                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                @if ($i <= $googleReview_data->label)
+                                                                    <i class="fas fa-star review-color"></i>
+                                                                @else
+                                                                    <i class="far fa-star review-color ms-2"></i>
+                                                                @endif
+                                                            @endfor
+                                                        </div>
+                                                    @endif
+                                                </div>
+
+                                                <hr class="opacity-100 mt20 mb15">
+                                                @if ($googleReview_data->description != '')
+                                                    @php
+                                                        $shortDescription = Str::limit($googleReview_data->description, 80);
+                                                    @endphp
+
+                                                    <p class="review-description">“{{ $shortDescription }}”</p>
                                                 @endif
                                             </div>
-
-                                            <hr class="opacity-100 mt20 mb15">
-                                            @if ($googleReview_data->description != '')
-                                                @php
-                                                    $shortDescription = Str::limit($googleReview_data->description, 80);
-                                                @endphp
-
-                                                <p class="review-description">“{{ $shortDescription }}”</p>
-                                            @endif
                                         </div>
-                                    </div>
-                                </li>
-                            @endforeach
-                        @endif
+                                    </li>
+                                @endforeach
+                            @endif
 
-                        <!-- Add more slides as needed -->
+                            <!-- Add more slides as needed -->
 
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            {{-- <div class="vam_nav_style dots_none review-slider owl-carousel owl-theme">
+                {{-- <div class="vam_nav_style dots_none review-slider owl-carousel owl-theme">
 
                     @if (!empty($googleReview))
                     @foreach ($googleReview as $googleReview_data)
@@ -2304,7 +2237,7 @@
                                 <div class="review">
                                     @if ($googleReview_data->label != '')
                                     <div class="d-flex review-stars">
-                                        @for ($i = 1; $i <= 5; $i++) @if ($i <= $googleReview_data->label)
+                                        @for ($i = 1; $i <= 5; $i++) @if ($i <=$googleReview_data->label)
                                             <i class="fas fa-star review-color"></i>
                                             @else
                                             <i class="far fa-star review-color ms-2"></i>
@@ -2324,10 +2257,10 @@
                     @endforeach
                     @endif
                 </div> --}}
+            </div>
         </div>
     </div>
-</div>
-{{--
+    {{--
 </section> --}}
 
 <div class="container">
@@ -2559,8 +2492,8 @@
 
                     <!-- Left Column: Hero -->
                     <div class="tabby-modal-left text-center">
-                        <img src="https://cdn.tabby.ai/assets/logo.png" alt="Tabby"
-                            style="max-height:40px; width:auto;" class="mb-4 mx-auto">
+                        <img src="https://cdn.tabby.ai/assets/logo.png" alt="Tabby" style="max-height:40px; width:auto;"
+                            class="mb-4 mx-auto">
 
                         <h2 class="tabby-main-heading mb-4">
                             Shop now.
@@ -2897,7 +2830,7 @@
 
 
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         new Splide('#feature-slider', {
             type: 'slide',
             perPage: 6,
@@ -2918,7 +2851,7 @@
         }).mount();
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         new Splide('#our-location-slider', {
             type: 'slide',
             perPage: 7,
@@ -2939,7 +2872,7 @@
     });
 
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         new Splide('#we-do-slider-mobile', {
             type: 'slide',
             perPage: 2,
@@ -2959,7 +2892,7 @@
         }).mount();
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         new Splide('#review-slider', {
             type: 'slide',
             perPage: 4,
@@ -2979,9 +2912,9 @@
         }).mount();
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Select all .splide elements except #feature-slider
-        document.querySelectorAll('.custom_splide.splide:not(#feature-slider)').forEach(function(
+        document.querySelectorAll('.custom_splide.splide:not(#feature-slider)').forEach(function (
             splideElement) {
 
             splideElement.classList.add('custom-splide');
@@ -3109,7 +3042,7 @@
 
 
     // We Do Mobile View Slider
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('.we-do-mobile-slider').owlCarousel({
             loop: false,
             margin: 30,
@@ -3139,7 +3072,7 @@
     });
 </script>
 <script>
-    $(window).on('scroll load resize', function() {
+    $(window).on('scroll load resize', function () {
         // Try to find the most appropriate header for the current viewport
         var header = $('.mobilie_header_nav:visible');
         if (!header.length) header = $('header.stricky:visible');

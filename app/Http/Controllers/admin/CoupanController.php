@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\admin;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -15,9 +16,9 @@ class CoupanController extends Controller
      */
     public function index()
     {
-        $data['all_coupan']= DB::table('coupans')->orderBy('id','DESC')->get();
+        $data['all_coupan'] = DB::table('coupans')->orderBy('id', 'DESC')->get();
 
-       return view('admin.list_coupan',$data);
+        return view('admin.list_coupan', $data);
     }
 
     /**
@@ -27,9 +28,9 @@ class CoupanController extends Controller
      */
     public function create()
     {
-        $data['service'] = DB::table('services')->where('is_active', '0')->orderBy('id','DESC')->get();
-        $data['subservice'] = DB::table('subservices')->orderBy('id','DESC')->get();
-        return view('admin.add_coupan',$data);
+        $data['service'] = DB::table('services')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        $data['subservice'] = DB::table('subservices')->orderBy('id', 'DESC')->get();
+        return view('admin.add_coupan', $data);
     }
     /**
      * Store a newly created resource in storage.
@@ -56,9 +57,29 @@ class CoupanController extends Controller
         $data['description'] = $request->input('description');
         $data['is_active'] = 0;
 
+        $data['active_for_web'] = $request->has('active_for_web') ? 1 : 0;
+        $data['active_for_app'] = $request->has('active_for_app') ? 1 : 0;
+        $data['display_image'] = $request->input('display_image');
+
+        if ($request->hasFile('horizontal_image')) {
+            $image = $request->file('horizontal_image');
+            $name = time() . 'h.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('/upload/coupans');
+            $image->move($destinationPath, $name);
+            $data['horizontal_image'] = $name;
+        }
+
+        if ($request->hasFile('vertical_image')) {
+            $image = $request->file('vertical_image');
+            $name = time() . 'v.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('/upload/coupans');
+            $image->move($destinationPath, $name);
+            $data['vertical_image'] = $name;
+        }
+
         DB::table('coupans')->insert($data);
 
-    return redirect()->route('coupan.index')->with('success','Coupon Added Successfully.');  
+        return redirect()->route('coupan.index')->with('success', 'Coupon Added Successfully.');
     }
 
     public function show($id)
@@ -68,7 +89,7 @@ class CoupanController extends Controller
 
     public function edit($id)
     {
-        $data['coupan_data'] = DB::table('coupans')->where('id',$id)->first();
+        $data['coupan_data'] = DB::table('coupans')->where('id', $id)->first();
 
         // echo"<pre>";print_r($data['coupan_data']);echo"<pre>";exit;
 
@@ -76,12 +97,11 @@ class CoupanController extends Controller
 
         // ECHO"<PRE>";PRINT_R($service_id);EXIT;
 
-        $data['service'] = DB::table('services')->where('is_active', '0')->orderBy('id','DESC')->get();
+        $data['service'] = DB::table('services')->where('is_active', '0')->orderBy('id', 'DESC')->get();
 
-        $data['subservice'] = DB::table('subservices')->whereIn('serviceid',$service_id)->orderBy('id','DESC')->get();
+        $data['subservice'] = DB::table('subservices')->whereIn('serviceid', $service_id)->orderBy('id', 'DESC')->get();
 
-        return view('admin.edit_coupan',$data);
-
+        return view('admin.edit_coupan', $data);
     }
 
     public function update(Request $request, $id)
@@ -101,10 +121,29 @@ class CoupanController extends Controller
         $data['enddate'] = $request->input('enddate');
         $data['description'] = $request->input('description');
 
-        DB::table('coupans')->where('id',$id)->update($data);
+        $data['active_for_web'] = $request->has('active_for_web') ? 1 : 0;
+        $data['active_for_app'] = $request->has('active_for_app') ? 1 : 0;
+        $data['display_image'] = $request->input('display_image');
 
-    return redirect()->route('coupan.index')->with('success','Coupon Updated Successfully.');
+        if ($request->hasFile('horizontal_image')) {
+            $image = $request->file('horizontal_image');
+            $name = time() . 'h.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('/upload/coupans');
+            $image->move($destinationPath, $name);
+            $data['horizontal_image'] = $name;
+        }
 
+        if ($request->hasFile('vertical_image')) {
+            $image = $request->file('vertical_image');
+            $name = time() . 'v.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('/upload/coupans');
+            $image->move($destinationPath, $name);
+            $data['vertical_image'] = $name;
+        }
+
+        DB::table('coupans')->where('id', $id)->update($data);
+
+        return redirect()->route('coupan.index')->with('success', 'Coupon Updated Successfully.');
     }
 
     public function destroy(Request $request)
@@ -115,44 +154,44 @@ class CoupanController extends Controller
 
         // echo"<pre>";print_r($delete_id);echo"<pre>";exit;
 
-        DB::table('coupans')->whereIn('id',$delete_id)->delete();
+        DB::table('coupans')->whereIn('id', $delete_id)->delete();
 
-        return redirect()->route('coupan.index')->with('success','Coupon has been deleted successfully');
+        return redirect()->route('coupan.index')->with('success', 'Coupon has been deleted successfully');
     }
 
-    public  function change_status_coupan(){
-        $id=$_POST['id'];
-        $value=$_POST['value'];
-        DB::table('coupans')->where('id',$id)->update(array('is_active'=>$value));
+    public  function change_status_coupan()
+    {
+        $id = $_POST['id'];
+        $value = $_POST['value'];
+        DB::table('coupans')->where('id', $id)->update(array('is_active' => $value));
 
-        echo"1";
-
+        echo "1";
     }
-    public function coupan_subservice_change(){
+    public function coupan_subservice_change()
+    {
 
         // echo"<pre>";print_r($_POST);echo"<pre>";exit;
 
-    $service_id = $_POST['service_id'];
-    $selected_subservice_ids = $_POST['selected_subservice_ids'] ?? [];
+        $service_id = $_POST['service_id'];
+        $selected_subservice_ids = $_POST['selected_subservice_ids'] ?? [];
 
-    $subservices = DB::table('subservices')
-                        ->select('*')
-                        ->whereIn('serviceid', $service_id)
-                        ->where('is_active', '0')
-                        ->get();
-    $html = '<select class="form-control" id="subservice_id" name="subservice_id[]" multiple="multiple">';
-    $html .= "<option value=''>Select Sub Service</option>";
-                        
-    if ($subservices->isNotEmpty()) {
-        foreach ($subservices as $subservice) {
-            $selected = in_array($subservice->id, $selected_subservice_ids) ? ' selected' : '';
-            $html .= "<option value='" . $subservice->id . "'" . $selected . ">" . $subservice->subservicename . "</option>";
+        $subservices = DB::table('subservices')
+            ->select('*')
+            ->whereIn('serviceid', $service_id)
+            ->where('is_active', '0')
+            ->get();
+        $html = '<select class="form-control" id="subservice_id" name="subservice_id[]" multiple="multiple">';
+        $html .= "<option value=''>Select Sub Service</option>";
+
+        if ($subservices->isNotEmpty()) {
+            foreach ($subservices as $subservice) {
+                $selected = in_array($subservice->id, $selected_subservice_ids) ? ' selected' : '';
+                $html .= "<option value='" . $subservice->id . "'" . $selected . ">" . $subservice->subservicename . "</option>";
+            }
         }
-    }
-    $html .= "</select>";
-    
-    // Return the generated HTML
-    echo $html;
+        $html .= "</select>";
 
+        // Return the generated HTML
+        echo $html;
     }
 }
