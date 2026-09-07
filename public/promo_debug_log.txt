@@ -1,0 +1,15 @@
+[2026-05-27 10:33:53] urlPromo: 'gpromo', data['promo']: 'gpromo', existsCheck: true, session: gpromo
+[2026-05-27 10:35:38] urlPromo: 'gpromo', data['promo']: 'gpromo', existsCheck: true, session: gpromo
+[2026-05-27 10:36:10] urlPromo: 'gpromo', data['promo']: 'gpromo', existsCheck: true, session: gpromo
+[2026-05-27 10:49:50] urlPromo: 'gpromo', data['promo']: 'gpromo', existsCheck: true, session: gpromo
+[2026-05-27 10:49:56] urlPromo: 'gpromo', data['promo']: 'gpromo', existsCheck: true, session: gpromo
+[2026-05-27 12:44:04] urlPromo: 'gpromo', data['promo']: 'gpromo', existsCheck: true, session: gpromo
+[2026-05-28 05:49:36] urlPromo: '', data['promo']: '', existsCheck: N/A, session: none
+[2026-05-28 05:54:09] urlPromo: '', data['promo']: '', existsCheck: N/A, session: none
+[2026-05-28 05:55:48] urlPromo: '', data['promo']: '', existsCheck: N/A, session: none
+[2026-05-28 05:56:19] urlPromo: '', data['promo']: '', existsCheck: N/A, session: none
+[2026-05-28 06:05:08] urlPromo: '', data['promo']: '', existsCheck: N/A, session: none
+[2026-05-28 06:14:20] urlPromo: '', data['promo']: '', existsCheck: N/A, session: none
+[2026-05-28 06:30:21] urlPromo: '', data['promo']: '', existsCheck: N/A, session: none
+[2026-05-28 06:44:05] urlPromo: 'gpromo', data['promo']: 'gpromo', existsCheck: true, session: gpromo
+[2026-05-28 08:55:41] urlPromo: 'gpromo', data['promo']: 'gpromo', existsCheck: true, session: gpromo

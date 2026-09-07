@@ -1,0 +1,337 @@
+:root {
+            --primary-blue: #3b82f6;
+            --primary-hover: #0d3a63;
+            --accent-yellow: #FACC15;
+            --success-bg: #e7f6f2;
+            --success-text: #059669;
+            --danger-bg: #fff1f2;
+            --danger-text: #e11d48;
+            --border-color: #e5e7eb;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --hover-bg: #f5f6f8;
+        }
+
+        /* Page Setup */
+        .content-wrapper {
+            padding: 1.5rem;
+            background: #f9fafb;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 1rem 0.5rem;
+            }
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.25rem;
+            }
+
+            .breadcrumb {
+                font-size: 13px;
+            }
+        }
+
+        .btn-submit {
+    background: var(--primary-blue);
+    color: #fff;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-delete-multi {
+    background: #ef4444;
+    color: #fff;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+.btn-submit:hover {
+    background: var(--primary-hover);
+    color: #fff;
+    transform: translateY(-1px);
+}
+.btn-delete-multi:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+        /* Card & Container Styling */
+        .custom-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card-body {
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+
+        .table-responsive {
+            overflow: visible !important;
+            padding-top: 15px;
+        }
+
+        @media (max-width: 991px) {
+            .table-responsive {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 120px;
+                /* Extra space for dropdowns on mobile scroll */
+            }
+        }
+
+        /* DataTable Overrides */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            padding: 0 20px 15px 20px !important;
+        }
+
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            padding: 15px 20px !important;
+        }
+
+        /* Table Design */
+        .table {
+            margin-bottom: 0;
+            width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+        }
+
+        .table thead th {
+            background: var(--primary-blue) !important;
+            color: #ffffff !important;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            padding: 16px 12px !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .table thead th:last-child {
+            border-right: none !important;
+        }
+
+        .table tbody td {
+            padding: 12px 14px !important;
+            vertical-align: middle;
+            border-bottom: 1px solid #ccc;
+            color: var(--text-main);
+            font-size: 14px;
+            border-left: 1px solid #ccc;
+            transition: all 0.2s ease;
+        }
+
+        .table tbody td:last-child {
+            border-right: 1px solid #ccc;
+        }
+
+        /* Hover Effects */
+        .table tbody tr:hover td {
+            background-color: var(--hover-bg) !important;
+            border-left: 1px solid var(--accent-yellow) !important;
+        }
+
+        .table tbody tr:hover td:last-child {
+            border-right: 1px solid var(--accent-yellow) !important;
+        }
+
+        .table tbody tr:hover td:first-child {
+            border-left: 1px solid var(--accent-yellow) !important;
+        }
+
+        /* Checkbox & Elements */
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-blue);
+            border: 1.5px solid #d1d5db;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-paid {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .badge-unpaid {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .payment-id {
+            display: block;
+            font-size: 10px;
+            color: var(--text-light);
+            margin-top: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        /* Action Menu Styles */
+        .action-dropdown .dropdown-toggle::after {
+            display: none;
+        }
+
+        .btn-dots {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2.5px solid var(--accent-yellow);
+            background: #fff;
+            color: var(--accent-yellow);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-dots:hover {
+            background: var(--accent-yellow);
+            color: #fff;
+        }
+
+        .dropdown-menu {
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 6px;
+            min-width: 200px;
+            margin-top: 5px !important;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 13.5px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.15s;
+        }
+
+        .dropdown-item i {
+            font-size: 14px;
+            color: var(--primary-blue);
+            width: 18px;
+            text-align: center;
+        }
+
+        .dropdown-item:hover {
+            background-color: #eff6ff;
+            color: var(--primary-blue);
+        }
+
+        .btn-send-mail {
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 5px;
+            background: var(--primary-blue);
+            color: #fff;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-send-mail:hover {
+            background: var(--primary-hover);
+            color: #fff;
+        }
+
+        .strong{color:#000}
+
+        /* Mobile Specific Tweaks */
+        @media (max-width: 768px) {
+            .table tbody td {
+                font-size: 13px;
+                padding: 10px 8px !important;
+            }
+
+            .badge-status {
+                padding: 4px 10px;
+                font-size: 11px;
+            }
+
+            .btn-dots {
+                width: 28px;
+                height: 28px;
+            }
+
+            .custom-checkbox {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        .btn-dots {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2.5px solid var(--accent-yellow);
+            background: #fff;
+            color: var(--accent-yellow);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .status-select {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}

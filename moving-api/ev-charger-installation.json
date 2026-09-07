@@ -1,0 +1,47 @@
+{
+  "service_id": 34,
+  "subservice_id": 94,
+  "form_type": "Local Move",
+  "fields": [
+    {
+      "field_id": 71,
+      "field_type": "radio",
+      "value": [1133]
+    },
+    {
+      "field_id": 72,
+      "field_type": "radio",
+      "value": [1138]
+    },
+    {
+      "field_id": 73,
+      "field_type": "radio",
+      "value": [1145]
+    },
+    {
+      "field_id": 74,
+      "field_type": "text",
+      "value": "Vastral"
+    },
+    {
+      "field_id": 75,
+      "field_type": "text",
+      "value": "Rudra Business Park"
+    },
+    {
+      "field_id": 76,
+      "field_type": "radio",
+      "value": [538]
+    },
+    {
+      "field_id": 77,
+      "field_type": "date",
+      "value": "2026-09-05"
+    },
+    {
+      "field_id": 78,
+      "field_type": "radio",
+      "value": [1150]
+    }
+  ]
+}

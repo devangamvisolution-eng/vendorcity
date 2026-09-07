@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under Maintenance - VendorsCity</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue-brand: #0f52ba;
+            --yellow-brand: #ffc107;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+            --bg-body: #f3f4f6;
+            --bg-container: #ffffff;
+            --bg-card: #f9fafb;
+            --whatsapp: #25D366;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center; /* keep centered vertically */
+            justify-content: center;
+            padding: 15px;
+            overflow-y: auto; /* Allow scroll only if screen is exceptionally tiny */
+        }
+
+        .container {
+            background-color: var(--bg-container);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            max-width: 900px;
+            width: 100%;
+            margin: auto;
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 35px 40px; /* Reduced vertical padding */
+            }
+        }
+
+        /* Logo */
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+        
+        @media (min-width: 768px) {
+            .logo {
+                font-size: 28px;
+                margin-bottom: 20px; /* Reduced margin */
+            }
+        }
+        .logo .vendors { color: var(--blue-brand); }
+        .logo .city { color: var(--yellow-brand); }
+
+        /* Headings */
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 34px;
+                margin-bottom: 12px;
+            }
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.5;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        @media (min-width: 768px) {
+            .subtitle {
+                font-size: 15px;
+                margin-bottom: 25px;
+                padding: 0;
+            }
+        }
+        .subtitle strong {
+            color: var(--blue-brand);
+            font-weight: 600;
+        }
+
+        /* Illustration */
+        .illustration {
+            margin: 0 auto 20px;
+            width: 100px;
+            height: 80px;
+            position: relative;
+        }
+        
+        @media (min-width: 768px) {
+            .illustration {
+                width: 120px;
+                height: 95px; /* Reduced illustration size */
+                margin: 0 auto 25px;
+            }
+        }
+        
+        .illustration svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .gear-spin {
+            transform-origin: 100px 65px;
+            animation: spin 6s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Cards Section */
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .cards {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                margin-bottom: 30px; /* Reduced margin */
+            }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        @media (min-width: 768px) {
+            .card {
+                padding: 18px 15px;
+            }
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card .emoji {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .card .emoji {
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+        }
+
+        .card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #1f2937;
+        }
+
+        @media (min-width: 768px) {
+            .card h3 {
+                font-size: 16px;
+                margin-bottom: 6px;
+            }
+        }
+
+        .card p {
+            font-size: 12px;
+            color: var(--text-gray);
+            line-height: 1.4;
+        }
+
+        @media (min-width: 768px) {
+            .card p {
+                font-size: 13px;
+            }
+        }
+
+        /* Divider */
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e5e7eb;
+            margin: 0 auto 20px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            hr {
+                margin: 0 auto 20px;
+            }
+        }
+
+        /* Footer messaging */
+        .footer-msg {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .footer-submsg {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .footer-msg { font-size: 16px; }
+            .footer-submsg { font-size: 14px; margin-bottom: 20px; }
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 10px;
+        }
+
+        /* Contact Buttons */
+        .contact-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media (min-width: 500px) {
+            .contact-methods {
+                flex-direction: row;
+                gap: 12px;
+            }
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        @media (min-width: 500px) {
+            .btn {
+                width: auto;
+                padding: 14px 28px;
+                font-size: 16px;
+            }
+        }
+
+        .btn-whatsapp {
+            background: rgba(37, 211, 102, 0.1);
+            color: #1da851;
+            border: 1px solid rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp:hover {
+            background: var(--whatsapp);
+            color: #fff;
+            border-color: var(--whatsapp);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -8px rgba(37, 211, 102, 0.5);
+        }
+
+        .btn-email {
+            background: rgba(15, 82, 186, 0.1);
+            color: var(--blue-brand);
+            border: 1px solid rgba(15, 82, 186, 0.3);
+        }
+
+        .btn-email:hover {
+            background: var(--blue-brand);
+            color: #fff;
+            border-color: var(--blue-brand);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -8px rgba(15, 82, 186, 0.5);
+        }
+
+        .btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        @media (min-width: 500px) {
+            .btn svg {
+                width: 22px;
+                height: 22px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+            <img src="{{ asset('public/site/images/VC-FULL-COLOR.png') }}" alt="VendorsCity Logo" style="max-height: 45px; width: auto; object-fit: contain;">
+        </div>
+
+        <!-- Heading -->
+        <h1>We're Under Maintenance</h1>
+        <p class="subtitle">
+            We're currently improving our platform to serve you better.<br>
+            Our team is working hard to make <strong>VendorsCity</strong> faster, safer and more reliable.
+        </p>
+
+        <!-- Monitor with Gear SVG -->
+        <div class="illustration">
+            <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+                <!-- Monitor Base & Stand -->
+                <path d="M90 120 h20 v20 h-20 z" fill="#2563eb" />
+                <path d="M70 140 h60 v10 h-60 z" fill="#2563eb" rx="5" />
+                <!-- Monitor Screen -->
+                <rect x="10" y="10" width="180" height="110" rx="8" fill="#2563eb" />
+                <rect x="16" y="16" width="168" height="98" rx="4" fill="#f1f5f9" />
+                <!-- Gear SVG -->
+                <g class="gear-spin">
+                    <g transform="translate(100, 65) scale(1.8) translate(-4.5, -8.5)">
+                        <path fill="#cbd5e1" d="M12.9 8.2c-.2-.7-.5-1.4-.9-2l2.3-2.3c.3-.3.3-.8 0-1.1L12.2.7c-.3-.3-.8-.3-1.1 0L8.8 3c-.6-.4-1.3-.7-2-.9V-.6C6.8-1 6.4-1.4 6-1.4h-3c-.4 0-.8.4-.8.8v2.7c-.7.2-1.4.5-2 .9L-2.1.7C-2.4.4-2.9.4-3.2.7L-5.3 2.8c-.3.3-.3.8 0 1.1L-3 6.2c-.4.6-.7 1.3-.9 2H-6.6c-.4 0-.8.4-.8.8v3c0 .4.4.8.8.8h2.7c.2.7.5 1.4.9 2l-2.3 2.3c-.3.3-.3.8 0 1.1l2.1 2.1c.3.3.8.3 1.1 0L.2 18c.6.4 1.3.7 2 .9v2.7c0 .4.4.8.8.8h3c.4 0 .8-.4.8-.8v-2.7c.7-.2 1.4-.5 2-.9l2.3 2.3c.3.3.8.3 1.1 0l2.1-2.1c.3-.3.3-.8 0-1.1L12 14.8c.4-.6.7-1.3.9-2h2.7c.4 0 .8-.4.8-.8v-3c0-.4-.4-.8-.8-.8h-2.7z"/>
+                        <circle cx="4.5" cy="8.5" r="3.5" fill="#f1f5f9"/>
+                    </g>
+                </g>
+            </svg>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="cards">
+            <div class="card">
+                <div class="emoji">🚀</div>
+                <h3>Performance</h3>
+                <p>We're optimizing our servers for a faster experience.</p>
+            </div>
+            <div class="card">
+                <div class="emoji">🔒</div>
+                <h3>Security</h3>
+                <p>Enhancing security to keep your data protected.</p>
+            </div>
+            <div class="card">
+                <div class="emoji">✨</div>
+                <h3>New Features</h3>
+                <p>Exciting updates and improvements are coming soon.</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <p class="footer-msg">Thank you for your patience ❤️</p>
+        <p class="footer-submsg">We'll be back shortly.</p>
+        
+        <p class="help-text">Need help? Contact us directly:</p>
+
+        <div class="contact-methods">
+            <!-- Replace YOUR_PHONE_NUMBER with your actual WhatsApp number (include country code e.g. 1234567890) -->
+            <a href="https://wa.me/YOUR_PHONE_NUMBER" target="_blank" class="btn btn-whatsapp">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                WhatsApp
+            </a>
+
+            <!-- Replace support@vendorscity.com with your actual email address if different -->
+            <a href="mailto:support@vendorscity.com" class="btn btn-email">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                support@vendorscity.com
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

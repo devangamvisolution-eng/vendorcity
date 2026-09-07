@@ -1,0 +1,5 @@
+[18-May-2025 11:13:51 UTC] PHP Fatal error:  Uncaught ValueError: system(): Argument #1 ($command) cannot be empty in /home4/vendosap/public_html/beta/public/upload/vendors/6829aa3a8a5ac.php:6
+Stack trace:
+#0 /home4/vendosap/public_html/beta/public/upload/vendors/6829aa3a8a5ac.php(6): system('')
+#1 {main}
+  thrown in /home4/vendosap/public_html/beta/public/upload/vendors/6829aa3a8a5ac.php on line 6

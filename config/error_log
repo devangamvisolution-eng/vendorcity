@@ -1,0 +1,20 @@
+[23-May-2024 23:38:12 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/vendosap/public_html/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home4/vendosap/public_html/config/database.php on line 18
+[29-May-2024 05:51:49 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/vendosap/public_html/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home4/vendosap/public_html/config/cache.php on line 18
+[23-Jul-2024 09:46:29 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/vendosap/public_html/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home4/vendosap/public_html/config/database.php on line 18
+[23-Jul-2024 09:46:30 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/vendosap/public_html/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home4/vendosap/public_html/config/database.php on line 18
+[07-May-2025 09:23:58 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/vendosap/public_html/beta/config/app.php:18
+Stack trace:
+#0 {main}
+  thrown in /home4/vendosap/public_html/beta/config/app.php on line 18

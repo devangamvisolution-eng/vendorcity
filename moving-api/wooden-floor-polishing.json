@@ -1,0 +1,17 @@
+{
+    "service_id": 34,
+    "subservice_id": 89,
+    "property_type": "Villa",
+    "area_of_floor": "Less than 200 sq. ft.",
+    "condition_of_floor": "Slight wear / dullness",
+    "service_required": "Floor polishing only",
+    "schedule_site_survey": "yes",
+    "describe_your_requirements": "Looking for polishing around the living room area.",
+    "address_type": "home",
+    "city": "Dubai",
+    "area": "Al Barsha",
+    "building_street_no": "Street 12A, Villa 43",
+    "date": "6",
+    "month": "September",
+    "time_slot": "3"
+}
