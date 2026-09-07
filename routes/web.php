@@ -1584,6 +1584,9 @@ Route::prefix('{city}')
 
 
 
+
+
+
 Route::post('admin/cancel_recurring_visit', '\App\Http\Controllers\admin\Ordercontroller@cancel_recurring_visit')->name('admin.cancel_recurring_visit');
 Route::post('admin/assign_visit_cleaner', '\App\Http\Controllers\admin\Ordercontroller@assign_visit_cleaner')->name('admin.assign_visit_cleaner');
 Route::post('admin/adjust_visit_hours', '\App\Http\Controllers\admin\Ordercontroller@adjust_visit_hours')->name('admin.adjust_visit_hours');
