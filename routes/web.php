@@ -240,6 +240,7 @@ Route::get('/fix-db', function () {
     return 'Columns already exist!';
 });
 
+
 // Clear application cache:
 // Route::get('/clear-cache', function() {
 //     $exitCode = Artisan::call('cache:clear');

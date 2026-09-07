@@ -587,7 +587,7 @@
                     @if($subscription->payment_failed ?? true) <!-- Demo purpose: Set to true. In production, depends on backend flag -->
                         <div style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">
                             <div>
-                                <strong style="color: #dc2626; display:block; margin-bottom:4px; font-size: 16px;"><i class="fas fa-exclamation-circle" style="margin-right:5px;"></i> We couldn’t renew your subscription.</strong>
+                                <strong style="color: #dc2626; display:block; margin-bottom:4px; font-size: 16px;"><i class="fas fa-exclamation-circle" style="margin-right:5px;"></i> We couldn’t renew your subscription</strong>
                                 <span style="color: #991b1b; font-size:14px;">Update your payment method to keep your upcoming cleanings active. (Retry attempt 1 of 3)</span>
                             </div>
                             <div>
