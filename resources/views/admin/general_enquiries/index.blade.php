@@ -41,6 +41,11 @@
             color: #fff !important;
         }
 
+        .badge-lead-sold {
+            background-color: #17a2b8 !important;
+            color: #fff !important;
+        }
+
         .premium-card {
             border: none;
             border-radius: 12px;
@@ -133,6 +138,9 @@
                         <a class="btn btn-primary shadow-sm me-1" href="javascript:void(0);" id="filter_search">
                             <i class="fas fa-filter"></i>
                         </a>
+                        <button class="btn btn-danger shadow-sm me-1" id="multiple_delete_btn" title="Delete Selected">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 @endif
             </div>
@@ -206,6 +214,9 @@
                                                 Vendor
                                             </option>
                                             <option value="Job" {{ request('status') == 'Job' ? 'selected' : '' }}>Job
+                                            </option>
+                                            <option value="Lead Sold"
+                                                {{ request('status') == 'Lead Sold' ? 'selected' : '' }}>Lead Sold
                                             </option>
                                         </select>
                                     </div>
@@ -304,11 +315,22 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="px-3 py-2 text-muted text-center" style="font-size: 13px;">No Data
+                                            <td colspan="2" class="px-3 py-2 text-muted text-center"
+                                                style="font-size: 13px;">No Data
                                                 Found
                                             </td>
                                         </tr>
                                     @endforelse
+                                    @if (count($subservice_summary) > 0)
+                                        <tr style="background-color: #f8f9fa;">
+                                            <td class="px-3 py-2 fw-bold text-uppercase"
+                                                style="font-size: 13px; color: #333;">
+                                                Total
+                                            </td>
+                                            <td class="px-3 py-2 text-end fw-bold" style="font-size: 14px; color: #333;">
+                                                {{ collect($subservice_summary)->sum('total') }}</td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -339,11 +361,22 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="px-3 py-2 text-muted text-center" style="font-size: 13px;">No Data
+                                            <td colspan="2" class="px-3 py-2 text-muted text-center"
+                                                style="font-size: 13px;">No Data
                                                 Found
                                             </td>
                                         </tr>
                                     @endforelse
+                                    @if (count($source_summary) > 0)
+                                        <tr style="background-color: #f8f9fa;">
+                                            <td class="px-3 py-2 fw-bold text-uppercase"
+                                                style="font-size: 13px; color: #333;">
+                                                Total
+                                            </td>
+                                            <td class="px-3 py-2 text-end fw-bold" style="font-size: 14px; color: #333;">
+                                                {{ collect($source_summary)->sum('total') }}</td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -369,7 +402,8 @@
                                             <td class="px-3 py-2 border-bottom" style="font-size: 13px; color: #555;">
                                                 @php
                                                     $statusName = $summary->name ?? 'Pending';
-                                                    $badgeClass = 'badge-' . strtolower($statusName);
+                                                    $badgeClass =
+                                                        'badge-' . strtolower(str_replace(' ', '-', $statusName));
                                                 @endphp
                                                 <span class="badge {{ $badgeClass }}">{{ ucfirst($statusName) }}</span>
                                             </td>
@@ -378,11 +412,22 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="px-3 py-2 text-muted text-center" style="font-size: 13px;">No Data
+                                            <td colspan="2" class="px-3 py-2 text-muted text-center"
+                                                style="font-size: 13px;">No Data
                                                 Found
                                             </td>
                                         </tr>
                                     @endforelse
+                                    @if (count($status_summary) > 0)
+                                        <tr style="background-color: #f8f9fa;">
+                                            <td class="px-3 py-2 fw-bold text-uppercase"
+                                                style="font-size: 13px; color: #333;">
+                                                Total
+                                            </td>
+                                            <td class="px-3 py-2 text-end fw-bold" style="font-size: 14px; color: #333;">
+                                                {{ collect($status_summary)->sum('total') }}</td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -399,12 +444,17 @@
                             <table class="table premium-table" id="enquiry_table">
                                 <thead>
                                     <tr>
+                                        <th class="text-center" style="width: 40px;">
+                                            <input type="checkbox" id="selectAll" class="form-check-input">
+                                        </th>
                                         <th>ID</th>
                                         <th>Customer Info</th>
                                         <th>Service & Sub Service</th>
                                         <th>Source of Lead</th>
                                         <th>Status</th>
                                         <th>Salesperson</th>
+                                        <th>Service Date</th>
+                                        <th>Frequency</th>
                                         <th>Created At</th>
                                         <th>Action</th>
                                     </tr>
@@ -412,6 +462,10 @@
                                 <tbody>
                                     @foreach ($enquiries as $enquiry)
                                         <tr>
+                                            <td class="text-center">
+                                                <input type="checkbox" class="record-checkbox form-check-input"
+                                                    value="{{ $enquiry->id }}">
+                                            </td>
                                             <td>{{ $enquiry->id }}</td>
                                             <td>
                                                 <strong>{{ $enquiry->customer_name ?: ($enquiry->c_name ?: 'Unknown / Guest') }}</strong><br>
@@ -471,6 +525,9 @@
                                                         {{ $currentStatus == 'Vendor' ? 'selected' : '' }}>Vendor</option>
                                                     <option value="Job"
                                                         {{ $currentStatus == 'Job' ? 'selected' : '' }}>Job</option>
+                                                    <option value="Lead Sold"
+                                                        {{ $currentStatus == 'Lead Sold' ? 'selected' : '' }}>Lead Sold
+                                                    </option>
                                                 </select>
                                             </td>
                                             <td>
@@ -479,6 +536,16 @@
                                                 @else
                                                     <span class="text-muted">Not Assigned</span>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                @if ($enquiry->service_date)
+                                                    {{ date('d M Y', strtotime($enquiry->service_date)) }}
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{ $enquiry->frequency ?: '-' }}
                                             </td>
                                             <td>{{ date('d M Y', strtotime($enquiry->created_at)) }}</td>
                                             <td>
@@ -748,7 +815,7 @@
                 var notesList = $('#modal_notes_list');
                 notesList.html(
                     '<div class="text-center p-3"><span class="spinner-border spinner-border-sm"></span> Loading notes...</div>'
-                    );
+                );
 
                 $.ajax({
                     url: "{{ url('admin/general-enquiries') }}/" + enquiryId + "/notes",
@@ -758,7 +825,7 @@
                             if (response.notes.length === 0) {
                                 notesList.html(
                                     '<div class="text-muted text-center p-3">No notes available.</div>'
-                                    );
+                                );
                             } else {
                                 var html = '';
                                 response.notes.forEach(function(note) {
@@ -822,6 +889,65 @@
                     error: function() {
                         select.prop('disabled', false);
                         Swal.fire('Error', 'An error occurred while updating status.', 'error');
+                    }
+                });
+            });
+
+            // Multiple Delete Logic
+            $('#selectAll').on('click', function() {
+                $('.record-checkbox').prop('checked', $(this).prop('checked'));
+            });
+
+            $('#multiple_delete_btn').on('click', function() {
+                var selectedIds = [];
+                $('.record-checkbox:checked').each(function() {
+                    selectedIds.push($(this).val());
+                });
+
+                if (selectedIds.length === 0) {
+                    Swal.fire('Error', 'Please select at least one record', 'error');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to delete " + selectedIds.length +
+                        " selected record(s). This cannot be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete them!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('general-enquiries.multiple-delete') }}",
+                            type: "POST",
+                            data: {
+                                ids: selectedIds,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Deleted!',
+                                        text: response.message,
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Error', response.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error',
+                                    'An error occurred while deleting records.',
+                                    'error');
+                            }
+                        });
                     }
                 });
             });

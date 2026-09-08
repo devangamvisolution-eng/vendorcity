@@ -6,7 +6,7 @@
 @endpush
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js" defer></script>
     <script src="{{ asset('public/site/js/intlTelInput.min.js') }}" defer></script>
 @endpush
 
@@ -14,7 +14,8 @@
 <div class="tabby-banner-wrapper" data-bs-toggle="modal" data-bs-target="#tabby_info_modal">
     <div class="container">
         <div class="tabby-banner-content d-flex align-items-center justify-content-center">
-            <img src="https://cdn.tabby.ai/assets/logo.png" alt="Tabby" style="height: 20px; margin-right: 10px;">
+            <img src="https://cdn.tabby.ai/assets/logo.png" alt="Tabby" width="55" height="20"
+                style="height: 20px; margin-right: 10px;">
             <span class="tabby-text">available on selected services</span>
             <i class="fas fa-info-circle tabby-banner-info-icon ms-2"></i>
         </div>
@@ -1643,7 +1644,7 @@
                                             <a
                                                 href="{{ route('front.subservices', ['city' => session('search_city_name'), 'page_url' => $service_data->page_url]) }}">
                                                 @if (isset($service_data->home_icon))
-                                                    <img class="bdrs20"
+                                                    <img loading="lazy" class="bdrs20"
                                                         src="{{ asset('public/upload/service/' . $service_data->home_icon) }}"
                                                         alt="{{ $service_data->homeicon_alt_tag ?? $service_data->servicename }}"
                                                         width="60px;">
@@ -1669,7 +1670,7 @@
                                             href="{{ route('front.subservices', ['city' => session('search_city_name'), 'page_url' => 'moving']) }}"><img
                                                 class="bdrs20"
                                                 src="{{ asset('public/site/images/Homepage/subservice_logo/moving_icon.png') }}"
-                                                alt="Moving service icon – Vendorscity relocation experts"
+                                                alt="Moving service icon â€“ Vendorscity relocation experts"
                                                 width="60px;"></a>
                                     </div>
                                 </div>
@@ -1688,9 +1689,9 @@
                                     <div class="details">
                                         <a
                                             href="{{ route('front.subservices', ['city' => session('search_city_name'), 'page_url' => 'salon-spa-at-home']) }}">
-                                            <img class="bdrs20"
+                                            <img loading="lazy" class="bdrs20"
                                                 src="{{ asset('public/site/images/Homepage/subservice_logo/spa_salon_icon.png') }}"
-                                                alt="Spa and salon service icon – Vendorscity wellness services"
+                                                alt="Spa and salon service icon â€“ Vendorscity wellness services"
                                                 width="60px;"></a>
                                     </div>
                                 </div>
@@ -1711,7 +1712,7 @@
                                             href="{{ route('front.subservices', ['city' => session('search_city_name'), 'page_url' => 'storage']) }}"><img
                                                 class="bdrs20"
                                                 src="{{ asset('public/site/images/Homepage/subservice_logo/storage_icon.png') }}"
-                                                alt="Storage service icon – Vendorscity secure storage solutions"
+                                                alt="Storage service icon â€“ Vendorscity secure storage solutions"
                                                 width="60px;"></a>
                                     </div>
                                 </div>
@@ -1732,7 +1733,7 @@
                                             href="{{ route('front.subservices', ['city' => session('search_city_name'), 'page_url' => 'pest-control-gardening']) }}"><img
                                                 class="bdrs20"
                                                 src="{{ asset('public/site/images/Homepage/subservice_logo/pest_control_icon.png') }}"
-                                                alt="Pest control service icon – Vendorscity pest management UAE"
+                                                alt="Pest control service icon â€“ Vendorscity pest management UAE"
                                                 width="60px;"></a>
                                     </div>
                                 </div>
@@ -1753,7 +1754,7 @@
                                             href="{{ route('front.subservices', ['city' => session('search_city_name'), 'page_url' => 'handyman-maintainence']) }}"><img
                                                 class="bdrs20"
                                                 src="{{ asset('public/site/images/Homepage/subservice_logo/handyman_icon.png') }}"
-                                                alt="Handyman service icon – Vendorscity maintenance experts"
+                                                alt="Handyman service icon â€“ Vendorscity maintenance experts"
                                                 width="60px;"></a>
                                     </div>
                                 </div>
@@ -1899,10 +1900,12 @@
                                                                             href="{{ route('booknow', ['service_id' => \App\Models\Admin\Service::find($service_data->id)->page_url ?? $service_data->id, 'subservice_id' => \App\Models\Admin\Subservice::find($subservice->id)->page_url ?? $subservice->id] + ($category_id != '' ? ['category' => $category_id] : [])) }}">
                                                                 @endif
                                                         @endif
-                                                        <img src="{{ asset('public/upload/subservice/' . $subservice->image) }}"
+                                                        <img loading="lazy"
+                                                            src="{{ asset('public/upload/subservice/' . $subservice->image) }}"
                                                             alt="{{ $subservice->image_alt_tag ?? $subservice->subservicename }}"
                                                             class="serviceimage_desktop">
-                                                        <img src="{{ asset('public/upload/subservice/' . $subservice->image) }}"
+                                                        <img loading="lazy"
+                                                            src="{{ asset('public/upload/subservice/' . $subservice->image) }}"
                                                             alt="{{ $subservice->image_alt_tag ?? $subservice->subservicename }}"
                                                             class="serviceimage_mobile">
                                                         </a>
@@ -1930,72 +1933,7 @@
                         </div>
                     @endif
 
-                    @if ($service_data->image != '')
-                        <section class="our-about bgc-thm2 pb0 pt0 mb30 hideDiv">
-                            {{-- <div class="container">
-                                <div class="row align-items-center">
 
-                                    <div class="col-xl-6 services_banner_text">
-                                        <div class="position-relative wow fadeInLeft pl50" data-wow-delay="300ms">
-                                            @if ($service_data->title1 != '')
-                                            <h4 class="">{{ $service_data->title1 }}</h4>
-                                            @endif
-
-                                            @if ($service_data->title2 != '')
-                                            <h2 class=" mb35">{{ $service_data->title2 }}</h2>
-                                            @endif
-
-                                            @if ($service_data->banner_url != '')
-                                            <a href="{{ $service_data->banner_url }}" class="ud-btn btn-thm">Get up to 5 Free Quotes
-                                                Today!</a>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6">
-                                        <div class="position-relative">
-
-                                            <div class="about-img wow fadeInRight services_banner_image" data-wow-delay="300ms">
-                                                @if ($service_data->image != '')
-                                                <img class="" src="{{ asset('public/upload/service/' . $service_data->image) }}" alt="">
-                                                @endif
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
-
-
-
-
-                            {{-- <div class="row align-items-center">
-                                <div class="col-xl-12">
-                                    <div class="position-relative mb30-lg mrgb0">
-                                        <div class="about-img wow fadeInRight" data-wow-delay="300ms" style="position: relative;">
-                                            @if (isset($service_data->image))
-                                            <img style="width: 100%;" class="bdrs16 desktop_img"
-                                                src="{{ asset('public/upload/service/' . $service_data->image) }}" alt="">
-
-                                            <div id="banner_url" style="position: absolute; bottom: 10px; left: 20px; padding: 10px;">
-                                                @if ($service_data->banner_url != '')
-                                                <a href="{{ $service_data->banner_url }}" class="learn-more-btn"
-                                                    style="padding: 15px 20px; display: inline-block;">Learn More</a>
-                                                @endif
-                                            </div>
-
-
-                                            @else
-                                            <img style="width: 100%;" class="bdrs16"
-                                                src="{{ asset('public/upload/subservice/banner/no_image_subservice.png') }}" alt="">
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
-
-
-                        </section>
-                    @endif
 
                 </div>
             @endif
@@ -2081,9 +2019,9 @@
 
 <!-- CTA Banner -->
 <section class="cta-banner-about2 at-home10 mx-auto position-relative pt60-lg pb30-lg we-do-slider-desk">
-    <img class="cta-about2-img big-cleaning at-home10 bdrs24 d-none d-xl-block"
+    <img loading="lazy" class="cta-about2-img big-cleaning at-home10 bdrs24 d-none d-xl-block"
         src="{{ asset('public/site/images/Homepage/bigcleaning.webp') }}"
-        alt="Deep cleaning services in Dubai – Vendorscity professional cleaning solutions">
+        alt="Deep cleaning services in Dubai â€“ Vendorscity professional cleaning solutions">
     <div class="container">
         <div class="row">
             <div class="col-xl-7 offset-xl-5 wow fadeInUp" data-wow-delay="200ms">
@@ -2100,7 +2038,7 @@
                     <div class="col-sm-6 col-lg-4">
                         <div
                             class="iconbox-style9 default-box-shadow1 bgc-white box-padding bdrs12 position-relative mb30">
-                            <img src="{{ asset('public/site/images/Homepage/search.png') }}"
+                            <img loading="lazy" src="{{ asset('public/site/images/Homepage/search.png') }}"
                                 alt="Search services in Dubai and UAE on Vendorscity platform">
                             <h4 class="iconbox-title mt20">Find your required service</h4>
                             <p class="text mb-0">Choose from 50+ services, 100+ vendors, same-day slots, live support,
@@ -2110,7 +2048,7 @@
                     <div class="col-sm-6 col-lg-4">
                         <div
                             class="iconbox-style9 default-box-shadow1 bgc-white box-padding bdrs12 position-relative mb30">
-                            <img src="{{ asset('public/site/images/Homepage/verified.png') }}"
+                            <img loading="lazy" src="{{ asset('public/site/images/Homepage/verified.png') }}"
                                 alt="Verified service providers on Vendorscity platform">
                             <h4 class="iconbox-title mt20">Book your Service in Minutes</h4>
                             <p class="text mb-0">Secure pay, easy cancel, flexible slots, free quotes, managed
@@ -2120,7 +2058,7 @@
                     <div class="col-sm-6 col-lg-4">
                         <div
                             class="iconbox-style9 default-box-shadow1 bgc-white box-padding bdrs12 position-relative mb30">
-                            <img src="{{ asset('public/site/images/Homepage/relax.png') }}"
+                            <img loading="lazy" src="{{ asset('public/site/images/Homepage/relax.png') }}"
                                 alt="Relax while Vendorscity handles moving and cleaning services">
                             <h4 class="iconbox-title mt20">Relax & Let Us Handle the Work</h4>
                             <p class="text mb-0">100% satisfaction, referral rewards,no hidden fees, quality checks,
@@ -2155,7 +2093,7 @@
                         <li class="splide__slide text-center">
                             <div class="freelancer-style12 text-center bdr1 bdrs16 hover-box-shadow">
                                 <div class="thumb w90 mb25 mx-auto position-relative rounded-circle">
-                                    <img src="{{ asset('public/site/images/Homepage/search.png') }}"
+                                    <img loading="lazy" src="{{ asset('public/site/images/Homepage/search.png') }}"
                                         alt="Search services in Dubai and UAE on Vendorscity platform">
                                 </div>
                                 <div class="details">
@@ -2169,7 +2107,7 @@
                         <li class="splide__slide text-center">
                             <div class="freelancer-style12 text-center bdr1 bdrs16 hover-box-shadow">
                                 <div class="thumb w90 mb25 mx-auto position-relative rounded-circle">
-                                    <img src="{{ asset('public/site/images/Homepage/verified.png') }}"
+                                    <img loading="lazy" src="{{ asset('public/site/images/Homepage/verified.png') }}"
                                         alt="Verified service providers on Vendorscity platform">
                                 </div>
                                 <div class="details">
@@ -2183,7 +2121,7 @@
                         <li class="splide__slide text-center">
                             <div class="freelancer-style12 text-center bdr1 bdrs16 hover-box-shadow">
                                 <div class="thumb w90 mb25 mx-auto position-relative rounded-circle">
-                                    <img src="{{ asset('public/site/images/Homepage/relax.png') }}"
+                                    <img loading="lazy" src="{{ asset('public/site/images/Homepage/relax.png') }}"
                                         alt="Relax while Vendorscity handles moving and cleaning services">
                                 </div>
                                 <div class="details">
@@ -2276,7 +2214,7 @@
                                                     $shortDescription = Str::limit($googleReview_data->description, 80);
                                                 @endphp
 
-                                                <p class="review-description">“{{ $shortDescription }}”</p>
+                                                <p class="review-description">â€œ{{ $shortDescription }}â€</p>
                                             @endif
                                         </div>
                                     </div>
@@ -2316,7 +2254,7 @@
 
                                 <hr class="opacity-100 mt20 mb15">
                                 @if ($googleReview_data->description != '')
-                                <p>“{{$googleReview_data->description}}”</p>
+                                <p>â€œ{{$googleReview_data->description}}â€</p>
                                 @endif
                             </div>
                         </div>
@@ -2343,7 +2281,7 @@
                     target="_blank" class="ud-btn btn-thm google-button">Read More Reviews</a>
             </div>
             <div class="col-lg-4 col-5 wow fadeInUp" data-wow-delay="300ms" style="text-align: right;">
-                <img class="w100" src="{{ asset('public/site/images/googlereview.png') }}"
+                <img loading="lazy" class="w100" src="{{ asset('public/site/images/googlereview.png') }}"
                     alt="Graphic representation of Google reviews" style="max-width: 400px;">
             </div>
         </div>
@@ -2387,7 +2325,7 @@
 
                         <li class="splide__slide text-center">
                             <div class="feature-style1 at-home13 mb30 bdrs12">
-                                <div class="feature-img bdrs12 overflow-hidden"><img class="w-100"
+                                <div class="feature-img bdrs12 overflow-hidden"><img loading="lazy" class="w-100"
                                         src="{{ asset('public/site/images/home13-team-1.png') }}"
                                         alt="Vendorscity professional team for moving and cleaning services"></div>
                                 <div class="feature-content">
@@ -2400,9 +2338,9 @@
 
                         <li class="splide__slide text-center">
                             <div class="feature-style1 at-home13 mb30 bdrs12">
-                                <div class="feature-img bdrs12 overflow-hidden"><img class="w-100"
+                                <div class="feature-img bdrs12 overflow-hidden"><img loading="lazy" class="w-100"
                                         src="{{ asset('public/site/images/abudhabi.png') }}"
-                                        alt="Abu Dhabi cleaning, moving, and handyman services – Vendorscity"></div>
+                                        alt="Abu Dhabi cleaning, moving, and handyman services â€“ Vendorscity"></div>
                                 <div class="feature-content">
                                     <div class="top-area">
                                         <p class="title mb-1">Abu Dhabi</p>
@@ -2413,9 +2351,9 @@
 
                         <li class="splide__slide text-center">
                             <div class="feature-style1 at-home13 mb30 bdrs12">
-                                <div class="feature-img bdrs12 overflow-hidden"><img class="w-100"
+                                <div class="feature-img bdrs12 overflow-hidden"><img loading="lazy" class="w-100"
                                         src="{{ asset('public/site/images/sharjaha.png') }}"
-                                        alt="Sharjah cleaning and moving services – Vendorscity UAE"></div>
+                                        alt="Sharjah cleaning and moving services â€“ Vendorscity UAE"></div>
                                 <div class="feature-content">
                                     <div class="top-area">
                                         <p class="title mb-1">Sharjah</p>
@@ -2426,9 +2364,9 @@
 
                         <li class="splide__slide text-center">
                             <div class="feature-style1 at-home13 mb30 bdrs12">
-                                <div class="feature-img bdrs12 overflow-hidden"><img class="w-100"
+                                <div class="feature-img bdrs12 overflow-hidden"><img loading="lazy" class="w-100"
                                         src="{{ asset('public/site/images/rasal.png') }}"
-                                        alt="Ras Al Khaimah moving and cleaning services – Vendorscity"></div>
+                                        alt="Ras Al Khaimah moving and cleaning services â€“ Vendorscity"></div>
                                 <div class="feature-content">
                                     <div class="top-area">
                                         <p class="title mb-1">Ras Al Khamiah</p>
@@ -2439,7 +2377,7 @@
 
                         <li class="splide__slide text-center">
                             <div class="feature-style1 at-home13 mb30 bdrs12">
-                                <div class="feature-img bdrs12 overflow-hidden"><img class="w-100"
+                                <div class="feature-img bdrs12 overflow-hidden"><img loading="lazy" class="w-100"
                                         src="{{ asset('public/site/images/ajman.png') }}"
                                         alt="Ajman moving and cleaning services by Vendorscity"></div>
                                 <div class="feature-content">
@@ -2452,9 +2390,9 @@
 
                         <li class="splide__slide text-center">
                             <div class="feature-style1 at-home13 mb30 bdrs12">
-                                <div class="feature-img bdrs12 overflow-hidden"><img class="w-100"
+                                <div class="feature-img bdrs12 overflow-hidden"><img loading="lazy" class="w-100"
                                         src="{{ asset('public/site/images/quwain.png') }}"
-                                        alt="Umm Al Quwain moving and cleaning services – Vendorscity"></div>
+                                        alt="Umm Al Quwain moving and cleaning services â€“ Vendorscity"></div>
                                 <div class="feature-content">
                                     <div class="top-area">
                                         <p class="title mb-1">Umm Al Quwain</p>
@@ -2464,9 +2402,9 @@
                         </li>
                         <li class="splide__slide text-center">
                             <div class="feature-style1 at-home13 mb30 bdrs12">
-                                <div class="feature-img bdrs12 overflow-hidden"><img class="w-100"
+                                <div class="feature-img bdrs12 overflow-hidden"><img loading="lazy" class="w-100"
                                         src="{{ asset('public/site/images/fujairah.png') }}"
-                                        alt="Fujairah moving and cleaning services – Vendorscity"></div>
+                                        alt="Fujairah moving and cleaning services â€“ Vendorscity"></div>
                                 <div class="feature-content">
                                     <div class="top-area">
                                         <p class="title mb-1">Fujairah</p>
@@ -2513,7 +2451,7 @@
                 <div class="position-relative">
 
                     <div class="about-img wow fadeInRight" data-wow-delay="300ms">
-                        <img class="w100" src="{{ asset('public/site/images/regasvendor.png') }}"
+                        <img loading="lazy" class="w100" src="{{ asset('public/site/images/regasvendor.png') }}"
                             alt="Graphic showing vendor registration process">
                     </div>
 
@@ -2559,7 +2497,7 @@
 
                     <!-- Left Column: Hero -->
                     <div class="tabby-modal-left text-center">
-                        <img src="https://cdn.tabby.ai/assets/logo.png" alt="Tabby"
+                        <img loading="lazy" src="https://cdn.tabby.ai/assets/logo.png" alt="Tabby"
                             style="max-height:40px; width:auto;" class="mb-4 mx-auto">
 
                         <h2 class="tabby-main-heading mb-4">
@@ -2644,7 +2582,7 @@
                                             style="width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                                             <i class="fas fa-check text-success small" style="font-size:10px;"></i>
                                         </div>
-                                        <span class="small text-muted"><strong>Trust:</strong> Shari’ah-compliant and
+                                        <span class="small text-muted"><strong>Trust:</strong> Shariâ€™ah-compliant and
                                             licensed by the Saudi Central Bank.</span>
                                     </li>
                                 </ul>

@@ -601,18 +601,10 @@ class Packagecontroller extends Controller
             ->get();
 
         if ($subservice_id == 101) { // cleaning subscription
-            $data['durations'] = Cache::remember('cleaning_subscription_durations', 86400, function () {
-                return DB::table('cleaning_subscription_durations')->where('is_active_web', 1)->orderBy('set_order')->get();
-            });
-            $data['frequencies'] = Cache::remember('cleaning_subscription_frequencies', 86400, function () {
-                return DB::table('cleaning_subscription_frequencies')->where('is_active_web', 1)->orderBy('set_order')->get();
-            });
-            $data['packages'] = Cache::remember('cleaning_subscription_packages', 86400, function () {
-                return DB::table('cleaning_subscription_packages')->where('is_active_web', 1)->orderBy('set_order')->get();
-            });
-            $data['pricing_rules'] = Cache::remember('cleaning_subscription_pricing', 86400, function () {
-                return DB::table('cleaning_subscription_pricing')->where('is_active_web', 1)->get();
-            });
+            $data['durations'] = DB::table('cleaning_subscription_durations')->where('is_active_web', 1)->orderBy('set_order')->get();
+            $data['frequencies'] = DB::table('cleaning_subscription_frequencies')->where('is_active_web', 1)->orderBy('set_order')->get();
+            $data['packages'] = DB::table('cleaning_subscription_packages')->where('is_active_web', 1)->orderBy('set_order')->get();
+            $data['pricing_rules'] = DB::table('cleaning_subscription_pricing')->where('is_active_web', 1)->get();
             $user_id = Session::get('user')['userid'] ?? '';
             $data['is_first_time_user'] = DB::table('ci_order_item')->where('user_info_id', $user_id)->where('subservice_id', '101')->first();
             $data['promo'] = $request->query('promo', '');

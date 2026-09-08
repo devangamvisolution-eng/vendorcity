@@ -297,6 +297,7 @@ window.nextStep = function (step) {
         activeStep.classList.add('active');
     }
     updateHeader();
+    updateUI();
     saveState();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
@@ -391,6 +392,9 @@ function updateUI() {
 
     // Dynamically update Frequency cards
     let currentDuration = parseInt(state.hours);
+    let hasVisibleFrequency = false;
+    let firstVisibleFrequencyId = null;
+
     document.querySelectorAll('#frequenciesSelection .frequency-card').forEach(el => {
         let fVisits = parseInt(el.getAttribute('data-visits') || 1);
         let fId = el.getAttribute('data-val');
@@ -411,6 +415,10 @@ function updateUI() {
         }
 
         if (freqPkgObj) {
+            el.style.display = 'block';
+            if (!firstVisibleFrequencyId) firstVisibleFrequencyId = fId;
+            if (state.frequencyId == fId) hasVisibleFrequency = true;
+
             let hourlyRate = parseFloat(freqPkgObj.price_per_hour);
             let formattedRate = hourlyRate % 1 === 0 ? hourlyRate.toString() : hourlyRate.toFixed(2);
 
@@ -423,10 +431,27 @@ function updateUI() {
                 if (fBadge) fBadge.style.display = 'none';
             }
         } else {
+            el.style.display = 'none';
             if (fPriceHr) fPriceHr.innerHTML = '<span class="currency_dhiramnew" style="font-size: 16px;">AED</span> <span class="price-val">0</span>';
             if (fBadge) fBadge.style.display = 'none';
         }
     });
+
+    if (!hasVisibleFrequency && firstVisibleFrequencyId) {
+        state.frequencyId = firstVisibleFrequencyId;
+        document.querySelectorAll('#frequenciesSelection .frequency-card').forEach(p => {
+            if (p.getAttribute('data-val') == state.frequencyId) {
+                p.classList.add('selected');
+                state.visits = parseInt(p.getAttribute('data-visits') || 1);
+            } else {
+                p.classList.remove('selected');
+            }
+        });
+        if (state.selectedDays.length > state.visits) {
+            state.selectedDays = [];
+            document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+        }
+    }
 
     let pkgObj = null;
     if (typeof pricingRules !== 'undefined') {
@@ -562,33 +587,73 @@ function updateUI() {
     let promoDiscount = parseFloat(document.getElementById('promo_discount') ? document.getElementById('promo_discount').value : 0) || 0;
     let walletUsed = parseFloat(document.getElementById('wallet_used') ? document.getElementById('wallet_used').value : 0) || 0;
 
-    let promoSummaryRow = document.querySelector('.promo_dicount_summary_div');
-    if (promoSummaryRow) {
+    let promoSummaryRows = document.querySelectorAll('.promo_dicount_summary_div');
+    promoSummaryRows.forEach(row => {
         if (promoDiscount > 0) {
-            promoSummaryRow.style.setProperty('display', 'flex', 'important');
-            let pVal = document.querySelector('.promo_code_summary');
-            if (pVal) pVal.innerText = promoDiscount.toFixed(2);
+            row.style.setProperty('display', 'flex', 'important');
         } else {
-            promoSummaryRow.style.setProperty('display', 'none', 'important');
+            row.style.setProperty('display', 'none', 'important');
         }
-    }
+    });
+    let pVals = document.querySelectorAll('.promo_code_summary');
+    pVals.forEach(p => p.innerText = promoDiscount.toFixed(2));
 
-    let walletSummaryRow = document.querySelector('.wallet_dicount_summary_div');
-    if (walletSummaryRow) {
+    let walletSummaryRows = document.querySelectorAll('.wallet_dicount_summary_div');
+    walletSummaryRows.forEach(row => {
         if (walletUsed > 0) {
-            walletSummaryRow.style.setProperty('display', 'flex', 'important');
-            let wVal = document.querySelector('.wallet_used_summary');
-            if (wVal) wVal.innerText = walletUsed.toFixed(2);
+            row.style.setProperty('display', 'flex', 'important');
         } else {
-            walletSummaryRow.style.setProperty('display', 'none', 'important');
+            row.style.setProperty('display', 'none', 'important');
         }
+    });
+    let wVals = document.querySelectorAll('.wallet_used_summary');
+    wVals.forEach(w => w.innerText = walletUsed.toFixed(2));
+
+    let walletReward = parseFloat(document.getElementById('wallet_reward_amount') ? document.getElementById('wallet_reward_amount').value : 0) || 0;
+    let walletRewardSummaryRows = document.querySelectorAll('.wallet_reward_summary_div');
+    walletRewardSummaryRows.forEach(row => {
+        if (walletReward > 0) {
+            row.classList.remove('d-none');
+            row.style.setProperty('display', 'flex', 'important');
+        } else {
+            row.classList.add('d-none');
+            row.style.setProperty('display', 'none', 'important');
+        }
+    });
+    let rwVals = document.querySelectorAll('.wallet_reward_code_amount');
+    rwVals.forEach(rw => rw.innerText = walletReward.toFixed(2));
+
+    // Assume 5% VAT on baseTotal (before promo/wallet)
+    let vatAmount = baseTotal * 0.05;
+    let serviceFee = 0; // Default service fee
+    if (currentStep === 4) {
+        serviceFee = 9;
     }
 
-    let total = baseTotal - promoDiscount - walletUsed;
+    let total = baseTotal + vatAmount + serviceFee - promoDiscount - walletUsed;
     if (total < 0) total = 0;
     
     let sumSubtotal = document.getElementById('summarySubtotal');
     if (sumSubtotal) sumSubtotal.innerText = subtotal.toFixed(2);
+    
+    let sumVatRow = document.getElementById('summaryVatRow');
+    if (sumVatRow) {
+        sumVatRow.style.setProperty('display', 'flex', 'important');
+        let sumVat = document.getElementById('summaryVat');
+        if (sumVat) sumVat.innerText = vatAmount.toFixed(2);
+    }
+    
+    let sumServiceFeeRow = document.getElementById('summaryServiceFeeRow');
+    if (sumServiceFeeRow) {
+        if (serviceFee > 0) {
+            sumServiceFeeRow.style.setProperty('display', 'flex', 'important');
+        } else {
+            sumServiceFeeRow.style.setProperty('display', 'none', 'important');
+        }
+        let sumServiceFee = document.getElementById('summaryServiceFee');
+        if (sumServiceFee) sumServiceFee.innerText = serviceFee.toFixed(2);
+    }
+    
     let totalPriceDisplay = document.querySelectorAll('.total_to_pay');
     let subTotalDisplay = document.querySelectorAll('.sub_total_display');
     let vatChargeDisplay = document.querySelectorAll('.vat_charge_display');
@@ -600,13 +665,29 @@ function updateUI() {
         el.innerText = subtotal.toFixed(2);
     });
     vatChargeDisplay.forEach(el => {
-        el.innerText = "0.00";
+        el.innerText = vatAmount.toFixed(2);
     });
 
     let summaryTotalBtnVal = document.getElementById('summaryTotalBtnVal');
     if (summaryTotalBtnVal) summaryTotalBtnVal.innerText = total.toFixed(2);
     
+    let crossAmountDiv = document.querySelector('.cross_amount_div');
+    if (crossAmountDiv) {
+        if (promoDiscount > 0 || discount > 0) {
+            crossAmountDiv.style.display = 'block';
+            let crossAmount = document.querySelector('.cross_amount');
+            if (crossAmount) crossAmount.innerText = (baseTotal + vatAmount + serviceFee).toFixed(2);
+        } else {
+            crossAmountDiv.style.display = 'none';
+        }
+    }
+    
     saveState();
+    
+    // Auto-apply promo if applicable (silent=true suppresses toast on auto-apply)
+    if (typeof window.maybeAutoApplyPromo === 'function') {
+        window.maybeAutoApplyPromo(state.total, true);
+    }
 }
 
 // Mobile Summary Modal Logic
@@ -697,6 +778,10 @@ function submitForm() {
     addHidden('sub_total', sumSubtotal);
     addHidden('package_discount', sumDiscount);
     addHidden('cod_charge', codFee);
+    
+    let sumServiceFee = parseFloat(document.getElementById('summaryServiceFee') ? document.getElementById('summaryServiceFee').innerText : 0) || 0;
+    addHidden('service_fee', sumServiceFee);
+    
     addHidden('total_to_pay', totalToPay);
 
     let formData = new FormData(form);
