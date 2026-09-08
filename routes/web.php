@@ -201,16 +201,49 @@ Route::get('/config-cache', function () {
     return 'Config cache cleared';
 });
 
-Route::get('/run-all-jobs', function () {
-
-    set_time_limit(0);
-
-    Artisan::call('queue:work', [
-        '--stop-when-empty' => true,
-    ]);
-
-    return 'All jobs completed';
+Route::get('/fix-db', function () {
+    if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'trn_certificate_number')) {
+        \Illuminate\Support\Facades\Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
+            $table->string('trn_certificate_number')->nullable();
+            $table->string('trade_license_number')->nullable();
+            $table->string('passport_number')->nullable();
+            $table->string('emirates_id_number')->nullable();
+        });
+        return 'Successfully added columns to users table!';
+    }
+    return 'Columns already exist!';
 });
+
+
+// Clear application cache:
+// Route::get('/clear-cache', function() {
+//     $exitCode = Artisan::call('cache:clear');
+//     return 'Application cache cleared';
+// });
+// // Clear view cache:
+// Route::get('/view-clear', function() {
+//     $exitCode = Artisan::call('view:clear');
+//     return 'View cache cleared';
+// });
+//  Route::get('/optimize-clear', function() {
+//     $exitCode = Artisan::call('optimize:clear');
+//     return 'Application cache cleared successfully';
+// });
+
+
+
+//Route::get('/edit-profile', '\App\Http\Controllers\front\MyaccountController@edit_profile');
+
+// Route::get('/checkout', '\App\Http\Controllers\front\checkoutcontroller@checkout');
+// Route::post('/order_place', '\App\Http\Controllers\front\checkoutcontroller@order_place')->name('order_place');
+// Route::get('thankyou', [checkoutcontroller::class, 'thankyou'])->name("thankyou");
+
+
+
+// Route::match(['get', 'post'], 'vendor-database', [FrontvendorController::class, 'vendor_database'])->name('vendor_database');
+
+
+/*------End Front routes  ------*/
 
 
 /*------End Front routes  ------*/
@@ -1484,6 +1517,8 @@ Route::prefix('{city}')
 
         Route::get('/my-account', '\App\Http\Controllers\front\MyaccountController@my_account')->name('front.myaccount');
         Route::get('/my-order', '\App\Http\Controllers\front\MyaccountController@my_order')->name('front.myorder');
+        Route::get('/subscriptions', '\App\Http\Controllers\front\MyaccountController@subscriptions')->name('front.subscriptions');
+        Route::get('/subscription/{id}', '\App\Http\Controllers\front\MyaccountController@subscription_detail')->name('front.subscription_detail');
         Route::get('/my-profile', '\App\Http\Controllers\front\MyaccountController@my_profile')->name('front.myprofile');
         Route::get('my-wallet', '\App\Http\Controllers\front\MyaccountController@my_wallet')->name('front.mywallet');
         // Route::get('/order-detail', '\App\Http\Controllers\front\MyaccountController@order_detail');
@@ -1611,4 +1646,5 @@ Route::post('admin/general-enquiries/assign', 'App\Http\Controllers\admin\Genera
 Route::get('admin/general-enquiries/{id}/notes', 'App\Http\Controllers\admin\GeneralEnquiryController@getNotes')->name('general-enquiries.get-notes');
 Route::post('admin/general-enquiries/{id}/notes', 'App\Http\Controllers\admin\GeneralEnquiryController@storeNote')->name('general-enquiries.store-note');
 Route::post('admin/general-enquiries/update-status', 'App\Http\Controllers\admin\GeneralEnquiryController@updateStatus')->name('general-enquiries.update-status');
+Route::post('admin/general-enquiries/multiple-delete', 'App\Http\Controllers\admin\GeneralEnquiryController@multipleDelete')->name('general-enquiries.multiple-delete');
 require __DIR__ . '/auth.php';

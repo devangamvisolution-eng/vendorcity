@@ -340,6 +340,28 @@
                             <span class="detail-label">Move/Job Type</span>
                             <span class="detail-value">{{ $enquiry->form_type }}</span>
                         </li>
+                        @if ($enquiry->email)
+                            <li>
+                                <span class="detail-label">Email Address</span>
+                                <span class="detail-value">{{ $enquiry->email }}</span>
+                            </li>
+                        @endif
+                        @php
+                            // Fetch country code from frontloginregisters based on mobile number
+                            $userReg = DB::table('frontloginregisters')->where('id', $enquiry->user_id)->first();
+                        @endphp
+
+                        @if ($enquiry->mobile)
+                            <li>
+                                <span class="detail-label">Phone Number</span>
+                                <span class="detail-value">
+                                    @if ($userReg && !empty($userReg->country_code))
+                                        +{{ $userReg->country_code }}
+                                    @endif
+                                    {{ $enquiry->mobile }}
+                                </span>
+                            </li>
+                        @endif
                         @foreach ($submittedFields as $field)
                             @if ($field->formfield_value != '')
                                 @php

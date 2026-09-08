@@ -739,25 +739,10 @@
                         <div>
                             <span class="status-badge" data-bs-toggle="modal" data-bs-target="#ConfirmModal">
                                 @php
-                                    // $statuses = [
-                                    //     'BK' => 'Booking Requested',
-                                    //     'P' => 'Booking Confirmed',
-                                    //     'PA' => 'Vendor Assigned',
-                                    //     'CO' => 'Booking Completed',
-                                    //     'CL' => 'Booking Cancelled',
-                                    // ];
-                                    $statuses = [
-                                        'BK' => 'Booking Requested',
-                                        'BC' => 'Booking Confirmed',
-                                        'P' => 'Booking Confirmed',
-                                        'PA' => 'Vendor Assigned',
-                                        'OTW' => 'On the way',
-                                        'IP' => 'In progress',
-                                        'CO' => 'Booking Completed',
-                                        'CL' => 'Booking Cancelled',
-                                        'UP' => 'Unpaid',
-                                    ];
-                                    $currentStatusText = $statuses[$thank_order_data->order_status] ?? 'Processing';
+                                    $statusDetails = \App\Helpers\Helper::getOrderStatusDetails(
+                                        $thank_order_data->order_status,
+                                    );
+                                    $currentStatusText = $statusDetails['text'];
                                 @endphp
                                 {{ $currentStatusText }}
                             </span>
@@ -812,6 +797,23 @@
                                 {{ $thank_ci_order_data->bookingdate }} {{ $thank_ci_order_data->bookingyear }} ,
                                 {!! Helper::timeslotname($thank_ci_order_data->time_slot) !!}</span>
                         </li>
+                        @php
+                            $customerDetails = DB::table('frontloginregisters')
+                                ->where('id', $thank_order_data->user_id)
+                                ->first();
+                        @endphp
+                        @if ($customerDetails && $customerDetails->email)
+                            <li class="mb-0 mt-0">
+                                <span class="detail-label">Email Address</span>
+                                <span class="detail-value">{{ $customerDetails->email }}</span>
+                            </li>
+                        @endif
+                        @if ($customerDetails && $customerDetails->mobile)
+                            <li class="mb-0 mt-0">
+                                <span class="detail-label">Phone Number</span>
+                                <span class="detail-value">{{ $customerDetails->mobile }}</span>
+                            </li>
+                        @endif
                     </ul>
 
                     <div class="mt-2 d-flex gap-3">
