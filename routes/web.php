@@ -201,6 +201,10 @@ Route::get('/config-cache', function () {
     return 'Config cache cleared';
 });
 
+Route::get('/indexnew', function () {
+    return view('front.indexnew');
+});
+
 Route::get('/fix-db', function () {
     if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'trn_certificate_number')) {
         \Illuminate\Support\Facades\Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {

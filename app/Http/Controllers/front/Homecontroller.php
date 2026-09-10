@@ -93,11 +93,21 @@ class Homecontroller extends Controller
         $cityData = City::where('name', $formattedCity)->first();
         $cityDataId = $cityData?->id ?? null;
 
-        $data['service'] = DB::table('services')->where('is_active', 0)->whereRaw("FIND_IN_SET(?, city)", [$cityDataId])->orderBy('set_order', 'ASC')->get();
-        // $data['service']=DB::table('services')->orderBy('set_order')->get();
-        $data['faq'] = DB::table('faqs')->orderBy('id', 'DESC')->get();
-        $data['googleReview'] = DB::table('googlereviews')->orderBy('id', 'DESC')->get()->toArray();
-        $data['sub_service'] = DB::table('subservices')->where('id', '!=', 102)->whereRaw("FIND_IN_SET(?, city)", [$cityDataId])->where('is_active', 0)->orderBy('set_order', 'ASC')->get();
+        $data['service'] = \Illuminate\Support\Facades\Cache::remember("services_{$cityDataId}", 3600, function () use ($cityDataId) {
+            return DB::table('services')->where('is_active', 0)->whereRaw("FIND_IN_SET(?, city)", [$cityDataId])->orderBy('set_order', 'ASC')->get();
+        });
+
+        $data['faq'] = \Illuminate\Support\Facades\Cache::remember('faqs', 3600, function () {
+            return DB::table('faqs')->orderBy('id', 'DESC')->get();
+        });
+
+        $data['googleReview'] = \Illuminate\Support\Facades\Cache::remember('googleReviews', 3600, function () {
+            return DB::table('googlereviews')->orderBy('id', 'DESC')->get()->toArray();
+        });
+
+        $data['sub_service'] = \Illuminate\Support\Facades\Cache::remember("sub_services_{$cityDataId}", 3600, function () use ($cityDataId) {
+            return DB::table('subservices')->where('id', '!=', 102)->whereRaw("FIND_IN_SET(?, city)", [$cityDataId])->where('is_active', 0)->orderBy('set_order', 'ASC')->get();
+        });
 
         if ((session('search_country_name') == 'United Arab Emirates')) {
             $data['city'] = DB::table('cities')->where('country', session('search_country_id'))->orderBy('name', 'asc')->get();
@@ -126,8 +136,12 @@ class Homecontroller extends Controller
         $data['meta_description'] = $system_attributeMeta->meta_description ?? 'Discover Top Home Services in the UAE with VendorsCity. Get Up to 5 free Quotes and Connect with Trusted Service Providers Effortlessly.';
 
         $data['formattedCity'] = $formattedCity;
+
+        // echo "<pre>";print_r($data);echo "</pre>";exit;
         return view('front.index', $data);
     }
+
+
     public function privacy_policy()
     {
 
@@ -156,6 +170,18 @@ class Homecontroller extends Controller
     {
 
         $data['cms_data'] = DB::table('cms')->where('id', 3)->first();
+
+        // $data['meta_title'] = "";
+        // $data['meta_keyword'] = "";
+        // $data['meta_description'] = "";    
+
+        // echo "<pre>";print_r($data);echo "</pre>";exit;
+        return view('front.privacy_policy', $data);
+    }
+    public function cancellations_policy()
+    {
+
+        $data['cms_data'] = DB::table('cms')->where('id', 4)->first();
 
         // $data['meta_title'] = "";
         // $data['meta_keyword'] = "";

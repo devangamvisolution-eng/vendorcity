@@ -121,7 +121,7 @@
                                              </div>
                                          </div>
                                          {{-- <h1 class="mb25" style="color: #fff;font-size: 60px;">VendorsCity</h1> --}}
-                                         <img loading="lazy" class="mb25 footer-logo"
+                                         <img class="mb25 footer-logo"
                                              src="{{ asset('public/site/images/footer-logo.svg') }}" alt="Footer Logo">
                                          <div class="row">
                                              <div class="col-sm-6 col-lg-3">
@@ -241,8 +241,7 @@
 
                                                              <a href="https://x.com/myvendorsCity" target="_blank"
                                                                  style="padding: 0 10px 0px 10px;display: initial;">
-                                                                 <img loading="lazy"
-                                                                     src="{{ asset('/public/site/images/twitter.png') }}"
+                                                                 <img src="{{ asset('/public/site/images/twitter.png') }}"
                                                                      style="height: 15px;width: 16px;margin-top: -4px;">
                                                              </a>
 
@@ -281,7 +280,7 @@
                                                              style="color: #fff;">Privacy Policy</a>
                                                          <a class="fz17 fw500" href=""
                                                              style="color: #fff;">Site
-                                                             Map</a><br>Copyright Â© {{ date('Y') }} VendorsCity.
+                                                             Map</a><br>Copyright © {{ date('Y') }} VendorsCity.
                                                          All
                                                          rights reserved.
                                                      </p>
@@ -337,38 +336,28 @@
                                  @endif
 
 
-                                 <script src="{{ asset('public/site/js/jquery-migrate-3.0.0.min.js') }}" defer></script>
-                                 <script src="{{ asset('public/site/js/popper.min.js') }}" defer></script>
-                                 <script src="{{ asset('public/site/js/bootstrap.min.js') }}" defer></script>
-                                 <script src="{{ asset('public/site/js/bootstrap-select.min.js') }}" defer></script>
-                                 <script src="{{ asset('public/site/js/jquery.mmenu.all.js') }}" defer></script>
-                                 <script src="{{ asset('public/site/js/ace-responsive-menu.js') }}" defer></script>
-                                 <script src="{{ asset('public/site/js/jquery-scrolltofixed-min.js') }}" defer></script>
+                                 <script src="{{ asset('public/site/js/jquery-migrate-3.0.0.min.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/popper.min.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/bootstrap.min.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/bootstrap-select.min.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/jquery.mmenu.all.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/ace-responsive-menu.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/jquery-scrolltofixed-min.js') }}"></script>
                                  @if (!request()->is('*/booknow/cleaning/cleaning-subscription'))
-                                     <script src="{{ asset('public/site/js/wow.min.js') }}" defer></script>
-                                     @if (!request()->is('*dubai*'))
-                                         <script src="{{ asset('public/site/js/owl.js') }}" defer></script>
-                                     @endif
-                                     <script src="{{ asset('public/site/js/jquery.counterup.js') }}" defer></script>
+                                     <script src="{{ asset('public/site/js/wow.min.js') }}"></script>
+                                     <script src="{{ asset('public/site/js/owl.js') }}"></script>
+                                     <script src="{{ asset('public/site/js/jquery.counterup.js') }}"></script>
                                  @endif
-
-                                 @if (request()->is('*dubai*'))
-                                     <link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}"
-                                         media="print" onload="this.media='all'">
-                                 @else
-                                     <link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}">
-                                 @endif
-
-                                 <script src="{{ asset('public/site/js/intlTelInput.min.js') }}" defer></script>
+                                 <link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}">
+                                 <script src="{{ asset('public/site/js/intlTelInput.min.js') }}"></script>
                                  {{-- <script src="{{ asset('public/site/js/isotop.js') }}"></script> --}}
-                                 <script src="{{ asset('public/site/js/scrollbalance.js') }}" defer></script>
-                                 <script src="{{ asset('public/site/js/scrollbalance_new.js') }}" defer></script>
+                                 <script src="{{ asset('public/site/js/scrollbalance.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/scrollbalance_new.js') }}"></script>
                                  <!-- Custom script for all pages -->
-                                 <script src="{{ asset('public/site/js/script.js') }}" defer></script>
-                                 @if (!request()->is('*/booknow/cleaning/cleaning-subscription') && !request()->is('*dubai*'))
-                                     <script src="{{ asset('public/site/js/owl.carousel.min.js') }}" defer></script>
-                                     <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js" defer>
-                                     </script>
+                                 <script src="{{ asset('public/site/js/script.js') }}"></script>
+                                 @if (!request()->is('*/booknow/cleaning/cleaning-subscription'))
+                                     <script src="{{ asset('public/site/js/owl.carousel.min.js') }}"></script>
+                                     <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
                                  @endif
                                  {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script> --}}
 
@@ -381,8 +370,8 @@
 
                                  <!-- Select2 JS -->
 
-                                 @if (!request()->is('*/booknow/cleaning/cleaning-subscription') && !request()->is('*dubai*'))
-                                     <script src="{{ asset('public/site/js/select2.min.js') }}" defer></script>
+                                 @if (!request()->is('*/booknow/cleaning/cleaning-subscription'))
+                                     <script src="{{ asset('public/site/js/select2.min.js') }}"></script>
                                  @endif
 
                                  <script type="text/javascript">
@@ -660,7 +649,7 @@
                                          }
                                      }
 
-                                     // Bootstrap selectpicker fires jQuery change events â€” bind here to be sure
+                                     // Bootstrap selectpicker fires jQuery change events — bind here to be sure
                                      $(document).ready(function() {
                                          // Desktop sticky header city dropdown (#city_picker_header)
                                          $('#city_picker_header').on('change', function() {
@@ -795,7 +784,7 @@
                                          function setCountryCode() {
                                              const countryData = Otpphoneinputnew.getSelectedCountryData();
                                              countryCodeInput.value = countryData.dialCode; // store only dial code (e.g. 971)
-                                             // If you want full ISO code (like 'AE') â†’ use countryData.iso2
+                                             // If you want full ISO code (like 'AE') → use countryData.iso2
                                          }
 
                                          // Set default initially
@@ -827,7 +816,7 @@
                                          function setCountryCode() {
                                              const countryData = Otpphoneinputnew1.getSelectedCountryData();
                                              countryCodeInput.value = countryData.dialCode; // store only dial code (e.g. 971)
-                                             // If you want full ISO code (like 'AE') â†’ use countryData.iso2
+                                             // If you want full ISO code (like 'AE') → use countryData.iso2
                                          }
 
                                          // Set default initially

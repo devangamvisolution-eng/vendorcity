@@ -47,6 +47,9 @@
                                 value="0">
                             <input type="hidden" name="time_charge_hidden" id="time_charge_hidden" value="0">
                             <input type="hidden" name="date_charge_hidden" id="date_charge_hidden" value="0">
+                            <input type="hidden" name="promo_name" id="promo_name" value="{{ $order->coupon_code ?? '' }}">
+                            <input type="hidden" name="promo_discount" id="promo_discount"
+                                value="{{ $order->coupon_discounted ?? 0 }}">
                             <input type="hidden" name="order_id" id="order_id" value="{{ $order->order_id }}">
                             <div class="row">
                                 <div class="col-md-4">
@@ -519,6 +522,16 @@
                                                     placeholder="Optional Override" value="{{ $overridePrice }}">
                                             </div>
                                         </div>
+                                        <div class="col-md-4" id="custom_subtotal_div"
+                                            style="display: {{ isset($order->items[0]) && $order->items[0]->subservice_id == 101 ? 'block' : 'none' }};">
+                                            <div class="form-group">
+                                                <label>Custom subtotal (AED)</label>
+                                                <input type="number" id="custom_subtotal_override"
+                                                    name="custom_subtotal" class="form-control"
+                                                    placeholder="Optional Override"
+                                                    value="{{ $order->custom_subtotal ?? '' }}">
+                                            </div>
+                                        </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Need Cleaning Materials?</label>
@@ -793,6 +806,36 @@
                                             placeholder="Enter Your Apartment number & floor or Villa Number">
                                         <p class="form-error-text" id="apartment_villa_num_error"
                                             style="color: red; margin-top: 10px;"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <div class="form-group {{ !empty($order->coupon_code) ? 'd-none' : '' }}"
+                                        id="promo_code_input_section">
+                                        <label>Promo Code</label>
+                                        <div class="input-group">
+                                            <input type="text" id="promo_code" class="form-control"
+                                                placeholder="Enter Promo Code">
+                                            <button class="btn btn-success" type="button"
+                                                onclick="applyPromo()">Apply</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group {{ empty($order->coupon_code) ? 'd-none' : 'd-block' }}"
+                                        id="promo_applied_section">
+                                        <label>Promo Applied</label>
+                                        <div
+                                            class="alert alert-success d-flex justify-content-between align-items-center mb-0 p-2">
+                                            <div>
+                                                <strong><span
+                                                        class="promo_code_name">{{ $order->coupon_code ?? '' }}</span></strong>
+                                                - AED <span
+                                                    class="promo_code_amount">{{ number_format((float) ($order->coupon_discounted ?? 0), 2, '.', '') }}</span>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="removePromo()">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1308,6 +1351,10 @@
                 $('#subservice_id').change(function() {
                     var subservice_id = $(this).val();
 
+                    if (typeof clearPromoData === 'function') {
+                        clearPromoData();
+                    }
+
                     if (!isPageLoad) {
                         $('#time_slot').val('');
                         $('#service_date').val('');
@@ -1458,7 +1505,7 @@
 
         var pricingRules = @json($pricing_rules ?? []);
 
-        function calculateSubscriptionPrice() {
+        function calculateSubscriptionPrice(e) {
             var hours = parseInt($('#sub_hours').val()) || 0;
             var frequencyOpt = $('#sub_frequency').find(':selected');
             var frequencyId = frequencyOpt.data('id');
@@ -1483,7 +1530,7 @@
                         if (rule) {
                             var hourlyRate = parseFloat(rule.price_per_hour);
                             var formattedRate = hourlyRate % 1 === 0 ? hourlyRate.toString() : hourlyRate.toFixed(
-                                2);
+                            2);
                             $(this).text(baseLabel + " - AED " + formattedRate + "/hr");
                         } else {
                             $(this).text(baseLabel);
@@ -1500,28 +1547,32 @@
                 });
             }
 
+            var isDropdownChange = (e && e.type === 'change' && e.target.id !== 'sub_materials' && e.target.id !==
+                'sub_cleaning_material_charge');
+
             var pricePerHour = parseFloat($('#price_change_of_visit').val()) || 0;
+            var customSubtotalOverride = parseFloat($('#custom_subtotal_override').val());
 
             if (hours && frequencyId && packageId && pricingRules.length > 0) {
                 var rule = pricingRules.find(r => r.package_id == packageId && r.duration_id == hours && r.frequency_id ==
                     frequencyId);
 
                 if (rule) {
-                    if (!$('#price_change_of_visit').is(':focus')) {
-                        if (window.isFirstLoad && ($('#price_change_of_visit').val() == '' || $('#price_change_of_visit')
-                                .val() == '0')) {
-                            pricePerHour = parseFloat(rule.price_per_hour);
-                            $('#price_change_of_visit').val(pricePerHour.toFixed(2));
-                        } else if (!window.isFirstLoad) {
-                            pricePerHour = parseFloat(rule.price_per_hour);
-                            $('#price_change_of_visit').val(pricePerHour.toFixed(2));
-                        }
+                    if (window.isFirstLoad && ($('#price_change_of_visit').val() == '' || $('#price_change_of_visit')
+                        .val() == '0')) {
+                        pricePerHour = parseFloat(rule.price_per_hour);
+                        $('#price_change_of_visit').val(pricePerHour.toFixed(2));
+                    } else if (isDropdownChange) {
+                        pricePerHour = parseFloat(rule.price_per_hour);
+                        $('#price_change_of_visit').val(pricePerHour.toFixed(2));
                     }
-                } else if (!$('#price_change_of_visit').is(':focus')) {
+                } else if (isDropdownChange) {
                     $('#price_change_of_visit').val('');
+                    pricePerHour = 0;
                 }
-            } else if (!$('#price_change_of_visit').is(':focus')) {
+            } else if (isDropdownChange) {
                 $('#price_change_of_visit').val('');
+                pricePerHour = 0;
             }
 
             // Calculate Totals based on pricePerHour
@@ -1539,15 +1590,25 @@
                     material_charge = parseFloat($('#sub_cleaning_material_charge').val()) || 0;
                 }
 
-                let sub_total = service_charge + material_charge + cod_charge + service_fee + timing_charge + date_charge;
+                let base_charge = service_charge + material_charge;
+                if (!isNaN(customSubtotalOverride) && customSubtotalOverride > 0) {
+                    base_charge = customSubtotalOverride;
+                }
+
+                let sub_total = base_charge + cod_charge + service_fee + timing_charge + date_charge;
+
+                // Subtract promo discount
+                let promo_discount = parseFloat($('#promo_discount').val()) || 0;
+                let sub_total_discounted = sub_total - promo_discount;
+                if (sub_total_discounted < 0) sub_total_discounted = 0;
 
                 let include_vat = $('#include_vat').val();
                 let vat_charge = 0;
                 if (include_vat === 'yes') {
-                    vat_charge = sub_total * (5 / 100);
+                    vat_charge = sub_total_discounted * (5 / 100);
                 }
 
-                let order_total = sub_total + vat_charge;
+                let order_total = sub_total_discounted + vat_charge;
 
                 $('#service_charge').val(service_charge.toFixed(2));
                 $('#sub_total').val(sub_total.toFixed(2));
@@ -1567,8 +1628,17 @@
             });
 
             $('#sub_hours, #sub_frequency, #sub_package, #subservice_id, #sub_materials, #sub_cleaning_material_charge')
-                .change(calculateSubscriptionPrice);
+                .change(function(e) {
+                    var subserviceId = $('#subservice_id').val();
+                    if (subserviceId == 101) {
+                        $('#custom_subtotal_div').show();
+                    } else {
+                        $('#custom_subtotal_div').hide();
+                    }
+                    calculateSubscriptionPrice(e);
+                });
             $('#price_change_of_visit').on('input', calculateSubscriptionPrice);
+            $('#custom_subtotal_override').on('input', calculateSubscriptionPrice);
             $('#sub_cleaning_material_charge').on('input', calculateSubscriptionPrice);
 
             $('#sub_materials').change(function() {
@@ -1685,6 +1755,16 @@
     </script>
 
     <script>
+        $(document).ready(function() {
+            $('#hour_value, #how_many_cleaner, #how_often_you_need, #need_cleaning_material, #include_vat, #cleaner_charge')
+                .on('change input', function() {
+                    let subservice = $('#subservice_id').val();
+                    if (subservice == 28 || subservice == 97) {
+                        home_cleaning_calculation();
+                    }
+                });
+        });
+
         function home_cleaning_calculation() {
 
             let hour_value = parseFloat($('#hour_value').val()) || 0;
@@ -1713,15 +1793,20 @@
             let sub_total = service_charge + additional_charge + cod_charge + service_fee + timing_charge + date_charge;
 
             // alert(sub_total);
+            // Subtract promo discount
+            let promo_discount = parseFloat($('#promo_discount').val()) || 0;
+            let sub_total_discounted = sub_total - promo_discount;
+            if (sub_total_discounted < 0) sub_total_discounted = 0;
+
             // Initialize vat_charge
             let vat_charge = 0;
 
             if (include_vat === 'yes') {
-                vat_charge = sub_total * (vatPercent / 100);
+                vat_charge = sub_total_discounted * (vatPercent / 100);
             }
 
             // Calculate order total
-            let order_total = sub_total + vat_charge;
+            let order_total = sub_total_discounted + vat_charge;
             // alert(vat_charge);
             // alert(order_total);
             // Update the form fields
@@ -1765,15 +1850,20 @@
 
             let sub_total = service_charge + cod_charge + service_fee + timing_charge + date_charge;
 
+            // Subtract promo discount
+            let promo_discount = parseFloat($('#promo_discount').val()) || 0;
+            let sub_total_discounted = sub_total - promo_discount;
+            if (sub_total_discounted < 0) sub_total_discounted = 0;
+
             // Initialize vat_charge
             let vat_charge = 0;
 
             if (include_vat === 'yes') {
-                vat_charge = sub_total * (vatPercent / 100);
+                vat_charge = sub_total_discounted * (vatPercent / 100);
             }
 
             // Calculate order total
-            let order_total = sub_total + vat_charge;
+            let order_total = sub_total_discounted + vat_charge;
 
             // Update the form fields
             $('#service_charge').val(service_charge.toFixed(2));
@@ -1829,13 +1919,13 @@
                     <div class="col-6">
                         <label>${packageName} - Quantity</label>
                         <input type="number" name="${packageId}_quantity" id="${packageId}_quantity" 
-                               class="form-control" min="1" placeholder="Enter Quantity" value="${savedQty}">
+                               class="form-control" min="1" placeholder="Enter Quantity" value="${savedQty}" onchange="package_calculation()" oninput="package_calculation()">
                         <p class="form-error-text" id="${packageId}_quantity_error" style="color: red; margin-top: 10px;"></p>
                     </div>
                     <div class="col-6">
                         <label>${packageName} - Price</label>
                         <input type="number" name="${packageId}_price" id="${packageId}_price" 
-                               class="form-control" min="0" step="0.01" placeholder="Enter Price" value="${savedPrice}">
+                               class="form-control" min="0" step="0.01" placeholder="Enter Price" value="${savedPrice}" onchange="package_calculation()" oninput="package_calculation()">
                         <p class="form-error-text" id="${packageId}_price_error" style="color: red; margin-top: 10px;"></p>
                     </div>
                 </div>
@@ -1851,5 +1941,96 @@
         // Add event listener to the select element
         const packageSelect = document.getElementById('package');
         packageSelect.addEventListener('change', showPackageFields);
+    </script>
+    <script>
+        function applyPromo() {
+            var promo_code = $('#promo_code').val();
+            var sub_total = $('#sub_total').val();
+            var customer_id = $('#customer_id').val();
+            var subservice_id = $('#subservice_id').val();
+
+            if (!promo_code) {
+                alert('Please enter a promo code.');
+                return;
+            }
+
+            if (sub_total <= 0) {
+                alert(
+                    'Please fill out the order details so the subtotal is greater than zero before applying a promo code.');
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('admin_promo_check') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    promo_code: promo_code,
+                    sub_total: sub_total,
+                    customer_id: customer_id,
+                    sub_service: subservice_id
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#promo_name').val(response.coupan_code);
+                        $('#promo_discount').val(response.discount);
+
+                        $('.promo_code_name').text(response.coupan_code);
+                        $('.promo_code_amount').text(parseFloat(response.discount).toFixed(2));
+
+                        $('#promo_code_input_section').addClass('d-none');
+                        $('#promo_applied_section').removeClass('d-none');
+                        $('#promo_applied_section').addClass('d-block');
+
+                        let subservice = $('#subservice_id').val();
+                        if (subservice == 28 || subservice == 97) {
+                            home_cleaning_calculation();
+                        } else if (subservice == 101) {
+                            if (typeof calculateSubscriptionPrice === 'function') {
+                                calculateSubscriptionPrice();
+                            }
+                        } else {
+                            if (typeof package_calculation === 'function') {
+                                package_calculation();
+                            }
+                        }
+                    } else {
+                        alert('Promo Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while validating the promo code.');
+                }
+            });
+        }
+
+        function clearPromoData() {
+            $('#promo_name').val('');
+            $('#promo_discount').val(0);
+            $('#promo_code').val('');
+
+            $('#promo_applied_section').removeClass('d-block');
+            $('#promo_applied_section').addClass('d-none');
+            $('#promo_code_input_section').removeClass('d-none');
+
+            let subservice = $('#subservice_id').val();
+            if (subservice == 28 || subservice == 97) {
+                home_cleaning_calculation();
+            } else if (subservice == 101) {
+                if (typeof calculateSubscriptionPrice === 'function') {
+                    calculateSubscriptionPrice();
+                }
+            } else {
+                if (typeof package_calculation === 'function') {
+                    package_calculation();
+                }
+            }
+        }
+
+        function removePromo() {
+            if (confirm("Are you sure you want to remove this coupon?")) {
+                clearPromoData();
+            }
+        }
     </script>
 @stop

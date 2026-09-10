@@ -859,6 +859,47 @@ class Helper
         }
     }
 
+    public static function getOrderStatusDetails($order_status)
+    {
+        $statusText = 'Unknown';
+        $statusColor = 'bg-secondary-light text-secondary';
+
+        switch ($order_status) {
+            case 'BK':
+                $statusText = 'Booking Requested';
+                $statusColor = 'bg-warning-light text-warning';
+                break;
+            case 'P':
+            case 'PA':
+            case 'BC':
+                $statusText = 'Booking Confirmed';
+                $statusColor = 'bg-info-light text-info';
+                break;
+            case 'OTW':
+                $statusText = 'On the way';
+                $statusColor = 'bg-primary-light text-primary';
+                break;
+            case 'IP':
+                $statusText = 'In progress';
+                $statusColor = 'bg-primary-light text-primary';
+                break;
+            case 'CO':
+                $statusText = 'Booking Completed';
+                $statusColor = 'bg-success-light text-success';
+                break;
+            case 'CL':
+                $statusText = 'Booking Cancelled';
+                $statusColor = 'bg-danger-light text-danger';
+                break;
+            case 'UP':
+                $statusText = 'Unpaid';
+                $statusColor = 'bg-secondary-light text-secondary';
+                break;
+        }
+
+        return ['text' => $statusText, 'color' => $statusColor];
+    }
+
     public static function timeAgo($time_ago)
     {
         $time_ago = strtotime($time_ago);
@@ -1172,6 +1213,447 @@ class Helper
 
         return true;
     }
+    public static function service_confirmation_whatsapp_customer($userid, $order_number)
+    {
+        $userdata = DB::table('frontloginregisters')
+            ->where('id', $userid)
+            ->first();
+
+        if (!$userdata) {
+            \Log::error('WhatsApp: User not found', [
+                'userid' => $userid,
+                'order_number' => $order_number,
+            ]);
+            return false;
+        }
+
+        $firstItem = DB::table('ci_order_item')
+            ->where('order_id', $order_number)
+            ->first();
+
+        if (!$firstItem) {
+            \Log::error('WhatsApp: Order item not found', [
+                'userid' => $userid,
+                'order_number' => $order_number,
+            ]);
+            return false;
+        }
+
+        $subservice = self::subservicename((int) $firstItem->subservice_id);
+
+        if (empty($subservice)) {
+            $subservice = self::servicename((int) $firstItem->service_id);
+        }
+
+        if (empty($subservice)) {
+            $subservice = 'Service';
+        }
+
+        $customer_name = !empty($userdata->name)
+            ? $userdata->name
+            : 'Customer';
+
+        $booking_date = trim($firstItem->bookingdate . ' ' . $firstItem->month . ' ' . $firstItem->bookingyear);
+        $booking_time = self::timeslotname((int)$firstItem->time_slot);
+
+        $countryCode = preg_replace('/[^0-9]/', '', $userdata->country_code);
+        $mobile = preg_replace('/[^0-9]/', '', $userdata->mobile);
+
+        $phone = $countryCode . $mobile;
+
+        if (empty($countryCode) || empty($mobile)) {
+            \Log::error('WhatsApp: Invalid customer phone', [
+                'userid' => $userid,
+                'country_code' => $userdata->country_code,
+                'mobile' => $userdata->mobile,
+                'final_phone' => $phone,
+            ]);
+
+            return false;
+        }
+
+        $payload = [
+            "messages" => [
+                [
+                    "content" => [
+                        "language" => "en",
+                        "templateData" => [
+                            "body" => [
+                                "placeholders" => [
+                                    $customer_name,
+                                    $subservice,
+                                    $booking_date,
+                                    $booking_time
+                                ]
+                            ],
+                            "buttons" => [
+                                [
+                                    "type" => "URL",
+                                    "parameter" => (string) $order_number
+                                ]
+                            ]
+                        ],
+                        "templateName" => "service_confirmation_vc"
+                    ],
+                    "from" => "+971503204846",
+                    "to" => "+" . $phone
+                ]
+            ]
+        ];
+
+        \Log::info('WhatsApp request started', [
+            'userid' => $userid,
+            'order_number' => $order_number,
+            'phone' => '+' . $phone,
+            'customer_name' => $customer_name,
+            'subservice' => $subservice,
+            'template' => 'service_confirmation_vc',
+            'payload' => $payload,
+        ]);
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($payload),
+            CURLOPT_HTTPHEADER => [
+                'Authorization: key_Fqjoz3rdR46CFfRcampB38eyKXqp56NZEm4JcB2EevE1QsvW85W8HsBtSIGVDq91JtGSCFj0v34YDR66UPWNR2tDWn4hABbXFHSLLk6J1VIQpgMUPHOK3jxS9DeZOlqTFnYjRMJS2xo17nTwx8iBHJkgRAanqeVPJpWtqkkqlc4Rt1eVdHVR4eRd7wpA6X3koFvJJZoxKkuatqo39XZaeWPtHcBURiboFPEaHldS4RlTUZL2VCfiAOfsaDPm',
+                'Accept: application/json',
+                'Content-Type: application/json',
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+
+        $curlError = curl_error($curl);
+        $curlErrno = curl_errno($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+
+        \Log::info('WhatsApp API response', [
+            'userid' => $userid,
+            'order_number' => $order_number,
+            'phone' => '+' . $phone,
+            'http_code' => $httpCode,
+            'curl_errno' => $curlErrno,
+            'curl_error' => $curlError,
+            'response' => $response,
+        ]);
+
+        if ($curlError) {
+            \Log::error('WhatsApp CURL ERROR', [
+                'error' => $curlError,
+                'errno' => $curlErrno,
+            ]);
+
+            return false;
+        }
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            \Log::error('WhatsApp DoubleTick API ERROR', [
+                'http_code' => $httpCode,
+                'response' => $response,
+                'phone' => '+' . $phone,
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function on_the_way_whatsapp_customer($userid, $order_number)
+    {
+        $userdata = DB::table('frontloginregisters')
+            ->where('id', $userid)
+            ->first();
+
+        if (!$userdata) {
+            \Log::error('WhatsApp: User not found', [
+                'userid' => $userid,
+                'order_number' => $order_number,
+            ]);
+            return false;
+        }
+
+        $firstItem = DB::table('ci_order_item')
+            ->where('order_id', $order_number)
+            ->first();
+
+        if (!$firstItem) {
+            \Log::error('WhatsApp: Order item not found', [
+                'userid' => $userid,
+                'order_number' => $order_number,
+            ]);
+            return false;
+        }
+
+        $booking_time = self::timeslotname((int)$firstItem->time_slot);
+
+        $countryCode = preg_replace('/[^0-9]/', '', $userdata->country_code);
+        $mobile = preg_replace('/[^0-9]/', '', $userdata->mobile);
+
+        $phone = $countryCode . $mobile;
+
+        if (empty($countryCode) || empty($mobile)) {
+            \Log::error('WhatsApp: Invalid customer phone', [
+                'userid' => $userid,
+                'country_code' => $userdata->country_code,
+                'mobile' => $userdata->mobile,
+                'final_phone' => $phone,
+            ]);
+
+            return false;
+        }
+
+        $payload = [
+            "messages" => [
+                [
+                    "content" => [
+                        "language" => "en",
+                        "templateData" => [
+                            "body" => [
+                                "placeholders" => [
+                                    $booking_time
+                                ]
+                            ],
+                            "buttons" => [
+                                [
+                                    "type" => "URL",
+                                    "parameter" => (string) $order_number
+                                ]
+                            ]
+                        ],
+                        "templateName" => "on_the_way"
+                    ],
+                    "from" => "+971503204846",
+                    "to" => "+" . $phone
+                ]
+            ]
+        ];
+
+        \Log::info('WhatsApp request started', [
+            'userid' => $userid,
+            'order_number' => $order_number,
+            'phone' => '+' . $phone,
+            'template' => 'on_the_way',
+            'payload' => $payload,
+        ]);
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($payload),
+            CURLOPT_HTTPHEADER => [
+                'Authorization: key_Fqjoz3rdR46CFfRcampB38eyKXqp56NZEm4JcB2EevE1QsvW85W8HsBtSIGVDq91JtGSCFj0v34YDR66UPWNR2tDWn4hABbXFHSLLk6J1VIQpgMUPHOK3jxS9DeZOlqTFnYjRMJS2xo17nTwx8iBHJkgRAanqeVPJpWtqkkqlc4Rt1eVdHVR4eRd7wpA6X3koFvJJZoxKkuatqo39XZaeWPtHcBURiboFPEaHldS4RlTUZL2VCfiAOfsaDPm',
+                'Accept: application/json',
+                'Content-Type: application/json',
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+
+        $curlError = curl_error($curl);
+        $curlErrno = curl_errno($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+
+        \Log::info('WhatsApp API response', [
+            'userid' => $userid,
+            'order_number' => $order_number,
+            'phone' => '+' . $phone,
+            'http_code' => $httpCode,
+            'curl_errno' => $curlErrno,
+            'curl_error' => $curlError,
+            'response' => $response,
+        ]);
+
+        if ($curlError) {
+            \Log::error('WhatsApp CURL ERROR', [
+                'error' => $curlError,
+                'errno' => $curlErrno,
+            ]);
+
+            return false;
+        }
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            \Log::error('WhatsApp DoubleTick API ERROR', [
+                'http_code' => $httpCode,
+                'response' => $response,
+                'phone' => '+' . $phone,
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function post_service_feedback_whatsapp_customer($userid, $order_number)
+    {
+        $userdata = DB::table('frontloginregisters')
+            ->where('id', $userid)
+            ->first();
+
+        if (!$userdata) {
+            \Log::error('WhatsApp: User not found', [
+                'userid' => $userid,
+                'order_number' => $order_number,
+            ]);
+            return false;
+        }
+
+        $firstItem = DB::table('ci_order_item')
+            ->where('order_id', $order_number)
+            ->first();
+
+        if (!$firstItem) {
+            \Log::error('WhatsApp: Order item not found', [
+                'userid' => $userid,
+                'order_number' => $order_number,
+            ]);
+            return false;
+        }
+
+        $subservice = self::subservicename((int) $firstItem->subservice_id);
+
+        if (empty($subservice)) {
+            $subservice = self::servicename((int) $firstItem->service_id);
+        }
+
+        if (empty($subservice)) {
+            $subservice = 'Service';
+        }
+
+        $customer_name = !empty($userdata->name)
+            ? $userdata->name
+            : 'Customer';
+
+        $countryCode = preg_replace('/[^0-9]/', '', $userdata->country_code);
+        $mobile = preg_replace('/[^0-9]/', '', $userdata->mobile);
+
+        $phone = $countryCode . $mobile;
+
+        if (empty($countryCode) || empty($mobile)) {
+            \Log::error('WhatsApp: Invalid customer phone', [
+                'userid' => $userid,
+                'country_code' => $userdata->country_code,
+                'mobile' => $userdata->mobile,
+                'final_phone' => $phone,
+            ]);
+
+            return false;
+        }
+
+        $payload = [
+            "messages" => [
+                [
+                    "content" => [
+                        "language" => "en",
+                        "templateData" => [
+                            "body" => [
+                                "placeholders" => [
+                                    $customer_name,
+                                    $subservice
+                                ]
+                            ]
+                        ],
+                        "templateName" => "post_service_feedback"
+                    ],
+                    "from" => "+971503204846",
+                    "to" => "+" . $phone
+                ]
+            ]
+        ];
+
+        \Log::info('WhatsApp request started', [
+            'userid' => $userid,
+            'order_number' => $order_number,
+            'phone' => '+' . $phone,
+            'template' => 'post_service_feedback',
+            'payload' => $payload,
+        ]);
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://public.doubletick.io/whatsapp/message/template',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($payload),
+            CURLOPT_HTTPHEADER => [
+                'Authorization: key_Fqjoz3rdR46CFfRcampB38eyKXqp56NZEm4JcB2EevE1QsvW85W8HsBtSIGVDq91JtGSCFj0v34YDR66UPWNR2tDWn4hABbXFHSLLk6J1VIQpgMUPHOK3jxS9DeZOlqTFnYjRMJS2xo17nTwx8iBHJkgRAanqeVPJpWtqkkqlc4Rt1eVdHVR4eRd7wpA6X3koFvJJZoxKkuatqo39XZaeWPtHcBURiboFPEaHldS4RlTUZL2VCfiAOfsaDPm',
+                'Accept: application/json',
+                'Content-Type: application/json',
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+
+        $curlError = curl_error($curl);
+        $curlErrno = curl_errno($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+
+        \Log::info('WhatsApp API response', [
+            'userid' => $userid,
+            'order_number' => $order_number,
+            'phone' => '+' . $phone,
+            'http_code' => $httpCode,
+            'curl_errno' => $curlErrno,
+            'curl_error' => $curlError,
+            'response' => $response,
+        ]);
+
+        if ($curlError) {
+            \Log::error('WhatsApp CURL ERROR', [
+                'error' => $curlError,
+                'errno' => $curlErrno,
+            ]);
+
+            return false;
+        }
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            \Log::error('WhatsApp DoubleTick API ERROR', [
+                'http_code' => $httpCode,
+                'response' => $response,
+                'phone' => '+' . $phone,
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
     public static function get_front_url($path, $city_slug = 'dubai')
     {
         return url("/" . $city_slug . "/" . ltrim($path, '/'));

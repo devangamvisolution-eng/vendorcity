@@ -28,11 +28,12 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <form id="add_form" action="{{ route('manpower-orders.update', $order->order_id) }}" method="POST" enctype="multipart/form-data">
+                        <form id="add_form" action="{{ route('manpower-orders.update', $order->order_id) }}" method="POST"
+                            enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <!-- removed hidden service_id to prevent ID conflict -->
-                            
+
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="form-group">
@@ -40,10 +41,14 @@
                                         <select name="customer_id" id="customer_id" class="form-control form-select">
                                             <option value="">Select Customer Name</option>
                                             @foreach ($customer as $customer_data)
-                                                <option value="{{ $customer_data->id }}" {{ $order->user_id == $customer_data->id ? 'selected' : '' }}>{{ $customer_data->id }}-{{ $customer_data->name }}-{{ $customer_data->email }}</option>
+                                                <option value="{{ $customer_data->id }}"
+                                                    {{ $order->user_id == $customer_data->id ? 'selected' : '' }}>
+                                                    {{ $customer_data->id }}-{{ $customer_data->name }}-{{ $customer_data->email }}
+                                                </option>
                                             @endforeach
                                         </select>
-                                        <p class="form-error-text" id="customer_name_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="customer_name_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -51,11 +56,14 @@
                                         <label>Service</label>
                                         <select name="service_id" id="service_id" class="form-control" required>
                                             <option value="">Select Service</option>
-                                            @foreach($services as $srv)
-                                                <option value="{{ $srv->id }}" {{ ($orderItem->service_id ?? 0) == $srv->id ? 'selected' : '' }}>{{ $srv->servicename }}</option>
+                                            @foreach ($services as $srv)
+                                                <option value="{{ $srv->id }}"
+                                                    {{ ($orderItem->service_id ?? 0) == $srv->id ? 'selected' : '' }}>
+                                                    {{ $srv->servicename }}</option>
                                             @endforeach
                                         </select>
-                                        <p class="form-error-text" id="service_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="service_error" style="color: red; margin-top: 10px;">
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -63,42 +71,62 @@
                                         <label>Subservice</label>
                                         <select name="subservice_id" id="subservice_id" class="form-control form-select">
                                             <option value="">Select Subservice</option>
-                                            @foreach($subservices as $subsrv)
-                                                <option value="{{ $subsrv->id }}" {{ ($orderItem->subservice_id ?? 0) == $subsrv->id ? 'selected' : '' }}>{{ $subsrv->subservicename }}</option>
+                                            @foreach ($subservices as $subsrv)
+                                                <option value="{{ $subsrv->id }}"
+                                                    {{ ($orderItem->subservice_id ?? 0) == $subsrv->id ? 'selected' : '' }}>
+                                                    {{ $subsrv->subservicename }}</option>
                                             @endforeach
                                         </select>
-                                        <p class="form-error-text" id="subservice_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="subservice_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Order Status</label>
                                         <select name="order_status" class="form-control">
-                                            <option value="P" {{ $order->order_status == 'P' ? 'selected' : '' }}>Pending</option>
-                                            <option value="CO" {{ $order->order_status == 'CO' ? 'selected' : '' }}>Completed</option>
-                                            <option value="C" {{ $order->order_status == 'C' ? 'selected' : '' }}>Cancelled</option>
+                                            <option value="P" {{ $order->order_status == 'P' ? 'selected' : '' }}>
+                                                Pending</option>
+                                            <option value="CO" {{ $order->order_status == 'CO' ? 'selected' : '' }}>
+                                                Completed</option>
+                                            <option value="C" {{ $order->order_status == 'C' ? 'selected' : '' }}>
+                                                Cancelled</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Send Notification</label>
-                                        <select id="send_notification" name="send_notification" class="form-control form-select">
+                                        <select id="send_notification" name="send_notification"
+                                            class="form-control form-select">
                                             <option value="no">No</option>
                                             <option value="yes">Yes (Resend)</option>
                                         </select>
-                                        <p class="form-error-text" id="send_notification_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="send_notification_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Payment Mode</label>
                                         <select id="payment_method" name="payment_method" class="form-control form-select">
-                                            <option value="CASH ON DELIVERY" {{ $order->paymentmode == 'CASH ON DELIVERY' || $order->paymentmode == '3' ? 'selected' : '' }}>CASH ON DELIVERY</option>
-                                            <option value="ONLINE" {{ $order->paymentmode == 'ONLINE' || $order->paymentmode == '1' ? 'selected' : '' }}>ONLINE</option>
+
+                                            <option value="ONLINE"
+                                                {{ isset($order->paymentmode) && $order->paymentmode == '2' ? 'selected' : '' }}>
+                                                ONLINE</option>
+                                            <option value="COD"
+                                                {{ isset($order->paymentmode) && $order->paymentmode == '1' ? 'selected' : '' }}>
+                                                COD</option>
+                                            {{-- <option value="CASH ON DELIVERY"
+                                                {{ $order->paymentmode == 'CASH ON DELIVERY' || $order->paymentmode == '3' ? 'selected' : '' }}>
+                                                CASH ON DELIVERY</option>
+                                            <option value="ONLINE"
+                                                {{ $order->paymentmode == 'ONLINE' || $order->paymentmode == '1' ? 'selected' : '' }}>
+                                                ONLINE</option> --}}
                                         </select>
-                                        <p class="form-error-text" id="payment_method_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="payment_method_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
@@ -108,31 +136,39 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Service Required</label>
-                                                <input type="text" name="manpower_service_required" class="form-control" placeholder="Enter Service Required" value="{{ $orderItem->manpower_service_required ?? '' }}">
+                                                <input type="text" name="manpower_service_required" class="form-control"
+                                                    placeholder="Enter Service Required"
+                                                    value="{{ $orderItem->manpower_service_required ?? '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Number of Workers</label>
-                                                <input type="number" name="manpower_workers_required" class="form-control" placeholder="Enter Number of Workers" value="{{ $orderItem->manpower_workers_required ?? '' }}">
+                                                <input type="number" name="manpower_workers_required" class="form-control"
+                                                    placeholder="Enter Number of Workers"
+                                                    value="{{ $orderItem->manpower_workers_required ?? '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Duration / Per Day</label>
-                                                <input type="text" name="manpower_duration" class="form-control" placeholder="Enter Duration" value="{{ $orderItem->manpower_duration ?? '' }}">
+                                                <input type="text" name="manpower_duration" class="form-control"
+                                                    placeholder="Enter Duration"
+                                                    value="{{ $orderItem->manpower_duration ?? '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Start Date</label>
-                                                <input type="date" name="manpower_start_date" class="form-control" value="{{ $orderItem->manpower_start_date ?? '' }}">
+                                                <input type="date" name="manpower_start_date" class="form-control"
+                                                    value="{{ $orderItem->manpower_start_date ?? '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>End Date</label>
-                                                <input type="date" name="manpower_end_date" class="form-control" value="{{ $orderItem->manpower_end_date ?? '' }}">
+                                                <input type="date" name="manpower_end_date" class="form-control"
+                                                    value="{{ $orderItem->manpower_end_date ?? '' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -144,14 +180,19 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Additional Notes</label>
-                                                <textarea name="manpower_additional_notes" class="form-control" rows="3" placeholder="Enter any additional notes...">{{ $orderItem->manpower_additional_notes ?? '' }}</textarea>
+                                                <textarea name="manpower_additional_notes" class="form-control" rows="3"
+                                                    placeholder="Enter any additional notes...">{{ $orderItem->manpower_additional_notes ?? '' }}</textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Subtotal (AED)</label>
-                                                <input type="number" name="sub_total" id="manual_price" class="form-control" placeholder="Enter Price" onkeyup="package_calculation()" onchange="package_calculation()" value="{{ $order->sub_total }}">
-                                                <small class="text-muted">Admin can directly add price for this manpower order.</small>
+                                                <input type="number" name="sub_total" id="manual_price"
+                                                    class="form-control" placeholder="Enter Price"
+                                                    onkeyup="package_calculation()" onchange="package_calculation()"
+                                                    value="{{ $order->sub_total }}">
+                                                <small class="text-muted">Admin can directly add price for this manpower
+                                                    order.</small>
                                             </div>
                                         </div>
                                     </div>
@@ -164,14 +205,24 @@
                                     <div class="form-group">
                                         @php
                                             $service_date = '';
-                                            if($orderItem) {
-                                                $service_date = date('Y-m-d', strtotime($orderItem->bookingyear.'-'.$orderItem->month.'-'.$orderItem->bookingdate));
+                                            if ($orderItem) {
+                                                $service_date = date(
+                                                    'Y-m-d',
+                                                    strtotime(
+                                                        $orderItem->bookingyear .
+                                                            '-' .
+                                                            $orderItem->month .
+                                                            '-' .
+                                                            $orderItem->bookingdate,
+                                                    ),
+                                                );
                                             }
                                         @endphp
                                         <label>When would you like your service ?</label>
                                         <input type="date" name="service_date" id="service_date" class="form-control"
                                             placeholder="Enter Service Date" value="{{ $service_date }}">
-                                        <p class="form-error-text" id="service_date_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="service_date_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
@@ -182,15 +233,17 @@
                                             <div id="time_slot_change">
                                                 <select id="time_slot" name="time_slot" class="form-control form-select">
                                                     <option value="">Select Time Slot</option>
-                                                    @foreach($time_slots as $slot)
-                                                        <option value="{{ $slot->name }}" {{ (isset($orderItem->time_slot) && $orderItem->time_slot == $slot->name) ? 'selected' : '' }}>
+                                                    @foreach ($time_slots as $slot)
+                                                        <option value="{{ $slot->name }}"
+                                                            {{ isset($orderItem->time_slot) && $orderItem->time_slot == $slot->name ? 'selected' : '' }}>
                                                             {{ $slot->name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                         </div>
-                                        <p class="form-error-text" id="time_slot_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="time_slot_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
@@ -198,8 +251,10 @@
                                     <div class="form-group">
                                         <label>Date Charge</label>
                                         <input type="text" name="date_charge" id="date_charge" class="form-control"
-                                            placeholder="Enter Date Charge" value="{{ $order->date_charge ?? 0 }}" onkeyup="package_calculation()" onchange="package_calculation()">
-                                        <p class="form-error-text" id="date_charge_error" style="color: red; margin-top: 10px;"></p>
+                                            placeholder="Enter Date Charge" value="{{ $order->date_charge ?? 0 }}"
+                                            onkeyup="package_calculation()" onchange="package_calculation()">
+                                        <p class="form-error-text" id="date_charge_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
@@ -207,8 +262,11 @@
                                     <div class="form-group">
                                         <label>Timing Charge</label>
                                         <input type="text" name="timing_charge" id="timing_charge"
-                                            class="form-control" placeholder="Enter Timing Charge" value="{{ $order->timing_charge ?? 0 }}" onkeyup="package_calculation()" onchange="package_calculation()">
-                                        <p class="form-error-text" id="timing_charge_error" style="color: red; margin-top: 10px;"></p>
+                                            class="form-control" placeholder="Enter Timing Charge"
+                                            value="{{ $order->timing_charge ?? 0 }}" onkeyup="package_calculation()"
+                                            onchange="package_calculation()">
+                                        <p class="form-error-text" id="timing_charge_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
@@ -216,8 +274,10 @@
                                     <div class="form-group">
                                         <label>Service Fee</label>
                                         <input type="text" name="service_fee" id="service_fee" class="form-control"
-                                            placeholder="Enter Service Fee" value="{{ $order->service_fee ?? 0 }}" onkeyup="package_calculation()" onchange="package_calculation()">
-                                        <p class="form-error-text" id="service_fee_error" style="color: red; margin-top: 10px;"></p>
+                                            placeholder="Enter Service Fee" value="{{ $order->service_fee ?? 0 }}"
+                                            onkeyup="package_calculation()" onchange="package_calculation()">
+                                        <p class="form-error-text" id="service_fee_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
@@ -225,20 +285,29 @@
                                     <div class="form-group">
                                         <label>Cash On Delivery Charge</label>
                                         <input type="text" name="cod_charge" id="cod_charge" class="form-control"
-                                            placeholder="Enter Cash On Delivery Charge" value="{{ $order->cod_charge ?? 0 }}" onkeyup="package_calculation()" onchange="package_calculation()">
-                                        <p class="form-error-text" id="cod_charge_error" style="color: red; margin-top: 10px;"></p>
+                                            placeholder="Enter Cash On Delivery Charge"
+                                            value="{{ $order->cod_charge ?? 0 }}" onkeyup="package_calculation()"
+                                            onchange="package_calculation()">
+                                        <p class="form-error-text" id="cod_charge_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Vat Charge Include</label>
-                                        <select id="include_vat" name="include_vat" class="form-control form-select" onchange="package_calculation()">
+                                        <select id="include_vat" name="include_vat" class="form-control form-select"
+                                            onchange="package_calculation()">
                                             <option value="">Select Vat Charge Include</option>
-                                            <option value="yes" {{ (isset($order->vat_charge) && $order->vat_charge > 0) ? 'selected' : '' }}>Yes</option>
-                                            <option value="no" {{ (!isset($order->vat_charge) || $order->vat_charge == 0) ? 'selected' : '' }}>No</option>
+                                            <option value="yes"
+                                                {{ isset($order->vat_charge) && $order->vat_charge > 0 ? 'selected' : '' }}>
+                                                Yes</option>
+                                            <option value="no"
+                                                {{ !isset($order->vat_charge) || $order->vat_charge == 0 ? 'selected' : '' }}>
+                                                No</option>
                                         </select>
-                                        <p class="form-error-text" id="include_vat_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="include_vat_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
@@ -249,11 +318,18 @@
                                         <label>Where would you like your service ?</label>
                                         <select id="address_type" name="address_type" class="form-control form-select">
                                             <option value="">Select Your Address</option>
-                                            <option value="home" {{ (isset($orderItem->address_type) && $orderItem->address_type == 'home') ? 'selected' : '' }}>Home</option>
-                                            <option value="office" {{ (isset($orderItem->address_type) && $orderItem->address_type == 'office') ? 'selected' : '' }}>Office</option>
-                                            <option value="other" {{ (isset($orderItem->address_type) && $orderItem->address_type == 'other') ? 'selected' : '' }}>Other</option>
+                                            <option value="home"
+                                                {{ isset($orderItem->address_type) && $orderItem->address_type == 'home' ? 'selected' : '' }}>
+                                                Home</option>
+                                            <option value="office"
+                                                {{ isset($orderItem->address_type) && $orderItem->address_type == 'office' ? 'selected' : '' }}>
+                                                Office</option>
+                                            <option value="other"
+                                                {{ isset($orderItem->address_type) && $orderItem->address_type == 'other' ? 'selected' : '' }}>
+                                                Other</option>
                                         </select>
-                                        <p class="form-error-text" id="address_type_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="address_type_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
@@ -263,23 +339,40 @@
                                         <!-- For simplicity since we don't have emiratesList in this controller easily, we just output the previously selected city as selected or typical hardcoded like in Handyman. -->
                                         <select id="city" name="city" class="form-control form-select">
                                             <option value="">Select Your City</option>
-                                            <option value="Dubai" {{ (isset($orderItem->city) && $orderItem->city == 'Dubai') ? 'selected' : '' }}>Dubai</option>
-                                            <option value="Abu Dhabi" {{ (isset($orderItem->city) && $orderItem->city == 'Abu Dhabi') ? 'selected' : '' }}>Abu Dhabi</option>
-                                            <option value="Sharjah" {{ (isset($orderItem->city) && $orderItem->city == 'Sharjah') ? 'selected' : '' }}>Sharjah</option>
-                                            <option value="Ajman" {{ (isset($orderItem->city) && $orderItem->city == 'Ajman') ? 'selected' : '' }}>Ajman</option>
-                                            <option value="Umm Al Quwain" {{ (isset($orderItem->city) && $orderItem->city == 'Umm Al Quwain') ? 'selected' : '' }}>Umm Al Quwain</option>
-                                            <option value="Ras Al Khaimah" {{ (isset($orderItem->city) && $orderItem->city == 'Ras Al Khaimah') ? 'selected' : '' }}>Ras Al Khaimah</option>
-                                            <option value="Fujairah" {{ (isset($orderItem->city) && $orderItem->city == 'Fujairah') ? 'selected' : '' }}>Fujairah</option>
+                                            <option value="Dubai"
+                                                {{ isset($orderItem->city) && $orderItem->city == 'Dubai' ? 'selected' : '' }}>
+                                                Dubai</option>
+                                            <option value="Abu Dhabi"
+                                                {{ isset($orderItem->city) && $orderItem->city == 'Abu Dhabi' ? 'selected' : '' }}>
+                                                Abu Dhabi</option>
+                                            <option value="Sharjah"
+                                                {{ isset($orderItem->city) && $orderItem->city == 'Sharjah' ? 'selected' : '' }}>
+                                                Sharjah</option>
+                                            <option value="Ajman"
+                                                {{ isset($orderItem->city) && $orderItem->city == 'Ajman' ? 'selected' : '' }}>
+                                                Ajman</option>
+                                            <option value="Umm Al Quwain"
+                                                {{ isset($orderItem->city) && $orderItem->city == 'Umm Al Quwain' ? 'selected' : '' }}>
+                                                Umm Al Quwain</option>
+                                            <option value="Ras Al Khaimah"
+                                                {{ isset($orderItem->city) && $orderItem->city == 'Ras Al Khaimah' ? 'selected' : '' }}>
+                                                Ras Al Khaimah</option>
+                                            <option value="Fujairah"
+                                                {{ isset($orderItem->city) && $orderItem->city == 'Fujairah' ? 'selected' : '' }}>
+                                                Fujairah</option>
                                         </select>
-                                        <p class="form-error-text" id="city_error" style="color: red; margin-top: 10px;"></p>
+                                        <p class="form-error-text" id="city_error" style="color: red; margin-top: 10px;">
+                                        </p>
                                     </div>
                                 </div>
 
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Your Area</label>
-                                        <input type="text" name="area" id="area" class="form-control" placeholder="Enter Your Area" value="{{ $orderItem->area ?? '' }}">
-                                        <p class="form-error-text" id="area_error" style="color: red; margin-top: 10px;"></p>
+                                        <input type="text" name="area" id="area" class="form-control"
+                                            placeholder="Enter Your Area" value="{{ $orderItem->area ?? '' }}">
+                                        <p class="form-error-text" id="area_error" style="color: red; margin-top: 10px;">
+                                        </p>
                                     </div>
                                 </div>
 
@@ -287,8 +380,10 @@
                                     <div class="form-group">
                                         <label>Your Building Name</label>
                                         <input type="text" name="building_name" id="building_name"
-                                            class="form-control" placeholder="Enter Your Building name and/or street" value="{{ $orderItem->building_street_no ?? '' }}">
-                                        <p class="form-error-text" id="building_name_error" style="color: red; margin-top: 10px;"></p>
+                                            class="form-control" placeholder="Enter Your Building name and/or street"
+                                            value="{{ $orderItem->building_street_no ?? '' }}">
+                                        <p class="form-error-text" id="building_name_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
@@ -296,23 +391,32 @@
                                     <div class="form-group">
                                         <label>Your Apartment or Villa Number</label>
                                         <input type="text" name="apartment_villa_num" id="apartment_villa_num"
-                                            class="form-control" placeholder="Enter Your Apartment number & floor or Villa Number" value="{{ $orderItem->apartment_villa_no ?? '' }}">
-                                        <p class="form-error-text" id="apartment_villa_num_error" style="color: red; margin-top: 10px;"></p>
+                                            class="form-control"
+                                            placeholder="Enter Your Apartment number & floor or Villa Number"
+                                            value="{{ $orderItem->apartment_villa_no ?? '' }}">
+                                        <p class="form-error-text" id="apartment_villa_num_error"
+                                            style="color: red; margin-top: 10px;"></p>
                                     </div>
                                 </div>
 
                                 <hr class="mt-4">
-                                
-                                <input type="hidden" id="computed_sub_total" name="computed_sub_total" value="{{ $order->sub_total }}">
-                                <input type="hidden" id="vat_charge" name="vat_charge" value="{{ $order->vat_charge ?? 0 }}">
-                                <input type="hidden" id="order_total" name="order_total" value="{{ $order->order_total }}">
-                                <input type="hidden" name="salesperson_id" value="{{ $orderItem->salesperson_id ?? '' }}">
+
+                                <input type="hidden" id="computed_sub_total" name="computed_sub_total"
+                                    value="{{ $order->sub_total }}">
+                                <input type="hidden" id="vat_charge" name="vat_charge"
+                                    value="{{ $order->vat_charge ?? 0 }}">
+                                <input type="hidden" id="order_total" name="order_total"
+                                    value="{{ $order->order_total }}">
+                                <input type="hidden" name="salesperson_id"
+                                    value="{{ $orderItem->salesperson_id ?? '' }}">
                                 <input type="hidden" name="vendor_id" value="{{ $orderItem->vendor_id ?? '' }}">
 
                             </div>
                             <div class="text-end mt-4">
-                                <a href="{{ route('manpower-orders.index') }}" class="btn btn-primary text-light">Cancel</a>
-                                <button type="submit" id="submit_button" class="btn btn-primary">Update Manpower Order</button>
+                                <a href="{{ route('manpower-orders.index') }}"
+                                    class="btn btn-primary text-light">Cancel</a>
+                                <button type="submit" id="submit_button" class="btn btn-primary">Update Manpower
+                                    Order</button>
                             </div>
                         </form>
                     </div>
@@ -331,23 +435,25 @@
             $('#customer_id, select[name="vendor_id"], select[name="salesperson_id"]').select2({
                 placeholder: 'Select an option',
             });
-            
+
             $('#service_id').change(function() {
                 var service_id = $(this).val();
-                if(service_id) {
+                if (service_id) {
                     $.ajax({
-                        url: '{{ route("general-enquiries.get-subservices") }}',
+                        url: '{{ route('general-enquiries.get-subservices') }}',
                         type: "POST",
                         data: {
                             _token: '{{ csrf_token() }}',
                             service_id: service_id
                         },
                         dataType: "json",
-                        success:function(data) {
+                        success: function(data) {
                             $('#subservice_id').empty();
-                            $('#subservice_id').append('<option value="">Select Subservice</option>');
+                            $('#subservice_id').append(
+                                '<option value="">Select Subservice</option>');
                             $.each(data, function(key, value) {
-                                $('#subservice_id').append('<option value="'+ value.id +'">'+ value.subservicename +'</option>');
+                                $('#subservice_id').append('<option value="' + value
+                                    .id + '">' + value.subservicename + '</option>');
                             });
                         }
                     });
@@ -378,6 +484,5 @@
             $('#vat_charge').val(vat_charge.toFixed(2));
             $('#order_total').val(order_total.toFixed(2));
         }
-        
     </script>
 @stop

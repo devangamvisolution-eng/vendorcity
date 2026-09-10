@@ -811,7 +811,11 @@
                         @if ($customerDetails && $customerDetails->mobile)
                             <li class="mb-0 mt-0">
                                 <span class="detail-label">Phone Number</span>
-                                <span class="detail-value">{{ $customerDetails->mobile }}</span>
+                                <span class="detail-value">
+                                    @if ($customerDetails && !empty($customerDetails->country_code))
+                                        +{{ $customerDetails->country_code }}
+                                    @endif{{ $customerDetails->mobile }}
+                                </span>
                             </li>
                         @endif
                     </ul>

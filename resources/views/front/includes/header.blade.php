@@ -6,8 +6,8 @@
 
 <head>
 
-    <!-- Google Tag Manager (Delayed to boost PageSpeed) -->
-    <script>
+    <!-- Google Tag Manager (Delayed) -->
+    <!-- <script>
         var gtmLoaded = false;
 
         function loadGTM() {
@@ -33,7 +33,26 @@
                 passive: true
             });
         });
-        // Removed setTimeout to prevent Lighthouse from catching GTM execution during profiling
+        setTimeout(loadGTM, 5000);
+    </script> -->
+    <!-- End Google Tag Manager -->
+
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start': new Date().getTime(),
+                event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s),
+                dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-ML9CL33C');
     </script>
     <!-- End Google Tag Manager -->
 
@@ -42,17 +61,6 @@
     <meta name="geo.region" content="AE" />
 
     <meta name="geo.position" content="24.000249;53.999483" />
-
-    <!-- Performance: Preconnect to CDNs -->
-    <link rel="preconnect" href="https://cdn.tabby.ai" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"
-        media="print" onload="this.media='all'">
-    <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    </noscript>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <meta name="ICBM" content="24.000249, 53.999483" />
 
@@ -92,77 +100,45 @@
     <!-- css file -->
 
     @if (!request()->is('/'))
-        <link rel="stylesheet" href="{{ asset('public/site/css/jquery-ui.min.css') }}" media="print"
-            onload="this.media='all'">
-    @endif
-    @if (request()->is('*dubai*'))
-        <link rel="preload" href="{{ asset('public/site/images/Homepage/bg.webp') }}" as="image"
-            fetchpriority="high">
-        <!-- Kept bootstrap synchronous to prevent massive layout shift -->
-        <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap.min.css') }}">
-    @else
-        <link rel="preload" href="{{ asset('public/site/images/Homepage/bg.png') }}" as="image"
-            fetchpriority="high">
-        <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('public/site/css/jquery-ui.min.css') }}">
     @endif
 
+    <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap.min.css') }}">
 
-    @if (request()->is('*dubai*'))
-        <link rel="stylesheet" href="{{ asset('public/site/css/ace-responsive-menu.css') }}">
-        <link rel="stylesheet" href="{{ asset('public/site/css/menu.css') }}">
-        <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}" media="print"
-            onload="this.media='all'">
-        <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}" media="print"
-            onload="this.media='all'">
-        <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}" media="print"
-            onload="this.media='all'">
+
+
+
+
+    <link rel="stylesheet" href="{{ asset('public/site/css/ace-responsive-menu.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('public/site/css/menu.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}">
+    <!-- Removed intlTelInput globally for Step 1 -->
+    <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}">
+
+    @if (!request()->is('/'))
         <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}" media="print"
             onload="this.media='all'">
-        <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}" media="print"
-            onload="this.media='all'">
-        <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}" media="print"
-            onload="this.media='all'">
-    @else
-        <link rel="stylesheet" href="{{ asset('public/site/css/ace-responsive-menu.css') }}">
-        <link rel="stylesheet" href="{{ asset('public/site/css/menu.css') }}">
-        <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}" media="print"
-            onload="this.media='all'">
-        <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}" media="print"
-            onload="this.media='all'">
-        <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}" media="print"
-            onload="this.media='all'">
-        @if (!request()->is('/') && !request()->is('*/booknow/cleaning/cleaning-subscription'))
-            <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}" media="print"
-                onload="this.media='all'">
-        @endif
-        <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}" media="print"
-            onload="this.media='all'">
-        <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}" media="print"
-            onload="this.media='all'">
     @endif
+
+    <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}">
 
     <!-- Critical CSS Preload -->
     <link rel="preload" href="{{ asset('public/site/css/style.css') }}" as="style">
     <link rel="preload" href="{{ asset('public/site/css/responsive.css') }}" as="style">
 
-    @if (request()->is('*dubai*'))
-        <link rel="stylesheet" href="{{ asset('public/site/css/style.css') }}">
-    @else
-        <link rel="stylesheet" href="{{ asset('public/site/css/style.css') }}">
-    @endif
+    <link rel="stylesheet" href="{{ asset('public/site/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
 
-    @if (request()->is('*dubai*'))
-        <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
-    @else
-        <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
-    @endif
+    <link rel="stylesheet" href="{{ asset('public/site/css/owl.carousel.min.css') }}" media="print"
+        onload="this.media='all'">
+    <link rel="stylesheet" href="{{ asset('public/site/css/owl.theme.default.min.css') }}" media="print"
+        onload="this.media='all'">
 
-    @if (!request()->is('*dubai*') && !request()->is('*/booknow/cleaning/cleaning-subscription'))
-        <link rel="stylesheet" href="{{ asset('public/site/css/owl.carousel.min.css') }}" media="print"
-            onload="this.media='all'">
-        <link rel="stylesheet" href="{{ asset('public/site/css/owl.theme.default.min.css') }}" media="print"
-            onload="this.media='all'">
-    @endif
     @stack('styles')
 
 
@@ -245,14 +221,12 @@
 
 
     <!-- Removed select2.min.css (loaded via stack) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css"
-        media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css">
 
 
 
 
-    <link rel="stylesheet" href="{{ asset('public/site/css/customstyle.css') }}" media="print"
-        onload="this.media='all'">
+    <link rel="stylesheet" href="{{ asset('public/site/css/customstyle.css') }}">
 
     {{--
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -261,8 +235,7 @@
 
     {{--
     <link href="https://db.onlinewebfonts.com/c/060fd297f19446447a9a1325ad5b889b?family=SF+Pro+Rounded"
-        rel="stylesheet" type="text/css" media="print" onload="this.media='all'" />
-    <noscript><link href="https://db.onlinewebfonts.com/c/060fd297f19446447a9a1325ad5b889b?family=SF+Pro+Rounded" rel="stylesheet" type="text/css" /></noscript> --}}
+        rel="stylesheet"> --}}
 
     <style>
         header.nav-homepage-style {
@@ -2788,7 +2761,7 @@
 
 
     <!-- Meta Pixel Code (Delayed) -->
-    <script>
+    {{-- <script>
         ! function(f, b, e, v, n, t, s) {
             if (f.fbq) return;
             n = f.fbq = function() {
@@ -2811,7 +2784,7 @@
         fbq('track', 'PageView');
     </script>
     <noscript><img height="1" width="1" style="display:none"
-            src="https://www.facebook.com/tr?id=483748947894350&ev=PageView&noscript=1" /></noscript>
+            src="https://www.facebook.com/tr?id=483748947894350&ev=PageView&noscript=1" /></noscript> --}}
     <!-- End Meta Pixel Code -->
 
 </head>
