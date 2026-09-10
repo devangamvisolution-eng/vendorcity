@@ -95,7 +95,7 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        padding: 20px;
+        padding: 16px 20px;
         border-bottom: 1px solid #f3f4f6;
     }
     
@@ -168,7 +168,7 @@
     }
     
     .sub-card-body {
-        padding: 20px;
+        padding: 16px 20px;
     }
     
     .sub-label {
@@ -177,21 +177,21 @@
         color: #9ca3af;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-bottom: 6px;
+        margin-bottom: 2px;
     }
     
     .sub-value {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
         color: #1f2937;
-        margin-bottom: 20px;
+        margin-bottom: 12px;
     }
     
     .sub-progress-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        margin-bottom: 8px;
+        margin-bottom: 2px;
     }
     
     .sub-progress-text {
@@ -210,7 +210,7 @@
         height: 4px;
         background-color: #e5e7eb;
         border-radius: 2px;
-        margin-bottom: 16px;
+        margin-bottom: 6px;
         overflow: hidden;
     }
     
@@ -224,7 +224,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 14px;
     }
     
     .sub-renewal-text {
@@ -245,6 +245,9 @@
         font-size: 16px;
         font-weight: 700;
         color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
     
     .sub-manage-btn {
@@ -253,7 +256,7 @@
         background-color: #1a0bdb;
         color: #ffffff;
         text-align: center;
-        padding: 12px;
+        padding: 10px;
         border-radius: 8px;
         font-size: 14px;
         font-weight: 700;
@@ -675,6 +678,21 @@
     .custom-tip-input {
         margin-top: 10px;
     }
+
+    .currency_dhiram {
+        display: inline-block;
+        width: 18px;
+        height: 14px;
+
+        background-color: currentColor;
+
+        -webkit-mask: url('{{ asset('public/site/icons/dirham.svg') }}') no-repeat center;
+        mask: url('{{ asset('public/site/icons/dirham.svg') }}') no-repeat center;
+
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        transform: translateY(1px);
+    }
 </style>
 
 <div class="body_content">
@@ -696,18 +714,18 @@
                     
                     <!-- Tabs -->
                     <div class="sub-tabs-container">
-                        <a href="#" class="sub-tab active">Active</a>
-                        <a href="#" class="sub-tab">Paused</a>
-                        <a href="#" class="sub-tab">Cancelled</a>
+                        <a href="#" class="sub-tab active" onclick="filterTabs(event, 'active')">Active</a>
+                        <a href="#" class="sub-tab" onclick="filterTabs(event, 'paused')">Paused</a>
+                        <a href="#" class="sub-tab" onclick="filterTabs(event, 'cancelled')">Cancelled</a>
                     </div>
 
                     @if (count($subscriptions) > 0)
-                        <div class="row">
+                        <div class="row" id="subscriptions-list">
                             @foreach ($subscriptions as $sub)
                                 @php
                                     $progress_percent = $sub->visits_per_cycle > 0 ? round(($sub->visits_completed / $sub->visits_per_cycle) * 100) : 0;
                                 @endphp
-                                <div class="col-md-6">
+                                <div class="col-md-12 sub-card-container" data-status="{{ strtolower($sub->status) }}">
                                     <div class="sub-card" onclick="window.location.href='{{ route('front.subscription_detail', ['id' => $sub->id]) }}'" style="cursor: pointer;">
                                         <!-- Header -->
                                         <div class="sub-card-header">
@@ -720,9 +738,9 @@
                                                     <p class="sub-meta">{{ $sub->frequency_desc }} &bull; {{ $sub->visits_per_cycle }} visits/cycle</p>
                                                 </div>
                                             </div>
-                                            @if($sub->status == 'ACTIVE')
+                                            @if(strtoupper($sub->status) == 'ACTIVE')
                                                 <span class="sub-status active">Active</span>
-                                            @elseif($sub->status == 'CANCELLED')
+                                            @elseif(strtoupper($sub->status) == 'CANCELLED')
                                                 <span class="sub-status cancelled">Cancelled</span>
                                             @else
                                                 <span class="sub-status" style="background-color: #f3f4f6; color: #4b5563;">{{ ucfirst(strtolower($sub->status)) }}</span>
@@ -746,7 +764,7 @@
                                                 <div class="sub-renewal-text">
                                                     <i class="fas fa-sync-alt sub-renewal-icon"></i> Renews on {{ $sub->next_renewal }}
                                                 </div>
-                                                <div class="sub-price">{{ $sub->renewal_amount }}</div>
+                                                <div class="sub-price"><span class="currency_dhiram"></span>{{ $sub->renewal_amount }}</div>
                                             </div>
                                             
                                             <button onclick="event.stopPropagation(); window.location.href='{{ route('front.subscription_detail', ['id' => $sub->id]) }}'" class="sub-manage-btn">
@@ -757,13 +775,22 @@
                                 </div>
                             @endforeach
                         </div>
+                        
+                        <!-- Dynamic Empty State (Hidden by default, controlled by JS) -->
+                        <div id="dynamic-empty-state" style="display: none; background: #f8f9fc; border: 1px solid #eef0f7; border-radius: 12px; padding: 40px 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px;">
+                                <i class="far fa-folder-open"></i>
+                            </div>
+                            <h4 style="font-size: 18px; color: #475569; font-weight: 600; margin-bottom: 10px;">No Subscriptions Found</h4>
+                            <p style="color: #64748b; font-size: 15px; margin: 0;">You don't have any subscriptions matching this status.</p>
+                        </div>
                     @else
                         <div style="background: #f8f9fc; border: 1px solid #eef0f7; border-radius: 12px; padding: 40px 20px; text-align: center;">
                             <div style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px;">
                                 <i class="far fa-folder-open"></i>
                             </div>
-                            <h4 style="font-size: 18px; color: #475569; font-weight: 600; margin-bottom: 10px;">No Active Subscriptions</h4>
-                            <p style="color: #64748b; font-size: 15px; margin: 0;">You don't have any active subscriptions.</p>
+                            <h4 style="font-size: 18px; color: #475569; font-weight: 600; margin-bottom: 10px;">No Subscriptions Found</h4>
+                            <p style="color: #64748b; font-size: 15px; margin: 0;">You don't have any subscriptions yet.</p>
                         </div>
                     @endif
                 </div>
@@ -771,5 +798,46 @@
         </div>
     </section>
 </div>
+
+<script>
+    function filterTabs(event, status) {
+        if(event) event.preventDefault();
+        
+        // Update active tab styling
+        document.querySelectorAll('.sub-tab').forEach(tab => tab.classList.remove('active'));
+        if(event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        } else {
+            document.querySelector('.sub-tab[onclick*="' + status + '"]').classList.add('active');
+        }
+    
+        // Filter cards
+        const cards = document.querySelectorAll('.sub-card-container');
+        let count = 0;
+        cards.forEach(card => {
+            if (card.dataset.status === status) {
+                card.style.display = 'block';
+                count++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Show empty state if count is 0
+        const emptyState = document.getElementById('dynamic-empty-state');
+        if(emptyState) {
+            if(count === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+    }
+    
+    // Initial load: show 'active' tab by default
+    document.addEventListener('DOMContentLoaded', () => {
+        filterTabs(null, 'active');
+    });
+</script>
 
 @include('front.includes.footer')

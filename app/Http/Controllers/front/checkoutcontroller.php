@@ -1474,10 +1474,10 @@ class checkoutcontroller extends Controller
 
     public function book_now_garden_order(Request $request)
     {
-        echo "<pre>";
+        /*  echo "<pre>";
         print_r($request->all());
         echo "</pre>";
-        exit;
+        exit; */
 
         $userdata = Session::get('user');
 
@@ -4178,6 +4178,9 @@ class checkoutcontroller extends Controller
 
     function book_now_subscription(Request $request)
     {
+        /* echo "<pre>";
+        print_r($request->all());
+        exit; */
         $coupan_data = session('coupan_data');
         $userdata = Session::get('user');
         $userid = $userdata['userid'];
@@ -4439,6 +4442,131 @@ class checkoutcontroller extends Controller
                 'updated_at' => now(),
             ]);
             Session::forget('booknow_pending_lead_id');
+        }
+
+        // --- START: RECURRING BOOKING GENERATION LOGIC ---
+        $frequency = $request->how_often_do_you_need_cleaning ?? 'Once';
+
+        if (!empty($frequency) && $frequency != 'Once') {
+            $visits = [];
+            $currentDate = \Carbon\Carbon::parse($request->date . ' ' . $request->month . ' ' . $bookingYear);
+
+            $endDateCarbon = \Carbon\Carbon::parse($end_date);
+
+            if ($frequency == 'Multiple times a week' && !empty($request->selectedDays)) {
+                $selectedDays = array_map('trim', explode(',', $request->selectedDays));
+
+                $period = new \DatePeriod(
+                    $currentDate,
+                    new \DateInterval('P1D'),
+                    $endDateCarbon->copy()->addDay() // Include the end date
+                );
+
+                $visitCount = 0;
+                foreach ($period as $date) {
+                    if (in_array($date->format('l'), $selectedDays)) {
+                        // Payment status logic
+                        if ($paymentmode == 3) {
+                            $v_payment_status = 'paid'; // Tabby
+                        } elseif ($paymentmode == 1) {
+                            $v_payment_status = 'pending'; // COD
+                        } else {
+                            $v_payment_status = ($visitCount == 0) ? 'paid' : 'pending'; // Stripe
+                        }
+
+                        $visits[] = [
+                            'order_id' => $arrOrderId,
+                            'order_item_id' => $order_item_id,
+                            'visit_date' => $date->format('Y-m-d'),
+                            'visit_time' => $request->time ?? null,
+                            'duration' => $request->hours ?? null,
+                            'cleaner_id' => 0,
+                            'payment_status' => $v_payment_status,
+                            'visit_status' => 'upcoming',
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ];
+                        $visitCount++;
+                    }
+                }
+            } else {
+                $i = 0;
+                while (true) {
+                    if ($frequency == 'Weekly') {
+                        $visitDateObj = $currentDate->copy()->addWeeks($i);
+                    } elseif ($frequency == 'Every 2 Weeks') {
+                        $visitDateObj = $currentDate->copy()->addWeeks($i * 2);
+                    } else {
+                        // Default fallback
+                        $visitDateObj = $currentDate->copy()->addDays($i * 7);
+                    }
+
+                    if ($visitDateObj->gt($endDateCarbon)) {
+                        break;
+                    }
+
+                    $visitDate = $visitDateObj->format('Y-m-d');
+
+                    // Payment status logic
+                    if ($paymentmode == 3) {
+                        $v_payment_status = 'paid'; // Tabby
+                    } elseif ($paymentmode == 1) {
+                        $v_payment_status = 'pending'; // COD
+                    } else {
+                        $v_payment_status = ($i == 0) ? 'paid' : 'pending'; // Stripe
+                    }
+
+                    $visits[] = [
+                        'order_id' => $arrOrderId,
+                        'order_item_id' => $order_item_id,
+                        'visit_date' => $visitDate,
+                        'visit_time' => $request->time ?? null,
+                        'duration' => $request->hours ?? null,
+                        'cleaner_id' => 0,
+                        'payment_status' => $v_payment_status,
+                        'visit_status' => 'upcoming',
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+
+                    $i++;
+                }
+            }
+
+            if (count($visits) > 0) {
+                DB::table('ci_order_visits')->insert($visits);
+            }
+        }
+        // --- END: RECURRING BOOKING GENERATION LOGIC ---
+
+        // Mark the order as a subscription if frequency is not Once
+        // Mark the order as a subscription if frequency is not Once
+        if (isset($frequency) && !empty($frequency) && $frequency != 'Once') {
+
+            // Re-calculate max_visits here just in case it wasn't defined earlier in scope
+            $visits_per_week = 1;
+            if ($frequency == 'Multiple times a week' && !empty($request->selectedDays)) {
+                $selectedDays = array_map('trim', explode(',', $request->selectedDays));
+                $visits_per_week = count($selectedDays);
+            } elseif ($frequency == 'Every 2 Weeks') {
+                $visits_per_week = 0.5;
+            }
+            $max_visits = ceil($visits_per_week * 4 * $package_duration_months);
+
+            DB::table('ci_orders')->where('order_id', $arrOrderId)->update([
+                'is_subscription' => 1,
+                'subscription_status' => 'Active',
+                'auto_renew_status' => 1,
+                'next_renewal_date' => $end_date,          // Cycle renews when the current package ends
+                'renewal_amount' => $order_total           // The price they will be billed next cycle
+            ]);
+
+            // Optional but highly recommended: Store the visits they are entitled to per cycle!
+            DB::table('ci_order_item')->where('id', $order_item_id)->update([
+                'visits_entitled' => $max_visits,
+                'visits_completed' => 0,
+                'cycle_start_date' => $formatted_date
+            ]);
         }
         $data = [];
         $data['first_name'] = "";

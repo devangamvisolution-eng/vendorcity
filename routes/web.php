@@ -1535,6 +1535,8 @@ Route::prefix('{city}')
         Route::post('/update-address', '\App\Http\Controllers\front\MyaccountController@update_address')->name('update-address');
         Route::post('/cancel-order', '\App\Http\Controllers\front\MyaccountController@cancel_order')->name('cancel-order');
         Route::post('/skip-visit', '\App\Http\Controllers\front\MyaccountController@skip_visit')->name('skip-visit');
+        Route::post('/subscription/visit/reschedule', '\App\Http\Controllers\front\MyaccountController@rescheduleVisit')->name('subscription.visit.reschedule');
+        Route::post('/subscription/visit/skip', '\App\Http\Controllers\front\MyaccountController@skipVisitAdvanced')->name('subscription.visit.skip');
         Route::get('refer&earn', '\App\Http\Controllers\front\MyaccountController@refer_earn')->name('front.refer_earn');
         Route::get('refral', '\App\Http\Controllers\front\MyaccountController@refral')->name('front.refral');;
         Route::get('refer_and_earn/{userid}', '\App\Http\Controllers\front\MyaccountController@refer_earn_frend');

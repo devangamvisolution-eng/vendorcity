@@ -73,93 +73,7 @@ class MyaccountController extends Controller
      * - Scheduled -> Assigned -> On the Way -> In Progress -> Completed
      * - Exception States: Rescheduled, Skipped, Cancelled, No-show, Vendor Cancelled
      */
-    private function get_mock_subscriptions()
-    {
-        return [
-            (object)[
-                'id' => 1,
-                'category' => 'Home Cleaning',
-                'plan_name' => 'Weekly Cleaning Plan',
-                'frequency_desc' => '1 visit/week',
-                'visits_per_cycle' => 4,
-                'visits_completed' => 2,
-                'status' => 'ACTIVE',
-                'next_visit_date' => 'Tuesday, 15 September',
-                'next_visit_time' => '10:00 AM',
-                'next_renewal' => '29 September',
-                'renewal_amount' => 'AED 499',
-                'auto_renew' => 'ON',
-                'payment_method' => 'Visa •••• 4242',
-                'service_address' => 'Dubai Hills Estate, Villa XX',
-                'recurring_schedule' => 'Every Tuesday • 10:00 AM',
-                'preferred_cleaner' => 'Sarah',
-                'cleaner_rating' => 4.9,
-                'cleaner_unavailable' => true,
-                'upcoming_visits' => [
-                    (object)[
-                        'visit_number' => 3,
-                        'total_visits' => 4,
-                        'date' => 'Tuesday, 15 September',
-                        'time' => '10:00 AM – 1:00 PM',
-                        'cleaner' => 'Sarah',
-                        'duration' => '3 Hours'
-                    ],
-                    (object)[
-                        'visit_number' => 4,
-                        'total_visits' => 4,
-                        'date' => 'Tuesday, 22 September',
-                        'time' => '10:00 AM – 1:00 PM',
-                        'cleaner' => 'Sarah',
-                        'duration' => '3 Hours'
-                    ]
-                ],
-                'past_visits' => [
-                    (object)[
-                        'date' => 'Tuesday, 8 September',
-                        'time' => '10:00 AM – 1:00 PM',
-                        'cleaner' => 'Sarah',
-                        'duration' => '3 Hours',
-                        'booking_id' => '#VC-84920',
-                        'status' => 'Completed',
-                        'amount' => 'AED 125',
-                        'rating' => 5
-                    ],
-                    (object)[
-                        'date' => 'Tuesday, 1 September',
-                        'time' => '10:00 AM – 1:00 PM',
-                        'cleaner' => 'Sarah',
-                        'duration' => '3 Hours',
-                        'booking_id' => '#VC-84102',
-                        'status' => 'Completed',
-                        'amount' => 'AED 125',
-                        'rating' => 4
-                    ]
-                ]
-            ],
-            (object)[
-                'id' => 2,
-                'category' => 'Deep Cleaning',
-                'plan_name' => 'Bi-Monthly Plan',
-                'frequency_desc' => '2 visits/month',
-                'visits_per_cycle' => 2,
-                'visits_completed' => 0,
-                'status' => 'PENDING ACTIVATION',
-                'next_visit_date' => 'Monday, 20 September',
-                'next_visit_time' => '09:00 AM',
-                'next_renewal' => '20 October',
-                'renewal_amount' => 'AED 999',
-                'auto_renew' => 'OFF',
-                'payment_method' => 'Mastercard •••• 1234',
-                'service_address' => 'Downtown Dubai, Apt 405',
-                'recurring_schedule' => 'Every 1st and 15th • 09:00 AM',
-                'preferred_cleaner' => 'Any',
-                'cleaner_rating' => null,
-                'cleaner_unavailable' => false,
-                'upcoming_visits' => [],
-                'past_visits' => []
-            ]
-        ];
-    }
+
 
     public function subscriptions(Request $request)
     {
@@ -169,7 +83,57 @@ class MyaccountController extends Controller
             return redirect()->to('/');
         }
 
-        $subscriptions = $this->get_mock_subscriptions();
+        $userid = $userdata['userid'];
+
+        $orders = DB::table('ci_orders')
+            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+            ->leftJoin('services', 'ci_order_item.service_id', '=', 'services.id')
+            ->leftJoin('subservices', 'ci_order_item.subservice_id', '=', 'subservices.id')
+            ->where('ci_orders.user_id', $userid)
+            ->where('ci_orders.is_subscription', 1)
+            ->where('ci_orders.is_delete', 0)
+            ->select(
+                'ci_orders.*',
+                'ci_order_item.*',
+                'services.servicename as category_name',
+                'subservices.subservicename as subcategory_name'
+            )
+            ->orderBy('ci_orders.order_id', 'desc')
+            ->get();
+
+
+        $subscriptions = [];
+
+        foreach ($orders as $order) {
+            $nextVisit = DB::table('ci_order_visits')
+                ->where('order_id', $order->order_id)
+                ->whereIn('visit_status', ['upcoming', 'rescheduled'])
+                ->orderBy('visit_date', 'asc')
+                ->orderBy('visit_time', 'asc')
+                ->first();
+
+            $category = $order->subcategory_name ?: $order->category_name;
+            $frequency = $order->how_often_do_you_need_cleaning;
+
+            $service_address = implode(', ', array_filter([$order->apartment_villa_no, $order->building_street_no, $order->area, $order->city]));
+
+            $subscriptions[] = (object)[
+                'id' => $order->order_id,
+                'category' => $category,
+                'plan_name' => $frequency . ' Cleaning Plan',
+                'frequency_desc' => $frequency,
+                'visits_per_cycle' => $order->visits_entitled ?: 0,
+                'visits_completed' => $order->visits_completed ?: 0,
+                'status' => $order->subscription_status ?: 'Active',
+                'next_visit_date' => $nextVisit ? Carbon::parse($nextVisit->visit_date)->format('l, d F') : 'N/A',
+                'next_visit_time' => $nextVisit ? $nextVisit->visit_time : 'N/A',
+                'next_renewal' => $order->next_renewal_date ? Carbon::parse($order->next_renewal_date)->format('d F Y') : 'N/A',
+                'renewal_amount' => $order->renewal_amount ?: $order->order_total,
+                'auto_renew' => $order->auto_renew_status == 1 ? 'ON' : 'OFF',
+                'payment_method' => $order->payment_method_id ?: 'Card',
+                'service_address' => $service_address,
+            ];
+        }
 
         return view('front.subscriptions', compact('subscriptions'));
     }
@@ -182,12 +146,105 @@ class MyaccountController extends Controller
             return redirect()->to('/');
         }
 
-        $subscriptions = collect($this->get_mock_subscriptions());
-        $subscription = $subscriptions->firstWhere('id', (int)$id);
+        $userid = $userdata['userid'];
 
-        if (!$subscription) {
+        $order = DB::table('ci_orders')
+            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+            ->leftJoin('services', 'ci_order_item.service_id', '=', 'services.id')
+            ->leftJoin('subservices', 'ci_order_item.subservice_id', '=', 'subservices.id')
+            ->where('ci_orders.order_id', $id)
+            ->where('ci_orders.user_id', $userid)
+            ->where('ci_orders.is_subscription', 1)
+            ->where('ci_orders.is_delete', 0)
+            ->select(
+                'ci_orders.*',
+                'ci_order_item.*',
+                'services.servicename as category_name',
+                'subservices.subservicename as subcategory_name'
+            )
+            ->first();
+
+        if (!$order) {
             return redirect()->route('front.subscriptions')->with('error', 'Subscription not found.');
         }
+
+        $all_visits = DB::table('ci_order_visits')
+            ->where('order_id', $id)
+            ->orderBy('visit_date', 'asc')
+            ->orderBy('visit_time', 'asc')
+            ->get();
+
+        $upcoming_visits = [];
+        $past_visits = [];
+
+        $cleaner_name = 'Any';
+        if ($order->preferred_cleaner_id) {
+            $cleaner_name = Helper::cleanername_new($order->preferred_cleaner_id) ?: 'Any';
+        }
+
+        $visit_num = 1;
+        foreach ($all_visits as $visit) {
+            $vCleaner = $visit->cleaner_id ? Helper::cleanername_new($visit->cleaner_id) : 'Unassigned';
+
+            $vTime = $visit->visit_time;
+            if (preg_match('/^00:00:(\d{2})$/', $vTime, $matches)) {
+                $tsId = (int) $matches[1];
+                $ts = DB::table('time_slots')->where('id', $tsId)->first();
+                if ($ts) $vTime = $ts->name;
+            } elseif (is_numeric($vTime)) {
+                $ts = DB::table('time_slots')->where('id', $vTime)->first();
+                if ($ts) $vTime = $ts->name;
+            }
+
+            $visitObj = (object)[
+                'id' => $visit->id,
+                'visit_number' => $visit_num,
+                'total_visits' => $order->visits_entitled,
+                'date' => Carbon::parse($visit->visit_date)->format('l, d F'),
+                'time' => $vTime,
+                'cleaner' => $vCleaner,
+                'duration' => $visit->duration ? $visit->duration . ' Hours' : 'N/A',
+                'status' => ucfirst($visit->visit_status),
+                'booking_id' => '#VC-V' . $visit->id,
+                'amount' => 'Included',
+                'rating' => $visit->rating,
+            ];
+
+            if (in_array(strtolower($visit->visit_status), ['upcoming', 'rescheduled'])) {
+                $upcoming_visits[] = $visitObj;
+            } else {
+                $past_visits[] = $visitObj;
+            }
+            $visit_num++;
+        }
+
+        $nextVisit = count($upcoming_visits) > 0 ? $upcoming_visits[0] : null;
+        $service_address = implode(', ', array_filter([$order->apartment_villa_no, $order->building_street_no, $order->area, $order->city]));
+
+        $subscription = (object)[
+            'id' => $order->order_id,
+            'category' => $order->subcategory_name ?: $order->category_name,
+            'plan_name' => $order->how_often_do_you_need_cleaning . ' Cleaning Plan',
+            'frequency_desc' => $order->how_often_do_you_need_cleaning,
+            'visits_per_cycle' => $order->visits_entitled ?: 0,
+            'visits_completed' => $order->visits_completed ?: 0,
+            'status' => $order->subscription_status ?: 'Active',
+            'next_visit_date' => $nextVisit ? $nextVisit->date : 'N/A',
+            'next_visit_time' => $nextVisit ? $nextVisit->time : 'N/A',
+            'next_renewal' => $order->next_renewal_date ? Carbon::parse($order->next_renewal_date)->format('d F Y') : 'N/A',
+            'renewal_amount' => $order->renewal_amount ?: $order->order_total,
+            'auto_renew' => $order->auto_renew_status == 1 ? 'ON' : 'OFF',
+            'payment_method' => $order->payment_method_id ?: 'Card',
+            'service_address' => $service_address,
+            'recurring_schedule' => $order->how_often_do_you_need_cleaning . ' • ' . $order->time_slot,
+            'preferred_cleaner' => $cleaner_name,
+            'cleaner_rating' => null,
+            'cleaner_unavailable' => false,
+            'upcoming_visits' => $upcoming_visits,
+            'past_visits' => $past_visits,
+            'service_id' => $order->service_id,
+            'subservice_id' => $order->subservice_id,
+        ];
 
         return view('front.subscription_detail', compact('subscription'));
     }
@@ -2406,5 +2463,89 @@ if (empty($userdata)) {
         }
 
         return response()->json(['status' => 0, 'message' => 'Visit date or Order ID missing']);
+    }
+
+    public function rescheduleVisit(Request $request)
+    {
+        $visit_id = $request->input('visit_id');
+        $new_date = $request->input('new_date');
+        $new_time = $request->input('new_time');
+        $cleaner_pref = $request->input('cleaner_pref'); // 'keep' or 'any'
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $visit = DB::table('ci_order_visits')
+            ->join('ci_orders', 'ci_order_visits.order_id', '=', 'ci_orders.order_id')
+            ->where('ci_order_visits.id', $visit_id)
+            ->where('ci_orders.user_id', $userdata['userid'])
+            ->select('ci_order_visits.*', 'ci_orders.preferred_cleaner_id')
+            ->first();
+
+        if ($visit) {
+            $updateData = [
+                'visit_date' => Carbon::parse($new_date)->format('Y-m-d'),
+                'visit_time' => Carbon::parse($new_time)->format('H:i:s'),
+                'visit_status' => 'rescheduled',
+                'rescheduled_from_date' => $visit->visit_date,
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+
+            if ($cleaner_pref === 'any') {
+                $updateData['cleaner_id'] = null;
+            }
+
+            DB::table('ci_order_visits')->where('id', $visit_id)->update($updateData);
+
+            return response()->json(['status' => 1, 'message' => 'Visit Rescheduled Successfully']);
+        }
+
+        return response()->json(['status' => 0, 'message' => 'Invalid visit or unauthorized.']);
+    }
+
+    public function skipVisitAdvanced(Request $request)
+    {
+        $visit_id = $request->input('visit_id');
+        $action = $request->input('action'); // 'move' or 'forfeit'
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $visit = DB::table('ci_order_visits')
+            ->join('ci_orders', 'ci_order_visits.order_id', '=', 'ci_orders.order_id')
+            ->where('ci_order_visits.id', $visit_id)
+            ->where('ci_orders.user_id', $userdata['userid'])
+            ->select('ci_order_visits.*')
+            ->first();
+
+        if ($visit) {
+            if ($action === 'forfeit') {
+                DB::table('ci_order_visits')->where('id', $visit_id)->update([
+                    'visit_status' => 'skipped',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            } else if ($action === 'move') {
+                $latestVisit = DB::table('ci_order_visits')
+                    ->where('order_id', $visit->order_id)
+                    ->orderBy('visit_date', 'desc')
+                    ->first();
+
+                $newDate = Carbon::parse($latestVisit->visit_date)->addDays(7)->format('Y-m-d');
+
+                DB::table('ci_order_visits')->where('id', $visit_id)->update([
+                    'visit_date' => $newDate,
+                    'visit_status' => 'upcoming',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+
+            return response()->json(['status' => 1, 'message' => 'Visit Skipped Successfully']);
+        }
+
+        return response()->json(['status' => 0, 'message' => 'Invalid visit or unauthorized.']);
     }
 }
