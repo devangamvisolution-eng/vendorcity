@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Admin\Order;
 use App\Models\front\Ciorder;
 use App\Models\front\CiorderItem;
+use App\Models\Admin\Service;
+use App\Models\Admin\Subservice;
 
 class ManpowerOrderController extends Controller
 {
@@ -243,7 +245,15 @@ class ManpowerOrderController extends Controller
 
         $data['customer'] = DB::table('frontloginregisters')->get();
         $data['services'] = DB::table('services')->where('is_active', '0')->get();
-        $data['subservices'] = DB::table('subservices')->where('serviceid', $orderItem->service_id ?? 0)->where('is_active', '0')->get();
+        $data['subservices'] = Subservice::where('serviceid', $orderItem->service_id)
+            ->where(function ($query) {
+                $query->whereIn('id', [101])
+                    ->orWhere('subservicename', 'like', '%Commercial Cleaning%')
+                    ->orWhere('is_active', 0);
+            })
+            ->orderBy('subservicename', 'ASC')
+            ->get();
+        // $data['subservices'] = DB::table('subservices')->where('serviceid', $orderItem->service_id ?? 0)->where('is_active', '0')->get();
         $data['salespersons'] = DB::table('users')->whereIn('role_id', [11, 12])->where('is_active', '0')->get();
         $data['vendors'] = DB::table('users')->where('vendor', 1)->where('is_active', '0')->get();
         $data['time_slots'] = DB::table('time_slots')->orderBy('set_order', 'ASC')->get();
@@ -253,6 +263,10 @@ class ManpowerOrderController extends Controller
 
     public function update(Request $request, $id)
     {
+
+        // echo "<pre>";
+        // print_r($request->all());
+        // exit;
         $request->validate([
             'sub_total' => 'required|numeric'
         ]);

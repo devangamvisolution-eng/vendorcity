@@ -150,7 +150,9 @@ class GoogleCalendarController extends Controller
         }
 
         $service = new Google_Service_Calendar($client);
-
+        // echo "<pre>";
+        // print_r($order);
+        // exit;
         // 🔥 DELETE OLD EVENTS
         if (!empty($order->google_event_id)) {
             $oldEvents = json_decode($order->google_event_id, true);
@@ -165,6 +167,8 @@ class GoogleCalendarController extends Controller
                 }
             }
         }
+
+        // exit;
 
         // 🔥 TIME SLOT LOGIC
         $timeSlot = DB::table('time_slots')->where('id', $item->time_slot)->value('name'); // e.g. "9:00 AM - 9:30 AM"

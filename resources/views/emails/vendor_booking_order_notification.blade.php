@@ -144,20 +144,20 @@
                             font-size:14px;line-height:24px;
                             font-family:Helvetica Neue, Helvetica, Helvetica, Arial, sans-serif;color:#555;padding:50px 0;">
         <div class="logo" style="float: inherit;border-bottom: 4px solid #FFD413;">
-            <img src="{{ asset('public/site/images/VC-FULL-COLOR.png') }}" style="width: 40%;">
+            <img src="{{asset("public/site/images/VC-FULL-COLOR.png")}}" style="width: 40%;">
         </div>
 
         <div class="email_wrapper" style="width:100%;margin-top: 18px;font-size: 16px;">
 
             <p> <strong> Dear </strong>{{ $vendor->name ?? 'Vendor' }}</p>
             <p>We are excited to inform you that a new customer has requested a Booking for
-                {{ \Helper::servicename($firstItem->service_id) }} on VendorsCity!
+                {{ \Helper::servicename($firstItem->service_id)}} on VendorsCity!
             </p>
 
             <p><strong>Request Details:</strong></p>
             <ul>
                 <li style="list-style-type: disc;margin-bottom: -15px;"> Service Requested :
-                    {{ \Helper::subservicename($firstItem->subservice_id) }}
+                    {{ \Helper::subservicename($firstItem->subservice_id)}}
                 </li>
 
                 <li style="list-style-type: disc;margin-bottom: -15px;"> Customer Name : {{ $user->name }}</li>
@@ -165,33 +165,28 @@
             </ul>
             <hr>
 
-            <p><a class="btnlink" href="{{ route('vendor.login') }}"
-                    style=" background: #0040E6;color: #fff !important;text-decoration: none;width: 100%;display: block;padding: 9px 0;text-align: center;
-                    font-size: 16px;border-radius: 9px;">View
-                    Request</a></p>
+            <p><a class="btnlink" href="{{route("vendor.login")}}" style=" background: #0040E6;color: #fff !important;text-decoration: none;width: 100%;display: block;padding: 9px 0;text-align: center;
+                    font-size: 16px;border-radius: 9px;">View Request</a></p>
 
             <p><strong>What You Need to Do:</strong></p>
             <ul>
                 <li style="list-style-type: disc;margin-bottom: -15px;"> Log in to your : <a
-                        href="{{ route('vendor.login') }}">Vendor Portal</a></li>
+                        href="{{ route("vendor.login")}}">Vendor Portal</a></li>
                 <li style="list-style-type: disc" ;> View the full request details and customer information.</li>
             </ul>
             <div class="main">
 
 
                 <div class="heading" style="font-weight: bold;font-size: 20px;
-                        <div class="
-                    email_footer" style="width:100%;margin-top: 20px;">
-                    <h3
-                        style=" font-size: 20px;font-weight: bolder;margin: 0;
+                        <div class=" email_footer" style="width:100%;margin-top: 20px;">
+                    <h3 style=" font-size: 20px;font-weight: bolder;margin: 0;
                         border-bottom: 3px solid #6B7177;padding-bottom: 20px;
-                        margin-bottom: 15px;">
-                        The VendorsCity Team</h3>
+                        margin-bottom: 15px;">The VendorsCity Team</h3>
                     <div class="email_footer_div" style=" width:100%;
                         display: flex; ">
                         <div class="footer_left" style="width: 100px;
                         float: left;">
-                            <img style="width:70%;" src="{{ asset('public/site/images/vcfaviconwap.png') }}">
+                            <img style="width:70%;" src="{{asset("public/site/images/vcfaviconwap.png")}}">
                         </div>
                         <div class="footer_right" style="margin-left:10px;
                             float: left;">
@@ -199,10 +194,8 @@
                                     href="mailto:support@vendorscity.com">support@vendorscity.com</a></p>
                             <p style="margin:0;">VendorsCity Portal LLC</p>
                             <div class="footer_links" style=" margin:10px 0;">
-                                <a href="" style="width: 100%;color: #555;display: inline-block;">Terms of
-                                    Use</a>
-                                <a href="" style="width: 100%;color: #555;display: inline-block;">Privacy
-                                    Policy</a>
+                                <a href="" style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                                <a href="" style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
                                 <a href="" style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                             </div>
 

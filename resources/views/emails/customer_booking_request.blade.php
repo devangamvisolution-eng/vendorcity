@@ -154,19 +154,12 @@
                 $firstItem->apartment_villa_no,
                 $firstItem->building_street_no,
                 $firstItem->area,
-                $firstItem->city,
+                $firstItem->city
             ]);
             $address = implode(', ', $addressParts);
 
             $timeSlotName = DB::table('time_slots')->where('id', $firstItem->time_slot)->value('name');
-            $dateTime =
-                $firstItem->bookingdate .
-                ' ' .
-                $firstItem->month .
-                ' ' .
-                $firstItem->bookingyear .
-                ' at ' .
-                $timeSlotName;
+            $dateTime = $firstItem->bookingdate . ' ' . $firstItem->month . ' ' . $firstItem->bookingyear . ' at ' . $timeSlotName;
         }
 
         $addons = DB::table('ci_order_item_addons')->where('order_id', $orderdata->order_id)->get();
@@ -197,47 +190,46 @@
                     <td class="label">Service</td>
                     <td class="value">
                         {{ $subserviceName }}
-                        @foreach ($packages as $package)
+                        @foreach($packages as $package)
                             <span class="addon-item">{{ $package->package_item_name }} x
                                 {{ $package->package_quantity }}</span>
                         @endforeach
-                        @foreach ($addons as $addon)
-                            <span class="addon-item">{{ $addon->package_item_name }} x
-                                {{ $addon->package_quantity }}</span>
+                        @foreach($addons as $addon)
+                            <span class="addon-item">{{ $addon->package_item_name }} x {{ $addon->package_quantity }}</span>
                         @endforeach
 
 
                     </td>
                 </tr>
-                @if (!empty($firstItem->how_many_cleaners_do_you_need))
+                @if(!empty($firstItem->how_many_cleaners_do_you_need))
                     <tr>
                         <td class="label">No. of Cleaners</td>
                         <td class="value">{{ $firstItem->how_many_cleaners_do_you_need }}</td>
                     </tr>
                 @endif
 
-                @if (!empty($firstItem->how_many_hours_should_they_stay))
+                @if(!empty($firstItem->how_many_hours_should_they_stay))
                     <tr>
                         <td class="label">No. of Hours</td>
                         <td class="value">{{ $firstItem->how_many_hours_should_they_stay }}</td>
                     </tr>
                 @endif
 
-                @if (!empty($firstItem->how_often_do_you_need_cleaning))
+                @if(!empty($firstItem->how_often_do_you_need_cleaning))
                     <tr>
                         <td class="label">Frequency</td>
                         <td class="value">{{ $firstItem->how_often_do_you_need_cleaning }}</td>
                     </tr>
                 @endif
 
-                @if (!empty($firstItem->which_day_of_the_week_do_you_want_the_service))
+                @if(!empty($firstItem->which_day_of_the_week_do_you_want_the_service))
                     <tr>
                         <td class="label">Days of the week</td>
                         <td class="value">{{ $firstItem->which_day_of_the_week_do_you_want_the_service }}</td>
                     </tr>
                 @endif
 
-                @if (!empty($firstItem->do_you_need_cleaning_material))
+                @if(!empty($firstItem->do_you_need_cleaning_material))
                     <tr>
                         <td class="label">Materials Provided</td>
                         <td class="value">{{ $firstItem->do_you_need_cleaning_material }}</td>
@@ -272,13 +264,13 @@
                     <td class="label">VAT</td>
                     <td class="value">AED {{ number_format($orderdata->vatcharge, 2) }}</td>
                 </tr>
-                @if ($orderdata->coupondiscount > 0)
+                @if($orderdata->coupondiscount > 0)
                     <tr>
                         <td class="label">Discount</td>
                         <td class="value">- AED {{ number_format($orderdata->coupondiscount, 2) }}</td>
                     </tr>
                 @endif
-                @if ($orderdata->front_wallet_amount > 0)
+                @if($orderdata->front_wallet_amount > 0)
                     <tr>
                         <td class="label">Wallet Used</td>
                         <td class="value">- AED {{ number_format($orderdata->front_wallet_amount, 2) }}</td>
