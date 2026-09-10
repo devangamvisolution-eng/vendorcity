@@ -143,6 +143,167 @@ class HomeControllerApi extends Controller
         }
 
 
+        if ($serviceId == 47 && in_array($subserviceId, [77, 78])) {
+            $gardenOnlineFields = [];
+
+            if ($subserviceId == 78) {
+                $gardenOnlineFields[] = [
+                    'id' => 'service_type',
+                    'label_name' => 'Which service do you need quotes for?',
+                    'type' => 'select',
+                    'is_moveType' => false,
+                    'options' => [
+                        (object)['id' => 'General gardening and maintenance', 'form_option' => 'General gardening and maintenance'],
+                        (object)['id' => 'Annual gardening contract', 'form_option' => 'Annual gardening contract'],
+                        (object)['id' => 'Gazebos, decks and porches', 'form_option' => 'Gazebos, decks and porches'],
+                        (object)['id' => 'Grass and artificial lawns', 'form_option' => 'Grass and artificial lawns'],
+                        (object)['id' => 'Landscaping', 'form_option' => 'Landscaping']
+                    ]
+                ];
+            }
+
+            $gardenOnlineFields[] = [
+                'id' => 'service_date',
+                'label_name' => 'When do you need the service?',
+                'type' => 'date',
+                'is_moveType' => false,
+                'options' => []
+            ];
+
+            $cities = DB::table('cities')->get();
+            $cityOptions = [];
+            foreach ($cities as $city) {
+                $cityOptions[] = (object)['id' => (string)$city->id, 'form_option' => $city->name];
+            }
+
+            $gardenOnlineFields[] = [
+                'id' => 'city',
+                'label_name' => 'Which city do you need the service?',
+                'type' => 'select',
+                'is_moveType' => false,
+                'options' => $cityOptions
+            ];
+
+            $gardenOnlineFields[] = [
+                'id' => 'address',
+                'label_name' => 'Where do you need the service?',
+                'type' => 'text',
+                'is_moveType' => false,
+                'options' => []
+            ];
+
+            $dynamicFields = $getFormattedFields([70]);
+
+            if ($subserviceId == 78 && isset($dynamicFields[0])) {
+                $filteredOptions = [];
+                foreach ($dynamicFields[0]['options'] as $opt) {
+                    if ($opt->form_option !== 'Warehouse') {
+                        $filteredOptions[] = $opt;
+                    }
+                }
+                $dynamicFields[0]['options'] = $filteredOptions;
+            }
+
+            $gardenOnlineFields = array_merge($gardenOnlineFields, $dynamicFields);
+
+            $gardenOnlineFields[] = [
+                'id' => 'describe_your_requirements',
+                'label_name' => 'Please describe the job in as much detail as possible (Optional)',
+                'type' => 'textarea',
+                'is_moveType' => false,
+                'options' => []
+            ];
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Garden form fields fetched successfully.',
+                'data' => [
+                    'garden_online_fields' => $gardenOnlineFields
+                ]
+            ], 200);
+        }
+
+        if ($serviceId == 34 && $subserviceId == 89) {
+            $bookOnlineFields = [
+                [
+                    'id' => 'property_type',
+                    'label_name' => 'Type of Property ?',
+                    'type' => 'select',
+                    'is_moveType' => false,
+                    'options' => [
+                        (object)['id' => 'Apartment', 'form_option' => 'Apartment'],
+                        (object)['id' => 'Villa', 'form_option' => 'Villa'],
+                        (object)['id' => 'Office', 'form_option' => 'Office'],
+                        (object)['id' => 'Commercial Space', 'form_option' => 'Commercial Space']
+                    ]
+                ],
+                [
+                    'id' => 'area_of_floor',
+                    'label_name' => 'Approximate Area of Wooden Flooring (sq. ft.)',
+                    'type' => 'select',
+                    'is_moveType' => false,
+                    'options' => [
+                        (object)['id' => 'Less than 200 sq. ft.', 'form_option' => 'Less than 200 sq. ft.'],
+                        (object)['id' => '200 – 500 sq. ft.', 'form_option' => '200 – 500 sq. ft.'],
+                        (object)['id' => '500 – 1000 sq. ft.', 'form_option' => '500 – 1000 sq. ft.'],
+                        (object)['id' => 'More than 1000 sq. ft.', 'form_option' => 'More than 1000 sq. ft.'],
+                        (object)['id' => 'Not Sure', 'form_option' => 'Not Sure']
+                    ]
+                ],
+                [
+                    'id' => 'condition_of_floor',
+                    'label_name' => 'Current Condition of the Floor',
+                    'type' => 'select',
+                    'is_moveType' => false,
+                    'options' => [
+                        (object)['id' => 'Current Condition of the Floor', 'form_option' => 'Current Condition of the Floor'],
+                        (object)['id' => 'Slight wear / dullness', 'form_option' => 'Slight wear / dullness'],
+                        (object)['id' => 'Deep scratches / stains', 'form_option' => 'Deep scratches / stains'],
+                        (object)['id' => 'Water damage', 'form_option' => 'Water damage'],
+                        (object)['id' => 'Just maintenance polish', 'form_option' => 'Just maintenance polish'],
+                        (object)['id' => 'Not sure', 'form_option' => 'Not sure']
+                    ]
+                ],
+                [
+                    'id' => 'service_required',
+                    'label_name' => 'Service Required',
+                    'type' => 'select',
+                    'is_moveType' => false,
+                    'options' => [
+                        (object)['id' => 'Floor polishing only', 'form_option' => 'Floor polishing only'],
+                        (object)['id' => 'Scratch/stain removal + polishing', 'form_option' => 'Scratch/stain removal + polishing'],
+                        (object)['id' => 'Full restoration (sanding & finishing)', 'form_option' => 'Full restoration (sanding & finishing)'],
+                        (object)['id' => 'Need expert advice', 'form_option' => 'Need expert advice']
+                    ]
+                ],
+                [
+                    'id' => 'schedule_site_survey',
+                    'label_name' => 'Would you like to schedule a site survey?',
+                    'type' => 'select',
+                    'is_moveType' => false,
+                    'options' => [
+                        (object)['id' => 'yes', 'form_option' => 'Yes, please schedule a free survey'],
+                        (object)['id' => 'no', 'form_option' => 'No, I’ll upload floor video below']
+                    ]
+                ],
+                [
+                    'id' => 'upload_video',
+                    'label_name' => 'Upload Video of the Wooden Floor',
+                    'type' => 'file',
+                    'is_moveType' => false,
+                    'options' => []
+                ]
+            ];
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Book online form fields fetched successfully.',
+                'data' => [
+                    'book_online_fields' => $bookOnlineFields
+                ]
+            ], 200);
+        }
+
         if ($subserviceId == 98) {
             return response()->json([
                 'status' => true,
@@ -1464,13 +1625,30 @@ class HomeControllerApi extends Controller
             ->where('horizontal_image', '!=', '')
             ->get();
 
-        $data['web']['horizontal_banners'] = $web_horizontal_banners->map(function ($item) {
-            return ['image_url' => asset('public/upload/coupans/' . $item->horizontal_image)];
+
+        $web_horizontal_banners->transform(function ($item) {
+            $item->image_url = asset('public/upload/coupans/' . $item->horizontal_image);
+
+            return $item;
         });
 
-        $data['app']['horizontal_banners'] = $app_horizontal_banners->map(function ($item) {
+        $data['web']['horizontal_banners'] = $web_horizontal_banners;
+
+        /* $data['web']['horizontal_banners'] = $web_horizontal_banners->map(function ($item) {
             return ['image_url' => asset('public/upload/coupans/' . $item->horizontal_image)];
+        }); */
+
+        $app_horizontal_banners->transform(function ($item) {
+            $item->image_url = asset('public/upload/coupans/' . $item->horizontal_image);
+
+            return $item;
         });
+
+        $data['app']['horizontal_banners'] = $app_horizontal_banners;
+
+        /* $data['app']['horizontal_banners'] = $app_horizontal_banners->map(function ($item) {
+            return ['image_url' => asset('public/upload/coupans/' . $item->horizontal_image)];
+        }); */
 
         // --- Vertical Banners ---
         $web_vertical_banners = DB::table('coupans')
@@ -1489,13 +1667,37 @@ class HomeControllerApi extends Controller
             ->where('vertical_image', '!=', '')
             ->get();
 
-        $data['web']['vertical_banners'] = $web_vertical_banners->map(function ($item) {
+        $web_vertical_banners->transform(function ($item) {
+            $item->image_url = asset('public/upload/coupans/' . $item->vertical_image);
+
+            return $item;
+        });
+
+        $data['web']['vertical_banners'] = $web_vertical_banners;
+
+        /* $data['web']['vertical_banners'] = $web_vertical_banners->map(function ($item) {
+            return ['image_url' => asset('public/upload/coupans/' . $item->vertical_image)];
+        }); */
+
+        $app_vertical_banners->transform(function ($item) {
+            $item->image_url = asset('public/upload/coupans/' . $item->vertical_image);
+
+            return $item;
+        });
+
+        $data['app']['vertical_banners'] = $app_vertical_banners;
+
+        /* $data['app']['vertical_banners'] = $app_vertical_banners->map(function ($item) {
+            return ['image_url' => asset('public/upload/coupans/' . $item->vertical_image)];
+        }); */
+
+        /* $data['web']['vertical_banners'] = $web_vertical_banners->map(function ($item) {
             return ['image_url' => asset('public/upload/coupans/' . $item->vertical_image)];
         });
 
         $data['app']['vertical_banners'] = $app_vertical_banners->map(function ($item) {
             return ['image_url' => asset('public/upload/coupans/' . $item->vertical_image)];
-        });
+        }); */
 
         return response()->json([
             'status' => true,

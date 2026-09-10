@@ -547,10 +547,7 @@ class BookingApiController extends Controller
 
 
         $item = $items->first();
-
         $total = 0;
-
-
 
         try {
 
@@ -788,8 +785,7 @@ class BookingApiController extends Controller
             ->where('order_id', $request->order_id)
             ->first();
 
-        $rating_rank = $service_review?->rating ?? 0;
-        $rating_comments = $service_review?->comments ?? null;
+        $rating = $service_review?->rating ?? 0;
 
 
         $response['order'] = [
@@ -816,8 +812,6 @@ class BookingApiController extends Controller
             'coupondiscount'     => $order->coupondiscount,
 
             'payment_method'  => $order->payment_method,
-            'rating_star'  => $rating_rank,
-            'rating_comments'  => $order->rating_comments,
             'created_at'      => $order->created_at,
 
         ];
@@ -835,6 +829,7 @@ class BookingApiController extends Controller
             'data' => $response
         ]);
     }
+
     public function paymentIntent(Request $request)
     {
         $validator = Validator::make($request->all(), [
