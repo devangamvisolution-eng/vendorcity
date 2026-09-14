@@ -1,0 +1,1 @@
+<?php require 'vendor/autoload.php'; $app = require_once 'bootstrap/app.php'; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); \Illuminate\Support\Facades\Schema::table('ci_orders', function($table) { $table->string('pending_plan_change')->nullable(); }); echo 'Column added'; 

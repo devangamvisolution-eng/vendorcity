@@ -1,0 +1,1 @@
+<?php require 'vendor/autoload.php'; $app = require_once 'bootstrap/app.php'; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); $all_visits = DB::table('ci_order_visits')->where('order_id', 266)->orderBy('visit_date', 'asc')->get(); print_r($all_visits);

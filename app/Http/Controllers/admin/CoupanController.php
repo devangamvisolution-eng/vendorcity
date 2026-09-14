@@ -30,6 +30,7 @@ class CoupanController extends Controller
     {
         $data['service'] = DB::table('services')->where('is_active', '0')->orderBy('id', 'DESC')->get();
         $data['subservice'] = DB::table('subservices')->orderBy('id', 'DESC')->get();
+        $data['users'] = DB::table('frontloginregisters')->where('status', 1)->get();
         return view('admin.add_coupan', $data);
     }
     /**
@@ -44,8 +45,9 @@ class CoupanController extends Controller
 
         $data['coupan_name'] = $request->input('coupan_name');
         $data['coupan_code'] = $request->input('coupan_code');
-        $data['service_id'] = implode(',', $request->input('service_id'));
-        $data['subservice_id'] = implode(',', $request->input('subservice_id'));
+        $data['service_id'] = $request->has('service_id') ? implode(',', $request->input('service_id')) : '';
+        $data['subservice_id'] = $request->has('subservice_id') ? implode(',', $request->input('subservice_id')) : '';
+        $data['user_id'] = $request->has('user_id') ? implode(',', $request->input('user_id')) : null;
         $data['discount'] = $request->input('discount');
         $data['coupanvalue'] = $request->input('coupanvalue');
         $data['coupan_apply_wallet'] = $request->input('coupan_apply_wallet');
@@ -101,6 +103,9 @@ class CoupanController extends Controller
 
         $data['subservice'] = DB::table('subservices')->whereIn('serviceid', $service_id)->orderBy('id', 'DESC')->get();
 
+        $data['users'] = DB::table('frontloginregisters')->where('status', 1)->get();
+        $data['selected_users'] = $data['coupan_data']->user_id ? explode(',', $data['coupan_data']->user_id) : [];
+
         return view('admin.edit_coupan', $data);
     }
 
@@ -109,8 +114,9 @@ class CoupanController extends Controller
         // echo"<pre>";print_r($_POST);echo"<pre>";exit;
         $data['coupan_name'] = $request->input('coupan_name');
         $data['coupan_code'] = $request->input('coupan_code');
-        $data['service_id'] = implode(',', $request->input('service_id'));
-        $data['subservice_id'] = implode(',', $request->input('subservice_id'));
+        $data['service_id'] = $request->has('service_id') ? implode(',', $request->input('service_id')) : '';
+        $data['subservice_id'] = $request->has('subservice_id') ? implode(',', $request->input('subservice_id')) : '';
+        $data['user_id'] = $request->has('user_id') ? implode(',', $request->input('user_id')) : null;
         $data['discount'] = $request->input('discount');
         $data['coupanvalue'] = $request->input('coupanvalue');
         $data['coupan_apply_wallet'] = $request->input('coupan_apply_wallet');

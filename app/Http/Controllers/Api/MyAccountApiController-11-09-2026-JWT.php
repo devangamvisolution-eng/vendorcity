@@ -606,23 +606,19 @@ class MyAccountApiController extends Controller
     public function listCoupons(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'user_id' => 'required|integer',
-            ]);
+            $authUser = JWTAuth::parseToken()->authenticate();
+            $userId = $authUser->id;
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => $validator->errors()->first()
-                ], 422);
-            }
 
-            $userId = $request->user_id;
-
+            /* echo "<pre>";
+            print_r($userId);
+            echo "</pre>";
+            exit; */
 
             // Fetch active coupons for app
             $coupons = DB::table('coupans')
                 ->where('is_active', 0)
+                ->where('active_for_app', 1)
                 ->orderBy('id', 'DESC')
                 ->get();
 
@@ -631,13 +627,11 @@ class MyAccountApiController extends Controller
 
             foreach ($coupons as $coupon) {
                 // Check user eligibility
-                if (empty($coupon->user_id)) {
-                    continue;
-                }
-
-                $eligibleUsers = explode(',', $coupon->user_id);
-                if (!in_array($userId, $eligibleUsers)) {
-                    continue;
+                if (!empty($coupon->user_id)) {
+                    $eligibleUsers = explode(',', $coupon->user_id);
+                    if (!in_array($userId, $eligibleUsers)) {
+                        continue;
+                    }
                 }
 
                 // Check expiry logic
@@ -701,7 +695,6 @@ class MyAccountApiController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'user_id' => 'required|integer',
                 'coupon_code' => 'required|string',
                 'amount' => 'required|numeric',
             ]);
@@ -713,9 +706,8 @@ class MyAccountApiController extends Controller
                 ], 422);
             }
 
-            // $authUser = JWTAuth::parseToken()->authenticate();
-            // $userId = $authUser->id;
-            $userId = $request->user_id;
+            $authUser = JWTAuth::parseToken()->authenticate();
+            $userId = $authUser->id;
             $couponCode = $request->coupon_code;
             $amount = $request->amount;
             $serviceId = $request->service_id ?? '';
