@@ -159,7 +159,8 @@
             </p>
 
             <p>
-                Need the service again? You can make a new booking anytime on <a href="{{ url('/') }}">VendorsCity</a>.
+                Need the service again? You can make a new booking anytime on <a
+                    href="{{ url('/') }}">VendorsCity</a>.
             </p>
 
             <p style="margin-top: 30px;">

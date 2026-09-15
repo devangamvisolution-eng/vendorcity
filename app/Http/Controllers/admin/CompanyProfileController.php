@@ -4,10 +4,10 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\CompanyProfile;
+use App\Models\Admin\CompanyProfile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use App\Models\admin\CompanyProfileDocument;
+use App\Models\Admin\CompanyProfileDocument;
 
 class CompanyProfileController extends Controller
 {

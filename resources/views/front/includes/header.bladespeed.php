@@ -107,59 +107,54 @@
     @endif
 
 
-    @if (file_exists(public_path('site/css/bundle-critical.min.css')))
-        <link rel="preload" href="{{ asset('public/site/css/bundle-critical.min.css') }}" as="style">
-        <link rel="stylesheet" href="{{ asset('public/site/css/bundle-critical.min.css') }}">
+    @if (request()->is('*dubai*'))
+        <link rel="stylesheet" href="{{ asset('public/site/css/ace-responsive-menu.css') }}">
+        <link rel="stylesheet" href="{{ asset('public/site/css/menu.css') }}">
+        <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}" media="print"
+            onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}" media="print"
+            onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}" media="print"
+            onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}" media="print"
+            onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}" media="print"
+            onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}" media="print"
+            onload="this.media='all'">
     @else
-        @if (request()->is('*dubai*'))
-            <link rel="stylesheet" href="{{ asset('public/site/css/ace-responsive-menu.css') }}">
-            <link rel="stylesheet" href="{{ asset('public/site/css/menu.css') }}">
-            <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}" media="print"
-                onload="this.media='all'">
-            <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}" media="print"
-                onload="this.media='all'">
-            <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}" media="print"
-                onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/ace-responsive-menu.css') }}">
+        <link rel="stylesheet" href="{{ asset('public/site/css/menu.css') }}">
+        <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}" media="print"
+            onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}" media="print"
+            onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}" media="print"
+            onload="this.media='all'">
+        @if (!request()->is('/') && !request()->is('*/booknow/cleaning/cleaning-subscription'))
             <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}" media="print"
                 onload="this.media='all'">
-            <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}" media="print"
-                onload="this.media='all'">
-            <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}" media="print"
-                onload="this.media='all'">
-        @else
-            <link rel="stylesheet" href="{{ asset('public/site/css/ace-responsive-menu.css') }}">
-            <link rel="stylesheet" href="{{ asset('public/site/css/menu.css') }}">
-            <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}" media="print"
-                onload="this.media='all'">
-            <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}" media="print"
-                onload="this.media='all'">
-            <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}" media="print"
-                onload="this.media='all'">
-            @if (!request()->is('/') && !request()->is('*/booknow/cleaning/cleaning-subscription'))
-                <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}" media="print"
-                    onload="this.media='all'">
-            @endif
-            <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}" media="print"
-                onload="this.media='all'">
-            <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}" media="print"
-                onload="this.media='all'">
         @endif
+        <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}" media="print"
+            onload="this.media='all'">
+        <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}" media="print"
+            onload="this.media='all'">
+    @endif
 
-        <!-- Critical CSS Preload -->
-        <link rel="preload" href="{{ asset('public/site/css/style.css') }}" as="style">
-        <link rel="preload" href="{{ asset('public/site/css/responsive.css') }}" as="style">
+    <!-- Critical CSS Preload -->
+    <link rel="preload" href="{{ asset('public/site/css/style.css') }}" as="style">
+    <link rel="preload" href="{{ asset('public/site/css/responsive.css') }}" as="style">
 
-        @if (request()->is('*dubai*'))
-            <link rel="stylesheet" href="{{ asset('public/site/css/style.css') }}">
-        @else
-            <link rel="stylesheet" href="{{ asset('public/site/css/style.css') }}">
-        @endif
+    @if (request()->is('*dubai*'))
+        <link rel="stylesheet" href="{{ asset('public/site/css/style.css') }}">
+    @else
+        <link rel="stylesheet" href="{{ asset('public/site/css/style.css') }}">
+    @endif
 
-        @if (request()->is('*dubai*'))
-            <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
-        @else
-            <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
-        @endif
+    @if (request()->is('*dubai*'))
+        <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
+    @else
+        <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
     @endif
 
     @if (!request()->is('*dubai*') && !request()->is('*/booknow/cleaning/cleaning-subscription'))

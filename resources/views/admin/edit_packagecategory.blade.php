@@ -124,6 +124,18 @@
                                     </div>
                                 </div>
 
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Card Image (Optional, for category card fallback display)</label>
+                                        <input type="file" class="form-control" id="card_image"
+                                            name="card_image" value="{{ $packagecategory->card_image }}">
+                                        @if ($packagecategory->card_image != '')
+                                            <img src="{{ asset('public/upload/packagecategory/' . $packagecategory->card_image) }}"
+                                                style="height: 80px; object-fit: cover; margin-top: 10px; border-radius: 8px;" />
+                                        @endif
+                                    </div>
+                                </div>
+
 
                             </div>
                             <div class="text-end mt-4">

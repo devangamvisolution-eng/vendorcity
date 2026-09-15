@@ -1,12 +1,12 @@
 @include('front.includes.header')
 
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css">
+    <link rel="stylesheet" href="{{ asset('public/site/css/splide.min.css') }}">
     <link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}" media="print" onload="this.media='all'">
 @endpush
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
+    <script src="{{ asset('public/site/js/splide.min.js') }}"></script>
     <script src="{{ asset('public/site/js/intlTelInput.min.js') }}" defer></script>
 @endpush
 
@@ -2717,7 +2717,7 @@
     }
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script> -->
 <script>
     // const tickerContainer = document.querySelector('.ticker-container');
     // const tickerItems = document.querySelector('.ticker-items');
@@ -2869,7 +2869,7 @@
         }
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js" defer></script>
+<script src="{{ asset('public/site/js/splide.min.js') }}" defer></script>
 <script>
     //  document.addEventListener('DOMContentLoaded', function () {
     //     // Select all .splide elements except #feature-slider

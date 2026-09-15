@@ -91,21 +91,21 @@
             foreach ($costing_attribute as $attribute) {
                 $isSecurityDeposit = stripos($attribute->description, 'security deposit') !== false;
 
-                $price =
-                    isset($followup_data->margin_percent) && $followup_data->margin_percent > 0
-                        ? $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100
-                        : $attribute->prov;
+                // $price =
+                //     isset($followup_data->margin_percent) && $followup_data->margin_percent > 0
+                //         ? $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100
+                //         : $attribute->prov;
 
-                // if (!empty($followup_data->margin_amount) && $followup_data->margin_amount > 0) {
-                //     // Fixed amount margin
-                //     $price = $attribute->prov + $followup_data->margin_amount;
-                // } elseif (!empty($followup_data->margin_percent) && $followup_data->margin_percent > 0) {
-                //     // Percentage margin
-                //     $price = $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100;
-                // } else {
-                //     // No margin
-                //     $price = $attribute->prov;
-                // }
+                if (!empty($followup_data->margin_amount) && $followup_data->margin_amount > 0) {
+                    // Fixed amount margin
+                    $price = $attribute->prov + $followup_data->margin_amount;
+                } elseif (!empty($followup_data->margin_percent) && $followup_data->margin_percent > 0) {
+                    // Percentage margin
+                    $price = $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100;
+                } else {
+                    // No margin
+                    $price = $attribute->prov;
+                }
 
                 $total = $price * $attribute->qty;
 
@@ -263,21 +263,21 @@
                             $isSecurityDeposit = stripos($attribute->description, 'security deposit') !== false;
 
                             // ✅ Apply margin for ALL items
-                            $price =
-                                isset($followup_data->margin_percent) && $followup_data->margin_percent > 0
-                                    ? $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100
-                                    : $attribute->prov;
+                            // $price =
+                            //     isset($followup_data->margin_percent) && $followup_data->margin_percent > 0
+                            //         ? $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100
+                            //         : $attribute->prov;
 
-                            // if (!empty($followup_data->margin_amount) && $followup_data->margin_amount > 0) {
-                            //     // Fixed amount margin
-                            //     $price = $attribute->prov + $followup_data->margin_amount;
-                            // } elseif (!empty($followup_data->margin_percent) && $followup_data->margin_percent > 0) {
-                            //     // Percentage margin
-                            //     $price = $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100;
-                            // } else {
-                            //     // No margin
-                            //     $price = $attribute->prov;
-                            // }
+                            if (!empty($followup_data->margin_amount) && $followup_data->margin_amount > 0) {
+                                // Fixed amount margin
+                                $price = $attribute->prov + $followup_data->margin_amount;
+                            } elseif (!empty($followup_data->margin_percent) && $followup_data->margin_percent > 0) {
+                                // Percentage margin
+                                $price = $attribute->prov + ($attribute->prov * $followup_data->margin_percent) / 100;
+                            } else {
+                                // No margin
+                                $price = $attribute->prov;
+                            }
 
                             $total = $price * $attribute->qty;
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\Wallet;
+use App\Models\Admin\Wallet;
 use Illuminate\Support\Facades\Mail;
 use Auth;
 use DB;

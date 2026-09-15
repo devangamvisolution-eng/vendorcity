@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-use App\Models\admin\Subscribe;
+use App\Models\Admin\Subscribe;
 
 
 
@@ -33,10 +33,9 @@ class SubscribeController extends Controller
 
     {
 
-        $data['subscribe_data'] = Subscribe::orderBy('id','DESC')->get();        
+        $data['subscribe_data'] = Subscribe::orderBy('id', 'DESC')->get();
 
-        return view('admin.list_subscribe',$data);
-
+        return view('admin.list_subscribe', $data);
     }
 
 
@@ -121,7 +120,7 @@ class SubscribeController extends Controller
 
     {
 
-       
+
 
         // return view('admin.edit_subscribe',compact('subscribe'));
 
@@ -173,9 +172,9 @@ class SubscribeController extends Controller
 
         // echo $delete_id;exit;
 
-        Subscribe::whereIn('id',$delete_id)->delete();
+        Subscribe::whereIn('id', $delete_id)->delete();
 
-        return redirect()->route('subscribe.index')->with('success','Subscribe has been deleted successfully');
+        return redirect()->route('subscribe.index')->with('success', 'Subscribe has been deleted successfully');
 
         // $id=$request->id;
 
@@ -184,5 +183,4 @@ class SubscribeController extends Controller
         // return redirect()->route('subscribe.index');
 
     }
-
 }

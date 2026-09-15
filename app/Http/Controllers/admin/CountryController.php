@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Http\Controllers\admin;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\Country;
+use App\Models\Admin\Country;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+
 class CountryController extends Controller
 {
     /**
@@ -15,8 +18,8 @@ class CountryController extends Controller
      */
     public function index()
     {
-        $data['country_data']=Country::orderBy('id','desc')->get();
-        return view('admin.list_country',$data);
+        $data['country_data'] = Country::orderBy('id', 'desc')->get();
+        return view('admin.list_country', $data);
     }
     /**
      * Show the form for creating a new resource.
@@ -25,8 +28,8 @@ class CountryController extends Controller
      */
     public function create()
     {
-        $data['continent_data'] = DB::table('continents')->select('*')->orderBy('id','DESC')->get();
-        return view('admin.add_country',$data);
+        $data['continent_data'] = DB::table('continents')->select('*')->orderBy('id', 'DESC')->get();
+        return view('admin.add_country', $data);
     }
     /**
      * Store a newly created resource in storage.
@@ -36,13 +39,13 @@ class CountryController extends Controller
      */
     public function store(Request $request)
     {
-        $country= new Country;
-        $country->country=$request->country;
-        $country->continent_id=$request->continent_id;
-        $country->country_code=$request->country_code;
-        
+        $country = new Country;
+        $country->country = $request->country;
+        $country->continent_id = $request->continent_id;
+        $country->country_code = $request->country_code;
+
         $country->save();
-        return redirect()->route('country.index')->with('success','Country Added Successfully');
+        return redirect()->route('country.index')->with('success', 'Country Added Successfully');
     }
     /**
      * Display the specified resource.
@@ -62,8 +65,8 @@ class CountryController extends Controller
      */
     public function edit(Country $country)
     {
-        $data['continent_data'] = DB::table('continents')->select('*')->orderBy('id','DESC')->get();
-       return view('admin.edit_country',compact('country'),$data);
+        $data['continent_data'] = DB::table('continents')->select('*')->orderBy('id', 'DESC')->get();
+        return view('admin.edit_country', compact('country'), $data);
     }
     /**
      * Update the specified resource in storage.
@@ -76,9 +79,9 @@ class CountryController extends Controller
     {
         $country = Country::find($id);
         $country->country     = $request->country;
-        $country->continent_id=$request->continent_id;
-        $country->country_code=$request->country_code;
-       
+        $country->continent_id = $request->continent_id;
+        $country->country_code = $request->country_code;
+
         $country->save();
         return redirect()->route('country.index')->with('success', 'Country Updated Successfully');
     }
@@ -91,12 +94,13 @@ class CountryController extends Controller
     public function destroy(Request $request)
     {
         $delete_id = $request->selected;
-      
-        Country::whereIn('id',$delete_id)->delete();
-        return redirect()->route('country.index')->with('success','Country Deleted Successfully');
+
+        Country::whereIn('id', $delete_id)->delete();
+        return redirect()->route('country.index')->with('success', 'Country Deleted Successfully');
     }
-    function xlsupload(Request $request){
-        
+    function xlsupload(Request $request)
+    {
+
         ini_set('memory_limit', '-1');
         if ($request->input('action') == 'add_XLS') {
             // $request->validate([

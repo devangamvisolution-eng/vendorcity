@@ -52,6 +52,15 @@
             box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
         }
 
+        /* Add padding to top (search/length) and bottom (info/pagination) rows */
+        .dataTables_wrapper>.row:first-child,
+        .dataTables_wrapper>.row:last-child {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
         /* Table Styling - UPDATED FOR REDUCED GAPS */
         .action-table {
             width: 100% !important;
@@ -60,13 +69,14 @@
 
         .action-table thead th {
             background: #4c7aef;
-            padding: 10px 12px;
-            /* Reduced from 15px 20px */
+            padding: 8px 6px;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             color: #ffffff;
             border-bottom: 2px solid var(--border-classic);
+            white-space: normal;
+            vertical-align: middle;
 
             /* Sticky Properties */
             position: sticky;
@@ -87,7 +97,7 @@
         }
 
         .action-table td {
-            padding: 8px 12px;
+            padding: 6px 6px;
             /* Reduced from 16px 20px to close column and row gaps */
             vertical-align: middle;
             font-size: 13px;
@@ -128,17 +138,24 @@
 
         table.dataTable td,
         table.dataTable th {
-            -webkit-box-sizing: content-box;
-            box-sizing: content-box;
-            border-bottom: 1px solid cornflowerblue;
+            -webkit-box-sizing: border-box !important;
+            box-sizing: border-box !important;
+            border-bottom: 1px solid var(--border-classic);
         }
 
-        @media only screen and (max-width: 767px) {
+        .table-responsive-custom {
+            overflow: visible;
+        }
 
+        @media only screen and (max-width: 991.98px) {
             .action-card {
-                overflow: scroll !important;
+                overflow: auto !important;
             }
 
+            .table-responsive-custom {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
         }
     </style>
 
@@ -163,6 +180,8 @@
                             Package Order - Storage
                         @elseif(Route::currentRouteName() == 'healthcare_at_home_package_order')
                             Package Order - Healthcare At Home
+                        @elseif(Route::currentRouteName() == 'car-services-at-home-service-order')
+                            Package Order - Car Service At Home
                         @else
                             Package Order - Moving
                         @endif
@@ -180,6 +199,7 @@
                         in_array('45', $edit_perm) ||
                         in_array('42', $edit_perm) ||
                         in_array('75', $edit_perm) ||
+                        in_array('85', $edit_perm) ||
                         in_array('59', $edit_perm))
                     <div class="col-auto">
                         @php
@@ -205,6 +225,10 @@
                                     'route' => 'healthcare_at_home_admin_order',
                                     'label' => 'Healthcare At Home',
                                 ],
+                                'car-services-at-home-service-order' => [
+                                    'route' => 'car-services-at-home-service-admin-order',
+                                    'label' => 'Car Service At Home',
+                                ],
                             ];
                             $curr = Route::currentRouteName();
                         @endphp
@@ -227,329 +251,27 @@
         </div>
 
         <div class="action-card">
-            <div class="card-body p-4">
+            <div class="card-body py-3 px-0 table-responsive-custom">
                 <form id="form" action="{{ route('delete_order') }}">
                     @csrf
-                    <table class="action-table" id="example">
+                    <table class="action-table" id="example" style="width: 100%;">
                         <thead>
                             <tr>
                                 @if (Route::currentRouteName() == 'cleaning_package_order')
-                                    <th>Select</th>
+                                    <th style="width: 35px; min-width: 35px; text-align: center;">Select</th>
                                 @else
-                                    <th class="d-none">Select</th>
+                                    <th class="d-none" style="width: 35px; text-align: center;">Select</th>
                                 @endif
-                                <th>Order Detail</th>
-                                <th>Customer & Service</th>
-                                <th>Status</th>
-                                <th class="text-center">Assign</th>
-                                <th class="text-end">Actions</th>
+                                <th style="min-width: 110px;">Order Detail</th>
+                                <th style="min-width: 130px;">Customer & Service</th>
+                                <th style="min-width: 120px;">Status</th>
+                                <th class="text-center" style="min-width: 85px;">Assign Salesperson</th>
+                                <th class="text-center" style="min-width: 75px;">Assign Crew</th>
+                                <th class="text-center" style="min-width: 85px;">Assign Vendor</th>
+                                <th class="text-center" style="width: 50px; min-width: 50px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @if (isset($orders_list) && count($orders_list))
-                                @foreach ($orders_list as $orders)
-                                    {{-- @php
-                                        echo '<pre>';
-                                        print_r($orders);
-                                    @endphp --}}
-                                    @if (!empty($orders->items))
-                                        <tr>
-                                            @if (Route::currentRouteName() == 'cleaning_package_order')
-                                                <td><input name="selected[]" value="{{ $orders->order_id }}" type="checkbox"
-                                                        class="minimal-red" style="height: 18px; width: 18px;"></td>
-                                            @else
-                                                <td class="d-none"><input name="selected[]" value="{{ $orders->order_id }}"
-                                                        type="checkbox" class="minimal-red"></td>
-                                            @endif
-                                            <td>
-                                                <span class="stack-top text-primary">#{{ $orders->format_order_id }}</span>
-                                                <span
-                                                    class="stack-bottom">{{ date('d M, Y', strtotime($orders->created_at)) }}</span>
-                                            </td>
-                                            <td>
-                                                <span class="stack-top">{{ $orders->user_name }}</span>
-                                                <span class="stack-bottom">{!! isset($orders->items[0]) ? Helper::subservicename($orders->items[0]->subservice_id) : '-' !!}</span>
-                                            </td>
-                                            <td>
-                                                <select class="form-select form-select-sm mb-1 fw-bold"
-                                                    style="font-size: 12px;"
-                                                    onchange="order_status_change({{ $orders->order_id }}, this)">
-                                                    <option value="BK"
-                                                        {{ $orders->order_status === 'BK' ? 'selected' : '' }}>Booking
-                                                        Requested
-                                                    </option>
-                                                    <option value="P"
-                                                        {{ $orders->order_status === 'P' ? 'selected' : '' }}>Booking
-                                                        Confirmed
-                                                    </option>
-                                                    <option value="PA"
-                                                        {{ $orders->order_status === 'PA' ? 'selected' : '' }}>Vendor
-                                                        Assigned
-                                                    </option>
-                                                    <option value="CO"
-                                                        {{ $orders->order_status === 'CO' ? 'selected' : '' }}>Booking
-                                                        Completed
-                                                    </option>
-                                                    <option value="CL"
-                                                        {{ $orders->order_status === 'CL' ? 'selected' : '' }}>
-                                                        Booking Cancelled</option>
-                                                </select>
-                                                <div class="d-flex align-items-center">
-                                                    <input type="text"
-                                                        value="{{ $orders->items[0]->subservice_booking_percentage }}"
-                                                        onchange="updateorder_booking_percentage(this.value, '{{ $orders->items[0]->id }}');"
-                                                        class="form-control form-control-sm text-center"
-                                                        style="width: 45px; height: 22px; font-size: 11px;">
-                                                    <span class="ms-1 small text-muted">Comm %</span>
-                                                </div>
-                                            </td>
-                                            <td class="text-center">
-                                                <div class="d-flex justify-content-center gap-1">
-                                                    @if (isset($orders->items[0]))
-                                                        <button type="button" class="btn-utility"
-                                                            onclick="assign_salesperson('{{ $orders->order_id }}', '{{ $orders->items[0]->salesperson_id }}'); event.preventDefault();"
-                                                            data-bs-toggle="tooltip" data-bs-placement="top"
-                                                            title="Assign Salesperson">
-
-                                                            <i
-                                                                class="fas fa-user-tie {{ !empty($orders->items[0]->salesperson_id) ? 'text-success' : '' }}"></i>
-                                                        </button>
-                                                    @endif
-
-
-                                                    @if (Route::currentRouteName() == 'cleaning_package_order' ||
-                                                            Route::currentRouteName() == 'handyman-service-order' ||
-                                                            Route::currentRouteName() == 'salon-spa-order' ||
-                                                            Route::currentRouteName() == 'pest-control-order')
-                                                        {{-- ================= SALES PERSON ================= --}}
-
-
-
-                                                        @if (isset($orders->items[0]))
-                                                            {{-- If Cleaner ID = 2 → Assign Single Crew --}}
-                                                            @if ($orders->items[0]->cleaner_id == 2)
-                                                                <button type="button" class="btn-utility"
-                                                                    onclick="assign_cleaner('{{ $orders->order_id }}', '{{ $orders->items[0]->service_id }}', '{{ $orders->items[0]->subservice_id }}', '{{ $orders->items[0]->cleaner_id }}'); event.preventDefault();">
-                                                                    <i
-                                                                        class="fas fa-user {{ !empty($orders->items[0]->cleaner_id) ? 'text-success' : '' }}"></i>
-                                                                </button>
-
-                                                                {{-- If Cleaner Already Assigned or Not Assigned --}}
-                                                            @else
-                                                                <button type="button" class="btn-utility"
-                                                                    onclick="assign_multi_cleaner(
-                                                                                        '{{ $orders->order_id }}',
-                                                                                        '{{ $orders->items[0]->service_id }}',
-                                                                                        '{{ $orders->items[0]->subservice_id }}',
-                                                                                        '{{ $orders->items[0]->how_many_cleaners_do_you_need }}',
-                                                                                        '{{ $orders->items[0]->cleaner_id }}'
-                                                                                    ); event.preventDefault();"
-                                                                    title="Assign Multiple Crew">
-
-                                                                    <i
-                                                                        class="fas fa-users {{ !empty($orders->items[0]->cleaner_id) ? 'text-success' : '' }}"></i>
-                                                                </button>
-                                                            @endif
-                                                        @else
-                                                            {{ '-' }}
-                                                        @endif
-
-                                                        {{-- @if (isset($orders->items[0]))
-                                                    @if (!empty($orders->items[0]->cleaner_id))
-                                                    <a href="{{ url('mark-attendance/' . $orders->order_id) }}" class="btn-utility"
-                                                        data-bs-toggle="tooltip" title="Attendance">
-
-                                                        <i class="fas fa-calendar-check"></i>
-                                                    </a>
-                                                    @endif
-                                                    @endif --}}
-
-                                                        {{-- ================= ADD PER CREW PRICE ================= --}}
-                                                        {{-- @if ($orders->items[0]->subservice_id != 28) --}}
-                                                        {{-- @if (!empty($orders->items[0]->cleaner_id))
-                                                    @if (empty($orders->items[0]->cleaner_price) && $orders->items[0]->cleaner_price == null)
-                                                    <button type="button" class="btn-utility"
-                                                        onclick="add_cleaner_price('{{ $orders->order_id }}');" data-bs-toggle="tooltip"
-                                                        data-bs-placement="top" title="Add Per Crew Price">
-
-                                                        <i class="fas fa-dollar-sign"></i>
-                                                    </button>
-                                                    @endif
-                                                    @endif --}}
-                                                        {{-- @endif --}}
-                                                    @endif
-
-                                                    @if ($orders->payment_status == 'Success' || $orders->payment_status == 'paid')
-                                                        @if ($orders->items[0]->service_id == 50)
-                                                            <button type="button" class="btn-utility"
-                                                                onclick="assign_vendor_car('{{ $orders->order_id }}', '{{ $orders->vendor_id }}'); event.preventDefault();"
-                                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                                title="Assign Vendor car">
-
-                                                                <i
-                                                                    class="fas fa-user {{ !empty($orders->vendor_id) ? 'text-success' : '' }}"></i>
-                                                            </button>
-                                                        @else
-                                                            <button type="button" class="btn-utility"
-                                                                onclick="assign_vendor('{{ $orders->order_id }}', '{{ $orders->vendor_id }}'); event.preventDefault();"
-                                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                                title="Assign Vendor">
-
-                                                                <i
-                                                                    class="fas fa-user {{ !empty($orders->vendor_id) ? 'text-success' : '' }}"></i>
-                                                            </button>
-                                                        @endif
-                                                    @endif
-
-                                                    <button type="button" class="btn-utility"
-                                                        onclick="openLocationLink('{{ $orders->order_id }}', '{{ $orders->items[0]->location_link }}'); event.preventDefault();"
-                                                        title="Location Link">
-
-                                                        <i
-                                                            class="fas fa-map-marker-alt {{ !empty($orders->items[0]->location_link) ? 'text-success' : '' }}"></i>
-                                                    </button>
-
-                                                </div>
-                                            </td>
-
-                                            <td class="text-end">
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle fw-bold"
-                                                        type="button" data-bs-toggle="dropdown">
-                                                        Manage
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-end shadow border-0">
-                                                        @php
-                                                            $routeMap = [
-                                                                'order.index' => [
-                                                                    'route' => 'moving_package_order_edit',
-                                                                    'param' => 'id',
-                                                                ],
-                                                                'handyman-service-order' => [
-                                                                    'route' => 'handyman_order_edit',
-                                                                    'param' => 'ci_order',
-                                                                ],
-                                                                'painting-service-order' => [
-                                                                    'route' => 'painting_order_edit',
-                                                                    'param' => 'ci_order',
-                                                                ],
-                                                                'salon-spa-order' => [
-                                                                    'route' => 'salon_spa_order_edit',
-                                                                    'param' => 'ci_order',
-                                                                ],
-                                                                'pest-control-order' => [
-                                                                    'route' => 'pest_control_order_edit',
-                                                                    'param' => 'ci_order',
-                                                                ],
-                                                                'automobile-order' => [
-                                                                    'route' => 'automobile_order_edit',
-                                                                    'param' => 'ci_order',
-                                                                ],
-                                                                'cleaning_package_order' => [
-                                                                    'route' => 'cleaning_package_order_edit',
-                                                                    'param' => 'id',
-                                                                ],
-                                                                'storage_package_order' => [
-                                                                    'route' => 'storage-package-order-edit',
-                                                                    'param' => 'id',
-                                                                ],
-                                                                'storage_package_order' => [
-                                                                    'route' => 'storage-package-order-edit',
-                                                                    'param' => 'id',
-                                                                ],
-                                                                // 'healthcare_at_home_package_order' => [
-                                                                //     'route' => 'healthcare_at_home_order_edit',
-                                                                //     'param' => 'id',
-                                                                // ],
-                                                            ];
-                                                            $currentRoute = Route::currentRouteName();
-                                                        @endphp
-
-                                                        @if (isset($routeMap[$currentRoute]))
-                                                            <a class="dropdown-item"
-                                                                href="{{ route($routeMap[$currentRoute]['route'], [$routeMap[$currentRoute]['param'] => $orders->order_id]) }}"><i
-                                                                    class="far fa-edit me-2"></i>Edit Order</a>
-                                                        @endif
-
-                                                        @if ($orders->items[0]->service_id == 34)
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('painting-detail', [$orders->order_id]) }}">
-                                                            @elseif($orders->items[0]->service_id == 45)
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('cleaning-detail', [$orders->order_id]) }}">
-                                                                @elseif($orders->items[0]->service_id == 71)
-                                                                    <a class="dropdown-item"
-                                                                        href="{{ route('handyman-detail', [$orders->order_id]) }}">
-                                                                    @elseif($orders->items[0]->service_id == 54)
-                                                                        <a class="dropdown-item"
-                                                                            href="{{ route('healthcare_at_home_detail', [$orders->order_id]) }}">
-                                                                        @else
-                                                                            <a class="dropdown-item"
-                                                                                href="{{ route('moving-detail', [$orders->order_id]) }}">
-                                                        @endif
-                                                        <i class="far fa-eye me-2"></i>Details
-                                                        </a>
-
-                                                        <button type="button" class="dropdown-item"
-                                                            onclick="add_comm_model(
-        '{{ $orders->order_id }}',
-        '{{ $orders->order_total }}',
-        '{{ $orders->sub_total }}',
-        '{{ $orders->items[0]->subservice_booking_percentage ?? 0 }}',
-        '{{ $orders->items[0]->subservice_booking_amount ?? 0 }}'
-    )">
-                                                            <i class="fas fa-coins me-2"></i>Add Commission
-                                                        </button>
-
-                                                        @if ($orders->vendor_id != 0 && $orders->vendor_id != '')
-                                                            <button type="button" class="dropdown-item"
-                                                                onclick="add_amount_model(
-                                                                                        '{{ $orders->order_id }}',
-                                                                                        '{{ $orders->order_total }}'
-                                                                                    )">
-                                                                <i class="fas fa-money-bill-wave me-2"></i>Add Amount
-                                                            </button>
-                                                        @endif
-                                                        @if (Route::currentRouteName() == 'cleaning_package_order')
-                                                            @if (
-                                                                $orders->items[0]->how_often_do_you_need_cleaning == 'Weekly' ||
-                                                                    $orders->items[0]->how_often_do_you_need_cleaning == 'Multiple times a week')
-                                                                <a class="dropdown-item" href="javascript:void(0)"
-                                                                    onclick="set_end_date({{ $orders->order_id }}, '{{ $orders->items[0]->end_date }}')">
-                                                                    <i class="far fa-calendar me-2"></i>End Date
-                                                                </a>
-                                                            @endif
-                                                        @endif
-
-                                                        @if ($currentRoute == 'storage_package_order')
-                                                            <a class="dropdown-item" href="javascript:void(0);"
-                                                                onclick="confirmRenewMail({{ $orders->order_id }})">
-                                                                <i class="fas fa-envelope me-2"></i>Renew Mail
-                                                            </a>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('storage-admin-order', ['renew_id' => $orders->order_id]) }}">
-                                                                <i class="fas fa-sync me-2"></i>Renew Order
-                                                            </a>
-                                                        @endif
-                                                        @if ($orders->google_event_id)
-                                                            <a href="javascript:void(0);" class="dropdown-item"
-                                                                onclick="handlecalanderAction({{ $orders->order_id }}, 'update')">
-                                                                <i class="fas fa-calendar-check"></i> Update Calendar
-                                                            </a>
-                                                        @else
-                                                            <a href="javascript:void(0);" class="dropdown-item"
-                                                                onclick="handlecalanderAction({{ $orders->order_id }}, 'add')">
-                                                                <i class="fas fa-calendar-plus"></i> Add to Calendar
-                                                            </a>
-                                                        @endif
-
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                @endforeach
-                            @endif
                         </tbody>
                     </table>
                 </form>
@@ -1118,7 +840,7 @@
                         });
                         $('#end_date_model').modal('hide');
                         setTimeout(function() {
-                            location.reload();
+                            $('#example').DataTable().ajax.reload(null, false);
                         }, 2000);
                     } else {
                         Swal.fire('Error', 'Failed to update end date', 'error');
@@ -1321,7 +1043,8 @@
                                             timer: 2000,
                                             showConfirmButton: false
                                         });
-                                        setTimeout(() => location.reload(), 2000);
+                                        setTimeout(() => $('#example').DataTable().ajax
+                                            .reload(null, false), 2000);
                                     }
                                 },
                                 error: function() {
@@ -1419,7 +1142,7 @@
                         });
                         $('#locationModal').modal('hide');
                         setTimeout(function() {
-                            location.reload();
+                            $('#example').DataTable().ajax.reload(null, false);
                         }, 2000);
                     }
                 },
@@ -1467,7 +1190,7 @@
                         });
                         $('#cleaner_model').modal('hide');
                         setTimeout(function() {
-                            location.reload();
+                            $('#example').DataTable().ajax.reload(null, false);
                         }, 2000);
                     } else {
                         Swal.fire('Error', response.message, 'error');
@@ -1604,7 +1327,7 @@
                         });
                         $('#multi_cleaner_model').modal('hide');
                         setTimeout(function() {
-                            location.reload();
+                            $('#example').DataTable().ajax.reload(null, false);
                         }, 2000);
                     } else {
                         Swal.fire('Error', response.message, 'error');
@@ -1654,7 +1377,7 @@
                         });
                         $('#assign_salesperson_modal').modal('hide');
                         setTimeout(function() {
-                            location.reload();
+                            $('#example').DataTable().ajax.reload(null, false);
                         }, 2000);
                     } else {
                         Swal.fire('Error', response.message, 'error');
@@ -1849,7 +1572,7 @@
                         });
                         $('#set_order_model').modal('hide');
                         setTimeout(function() {
-                            location.reload();
+                            $('#example').DataTable().ajax.reload(null, false);
                         }, 2000);
                     }
                 },
@@ -1864,6 +1587,70 @@
             });
         }
     </script>
+    <style>
+        .table-blur {
+            filter: blur(4px);
+            opacity: 0.6;
+            transition: all 0.2s ease-in-out;
+            pointer-events: none;
+        }
+
+        .action-table thead th {
+            background-color: #0040E6 !important;
+            color: #ffffff !important;
+            border-right: 1px solid #FFD312 !important;
+            vertical-align: middle;
+            padding: 12px 10px !important;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .action-table thead th:last-child {
+            border-right: none !important;
+        }
+
+        .action-table thead tr {
+            border-bottom: 2px solid #f39c12 !important;
+        }
+
+        .btn-dot-action::after {
+            display: none !important;
+            /* hide default dropdown arrow if it appears */
+        }
+
+        /* Table Body and Hover styles */
+        .action-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .action-table tbody td {
+            vertical-align: middle;
+            border-right: 1px solid #e9ecef;
+            /* Subtle vertical border normally */
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 10px !important;
+        }
+
+        .action-table tbody td:last-child {
+            border-right: none;
+        }
+
+        /* Hover state for the row */
+        .action-table tbody tr:hover {
+            /* background-color: #f1f5f9 !important; */
+            background: linear-gradient(135deg, rgb(243, 242, 249) 0%, rgb(231, 230, 244) 100%) !important;
+            /* Light gray background */
+        }
+
+        /* Orange vertical borders on hover */
+        .action-table tbody tr:hover td {
+            border-right: 1px solid #f39c12 !important;
+        }
+
+        .action-table tbody tr:hover td:last-child {
+            border-right: none !important;
+        }
+    </style>
     <script>
         $(document).ready(function() {
             // Check if the DataTable instance already exists
@@ -1872,8 +1659,79 @@
                 $('#example').DataTable().destroy();
             }
             // Initialize DataTable with the new options
-            $('#example').dataTable({
-                "searching": true
+            var table = $('#example').DataTable({
+                "stateSave": true,
+                "processing": false,
+                "serverSide": true,
+                "searching": true,
+                "ajax": {
+                    "url": window.location.href,
+                    "type": "GET"
+                },
+                "columns": [
+                    @if (Route::currentRouteName() == 'cleaning_package_order')
+                        {
+                            "data": "checkbox",
+                            "orderable": false,
+                            "searchable": false
+                        },
+                    @else
+                        {
+                            "data": "checkbox",
+                            "orderable": false,
+                            "searchable": false,
+                            "className": "d-none"
+                        },
+                    @endif {
+                        "data": "order_detail",
+                        "orderable": false,
+                        "searchable": false
+                    },
+                    {
+                        "data": "customer_service",
+                        "orderable": false,
+                        "searchable": false
+                    },
+                    {
+                        "data": "status",
+                        "orderable": false,
+                        "searchable": false
+                    },
+                    {
+                        "data": "assign_salesperson",
+                        "orderable": false,
+                        "searchable": false,
+                        "className": "text-center"
+                    },
+                    {
+                        "data": "assign_crew",
+                        "orderable": false,
+                        "searchable": false,
+                        "className": "text-center"
+                    },
+                    {
+                        "data": "assign_vendor",
+                        "orderable": false,
+                        "searchable": false,
+                        "className": "text-center"
+                    },
+                    {
+                        "data": "actions",
+                        "orderable": false,
+                        "searchable": false,
+                        "className": "text-center"
+                    }
+                ]
+            });
+
+            // Add blur effect before AJAX request
+            table.on('preXhr.dt', function(e, settings, data) {
+                $('#example').addClass('table-blur');
+            });
+
+            // Remove blur effect after table draws
+            table.on('draw.dt', function() {
+                $('#example').removeClass('table-blur');
             });
         });
 
@@ -1909,7 +1767,7 @@
                             showConfirmButton: false
                         });
                         setTimeout(function() {
-                            location.reload();
+                            $('#example').DataTable().ajax.reload(null, false);
                         }, 2000);
                     }
                 },
@@ -1952,7 +1810,7 @@
                             showConfirmButton: false
                         });
                         setTimeout(function() {
-                            location.reload();
+                            $('#example').DataTable().ajax.reload(null, false);
                         }, 2000);
                     }
                 },
@@ -1986,7 +1844,7 @@
                             .text(response.message)
                             .fadeIn().delay(2000).fadeOut();
                         //$('#assign_vendor_model_car').modal('hide');
-                        location.reload();
+                        $('#example').DataTable().ajax.reload(null, false);
                     } else {
                         // Error message
                         $('#vendor_message')
@@ -2025,7 +1883,69 @@
             }
 
             var table = $('#example').DataTable({
-                "searching": true
+                "stateSave": true,
+                "processing": false,
+                "serverSide": true,
+                "ajax": {
+                    "url": window.location.href,
+                    "type": "GET"
+                },
+                "columns": [{
+                        data: 'checkbox',
+                        name: 'checkbox',
+                        orderable: false,
+                        searchable: false,
+                        className: '{{ Route::currentRouteName() == 'cleaning_package_order' ? '' : 'd-none' }}'
+                    },
+                    {
+                        data: 'order_detail',
+                        name: 'order_id'
+                    },
+                    {
+                        data: 'customer_service',
+                        name: 'user_name'
+                    },
+                    {
+                        data: 'status',
+                        name: 'order_status',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'assign_salesperson',
+                        name: 'assign_salesperson',
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center"
+                    },
+                    {
+                        data: 'assign_crew',
+                        name: 'assign_crew',
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center"
+                    },
+                    {
+                        data: 'assign_vendor',
+                        name: 'assign_vendor',
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center"
+                    },
+                    {
+                        data: 'actions',
+                        name: 'actions',
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center"
+                    }
+                ],
+                "order": [
+                    [1, 'desc']
+                ],
+                "drawCallback": function(settings) {
+                    initTooltips();
+                }
             });
 
             // Initialize tooltips on first load
@@ -2284,7 +2204,7 @@
                             text: response.message
                         });
 
-                        location.reload();
+                        $('#example').DataTable().ajax.reload(null, false);
 
                     } else {
 

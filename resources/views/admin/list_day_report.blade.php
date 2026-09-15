@@ -384,13 +384,10 @@
 
                                                 
                                                 <td>
-                                                @if($orders->order_status === 'P')
-                                                     <span class="badge-status badge-pending">Pending</span>
-                                                @elseif ($orders->order_status == 'CO')
-                                                    <span class="badge-status badge-completed">Completed</span>
-                                                @elseif ($orders->order_status == 'CL')
-                                                    <span class="badge-status badge-cancelled">Cancelled</span>
-                                                @endif
+                                                @php
+                                                    $statusDetails = \App\Helpers\Helper::getOrderStatusDetails($orders->order_status);
+                                                @endphp
+                                                    <span class="badge {{ $statusDetails['color'] }}">{{ $statusDetails['text'] }}</span>
                                                 </td>
 
                                                 <td>

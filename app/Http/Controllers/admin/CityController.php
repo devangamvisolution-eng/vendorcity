@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\City;
+use App\Models\Admin\City;
 use Session;
 use DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,9 +22,9 @@ class CityController extends Controller
      */
     public function index()
     {
-        $data['city_data'] = City::orderBy('id','DESC')->get();
+        $data['city_data'] = City::orderBy('id', 'DESC')->get();
 
-        return view('admin.list_city',$data);
+        return view('admin.list_city', $data);
     }
 
     /**
@@ -35,10 +35,10 @@ class CityController extends Controller
     public function create()
     {
 
-        $data['country_data'] = DB::table('countries')->select('*')->orderBy('id','DESC')->get();
-        $data['state_data'] = DB::table('states')->select('*')->orderBy('id','DESC')->get();
+        $data['country_data'] = DB::table('countries')->select('*')->orderBy('id', 'DESC')->get();
+        $data['state_data'] = DB::table('states')->select('*')->orderBy('id', 'DESC')->get();
 
-        return view('admin.add_city',$data);
+        return view('admin.add_city', $data);
     }
 
     /**
@@ -57,7 +57,7 @@ class CityController extends Controller
 
         $city->save();
 
-        return redirect()->route('city.index')->with('success','City Added Successfully.');
+        return redirect()->route('city.index')->with('success', 'City Added Successfully.');
     }
 
     /**
@@ -80,12 +80,12 @@ class CityController extends Controller
     public function edit(City $city)
     {
 
-        $data['country_data'] = DB::table('countries')->select('*')->orderBy('id','DESC')->get();       
-        $data['state_data'] = DB::table('states')->select('*')->where('country_id', $city->country)->orderBy('id','DESC')->get();
+        $data['country_data'] = DB::table('countries')->select('*')->orderBy('id', 'DESC')->get();
+        $data['state_data'] = DB::table('states')->select('*')->where('country_id', $city->country)->orderBy('id', 'DESC')->get();
 
         //echo "<pre>";print_r($city->country);echo "</pre>";exit;
-        
-        return view('admin.edit_city',compact('city'),$data);
+
+        return view('admin.edit_city', compact('city'), $data);
     }
 
     /**
@@ -105,7 +105,7 @@ class CityController extends Controller
 
         $city->save();
 
-        return redirect()->route('city.index')->with('success','City Updated Successfully.');
+        return redirect()->route('city.index')->with('success', 'City Updated Successfully.');
     }
 
     /**
@@ -118,35 +118,35 @@ class CityController extends Controller
     {
         $delete_id = $request->selected;
         // echo $delete_id;exit;
-        City::whereIn('id',$delete_id)->delete();
-        return redirect()->route('city.index')->with('success','City Deleted Successfully');
+        City::whereIn('id', $delete_id)->delete();
+        return redirect()->route('city.index')->with('success', 'City Deleted Successfully');
     }
 
-    function state_show(){
+    function state_show()
+    {
         $country_id = $_POST['country_id'];
         //echo $cat_id;exit;
-        $result = DB::table('states')->select('*')->where('country_id','=',$country_id)->get();
+        $result = DB::table('states')->select('*')->where('country_id', '=', $country_id)->get();
 
         $result_new = $result->toArray();
 
         $html = "<select id='state' name='state' class='form-control'>";
         $html .= "<option value=''>Select State</option>";
-        if($result != '' && count($result) >0)
-        {
-            for($i=0;$i<count($result);$i++)
-            {
+        if ($result != '' && count($result) > 0) {
+            for ($i = 0; $i < count($result); $i++) {
                 //echo "<pre>";print_r($result[$i]->id);echo "</pre>";exit;
-                $html .= "<option value='".$result[$i]->id ."'>".$result[$i]->state ."</option>";
+                $html .= "<option value='" . $result[$i]->id . "'>" . $result[$i]->state . "</option>";
             }
         }
-        $html .="</select>";
+        $html .= "</select>";
         //echo "<pre>";print_r($html);echo "</pre>";exit;
         echo $html;
     }
 
-    function bulk_upload_city(Request $request){
+    function bulk_upload_city(Request $request)
+    {
 
-        if($request->input('action') == 'add_bulk'){
+        if ($request->input('action') == 'add_bulk') {
 
 
             $path = $request->file('csv')->getRealPath();
@@ -158,86 +158,85 @@ class CityController extends Controller
             //     }
             // }, $path);
 
-           $data = Excel::toArray(new class implements WithHeadingRow {
-    public function headingRow(): int
-    {
-        return 1; // Skip the header row in the file
-    }
-}, $path)[0];
+            $data = Excel::toArray(new class implements WithHeadingRow {
+                public function headingRow(): int
+                {
+                    return 1; // Skip the header row in the file
+                }
+            }, $path)[0];
 
             if (!empty($data)) {
 
                 foreach ($data[0] as $row) {
 
-                   $countries =  DB::table('countries')
-                                ->where('country', 'LIKE', $row['country'])
-                                ->first();
+                    $countries =  DB::table('countries')
+                        ->where('country', 'LIKE', $row['country'])
+                        ->first();
 
 
-                    
 
-                    if($countries != ''){
+
+                    if ($countries != '') {
                         $country_id = $countries->id;
                         $data_update_country['country'] = $row['country'];
                         //DB::table('countries')->where('id', $country_id)->update($data_update);
-                    }else{
+                    } else {
                         //$country_id = 0;
                         $data_update_country['country'] = $row['country'];
                         $country_id = DB::table('countries')->insertGetId($data_update_country);
                     }
 
                     $states =  DB::table('states')
-                                ->where('country_id', $country_id)
-                                ->where('state', 'LIKE', $row['state'])
-                                ->first();
+                        ->where('country_id', $country_id)
+                        ->where('state', 'LIKE', $row['state'])
+                        ->first();
 
-                    if($states != ''){
+                    if ($states != '') {
                         $states_id = $states->id;
                         $data_update_states['country_id'] = $country_id;
                         $data_update_states['state'] = $row['state'];
                         DB::table('states')->where('id', $states_id)->update($data_update_states);
-                    }else{
+                    } else {
                         $data_update_states['country_id'] = $country_id;
                         $data_update_states['state'] = $row['state'];
                         $states_id = DB::table('states')->insertGetId($data_update_states);
                     }
 
                     $cities =  DB::table('cities')
-                                ->where('country', $country_id)
-                                ->where('state', $states_id)
-                                ->where('name', 'LIKE', $row['cities'])
-                                ->first();
+                        ->where('country', $country_id)
+                        ->where('state', $states_id)
+                        ->where('name', 'LIKE', $row['cities'])
+                        ->first();
 
-                    if($cities != ''){
+                    if ($cities != '') {
                         $data_update_cities['country'] = $country_id;
                         $data_update_cities['state'] = $states_id;
                         $data_update_cities['name'] = $row['cities'];
                         DB::table('cities')->where('id', $cities->id)->update($data_update_cities);
-                    }else{
+                    } else {
 
                         $data_update_cities['country'] = $country_id;
                         $data_update_cities['state'] = $states_id;
                         $data_update_cities['name'] = $row['cities'];
                         $states_id = DB::table('cities')->insertGetId($data_update_cities);
-
                     }
 
                     //echo "<pre>";print_r($cities);echo "</pre>";
                 }
-
             }
             //exit;
-            return redirect()->route('city.index')->with('success','Data Insert Successfully');
+            return redirect()->route('city.index')->with('success', 'Data Insert Successfully');
             //$file = $request->file('csv');
 
-            
+
         }
 
         return view('admin.bulk_city_upload');
     }
 
-    function xlsupload(Request $request){
-        
+    function xlsupload(Request $request)
+    {
+
 
         ini_set('memory_limit', '-1');
 
@@ -279,9 +278,9 @@ class CityController extends Controller
                         'country' => $country,
                     ];
 
-                    $check = DB::table('cities')->where('id',$id)->first();
+                    $check = DB::table('cities')->where('id', $id)->first();
 
-                    if(empty($check)){
+                    if (empty($check)) {
                         DB::table('cities')->insert($data);
                     }
 
@@ -289,7 +288,6 @@ class CityController extends Controller
                     //echo "<pre>";print_r($data);echo"</pre>";exit;
 
                 }
-
             }
 
             return redirect()->route('city.index')->with('success', 'Your Data File Uploaded Successfully.!!');

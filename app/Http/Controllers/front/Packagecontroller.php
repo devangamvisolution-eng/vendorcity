@@ -473,7 +473,7 @@ class Packagecontroller extends Controller
             ->where('city', $cityId)
             ->get();
 
-        // FAQ: load only entries linked to this subservice
+        // FAQ: load only entries linked to this subservice (Reverted to MySQL for speed)
         $data['faq_data'] = DB::table('faqs')
             ->whereRaw("FIND_IN_SET(?, packages)", [$subservice_id])
             ->get();
@@ -492,7 +492,7 @@ class Packagecontroller extends Controller
             }
         }
 
-        // Google Reviews: load only entries linked to this subservice
+        // Google Reviews: load only entries linked to this subservice (Reverted to MySQL for speed)
         $data['google_reviews_data'] = DB::table('googlereviews')
             ->whereRaw("FIND_IN_SET(?, subservice_id)", [$subservice_id])
             ->get();
@@ -504,16 +504,16 @@ class Packagecontroller extends Controller
             ->orderBy("set_order", 'asc')
             ->get()->toArray();
 
+        $active_package_category_ids = DB::table('packages')
+            ->where('service_id', $service_id)
+            ->where('subservice_id', $subservice_id)
+            ->where('is_active', 0)
+            ->pluck('packagecategory_id')
+            ->toArray();
+
         $filtered_package_cat = [];
         foreach ($package_cats as $cat) {
-            $has_packages = DB::table('packages')
-                ->where('service_id', $service_id)
-                ->where('subservice_id', $subservice_id)
-                ->where('packagecategory_id', $cat->id)
-                ->where('is_active', 0)
-                ->exists();
-
-            if ($has_packages) {
+            if (in_array($cat->id, $active_package_category_ids)) {
                 $filtered_package_cat[] = $cat;
             }
         }
@@ -529,7 +529,7 @@ class Packagecontroller extends Controller
         $data['timeslot'] = DB::table('time_slots')->orderBy('set_order', 'asc')->get()->toArray();
         $data['allcleaners'] = DB::table('users')->where('role_id', '16')
             ->where('is_active', 0)
-            //->whereRaw("FIND_IN_SET(?, city)", [17])
+            ->whereRaw("FIND_IN_SET(?, city)", [session('search_city_id', 17)]) // Restored City Filter
             ->whereRaw("FIND_IN_SET(?, service)", [$service_id])
             ->whereRaw("FIND_IN_SET(?, subservice)", [$subservice_id])
             ->orderBy('id', 'asc') // Ensures the first cleaner is prioritized

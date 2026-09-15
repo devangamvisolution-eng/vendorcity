@@ -9,10 +9,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (currentSubserviceId) {
         const lastServiceId = localStorage.getItem('lastServiceId');
         if (lastServiceId && lastServiceId !== currentSubserviceId) {
-            localStorage.removeItem('currentStep'); // Resets funnel to Step 1
+            localStorage.removeItem('currentStep');
+            sessionStorage.removeItem('currentStep');
         }
         localStorage.setItem('lastServiceId', currentSubserviceId);
     }
+
     let steps = Array.from(document.querySelectorAll(".step-content")).filter(
         (el) => el.id.match(/^step\d+$/),
     );

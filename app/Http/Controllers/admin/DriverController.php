@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\UserPermission;
+use App\Models\Admin\UserPermission;
 use App\Models\User;
 use DB;
 use Auth;
@@ -19,16 +19,16 @@ class DriverController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {   
+    {
         $user = Auth::user();
 
-        if($user->role_id == 1){
-            $data['driver_data'] = DB::table('users')->where('role_id','=','15')->get();
-        }else{
-             $data['driver_data'] = DB::table('users')->where('role_id','=','15')->where('added_by',$user->id)->get();
+        if ($user->role_id == 1) {
+            $data['driver_data'] = DB::table('users')->where('role_id', '=', '15')->get();
+        } else {
+            $data['driver_data'] = DB::table('users')->where('role_id', '=', '15')->where('added_by', $user->id)->get();
         }
 
-       return view('admin.list_driver',$data);
+        return view('admin.list_driver', $data);
     }
 
     /**
@@ -38,9 +38,9 @@ class DriverController extends Controller
      */
     public function create()
     {
-        $user_data['user_category'] =UserPermission::where('id','=','15')->get(); 
+        $user_data['user_category'] = UserPermission::where('id', '=', '15')->get();
 
-        return view('admin.add_driver',$user_data);
+        return view('admin.add_driver', $user_data);
     }
 
     /**
@@ -55,7 +55,7 @@ class DriverController extends Controller
 
         // echo"<pre>";print_r($user);die;
 
-        $data = Validator::make($request->all(),[
+        $data = Validator::make($request->all(), [
             'user_id'   => 'required',
             'name'      => 'required',
             'user_name' => 'required',
@@ -64,21 +64,21 @@ class DriverController extends Controller
             'mobile'    => 'required|numeric|digits:10'
         ]);
 
-        if($data->fails()){
+        if ($data->fails()) {
             return redirect()->back()->withErrors($data)->withInput();
         }
-        
-        $data =new User;
+
+        $data = new User;
         $data->role_id   = $request->user_id;
         $data->name      = $request->name;
         $data->user_name = $request->user_name;
         $data->email     = $request->email;
-        $data->password  = Hash::make($request->password);     
+        $data->password  = Hash::make($request->password);
         $data->mobile    = $request->mobile;
         $data->added_by  = $user->id;
-        $data->vendor    = 0; 
-        $data->save();      
-        return redirect()->route('driver.index')->with('success','Driver Added Successfully.');
+        $data->vendor    = 0;
+        $data->save();
+        return redirect()->route('driver.index')->with('success', 'Driver Added Successfully.');
     }
 
     /**
@@ -100,11 +100,11 @@ class DriverController extends Controller
      */
     public function edit($id)
     {
-        $data['driver'] = DB::table('users')->where('id' , '=' , $id)->first(); 
+        $data['driver'] = DB::table('users')->where('id', '=', $id)->first();
 
         $data['user_category'] = DB::select('select * from user_permissions');
 
-        return view('admin.edit_driver',$data);
+        return view('admin.edit_driver', $data);
     }
 
     /**
@@ -121,9 +121,9 @@ class DriverController extends Controller
         $data->user_name      = $request->user_name;
         $data->email      = $request->email;
         // $data->password      = $request->password;     
-        $data->mobile      = $request->mobile; 
+        $data->mobile      = $request->mobile;
         $data->save();
-        return redirect()->route('driver.index')->with('success','Driver Updated Successfully.');
+        return redirect()->route('driver.index')->with('success', 'Driver Updated Successfully.');
     }
 
     /**
@@ -134,8 +134,8 @@ class DriverController extends Controller
      */
     public function destroy(Request $request)
     {
-        $delete_id = $request->selected;         
-        DB::table('users')->whereIn('id',$delete_id)->delete();
-        return redirect()->route('driver.index')->with('success','Driver Deleted Successfully.');
+        $delete_id = $request->selected;
+        DB::table('users')->whereIn('id', $delete_id)->delete();
+        return redirect()->route('driver.index')->with('success', 'Driver Deleted Successfully.');
     }
 }

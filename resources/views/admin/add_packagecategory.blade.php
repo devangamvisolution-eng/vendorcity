@@ -98,6 +98,11 @@
                                         name="app_slider_image">
                                 </div>
 
+                                <div class="form-group">
+                                    <label>Card Image (Optional, for category card fallback display)</label>
+                                    <input type="file" class="form-control" id="card_image" name="card_image">
+                                </div>
+
 
 
                             </div>

@@ -1,12 +1,15 @@
 <?php
+
 namespace App\Http\Controllers\admin;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\admin\UserPermission;
+use App\Models\Admin\UserPermission;
 use Illuminate\Support\Facades\Hash;
 use DB;
-use DateTime; 
+use DateTime;
+
 class Admin_userController extends Controller
 {
     /**
@@ -16,8 +19,8 @@ class Admin_userController extends Controller
      */
     public function index()
     {
-        $data['user_data'] = DB::table('users')->orderBy('id','DESC')->where('vendor',0)->get();           
-        return view('admin.list_admin_user',$data);
+        $data['user_data'] = DB::table('users')->orderBy('id', 'DESC')->where('vendor', 0)->get();
+        return view('admin.list_admin_user', $data);
     }
     /**
      * Show the form for creating a new resource.
@@ -26,9 +29,9 @@ class Admin_userController extends Controller
      */
     public function create()
     {
-        $user_data['user_category'] =UserPermission::get(); 
+        $user_data['user_category'] = UserPermission::get();
         // $user_data['user_category'] =DB::table('users')->get();               
-        return view('admin.add_admin_user',$user_data);
+        return view('admin.add_admin_user', $user_data);
     }
     /**
      * Store a newly created resource in storage.
@@ -38,16 +41,16 @@ class Admin_userController extends Controller
      */
     public function store(Request $request)
     {
-        $data =new User;
+        $data = new User;
         $data->role_id      = $request->user_id;
         $data->name      = $request->name;
         $data->user_name      = $request->user_name;
         $data->email      = $request->email;
-        $data->password      = Hash::make($request->password);     
+        $data->password      = Hash::make($request->password);
         $data->mobile      = $request->mobile;
-        $data->vendor=0; 
-        $data->save();      
-        return redirect()->route('adminuser.index')->with('success','User Added Successfully.');
+        $data->vendor = 0;
+        $data->save();
+        return redirect()->route('adminuser.index')->with('success', 'User Added Successfully.');
     }
     /**
      * Display the specified resource.
@@ -55,9 +58,7 @@ class Admin_userController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show()
-    {
-    }
+    public function show() {}
     /**
      * Show the form for editing the specified resource.
      *
@@ -65,10 +66,10 @@ class Admin_userController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {     
-        $adminuser = DB::table('users')->where('id' , '=' , $id)->first();       
+    {
+        $adminuser = DB::table('users')->where('id', '=', $id)->first();
         $data['user_category'] = DB::select('select * from user_permissions');
-        return view('admin.edit_admin_user',compact('adminuser'),$data);
+        return view('admin.edit_admin_user', compact('adminuser'), $data);
     }
     /**
      * Update the specified resource in storage.
@@ -85,9 +86,9 @@ class Admin_userController extends Controller
         $data->user_name      = $request->user_name;
         $data->email      = $request->email;
         // $data->password      = $request->password;     
-        $data->mobile      = $request->mobile; 
+        $data->mobile      = $request->mobile;
         $data->save();
-        return redirect()->route('adminuser.index')->with('success','User Updated Successfully.');
+        return redirect()->route('adminuser.index')->with('success', 'User Updated Successfully.');
     }
     /**
      * Remove the specified resource from storage.
@@ -96,31 +97,32 @@ class Admin_userController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request)
-    {         
-        $delete_id = $request->selected;         
-        DB::table('users')->whereIn('id',$delete_id)->delete();
-        return redirect()->route('adminuser.index')->with('success','User Deleted Successfully.');
+    {
+        $delete_id = $request->selected;
+        DB::table('users')->whereIn('id', $delete_id)->delete();
+        return redirect()->route('adminuser.index')->with('success', 'User Deleted Successfully.');
     }
 
-    function change_status_adminuser(){
+    function change_status_adminuser()
+    {
 
 
-        
-        $id=$_POST['id'];
 
-        $value=$_POST['value'];  
-        
+        $id = $_POST['id'];
+
+        $value = $_POST['value'];
+
         // echo"<pre>";
         // print_r($_POST);
         // echo"</pre>";exit;
-        
-        if($value == 0){
 
-            $vendor_data = DB::table('users')->where('id',$id)->first();
+        if ($value == 0) {
+
+            $vendor_data = DB::table('users')->where('id', $id)->first();
 
             $dateTime = new DateTime($vendor_data->created_at);
             $year = $dateTime->format("y");
-            
+
             $vendorId = $vendor_data->vendor_id;
 
             $htmll = '<!doctype html> <html>
@@ -207,31 +209,31 @@ class Admin_userController extends Controller
                             font-size:14px;line-height:24px;
                             font-family:Helvetica Neue, Helvetica, Helvetica, Arial, sans-serif;color:#555;padding:50px 0;">
                     <div class="logo" style="float: inherit;border-bottom: 4px solid #FFD413;">
-                    <img src="'.asset("public/site/images/VC-FULL-COLOR.png").'"" style="width: 40%;" >
+                    <img src="' . asset("public/site/images/VC-FULL-COLOR.png") . '"" style="width: 40%;" >
                     </div>
                     <div class="email_wrapper" style="width:100%;margin-top: 18px;font-size: 16px;">
-                            <p>Dear '.$vendor_data->name.',</p>
+                            <p>Dear ' . $vendor_data->name . ',</p>
                             
                             <p>Congratulations! We are delighted to inform you that your registration as a vendor on VendorsCity has been accepted. Welcome aboard!</p>';
 
-                            $htmll_service = '<strong>Services Offered:</strong> ';
-                            $services = explode(',', $vendor_data->serviceList);
-                            $count = count($services);
-                            foreach($services as $key => $service){
+            $htmll_service = '<strong>Services Offered:</strong> ';
+            $services = explode(',', $vendor_data->serviceList);
+            $count = count($services);
+            foreach ($services as $key => $service) {
 
-                                $htmll_service .= \Helper::servicename($service);
-                                if ($key < $count - 1) {
-                                    $htmll_service .= ', '; // Add comma and space for all except the last item
-                                }
-                                  }
-                            
-                            $htmll .='<p><strong>Your Vendor ID:</strong> '.$vendorId.' <br> '.$htmll_service.'</p>';
+                $htmll_service .= \Helper::servicename($service);
+                if ($key < $count - 1) {
+                    $htmll_service .= ', '; // Add comma and space for all except the last item
+                }
+            }
 
-                           
-                            
-                            $htmll .=' 
+            $htmll .= '<p><strong>Your Vendor ID:</strong> ' . $vendorId . ' <br> ' . $htmll_service . '</p>';
 
-                            <p><strong>Your Vendor Login Details:</strong> <br>Email: '.$vendor_data->email.'</p>
+
+
+            $htmll .= ' 
+
+                            <p><strong>Your Vendor Login Details:</strong> <br>Email: ' . $vendor_data->email . '</p>
                             <p>You can now access your vendor dashboard and start offering your services to our customers. Here are some key actions you can take in your dashboard:</p>
                             <ol>
                                 <li><b>Manage Bookings:</b> View, accept, manage bookings and quote requests from customers.
@@ -243,7 +245,7 @@ class Admin_userController extends Controller
                                 </li>
                             </ol>
 
-                            <p><a class="btnlink" href="'.url("admin").'" style=" background: #0040E6;color: #fff !important;text-decoration: none;width: 100%;display: block;padding: 9px 0;text-align: center;font-size: 16px; border-radius: 9px;">Get Started</a></p>
+                            <p><a class="btnlink" href="' . url("admin") . '" style=" background: #0040E6;color: #fff !important;text-decoration: none;width: 100%;display: block;padding: 9px 0;text-align: center;font-size: 16px; border-radius: 9px;">Get Started</a></p>
 
                             <p>If you have any questions or need assistance, feel free to reach out to us at <a href="mailto:vendors@vendorscity.com">vendors@vendorscity.com</a>. We are here to support you throughout your journey with VendorsCity.
                             </p>
@@ -261,16 +263,16 @@ class Admin_userController extends Controller
                             display: flex; ">
                                 <div class="footer_left" style="width: 100px;
                             float: left;">
-                                    <img style="width:70%;" src="'.asset("public/site/images/vcfaviconwap.png").'"" >
+                                    <img style="width:70%;" src="' . asset("public/site/images/vcfaviconwap.png") . '"" >
                                 </div>
                                 <div class="footer_right" style="margin-left:10px;
                                 float: left;">
                                     <p style="margin:0;">Questions? Email <a style="color: #555;" href="mailto:vendors@vendorscity.com">vendors@vendorscity.com</a></p>
                                     <p style="margin:0;">VendorsCity Portal LLC</p>
                                     <div class="footer_links" style=" margin:10px 0;">
-                                <a href="'.url("/terms-of-service").'"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
-                                <a href="'.url("/privacy-policy").'"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
-                                <a href="'.url("/contact").'"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
+                                <a href="' . url("/terms-of-service") . '"  style="width: 100%;color: #555;display: inline-block;">Terms of Use</a>
+                                <a href="' . url("/privacy-policy") . '"  style="width: 100%;color: #555;display: inline-block;">Privacy Policy</a>
+                                <a href="' . url("/contact") . '"  style="width: 100%;color: #555;display: inline-block;">Contact Us</a>
                                 </div>
                                 </div>
                             </div>
@@ -283,9 +285,9 @@ class Admin_userController extends Controller
             // echo"<pre>";print_r($vendor_data);echo"</pre>";exit;
 
             $subject = "Important Update: Your Vendor Account at VendorsCity";
-            $admin = $vendor_data->email;                  
+            $admin = $vendor_data->email;
             $ccRecipients = [];
-            
+
             // Mail::send([], [], function($message) use($htmll, $admin, $subject,$ccRecipients) {
             //     $message->to($admin);
             //     $message->subject($subject);
@@ -296,8 +298,8 @@ class Admin_userController extends Controller
             // });
         }
 
-        DB::table('users')->where('id',$id)->update(array('is_active'=>$value));
+        DB::table('users')->where('id', $id)->update(array('is_active' => $value));
 
-        echo"1";
+        echo "1";
     }
 }

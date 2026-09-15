@@ -1,6 +1,5 @@
 @extends('admin.includes.Template')
 @section('content')
-
     @php
         $userId = Auth::id();
         $get_user_data = Helper::get_user_data($userId);
@@ -9,7 +8,11 @@
         foreach ($roleIds as $roleId) {
             $roleId = trim($roleId);
             $get_permission_data = Helper::get_permission_data($roleId);
-            if (is_object($get_permission_data) && property_exists($get_permission_data, 'editperm') && $get_permission_data->editperm !== '') {
+            if (
+                is_object($get_permission_data) &&
+                property_exists($get_permission_data, 'editperm') &&
+                $get_permission_data->editperm !== ''
+            ) {
                 $edit_perm = array_merge($edit_perm, explode(',', $get_permission_data->editperm));
             }
         }
@@ -103,10 +106,12 @@
                         <li class='breadcrumb-item'><a href="{{ url('/admin') }}">Dashboard</a></li>
                         <li class='breadcrumb-item active'>Cleaning Subscription Frequencies</li>
                     </ul>
-                </div>@if(in_array('78', $edit_perm))
+                </div>
+                {{-- @if (in_array('78', $edit_perm))
                     <div class='col-auto'><a class='btn btn-primary btn-premium'
                             href="{{ route('cleaning-subscription-frequencies.create') }}"><i class='fas fa-plus'></i> Add
-                New</a></div>@endif
+                            New</a></div>
+                @endif --}}
             </div>
         </div>
         <div class='row'>
@@ -126,52 +131,57 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>@foreach($data as $row)<tr>
-                                    <td>{{ $row->id }}</td>
-                                    <td>{{ $row->visits_per_week }}</td>
-                                    <td>{{ $row->label }}</td>
-                                    <td>{{ $row->set_order }}</td>
-                                    <td>
-                                        <span
-                                            class="badge {{ $row->is_active_web ? 'bg-success' : 'bg-danger' }}">{{ $row->is_active_web ? 'Active' : 'Deactive' }}</span>
-                                    </td>
-                                    <td>
-                                        <span
-                                            class="badge {{ $row->is_active_app ? 'bg-success' : 'bg-danger' }}">{{ $row->is_active_app ? 'Active' : 'Deactive' }}</span>
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-warning text-warning fw-bold"
-                                                type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                                style="border: 1px solid #ffc107; background: transparent; padding: 4px 10px; border-radius: 6px;">
-                                                ...
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                                @if(in_array('78', $edit_perm))
-                                                    <li>
-                                                        <a class="dropdown-item py-2"
-                                                            href="{{ route('cleaning-subscription-frequencies.edit', $row->id) }}">
-                                                            <i class="fas fa-edit text-primary me-2"></i> Edit
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <form id="delete-form-{{ $row->id }}"
-                                                            action="{{ route('cleaning-subscription-frequencies.destroy', $row->id) }}"
-                                                            method="POST" style="display:inline;" class="delete-form">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="button"
-                                                                class="dropdown-item py-2 delete-btn text-danger"
-                                                                onclick="confirmDelete({{ $row->id }})">
-                                                                <i class="fas fa-trash me-2"></i> Delete
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                @endif
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>@endforeach</tbody>
+                                <tbody>
+                                    @foreach ($data as $row)
+                                        <tr>
+                                            <td>{{ $row->id }}</td>
+                                            <td>{{ $row->visits_per_week }}</td>
+                                            <td>{{ $row->label }}</td>
+                                            <td>{{ $row->set_order }}</td>
+                                            <td>
+                                                <span
+                                                    class="badge {{ $row->is_active_web ? 'bg-success' : 'bg-danger' }}">{{ $row->is_active_web ? 'Active' : 'Deactive' }}</span>
+                                            </td>
+                                            <td>
+                                                <span
+                                                    class="badge {{ $row->is_active_app ? 'bg-success' : 'bg-danger' }}">{{ $row->is_active_app ? 'Active' : 'Deactive' }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-warning text-warning fw-bold"
+                                                        type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                                        style="border: 1px solid #ffc107; background: transparent; padding: 4px 10px; border-radius: 6px;">
+                                                        ...
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                                        @if (in_array('78', $edit_perm))
+                                                            <li>
+                                                                <a class="dropdown-item py-2"
+                                                                    href="{{ route('cleaning-subscription-frequencies.edit', $row->id) }}">
+                                                                    <i class="fas fa-edit text-primary me-2"></i> Edit
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <form id="delete-form-{{ $row->id }}"
+                                                                    action="{{ route('cleaning-subscription-frequencies.destroy', $row->id) }}"
+                                                                    method="POST" style="display:inline;"
+                                                                    class="delete-form">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    {{-- <button type="button"
+                                                                        class="dropdown-item py-2 delete-btn text-danger"
+                                                                        onclick="confirmDelete({{ $row->id }})">
+                                                                        <i class="fas fa-trash me-2"></i> Delete
+                                                                    </button> --}}
+                                                                </form>
+                                                            </li>
+                                                        @endif
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -182,11 +192,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        @if(session('success'))
+        @if (session('success'))
             Swal.fire({
                 icon: 'success',
                 title: 'Success',
-                text: '{{ session("success") }}',
+                text: '{{ session('success') }}',
                 showConfirmButton: false,
                 timer: 1500
             });
@@ -215,7 +225,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             if (!$.fn.DataTable.isDataTable(".premium-table")) {
                 $(".premium-table").DataTable({
                     "pageLength": 25,
@@ -224,5 +234,4 @@
             }
         });
     </script>
-
 @endsection

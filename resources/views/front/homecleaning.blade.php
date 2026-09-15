@@ -1,6 +1,6 @@
 @include('front.includes.header')
-<link rel="stylesheet" href="{{ asset('public/site/css/homecleaning.css') }}">
-<link rel="stylesheet" href="{{ asset('public/site/css/homedirham.css') }}">
+<link rel="stylesheet" href="{{ asset('public/site/css/homecleaning.css?v=15') }}">
+<link rel="stylesheet" href="{{ asset('public/site/css/homedirham.css?v=15') }}">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
     /* .currency_dhiramnew {
@@ -445,6 +445,8 @@
                     @csrf
                     <input type="hidden" name="service_id" id="service_id" value="{{ $service_id }}">
                     <input type="hidden" name="subservice_id" id="subservice_id" value="{{ $subservice_id }}">
+                    <input type="hidden" name="applied_discount_percentage" id="applied_discount_percentage"
+                        value="0">
                     <div class="main-content ">
 
                         <div class="step-content active" id="step1">
@@ -785,6 +787,13 @@
                                         <label for="Sunday">Sunday</label>
                                     </div>
 
+                                    <div id="dynamic_discount_alert" class="alert alert-success mt-3"
+                                        style="display: none; background-color: #cbeea2; color: #333; border: none; border-radius: 8px;">
+                                        <i class="fas fa-tag"></i> Congrats! You saved <b
+                                            id="dynamic_discount_text"></b>% by choosing <b
+                                            id="dynamic_days_text"></b> days.
+                                    </div>
+
                                     <p class="form-error-text"
                                         id="which_day_of_the_week_do_you_want_the_service_error"
                                         style="color: red; margin-top: 10px;">
@@ -795,8 +804,8 @@
                                 <div class="form-group mb-3">
                                     <label class="form-label fw500 dark-color cleaning-mobile" for="country">Need
                                         cleaning materials? </label>
-                                    <img src="{{ asset('public/site/images/dettol.png') }}"
-                                        style="height: 25px;margin-right:-13px;">
+                                    <img src="{{ asset('public/site/images/dettol.png') }}" width="75"
+                                        height="25" style="height: 25px; width: auto; margin-right:-13px;">
                                     <p class="dettol">Powered by Dettol</p>
                                     @if ($subservice_id == 28)
                                         <span>
@@ -852,7 +861,7 @@
                                                 class="mabrook-saving-amount">0.00</span></span>.
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-8 col-lg-6 col-sm-6 col-8">
+                                        <div class="col-md-8 col-lg-6 col-sm-6 col-8 d-lg-none">
                                             <div class="mobile_totalnew">
                                                 <div class="font-weight-bold">
                                                     {{-- <div class="cross_amount_div" style="display: none;">
@@ -873,8 +882,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-lg-6 col-sm-6 col-4">
-                                            <button class="btn btn-primary custome-black" onclick="nextStep()"
+                                        <div class="col-md-4 col-lg-12 col-sm-6 col-4">
+                                            <button class="btn btn-primary custome-black w-100" onclick="nextStep()"
                                                 type="button">Next</button>
                                         </div>
                                     </div>
@@ -987,8 +996,6 @@
                                 </div>
 
                                 <div class="step-buttons">
-                                    <button class="btn btn-secondary custome-black" type="button"
-                                        onclick="prevStep()">Back</button>
                                     <div class="sticky-footer-btn">
                                         <div class="mabrook-saving-banner d-none">
                                             <span>🎉 Mabrook! You are saving</span> <span class="price-wrapper"><span
@@ -996,8 +1003,9 @@
                                                     style="font-size: 12px;">AED</span><span
                                                     class="mabrook-saving-amount">0.00</span></span>.
                                         </div>
-                                        <div class="row align-items-center">
-                                            <div class="col-md-8 col-lg-6 col-sm-6 col-8">
+                                        <div class="row w-100 m-0 align-items-center">
+                                            <div class="col-md-5 col-lg-4 col-sm-5 col-4 d-lg-none"
+                                                style="padding-left:0;">
                                                 <div class="mobile_totalnew">
                                                     <div class="font-weight-bold">
                                                         {{-- <div class="cross_amount_div" style="display: none;">
@@ -1017,9 +1025,13 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4 col-lg-6 col-sm-6 col-4">
-                                                <button class="btn btn-primary custome-black" type="button"
-                                                    onclick="nextStep()">Next</button>
+                                            <div class="col-md-7 col-lg-12 col-sm-7 col-8 d-flex justify-content-between"
+                                                style="padding-right:0;">
+                                                <button class="btn btn-secondary custome-black mr-2"
+                                                    style="width: 48%;" type="button"
+                                                    onclick="prevStep()">Back</button>
+                                                <button class="btn btn-primary custome-black" style="width: 48%;"
+                                                    type="button" onclick="nextStep()">Next</button>
                                             </div>
                                         </div>
 
@@ -1105,16 +1117,15 @@
                             </div>
 
                             <div class="step-buttons">
-                                <button class="btn btn-secondary custome-black" onclick="prevStep()"
-                                    type="button">Back</button>
                                 <div class="sticky-footer-btn">
                                     <div class="mabrook-saving-banner d-none">
                                         <span>🎉 Mabrook! You are saving</span> <span class="price-wrapper"><span
                                                 class="currency_dhiramnew" style="font-size: 12px;">AED</span><span
                                                 class="mabrook-saving-amount">0.00</span></span>.
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-8 col-lg-6 col-sm-6 col-8">
+                                    <div class="row w-100 m-0 align-items-center">
+                                        <div class="col-md-5 col-lg-4 col-sm-5 col-4 d-lg-none"
+                                            style="padding-left:0;">
                                             <div class="mobile_totalnew">
                                                 <div class="font-weight-bold">
                                                     {{-- <div class="cross_amount_div" style="display: none;">
@@ -1134,9 +1145,12 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-lg-6 col-sm-6 col-4">
-                                            <button class="btn btn-primary custome-black" onclick="nextStep()"
-                                                type="button">Next</button>
+                                        <div class="col-md-7 col-lg-12 col-sm-7 col-8 d-flex justify-content-between"
+                                            style="padding-right:0;">
+                                            <button class="btn btn-secondary custome-black mr-2" style="width: 48%;"
+                                                onclick="prevStep()" type="button">Back</button>
+                                            <button class="btn btn-primary custome-black" style="width: 48%;"
+                                                onclick="nextStep()" type="button">Next</button>
                                         </div>
                                     </div>
 
@@ -1161,25 +1175,8 @@
                                             preferred cleaner</label>
 
                                         @php
-                                            $firstCleaner = DB::table('users')
-                                                ->where('role_id', '16')
-                                                ->where('is_active', 0)
-                                                ->whereRaw('FIND_IN_SET(?, city)', [17])
-                                                ->whereRaw('FIND_IN_SET(?, service)', [$service_id])
-                                                ->whereRaw('FIND_IN_SET(?, subservice)', [$subservice_id])
-                                                ->orderBy('id', 'asc') // Ensures the first cleaner is prioritized
-                                                ->limit(1);
-
-                                            $otherCleaners = DB::table('users')
-                                                ->where('role_id', '16')
-                                                ->where('is_active', 0)
-                                                //->where('area', 'LIKE', '%' . $user_data->area . '%')
-                                                ->whereRaw('FIND_IN_SET(?, city)', [17])
-                                                ->whereRaw('FIND_IN_SET(?, service)', [$service_id])
-                                                ->whereRaw('FIND_IN_SET(?, subservice)', [$subservice_id]);
-
-                                            $cleaners = $firstCleaner->union($otherCleaners)->get();
-
+                                            // Controller already fetches and filters $allcleaners via MySQL
+                                            $cleaners = $allcleaners;
                                         @endphp
                                         <div id="select_your_cleaner_slider_spatie" class="splide radio-group">
                                             <div class="splide__track">
@@ -1313,15 +1310,21 @@
                                     <label class="form-label fw500 dark-color" for="country">What time would you like
                                         us to start?</label>
                                     <div class="radio-group time-slot-grid time_replace_ab">
-                                        @php $i = 1; @endphp
+                                        @php
+                                            $i = 1;
+                                            // Pre-fetch timeslot prices to prevent N+1 queries in the loop
+                                            $all_timeslot_services = DB::table('subservice_timeslot_price')
+                                                ->where('subservice_id', $subservice_id)
+                                                ->where('is_active', 1)
+                                                ->get();
+                                        @endphp
 
                                         @foreach ($timeslot as $timeslot_data)
                                             @php
-                                                $timeslot_service = DB::table('subservice_timeslot_price')
-                                                    ->where('subservice_id', $subservice_id)
-                                                    ->where('time_slot_id', $timeslot_data->id)
-                                                    ->where('is_active', 1)
-                                                    ->first();
+                                                $timeslot_service = $all_timeslot_services->firstWhere(
+                                                    'time_slot_id',
+                                                    $timeslot_data->id,
+                                                );
 
                                                 $price =
                                                     $timeslot_service && $timeslot_service->price > 0
@@ -1399,16 +1402,15 @@
                                 @endif
                             </div>
                             <div class="step-buttons">
-                                <button class="btn btn-secondary custome-black" onclick="prevStep()"
-                                    type="button">Back</button>
                                 <div class="sticky-footer-btn">
                                     <div class="mabrook-saving-banner d-none">
                                         <span>🎉 Mabrook! You are saving</span> <span class="price-wrapper"><span
                                                 class="currency_dhiramnew" style="font-size: 12px;">AED</span><span
                                                 class="mabrook-saving-amount">0.00</span></span>.
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-8 col-lg-6 col-sm-6 col-8">
+                                    <div class="row w-100 m-0 align-items-center">
+                                        <div class="col-md-5 col-lg-4 col-sm-5 col-4 d-lg-none"
+                                            style="padding-left:0;">
                                             <div class="mobile_totalnew">
                                                 <div class="font-weight-bold">
                                                     {{-- <div class="cross_amount_div" style="display: none;">
@@ -1428,9 +1430,12 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-lg-6 col-sm-6 col-4">
-                                            <button class="btn btn-primary custome-black" onclick="nextStep()"
-                                                type="button">Next</button>
+                                        <div class="col-md-7 col-lg-12 col-sm-7 col-8 d-flex justify-content-between"
+                                            style="padding-right:0;">
+                                            <button class="btn btn-secondary custome-black mr-2" style="width: 48%;"
+                                                onclick="prevStep()" type="button">Back</button>
+                                            <button class="btn btn-primary custome-black" style="width: 48%;"
+                                                onclick="nextStep()" type="button">Next</button>
                                         </div>
                                     </div>
 
@@ -1454,7 +1459,7 @@
                                         style="color: #aaa; cursor: pointer; margin-left: 2px; font-size: 1rem;"
                                         data-bs-toggle="modal" data-bs-target="#tabby_info_popup"></i>
                                 </div>
-                                <img src="{{ asset('public/site/images/tabby-badge.png') }}"
+                                <img loading="lazy" src="{{ asset('public/site/images/tabby-badge.png') }}"
                                     style="height: 20px; object-fit: contain; margin-left: 8px;">
                             </div> --}}
                             <div class="form-group mb-4 payment-selection-container">
@@ -1506,7 +1511,7 @@
                                                     <span class="payment-radio-circle"></span>
                                                     Tabby
                                                 </div>
-                                                <img src="{{ asset('public/site/images/tabby-badge.png') }}"
+                                                <img loading="lazy" src="{{ asset('public/site/images/tabby-badge.png') }}"
                                                     style="height: 18px; object-fit: contain;">
                                             </div>
                                         </div>
@@ -1633,17 +1638,15 @@
 
                             </div>
                             <div class="step-buttons">
-                                <button class="btn btn-secondary custome-black" type="button"
-                                    onclick="prevStep()">Back</button>
-
                                 <div class="sticky-footer-btn">
                                     <div class="mabrook-saving-banner d-none">
                                         <span>🎉 Mabrook! You are saving</span> <span class="price-wrapper"><span
                                                 class="currency_dhiramnew" style="font-size: 12px;">AED</span><span
                                                 class="mabrook-saving-amount">0.00</span></span>.
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-8 col-lg-6 col-sm-6 col-7">
+                                    <div class="row w-100 m-0 align-items-center">
+                                        <div class="col-md-5 col-lg-4 col-sm-5 col-4 d-lg-none"
+                                            style="padding-left:0;">
                                             <div class="mobile_totalnew">
                                                 <div class="font-weight-bold">
                                                     {{-- <div class="cross_amount_div" style="display: none;">
@@ -1663,16 +1666,22 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-lg-6 col-sm-6 col-5">
-                                            <button
-                                                class="ud-btn btn-thm default-box-shadow2 order_now custome-black book-now-web"
-                                                type="button" disabled id="spinner_button" style="display: none;">
-                                                <span class="spinner-border spinner-border-sm" role="status"
-                                                    aria-hidden="true"></span>
-                                                Loading...</button>
-                                            <button type="button"
-                                                class="ud-btn btn-thm default-box-shadow2 order_now custome-black book-now-web finalbooknow"
-                                                id="nextBtn12" onclick="nextStep()">Book Now </button>
+                                        <div class="col-md-7 col-lg-12 col-sm-7 col-8 d-flex justify-content-between"
+                                            style="padding-right:0;">
+                                            <button class="btn btn-secondary custome-black mr-2" style="width: 48%;"
+                                                type="button" onclick="prevStep()">Back</button>
+                                            <div class="d-flex justify-content-end" style="width: 48%;">
+                                                <button
+                                                    class="ud-btn btn-thm default-box-shadow2 order_now custome-black book-now-web w-100"
+                                                    type="button" disabled id="spinner_button"
+                                                    style="display: none;">
+                                                    <span class="spinner-border spinner-border-sm" role="status"
+                                                        aria-hidden="true"></span>
+                                                    Loading...</button>
+                                                <button type="button"
+                                                    class="ud-btn btn-thm default-box-shadow2 order_now custome-black book-now-web finalbooknow w-100"
+                                                    id="nextBtn12" onclick="nextStep()">Book Now </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1714,6 +1723,8 @@
                     <input type="hidden" name="no_of_cleaners" id="no_of_cleaners" value="1">
                     <input type="hidden" name="frequency" id="frequency" value="Once">
                     <input type="hidden" name="days_of_the_week" id="days_of_the_week" value="">
+                    <input type="hidden" name="applied_discount_percentage" id="applied_discount_percentage"
+                        value="0">
 
                 </form>
             </div>
@@ -2002,8 +2013,8 @@
                 </button>
             </div>
             <div class="modal-body" style="padding:16px; overflow-y:scroll; -webkit-overflow-scrolling:touch;">
-                <img src="{{ asset('public/site/images/homecleaninghour1.png') }}" alt="Cleaning Time"
-                    style="width:100%; border-radius:12px;">
+                <img loading="lazy" src="{{ asset('public/site/images/homecleaninghour1.png') }}"
+                    alt="Cleaning Time" style="width:100%; border-radius:12px;">
             </div>
         </div>
     </div>
@@ -2448,6 +2459,15 @@
                         </span>
                     </div>
 
+                    <div class="d-flex justify-content-between py-1 d-none multiple_days_discount_div">
+                        <span style="font-size:0.85rem; color:#555;" id="dynamic_discount_label">Weekly Discount
+                            (0%)</span>
+                        <span style="font-size:0.85rem; font-weight:700; color:#111;" class="price-wrapper">
+                            − <span class="currency_dhiramnew">AED</span><span
+                                class="multiple_days_discount_amount">0.00</span>
+                        </span>
+                    </div>
+
                     <div class="d-flex justify-content-between py-1 d-none vat-div">
                         <span style="font-size:0.85rem; color:#555;">VAT
                             ({{ \App\Enums\VC_ChargiesEnum::VAT_PERCENT->percentage() }}%)</span>
@@ -2600,7 +2620,8 @@
             </div>
             <div class="modal-header"
                 style="border-bottom:none; padding:10px 20px 10px 20px; display:flex; align-items:center; justify-content:space-between;">
-                <img src="{{ asset('public/site/images/tabby-badge.png') }}" style="height: 28px;">
+                <img loading="lazy" src="{{ asset('public/site/images/tabby-badge.png') }}"
+                    style="height: 28px;">
                 <button type="button" data-bs-dismiss="modal" aria-label="Close"
                     style="background: transparent; border:none; font-size:1.8rem; line-height:1; color:#333; cursor:pointer; -webkit-tap-highlight-color:transparent;">
                     &times;
@@ -2824,7 +2845,8 @@
 <!--- Timing Fee Popup End ---->
 
 @php
-    $subservice_service_fee_popup = DB::table('subservices')->where('id', $subservice_id)->first();
+    // Use the already fetched subservice_data from the controller
+    $subservice_service_fee_popup = $subservice_data;
 @endphp
 
 <!--- Service Fee Popup Start ---->
@@ -2857,11 +2879,12 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
 
-<script src="{{ asset('public/site/js/homecleaning.js') }}"></script>
+<script src="{{ asset('public/site/js/homecleaning.js?v=15') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
 
 <script>
+    window.multipleDaysDiscounts = @json($cleaning_multiple_days_discounts ?? []);
     let codCharge = window.Enums.vcCharges.COD.value;
     let vatPercent = window.Enums.vcCharges.VAT_PERCENT.value;
     window.isUserLoggedIn = {{ Session::get('user') ? 'true' : 'false' }};
@@ -3067,6 +3090,13 @@
         $('.finalbooknow').hide();
 
         localStorage.removeItem('currentStep');
+        sessionStorage.removeItem('currentStep');
+        localStorage.removeItem('lastServiceId');
+        localStorage.removeItem('hc_hours');
+        localStorage.removeItem('hc_cleaners');
+        localStorage.removeItem('hc_freq');
+        localStorage.removeItem('hc_material');
+        sessionStorage.removeItem('cleaningSubState');
 
         $('#bookingForm').submit();
 
@@ -3743,6 +3773,22 @@
         //             // Restore remaining backdrops to default z-index
         //             $('body > .modal-backdrop').css('z-index', '');
         //         });
+
+        /* ─── 6 Days Validation for Cleaning Subscription ─── */
+        $(document).on('change', 'input[name="which_day_of_the_week_do_you_want_the_service[]"]', function() {
+            let checkedBoxes = $(
+                'input[name="which_day_of_the_week_do_you_want_the_service[]"]:checked');
+            if (checkedBoxes.length > 6) {
+                $(this).prop('checked', false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Limit Exceeded',
+                    text: 'You can select a maximum of 6 days.',
+                    confirmButtonColor: '#3085d6',
+                });
+            }
+        });
+
     });
 
     /* ============================
@@ -4180,8 +4226,36 @@
 
                     if (frequency === 'Weekly') {
                         cleaning_discount = {{ $weekly_discout_1 }};
+                        $('#dynamic_discount_alert').hide();
+                        $('.multiple_days_discount_div').hide();
+                        $('#applied_discount_percentage').val(cleaning_discount);
                     } else if (frequency === 'Multiple times a week') {
-                        cleaning_discount = {{ $multiple_time_week_discout_1 }};
+                        let selectedDaysCount = selectedDays.length;
+                        let foundDiscount = window.multipleDaysDiscounts.find(d => parseInt(d
+                            .number_of_days) === selectedDaysCount);
+                        if (foundDiscount) {
+                            cleaning_discount = parseFloat(foundDiscount.discount_value);
+                        } else {
+                            cleaning_discount = {{ $multiple_time_week_discout_1 }};
+                        }
+
+                        if (selectedDaysCount >= 2 && cleaning_discount > 0) {
+                            $('#dynamic_discount_text').text(cleaning_discount);
+                            $('#dynamic_days_text').text(selectedDaysCount);
+                            $('#dynamic_discount_alert').show();
+
+                            $('#dynamic_discount_label').text('Weekly Discount (' + cleaning_discount +
+                                '%)');
+                            $('.multiple_days_discount_div').show();
+                        } else {
+                            $('#dynamic_discount_alert').hide();
+                            $('.multiple_days_discount_div').hide();
+                        }
+                        $('#applied_discount_percentage').val(cleaning_discount);
+                    } else {
+                        $('#dynamic_discount_alert').hide();
+                        $('.multiple_days_discount_div').hide();
+                        $('#applied_discount_percentage').val(0);
                     }
 
                     let percleanprice_new = percleanprice;
@@ -4193,6 +4267,10 @@
                         const additional_discount = (additional_charge * cleaning_discount) / 100;
 
                         percleanprice_new -= cleaning_discount_amount;
+                        additional_charge_new -= additional_discount;
+
+                        let total_discount_amount = cleaning_discount_amount + additional_discount;
+                        $('.multiple_days_discount_amount').text(total_discount_amount.toFixed(2));
                         additional_charge_new -= additional_discount;
 
                         $('.cross_amount_div').show();
@@ -4399,7 +4477,15 @@
                 if (frequency === 'Weekly') {
                     var frequencyDiscount = {{ $weekly_discout_1 }};
                 } else if (frequency === 'Multiple times a week') {
-                    var frequencyDiscount = {{ $multiple_time_week_discout_1 }};
+                    var selectedDaysCount = $(
+                        "input[name='which_day_of_the_week_do_you_want_the_service[]']:checked").length;
+                    var foundDiscount = window.multipleDaysDiscounts.find(d => parseInt(d.number_of_days) ===
+                        selectedDaysCount);
+                    if (foundDiscount) {
+                        var frequencyDiscount = parseFloat(foundDiscount.discount_value);
+                    } else {
+                        var frequencyDiscount = {{ $multiple_time_week_discout_1 }};
+                    }
                 }
                 if (frequencyDiscount > 0) {
                     $(".cross_amount_div").show();
