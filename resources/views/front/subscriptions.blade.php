@@ -10,204 +10,268 @@
             display: none !important;
         }
     }
-    
-    .subscription-card {
-        border: 1px solid #eaeaea;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        background: #fff;
-        height: 100%;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+
+    /* Subscription Card Premium UI */
+    .sub-page-header {
         display: flex;
-        flex-direction: column;
+        align-items: center;
+        margin-bottom: 24px;
     }
     
-    .subscription-card:hover {
-        box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    .sub-back-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4b5563;
+        text-decoration: none;
+        margin-right: 16px;
+        transition: all 0.2s;
+    }
+    
+    .sub-back-btn:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+    
+    .sub-page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .sub-tabs-container {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+    
+    .sub-tab {
+        padding: 8px 24px;
+        border-radius: 9999px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+    
+    .sub-tab.active {
+        background-color: #eff6ff;
+        color: #2563eb;
+        border-color: #bfdbfe;
+    }
+    
+    .sub-tab:not(.active) {
+        background-color: #ffffff;
+        color: #4b5563;
+        border-color: #e5e7eb;
+    }
+    
+    .sub-tab:not(.active):hover {
+        background-color: #f9fafb;
+    }
+
+    .sub-card {
+        background: #ffffff;
+        border: 1px solid #f3f4f6;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+        margin-bottom: 24px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .sub-card:hover {
         transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
     
-    .subscription-header {
-        padding: 20px;
-        border-bottom: 1px solid #f5f5f5;
-        background-color: #fafbfc;
-        border-radius: 12px 12px 0 0;
+    .sub-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 10px 15px;
+        border-bottom: 1px solid #f3f4f6;
     }
     
-    .subscription-title {
+    .sub-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        background-color: #f8fafc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        flex-shrink: 0;
+    }
+    
+    .sub-icon-wrapper img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+    }
+    
+    .sub-title {
         font-size: 18px;
         font-weight: 700;
-        color: #1a1a1a;
-        margin: 0 0 5px 0;
-        line-height: 1.4;
+        color: #111827;
+        margin: 0 0 4px 0;
     }
-
-    .subscription-subtitle {
+    
+    .sub-meta {
         font-size: 14px;
-        color: #64748b;
-        margin-bottom: 10px;
+        color: #6b7280;
         font-weight: 500;
+        margin: 0;
     }
     
-    .status-badge {
-        font-size: 11px;
-        font-weight: 700;
+    .sub-status {
         padding: 4px 12px;
-        border-radius: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: inline-block;
-    }
-    
-    .status-active {
-        background-color: #ecfdf5;
-        color: #059669;
-        border: 1px solid #d1fae5;
-    }
-
-    .status-pending {
-        background-color: #fffbeb;
-        color: #d97706;
-        border: 1px solid #fef3c7;
-    }
-    
-    .status-cancelled {
-        background-color: #fef2f2;
-        color: #dc2626;
-        border: 1px solid #fee2e2;
-    }
-    
-    .status-expired {
-        background-color: #f1f5f9;
-        color: #475569;
-        border: 1px solid #e2e8f0;
-    }
-    
-    .subscription-body {
-        padding: 20px;
-        flex: 1;
-    }
-    
-    .next-visit-block {
-        background-color: #f8fafc;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-left: 4px solid #0040E6;
-    }
-    
-    .next-visit-label {
+        border-radius: 9999px;
         font-size: 12px;
-        color: #64748b;
-        text-transform: uppercase;
         font-weight: 600;
-        letter-spacing: 0.5px;
-        margin-bottom: 5px;
-    }
-    
-    .next-visit-value {
-        font-size: 15px;
-        font-weight: 700;
-        color: #1e293b;
-    }
-    
-    .progress-section {
-        margin-bottom: 20px;
-    }
-    
-    .progress-text {
-        font-size: 14px;
-        font-weight: 600;
-        color: #334155;
-        margin-bottom: 8px;
-    }
-    
-    .progress-dots {
-        display: flex;
+        display: inline-flex;
+        align-items: center;
         gap: 6px;
     }
     
-    .dot {
-        width: 10px;
-        height: 10px;
+    .sub-status.active {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+    
+    .sub-status.active::before {
+        content: "";
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
-        background-color: #e2e8f0;
+        background-color: #166534;
     }
     
-    .dot.completed {
-        background-color: #0040E6;
+    .sub-status.cancelled {
+        background-color: #fef2f2;
+        color: #991b1b;
     }
     
-    .renewal-info {
+    .sub-status.cancelled::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #991b1b;
+    }
+    
+    .sub-card-body {
+        padding: 10px 20px;
+    }
+    
+    .sub-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        /* margin-bottom: 2px; */
+    }
+    
+    .sub-value {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1f2937;
+        /* margin-bottom: 12px; */
+    }
+    
+    .sub-progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2px;
+    }
+    
+    .sub-progress-text {
+        font-size: 13px;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .sub-progress-percent {
+        font-size: 14px;
+        color: #16a34a;
+        font-weight: 700;
+    }
+    
+    .sub-progress-bar-bg {
+        height: 4px;
+        background-color: #e5e7eb;
+        border-radius: 2px;
+        margin-bottom: 6px;
+        overflow: hidden;
+    }
+    
+    .sub-progress-bar-fill {
+        height: 100%;
+        background-color: #16a34a;
+        border-radius: 2px;
+    }
+    
+    .sub-renewal-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-top: 1px dashed #e2e8f0;
-        padding-top: 15px;
+        margin-bottom: 14px;
     }
     
-    .renewal-date {
-        font-size: 13px;
-        color: #64748b;
+    .sub-renewal-text {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
     
-    .renewal-date strong {
-        color: #334155;
+    .sub-renewal-icon {
+        color: #3b82f6;
+        font-size: 14px;
     }
     
-    .renewal-amount {
+    .sub-price {
         font-size: 16px;
         font-weight: 700;
-        color: #0040E6;
-    }
-    
-    .subscription-footer {
-        padding: 20px;
-        border-top: 1px solid #f5f5f5;
+        color: #111827;
         display: flex;
-        flex-direction: column;
-        gap: 10px;
+        align-items: center;
+        gap: 4px;
     }
     
-    .btn-primary-custom {
-        background-color: #0040E6;
-        color: #fff;
+    .sub-manage-btn {
+        display: block;
+        width: 100%;
+        background-color: #1a0bdb;
+        color: #ffffff;
+        text-align: center;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        text-decoration: none;
+        transition: background-color 0.2s;
         border: none;
-        padding: 10px 20px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 14px;
-        text-align: center;
-        text-decoration: none;
-        transition: background-color 0.3s;
-        display: block;
-        width: 100%;
     }
     
-    .btn-primary-custom:hover {
-        background-color: #0030b3;
-        color: #fff;
+    .sub-manage-btn:hover {
+        background-color: #1207ab;
+        color: #ffffff;
     }
-    
-    .btn-secondary-custom {
-        background-color: #f1f5f9;
-        color: #475569;
-        border: 1px solid #e2e8f0;
-        padding: 10px 20px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 14px;
-        text-align: center;
-        text-decoration: none;
-        transition: all 0.3s;
-        display: block;
-        width: 100%;
-    }
-    
-    .btn-secondary-custom:hover {
-        background-color: #e2e8f0;
-        color: #1e293b;
-    }
+
 </style>
 <style type="text/css">
     .myaccount-tab-list {
@@ -614,6 +678,21 @@
     .custom-tip-input {
         margin-top: 10px;
     }
+
+    .currency_dhiram {
+        display: inline-block;
+        width: 18px;
+        height: 14px;
+
+        background-color: currentColor;
+
+        -webkit-mask: url('{{ asset('public/site/icons/dirham.svg') }}') no-repeat center;
+        mask: url('{{ asset('public/site/icons/dirham.svg') }}') no-repeat center;
+
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        transform: translateY(1px);
+    }
 </style>
 
 <div class="body_content">
@@ -625,66 +704,93 @@
                 </div>
 
                 <div class="col-lg-8">
-                    <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
-                        <h2 style="font-weight: 700; font-size: 24px; margin: 0;">My Subscriptions</h2>
+                    <!-- Page Header -->
+                    <div class="sub-page-header">
+                        <a href="javascript:history.back()" class="sub-back-btn">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h2 class="sub-page-title">Subscriptions</h2>
+                    </div>
+                    
+                    <!-- Tabs -->
+                    <div class="sub-tabs-container">
+                        <a href="#" class="sub-tab active" onclick="filterTabs(event, 'active')">Active</a>
+                        <a href="#" class="sub-tab" onclick="filterTabs(event, 'paused')">Paused</a>
+                        <a href="#" class="sub-tab" onclick="filterTabs(event, 'cancelled')">Cancelled</a>
                     </div>
 
                     @if (count($subscriptions) > 0)
-                        <div class="row">
+                        <div class="row" id="subscriptions-list">
                             @foreach ($subscriptions as $sub)
-                                <div class="col-md-6 mb-4">
-                                    <div class="subscription-card" onclick="window.location.href='{{ route('front.subscription_detail', ['id' => $sub->id]) }}'" style="cursor: pointer;">
-                                        <div class="subscription-header">
-                                            <h3 class="subscription-title">{{ $sub->category }}</h3>
-                                            <div class="subscription-subtitle">{{ $sub->plan_name }} &bull; {{ $sub->frequency_desc }} &bull; {{ $sub->visits_per_cycle }} visits/cycle</div>
-                                            
-                                            @if($sub->status == 'ACTIVE')
-                                                <span class="status-badge status-active">Active</span>
-                                            @elseif($sub->status == 'PENDING ACTIVATION')
-                                                <span class="status-badge status-pending">Pending Activation</span>
-                                            @elseif($sub->status == 'CANCELLED')
-                                                <span class="status-badge status-cancelled">Cancelled</span>
+                                @php
+                                    $progress_percent = $sub->visits_per_cycle > 0 ? round(($sub->visits_completed / $sub->visits_per_cycle) * 100) : 0;
+                                @endphp
+                                <div class="col-md-12 sub-card-container" data-status="{{ strtolower($sub->status) }}">
+                                    <div class="sub-card" onclick="window.location.href='{{ route('front.subscription_detail', ['id' => $sub->id]) }}'" style="cursor: pointer;">
+                                        <!-- Header -->
+                                        <div class="sub-card-header">
+                                            <div class="d-flex align-items-center">
+                                                <div class="sub-icon-wrapper">
+                                                    <img src="{{ asset('public/assets/images/service-placeholder.png') }}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/994/994928.png'" alt="icon">
+                                                </div>
+                                                <div>
+                                                    <h3 class="sub-title">{{ $sub->category }}</h3>
+                                                    <p class="sub-meta">{{ $sub->frequency_desc }} &bull; {{ $sub->visits_per_cycle }} visits/cycle</p>
+                                                </div>
+                                            </div>
+                                            @if(strtoupper($sub->status) == 'ACTIVE')
+                                                <span class="sub-status active">Active</span>
+                                            @elseif(strtoupper($sub->status) == 'CANCELLED')
+                                                <span class="sub-status cancelled">Cancelled</span>
                                             @else
-                                                <span class="status-badge status-expired">{{ ucfirst(strtolower($sub->status)) }}</span>
+                                                <span class="sub-status" style="background-color: #f3f4f6; color: #4b5563;">{{ ucfirst(strtolower($sub->status)) }}</span>
                                             @endif
                                         </div>
                                         
-                                        <div class="subscription-body">
-                                            <div class="next-visit-block">
-                                                <div class="next-visit-label">Next Visit</div>
-                                                <div class="next-visit-value">{{ $sub->next_visit_date }} &bull; {{ $sub->next_visit_time }}</div>
+                                        <!-- Body -->
+                                        <div class="sub-card-body">
+                                            <div class="sub-label">NEXT VISIT</div>
+                                            <div class="sub-value">{{ $sub->next_visit_date }} &bull; {{ $sub->next_visit_time }}</div>
+                                            
+                                            <div class="sub-progress-header">
+                                                <div class="sub-progress-text">{{ $sub->visits_completed }} of {{ $sub->visits_per_cycle }} visits completed</div>
+                                                <div class="sub-progress-percent">{{ $progress_percent }}%</div>
+                                            </div>
+                                            <div class="sub-progress-bar-bg">
+                                                <div class="sub-progress-bar-fill" style="width: {{ $progress_percent }}%;"></div>
                                             </div>
                                             
-                                            <div class="progress-section">
-                                                <div class="progress-text">{{ $sub->visits_completed }} of {{ $sub->visits_per_cycle }} visits completed</div>
-                                                <div class="progress-dots">
-                                                    @for ($i = 0; $i < $sub->visits_per_cycle; $i++)
-                                                        <span class="dot {{ $i < $sub->visits_completed ? 'completed' : '' }}"></span>
-                                                    @endfor
+                                            <div class="sub-renewal-row">
+                                                <div class="sub-renewal-text">
+                                                    <i class="fas fa-sync-alt sub-renewal-icon"></i> Renews on {{ $sub->next_renewal }}
                                                 </div>
+                                                <div class="sub-price"><span class="currency_dhiram"></span>{{ $sub->renewal_amount }}</div>
                                             </div>
                                             
-                                            <div class="renewal-info">
-                                                <div class="renewal-date">Next renewal: <strong>{{ $sub->next_renewal }}</strong></div>
-                                                <div class="renewal-amount">{{ $sub->renewal_amount }}</div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="subscription-footer">
-                                            <a href="{{ route('front.subscription_detail', ['id' => $sub->id]) }}" class="btn-primary-custom" onclick="event.stopPropagation();">Manage Subscription</a>
-                                            <a href="{{ route('front.subscription_detail', ['id' => $sub->id]) }}#upcoming" class="btn-secondary-custom" onclick="event.stopPropagation();">View Upcoming Visits</a>
+                                            <button onclick="event.stopPropagation(); window.location.href='{{ route('front.subscription_detail', ['id' => $sub->id]) }}'" class="sub-manage-btn">
+                                                Manage Subscription
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
+                        </div>
+                        
+                        <!-- Dynamic Empty State (Hidden by default, controlled by JS) -->
+                        <div id="dynamic-empty-state" style="display: none; background: #f8f9fc; border: 1px solid #eef0f7; border-radius: 12px; padding: 40px 20px; text-align: center;">
+                            <div style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px;">
+                                <i class="far fa-folder-open"></i>
+                            </div>
+                            <h4 style="font-size: 18px; color: #475569; font-weight: 600; margin-bottom: 10px;">No Subscriptions Found</h4>
+                            <p style="color: #64748b; font-size: 15px; margin: 0;">You don't have any subscriptions matching this status.</p>
                         </div>
                     @else
                         <div style="background: #f8f9fc; border: 1px solid #eef0f7; border-radius: 12px; padding: 40px 20px; text-align: center;">
                             <div style="font-size: 48px; color: #cbd5e1; margin-bottom: 15px;">
                                 <i class="far fa-folder-open"></i>
                             </div>
-                            <h4 style="font-size: 18px; color: #475569; font-weight: 600; margin-bottom: 10px;">No Active Subscriptions</h4>
-                            <p style="color: #64748b; font-size: 15px; margin: 0;">You don't have any active subscriptions.</p>
+                            <h4 style="font-size: 18px; color: #475569; font-weight: 600; margin-bottom: 10px;">No Subscriptions Found</h4>
+                            <p style="color: #64748b; font-size: 15px; margin: 0;">You don't have any subscriptions yet.</p>
                         </div>
                     @endif
                 </div>
@@ -692,5 +798,46 @@
         </div>
     </section>
 </div>
+
+<script>
+    function filterTabs(event, status) {
+        if(event) event.preventDefault();
+        
+        // Update active tab styling
+        document.querySelectorAll('.sub-tab').forEach(tab => tab.classList.remove('active'));
+        if(event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        } else {
+            document.querySelector('.sub-tab[onclick*="' + status + '"]').classList.add('active');
+        }
+    
+        // Filter cards
+        const cards = document.querySelectorAll('.sub-card-container');
+        let count = 0;
+        cards.forEach(card => {
+            if (card.dataset.status === status) {
+                card.style.display = 'block';
+                count++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Show empty state if count is 0
+        const emptyState = document.getElementById('dynamic-empty-state');
+        if(emptyState) {
+            if(count === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+    }
+    
+    // Initial load: show 'active' tab by default
+    document.addEventListener('DOMContentLoaded', () => {
+        filterTabs(null, 'active');
+    });
+</script>
 
 @include('front.includes.footer')

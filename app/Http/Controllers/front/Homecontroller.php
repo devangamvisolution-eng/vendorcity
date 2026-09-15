@@ -199,7 +199,7 @@ class Homecontroller extends Controller
         // $data['meta_title'] = "";
         // $data['meta_keyword'] = "";
         // $data['meta_description'] = "";    
-        return view('front.cleaning_policy', $data);
+        return view('front.privacy_policy', $data);
     }
 
 
