@@ -1320,6 +1320,7 @@ Route::prefix('{city}')
         Route::get('/terms-of-service', '\App\Http\Controllers\front\Homecontroller@term_condition')->name('term_condition');
         Route::get('/payment-and-refund-policy', '\App\Http\Controllers\front\Homecontroller@payment_refund_policy')->name('payment_refund_policy');
         Route::get('/cancellations-policy', '\App\Http\Controllers\front\Homecontroller@cancellations_policy')->name('cancellations_policy');
+        Route::get('/cleaning-policy', '\App\Http\Controllers\front\Homecontroller@cleaning_policy')->name('cleaning_policy');
         Route::get('/contact', '\App\Http\Controllers\front\Homecontroller@contact')->name('contact');
         Route::post('/contact_us_data', '\App\Http\Controllers\front\Homecontroller@contact_us_data');
         Route::get('/careers', '\App\Http\Controllers\front\Homecontroller@careers')->name('careers');

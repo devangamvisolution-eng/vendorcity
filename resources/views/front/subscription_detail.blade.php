@@ -805,15 +805,78 @@
         
         <div class="form-group">
             <label>Pause for:</label>
-            <select class="form-control">
-                <option>1 week</option>
-                <option>2 weeks</option>
-                <option>3 weeks</option>
-                <option>Custom dates</option>
+            <select id="pause-duration-select" class="form-control" onchange="handlePauseDurationChange()">
+                <option value="7">1 week</option>
+                <option value="14">2 weeks</option>
+                <option value="21">3 weeks</option>
+                <option value="custom">Custom dates</option>
             </select>
         </div>
+
+        <div id="custom-pause-dates" style="display:none; margin-bottom:15px; gap:15px;">
+            <div style="flex:1;">
+                <label style="font-size:14px;">Start Date</label>
+                <input type="date" id="custom-pause-start" class="form-control">
+            </div>
+            <div style="flex:1;">
+                <label style="font-size:14px;">End Date</label>
+                <input type="date" id="custom-pause-end" class="form-control">
+            </div>
+        </div>
         
-        <button class="vc-btn-primary" onclick="confirmModalAction('pauseModal', 'Subscription Paused ✓', () => { document.getElementById('main-status-badge').innerText = 'Paused'; document.getElementById('main-status-badge').className = 'status-badge status-pending'; })">Confirm Pause</button>
+        <button class="vc-btn-primary" id="btn-confirm-pause" onclick="submitPauseRequest()">Confirm Pause</button>
+        <div id="pause-success-msg" class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
+    </div>
+</div>
+
+<!-- Payment Method Modal -->
+<div class="vc-modal-overlay" id="paymentMethodModal">
+    <div class="vc-modal">
+        <span class="vc-modal-close" onclick="closeModal('paymentMethodModal')">&times;</span>
+        <h3>Payment Methods</h3>
+        <p style="font-size:14px; color:#64748b; margin-bottom:20px;">Manage your saved payment methods for auto-renewal.</p>
+        
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+            <!-- Current Card -->
+            <div style="border:1px solid #0040E6; background:#eff6ff; border-radius:8px; padding:15px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:24px; color:#1a1f36;"><i class="fab fa-cc-visa"></i></div>
+                    <div>
+                        <div style="font-weight:700; color:#1e293b; font-size:14px;">Visa •••• 4242</div>
+                        <div style="font-size:12px; color:#64748b;">Expires 09/28</div>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <span style="background:#0040E6; color:#fff; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; text-transform:uppercase; margin-bottom:4px; display:inline-block;">Default</span><br>
+                    <a href="#" style="color:#dc2626; font-size:11px; text-decoration:none; font-weight:600;" onclick="alert('Card removed')">Remove</a>
+                </div>
+            </div>
+
+            <!-- Apple Pay -->
+            <div style="border:1px solid #eaeaea; border-radius:8px; padding:15px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="confirmModalAction('paymentMethodModal', 'Default Payment Updated ✓')">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:24px; color:#000;"><i class="fab fa-apple"></i></div>
+                    <div>
+                        <div style="font-weight:700; color:#1e293b; font-size:14px;">Apple Pay</div>
+                    </div>
+                </div>
+                <button class="vc-btn-outline" style="width:auto; padding:4px 10px; font-size:12px; margin-top:0;">Set Default</button>
+            </div>
+            
+            <!-- Google Pay -->
+            <div style="border:1px solid #eaeaea; border-radius:8px; padding:15px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="confirmModalAction('paymentMethodModal', 'Default Payment Updated ✓')">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:24px; color:#4285F4;"><i class="fab fa-google"></i></div>
+                    <div>
+                        <div style="font-weight:700; color:#1e293b; font-size:14px;">Google Pay</div>
+                    </div>
+                </div>
+                <button class="vc-btn-outline" style="width:auto; padding:4px 10px; font-size:12px; margin-top:0;">Set Default</button>
+            </div>
+        </div>
+        
+        <button class="vc-btn-outline" style="width:100%; border:1px dashed #cbd5e1; background:#f8fafc; color:#0040E6; margin-bottom:15px;" onclick="alert('Redirect to Add Card gateway')"><i class="fas fa-plus"></i> Add New Card</button>
+        
         <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
 </div>
@@ -935,7 +998,77 @@
 
 <!-- Reschedule & Skip Modals -->
 <div class="vc-modal-overlay" id="rescheduleModal">
-    <div class="vc-modal">
+    <div class="vc-modal" id="reschedule-step-1">
+        <span class="vc-modal-close" onclick="closeModal('rescheduleModal')">&times;</span>
+        <h3 id="reschedule-modal-title">Reschedule Visit</h3>
+        
+        <div class="form-group">
+            <label>New Date</label>
+            <input type="date" class="form-control" id="reschedule-new-date" style="height: 42px; padding: 6px 12px;" min="{{ date('Y-m-d') }}">
+        </div>
+        
+        <div class="form-group">
+            <label>Available Time</label>
+            @php
+                use Carbon\Carbon;
+                date_default_timezone_set('Asia/Dubai');
+                $timeslot = DB::table('time_slots')->orderBy('set_order','asc')->get()->toArray();
+            @endphp
+
+            <select class="form-control" id="reschedule-new-time" name="reschedule_new_time" style="width: 100%;">
+            @foreach ($timeslot as $timeslot_data)
+                @php
+                    $timeslot_service = DB::table('subservice_timeslot_price')
+                        ->where('service_id', $subscription->service_id)
+                        ->where('subservice_id', $subscription->subservice_id)
+                        ->where('time_slot_id', $timeslot_data->id)
+                        ->where('is_active', 1)
+                        ->first();
+
+                    $timeslot_service_price = $timeslot_service && $timeslot_service->price > 0 ? $timeslot_service->price : 0;
+                @endphp
+
+                @if ($timeslot_service && $timeslot_service->is_active == 1)
+                    <option value="{{ $timeslot_data->id }}">
+                        {{ $timeslot_data->name }} @if($timeslot_service_price > 0) (+ AED {{ $timeslot_service_price }}) @endif
+                    </option>
+                @endif
+            @endforeach
+            </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:20px;">
+            <label>Cleaner Preference</label>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <label style="flex: 1; display:flex; flex-direction: column; align-items: flex-start; justify-content: center; cursor:pointer; font-size:13px; border:1px solid #eaeaea; padding:12px 10px; border-radius:6px; background:#fafafa;">
+                    <div style="display:flex; align-items:center; margin-bottom: 4px;">
+                        <input type="radio" name="reschedule_cleaner" value="keep" checked style="margin-right:6px;"> 
+                        <span style="font-weight:600; color:#1e293b; line-height: 1.2;">Keep {{ ucfirst($subscription->preferred_cleaner) }}</span>
+                    </div>
+                    <span style="color:#64748b; font-size:11px; margin-left:18px; line-height: 1.2;">(May limit available slots)</span>
+                </label>
+                <label style="flex: 1; display:flex; flex-direction: column; align-items: flex-start; justify-content: center; cursor:pointer; font-size:13px; border:1px solid #eaeaea; padding:12px 10px; border-radius:6px; background:#fafafa;">
+                    <div style="display:flex; align-items:center; margin-bottom: 4px;">
+                        <input type="radio" name="reschedule_cleaner" value="any" style="margin-right:6px;"> 
+                        <span style="font-weight:600; color:#1e293b; line-height: 1.2;">Any available</span>
+                    </div>
+                    <span style="color:#64748b; font-size:11px; margin-left:18px; line-height: 1.2;">(More time slots available)</span>
+                </label>
+            </div>
+        </div>
+
+        <div style="background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; padding:15px; margin-bottom:20px;">
+            <h4 style="margin:0 0 5px 0; font-size:13px; color:#d97706; font-weight:700;"><i class="fas fa-exclamation-circle"></i> Rescheduling Policy</h4>
+            <p style="margin:0 0 10px 0; font-size:12px; color:#b45309; line-height:1.4;">
+                Free rescheduling is available until <strong>{{ $reschedule_policy_hours ?? 24 }} hours</strong> before your appointment. Late rescheduling may result in the visit being counted or a fee being charged.
+            </p>
+            <a href="{{ route('cleaning_policy') }}" target="_blank" style="font-size:12px; color:#d97706; text-decoration:underline; font-weight:600;"><i class="fas fa-file-alt" style="margin-right:5px;"></i>Cleaning Policy</a>
+        </div>
+
+        <button class="vc-btn-primary" onclick="confirmReschedule()">Confirm Reschedule</button>
+    </div>
+
+    <div class="vc-modal" id="reschedule-step-2" style="display:none; text-align:center; padding: 40px 20px;">
         <span class="vc-modal-close" onclick="closeModal('rescheduleModal')">&times;</span>
         <h3>Reschedule Visit</h3>
         <div class="form-group"><label>New Date</label><input type="date" class="form-control"></div>
@@ -1051,13 +1184,177 @@
         }
     }
     
+    let currentRescheduleDate = '';
+    let currentRescheduleTime = '';
+    let currentVisitId = null;
+
+    function openRescheduleModal(visitId, visitDate, visitTime) {
+        currentVisitId = visitId;
+        currentRescheduleDate = visitDate || '{{ $subscription->next_visit_date }}';
+        currentRescheduleTime = visitTime || '{{ $subscription->next_visit_time }}';
+        
+        if (visitDate) {
+            document.getElementById('reschedule-modal-title').innerText = 'Reschedule Visit (' + visitDate + ')';
+        } else {
+            document.getElementById('reschedule-modal-title').innerText = 'Reschedule Next Visit';
+        }
+        
+        document.getElementById('reschedule-step-1').style.display = 'block';
+        document.getElementById('reschedule-step-2').style.display = 'none';
+        
+        openModal('rescheduleModal');
+        
+        // Initialize Select2 for the time dropdown
+        if (typeof jQuery !== 'undefined' && $.fn.select2) {
+            $('#reschedule-new-time').select2({
+                dropdownParent: $('#rescheduleModal'),
+                width: '100%',
+                placeholder: 'Search for a time...',
+                allowClear: true
+            });
+        }
+    }
+
+    function confirmReschedule() {
+        let newDateInput = document.getElementById('reschedule-new-date').value;
+        let newTimeElement = document.getElementById('reschedule-new-time');
+        if(!newTimeElement) { alert("Please select a time."); return; }
+        let newTime = newTimeElement.value;
+        let cleanerPref = document.querySelector('input[name="reschedule_cleaner"]:checked').value;
+        
+        if(!newDateInput) { alert("Please select a new date."); return; }
+        if(!currentVisitId) { alert("Invalid visit."); return; }
+        
+        fetch('{{ route('subscription.visit.reschedule') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                visit_id: currentVisitId,
+                new_date: newDateInput,
+                new_time: newTime,
+                cleaner_pref: cleanerPref
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status == 1) {
+                let newDate = new Date(newDateInput).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                
+                document.getElementById('reschedule-old-datetime').innerHTML = currentRescheduleDate + '<br>' + currentRescheduleTime;
+                document.getElementById('reschedule-new-datetime').innerHTML = newDate + '<br>' + newTime;
+                
+                document.getElementById('reschedule-cleaner-name').innerText = (cleanerPref === 'keep') ? '{{ $subscription->preferred_cleaner }}' : 'Any available cleaner';
+
+                document.getElementById('reschedule-step-1').style.display = 'none';
+                document.getElementById('reschedule-step-2').style.display = 'block';
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                alert(data.message);
+            }
+        }).catch(err => alert("Something went wrong"));
+    }
+
+    function openSkipModal(visitId, visitDate) {
+        currentVisitId = visitId;
+        if(visitDate) {
+            document.getElementById('skip-modal-title').innerText = 'Skip ' + visitDate + '?';
+        } else {
+            document.getElementById('skip-modal-title').innerText = 'Skip Next Visit?';
+        }
+        openModal('skipModal');
+    }
+
+    function confirmSkipAction() {
+        let action = document.querySelector('input[name="skip_action"]:checked').value;
+        if(!currentVisitId) { alert("Invalid visit."); return; }
+        
+        fetch('{{ route('subscription.visit.skip') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                visit_id: currentVisitId,
+                action: action
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status == 1) {
+                confirmModalAction('skipModal', 'Visit Skipped ✓');
+                setTimeout(() => window.location.reload(), 1200);
+            } else {
+                alert(data.message);
+            }
+        }).catch(err => alert("Something went wrong"));
+    }
+
+    function handlePauseDurationChange() {
+        let val = document.getElementById('pause-duration-select').value;
+        if(val === 'custom') {
+            document.getElementById('custom-pause-dates').style.display = 'flex';
+        } else {
+            document.getElementById('custom-pause-dates').style.display = 'none';
+        }
+    }
+
+    function submitPauseRequest() {
+        let duration = document.getElementById('pause-duration-select').value;
+        let start = document.getElementById('custom-pause-start').value;
+        let end = document.getElementById('custom-pause-end').value;
+
+        if(duration === 'custom' && (!start || !end)) {
+            alert('Please select custom start and end dates.');
+            return;
+        }
+        
+        let btn = document.getElementById('btn-confirm-pause');
+        let originalText = btn.innerText;
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.pause') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ order_id: {{ $subscription->id }}, duration: duration, start_date: start, end_date: end })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('pause-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.style.color = '#10b981';
+                msgBox.innerText = data.preview_text || data.message;
+                document.getElementById('main-status-badge').innerText = 'Paused';
+                document.getElementById('main-status-badge').className = 'status-badge status-pending';
+                setTimeout(() => window.location.reload(), 4000);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        }).catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            alert("Something went wrong");
+        });
+    }
+    
     function closeModal(id) {
         document.getElementById(id).classList.remove('active');
         let msg = document.getElementById(id).querySelector('.success-msg');
         if(msg) msg.style.display = 'none';
     }
     
-    function ss(id, msgText, callback) {
+    function confirmModalAction(id, msgText, callback) {
         let msg = document.getElementById(id).querySelector('.success-msg');
         if(msg) { msg.innerText = msgText; msg.style.display = 'block'; }
         if(callback) callback();
