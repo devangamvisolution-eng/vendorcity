@@ -190,19 +190,6 @@ class Homecontroller extends Controller
         // echo "<pre>";print_r($data);echo "</pre>";exit;
         return view('front.privacy_policy', $data);
     }
-
-    public function cleaning_policy()
-    {
-
-        $data['cms_data'] = DB::table('cms')->where('id', 5)->first();
-
-        // $data['meta_title'] = "";
-        // $data['meta_keyword'] = "";
-        // $data['meta_description'] = "";    
-        return view('front.cleaning_policy', $data);
-    }
-
-
     public function contact()
     {
         $data['meta_title'] = "Contact VendorsCity UAE | Customer Support Help";

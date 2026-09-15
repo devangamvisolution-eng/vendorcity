@@ -75,41 +75,7 @@ class MyaccountController extends Controller
      */
 
 
-    public function pauseSubscription(Request $request)
-    {
-        $order_id = $request->input('order_id');
-        $pause_reason = $request->input('pause_reason');
-        $pause_duration = (int) $request->input('pause_duration'); // 2, 4, 6, 8 weeks
 
-        $userdata = Session::get('user');
-        if (!$userdata) {
-            return response()->json(['status' => 0, 'message' => 'Please login.']);
-        }
-
-        $order = DB::table('ci_orders')->where('order_id', $order_id)->where('user_id', $userdata['userid'])->first();
-        if (!$order) {
-            return response()->json(['status' => 0, 'message' => 'Invalid order.']);
-        }
-
-        // Calculate dates
-        $start_date = Carbon::now();
-        $end_date = Carbon::now()->addWeeks($pause_duration);
-
-        // Update database (Assuming columns exist or using vendor_notes if they don't)
-        DB::table('ci_orders')->where('order_id', $order_id)->update([
-            'subscription_status' => 'Paused',
-            'pause_start_date' => $start_date->format('Y-m-d'),
-            'pause_end_date' => $end_date->format('Y-m-d'),
-            'total_pause_days' => $pause_duration * 7,
-            'auto_renew_status' => 0 // Disable auto renew during pause
-        ]);
-
-        return response()->json([
-            'status' => 1,
-            'message' => 'Subscription paused successfully until ' . $end_date->format('d M Y') . '.',
-            'new_status' => 'Paused'
-        ]);
-    }
 
     public function cancelSubscription(Request $request)
     {
@@ -3007,5 +2973,79 @@ if (empty($userdata)) {
         }
 
         return response()->json(['status' => 0, 'message' => 'Invalid visit or unauthorized.']);
+    }
+
+    public function pauseSubscription(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $duration = $request->input('duration');
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $order = DB::table('ci_orders')
+            ->where('order_id', $order_id)
+            ->where('user_id', $userdata['userid'])
+            ->first();
+
+        if (!$order) {
+            return response()->json(['status' => 0, 'message' => 'Invalid order or unauthorized.']);
+        }
+
+        // Calculate dates
+        if ($duration !== 'custom') {
+            $days = (int) $duration;
+            $start = Carbon::now();
+            $end = Carbon::now()->addDays($days);
+        } else {
+            if (!$start_date || !$end_date) {
+                return response()->json(['status' => 0, 'message' => 'Start and end dates are required for custom duration.']);
+            }
+            $start = Carbon::parse($start_date);
+            $end = Carbon::parse($end_date);
+            $days = $start->diffInDays($end);
+        }
+
+        if ($days <= 0) {
+            return response()->json(['status' => 0, 'message' => 'End date must be after start date.']);
+        }
+
+        // Check if there is an ongoing pause
+        if ($order->subscription_status == 'Paused') {
+            return response()->json(['status' => 0, 'message' => 'Subscription is already paused.']);
+        }
+
+        // Update ci_orders
+        DB::table('ci_orders')->where('order_id', $order_id)->update([
+            'pause_start_date' => $start->format('Y-m-d'),
+            'pause_end_date' => $end->format('Y-m-d'),
+            'total_pause_days' => $days,
+            'subscription_status' => 'Paused',
+            'next_renewal_date' => Carbon::parse($order->next_renewal_date)->addDays($days)->format('Y-m-d')
+        ]);
+
+        // Shift all upcoming visits by the pause duration
+        $upcomingVisits = DB::table('ci_order_visits')
+            ->where('order_id', $order_id)
+            ->where('visit_date', '>=', $start->format('Y-m-d'))
+            ->get();
+
+        foreach ($upcomingVisits as $visit) {
+            $newDate = Carbon::parse($visit->visit_date)->addDays($days)->format('Y-m-d');
+            DB::table('ci_order_visits')->where('id', $visit->id)->update([
+                'visit_date' => $newDate,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Subscription Paused ✓',
+            'preview_text' => "Your subscription is paused from {$start->format('jS M')} to {$end->format('jS M')}. Your next renewal date is moved to " . Carbon::parse($order->next_renewal_date)->addDays($days)->format('j M Y') . "."
+        ]);
     }
 }

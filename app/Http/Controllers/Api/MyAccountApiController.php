@@ -731,7 +731,7 @@ class MyAccountApiController extends Controller
                 return response()->json([
                     'status' => false,
                     'message' => 'Invalid or inactive coupon code.'
-                ], 400);
+                ], 200);
             }
 
             // Check Dates
