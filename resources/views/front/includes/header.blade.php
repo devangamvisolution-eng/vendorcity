@@ -3225,6 +3225,9 @@
 
                                                         Orders</a></li>
 
+                                                <li><a href="{{ route('front.subscriptions') }}"><i
+                                                            class="far fa-calendar-check"></i>Subscriptions</a></li>
+
                                                 <li><a href="{{ route('front.myprofile') }}"><i
                                                             class="far fa-user"></i>My
 
@@ -3703,6 +3706,12 @@
                                     <a href="{{ route('front.myorder') }}"
                                         class="{{ Route::is('front.myorder') ? 'active' : '' }}">
                                         <i class="far fa-file-alt"></i> &nbsp;&nbsp;My Orders
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('front.subscriptions') }}"
+                                        class="{{ Route::is('front.subscriptions') ? 'active' : '' }}">
+                                        <i class="far fa-calendar-check"></i> &nbsp;&nbsp;Subscriptions
                                     </a>
                                 </li>
                                 <li>

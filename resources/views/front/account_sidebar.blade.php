@@ -13,6 +13,8 @@
     <a href="{{ route('front.myorder') }}"
         class="{{ Route::is('front.myorder') || Route::is('order-detail') || Route::is('reschedule') || Route::is('cancelpackage') ? 'active' : '' }}">My
         Orders <i class="far fa-file-alt"></i></a>
+    <a href="{{ route('front.subscriptions') }}" class="{{ Route::is('front.subscriptions') || Route::is('front.subscription_detail') ? 'active' : '' }}">Subscriptions <i
+            class="far fa-calendar-check"></i></a>
     <a href="{{ route('front.myprofile') }}" class="{{ Route::is('front.myprofile') ? 'active' : '' }}">My Profile <i
             class="far fa-user"></i></a>
     <a href="{{ route('front.mywallet') }}" class="{{ Route::is('front.mywallet') ? 'active' : '' }}">Wallet <i
