@@ -346,20 +346,10 @@
                                 <span class="detail-value">{{ $enquiry->email }}</span>
                             </li>
                         @endif
-                        @php
-                            // Fetch country code from frontloginregisters based on mobile number
-                            $userReg = DB::table('frontloginregisters')->where('id', $enquiry->user_id)->first();
-                        @endphp
-
                         @if ($enquiry->mobile)
                             <li>
                                 <span class="detail-label">Phone Number</span>
-                                <span class="detail-value">
-                                    @if ($userReg && !empty($userReg->country_code))
-                                        +{{ $userReg->country_code }}
-                                    @endif
-                                    {{ $enquiry->mobile }}
-                                </span>
+                                <span class="detail-value">{{ $enquiry->mobile }}</span>
                             </li>
                         @endif
                         @foreach ($submittedFields as $field)

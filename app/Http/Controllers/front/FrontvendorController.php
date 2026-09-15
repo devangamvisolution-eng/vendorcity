@@ -131,41 +131,41 @@ class FrontvendorController extends Controller
 
         $country_code = $request->country_code;
 
-        // $curl = curl_init();
+        $curl = curl_init();
 
-        // curl_setopt_array($curl, array(
-        //     CURLOPT_URL => 'https://waba.inboundtest.com/whatsapp/1/message/template',
-        //     CURLOPT_RETURNTRANSFER => true,
-        //     CURLOPT_ENCODING => '',
-        //     CURLOPT_MAXREDIRS => 10,
-        //     CURLOPT_TIMEOUT => 0,
-        //     CURLOPT_FOLLOWLOCATION => true,
-        //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        //     CURLOPT_CUSTOMREQUEST => 'POST',
-        //     CURLOPT_POSTFIELDS => '{"messages":[{"to":"' . $country_code . $phone . '","content":{"templateName":"login_otp_vc2","language":"en","templateData":{"body":{"placeholders":["' . $otp . '"]}}}}]}',
-        //     CURLOPT_HTTPHEADER => array(
-        //         'Authorization: Basic aW5ib3VuZHZlbmRvcnNjaXR5OmluYm91bmR2ZW5kb3JzY2l0eQ==',
-        //         'Content-Type: application/json'
-        //     ),
-        // ));
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://waba.inboundtest.com/whatsapp/1/message/template',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{"messages":[{"to":"' . $country_code . $phone . '","content":{"templateName":"login_otp_vc2","language":"en","templateData":{"body":{"placeholders":["' . $otp . '"]}}}}]}',
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Basic aW5ib3VuZHZlbmRvcnNjaXR5OmluYm91bmR2ZW5kb3JzY2l0eQ==',
+                'Content-Type: application/json'
+            ),
+        ));
 
-        // $response = curl_exec($curl);
-        // curl_close($curl);
+        $response = curl_exec($curl);
+        curl_close($curl);
 
-        // $res = json_decode($response);
-        // if (isset($res->messages[0]->messageId)) {
-        session(['vendor-form-otp' => $otp]);
-        return response()->json([
-            'status' => 'success',
-            'message' => 'OTP sent via WhatsApp',
-            'otp' => $otp,
-        ]);
-        // } else {
-        //     return response()->json([
-        //         'status' => 'error',
-        //         'message' => 'Failed to send OTP',
-        //     ], 400);
-        // }
+        $res = json_decode($response);
+        if (isset($res->messages[0]->messageId)) {
+            session(['vendor-form-otp' => $otp]);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'OTP sent via WhatsApp',
+                'otp' => $otp,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to send OTP',
+            ], 400);
+        }
     }
 
     public function vendor_otp_verify(Request $request)

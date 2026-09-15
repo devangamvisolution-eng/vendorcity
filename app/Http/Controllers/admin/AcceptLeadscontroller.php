@@ -15,13 +15,16 @@ class AcceptLeadscontroller extends Controller
 
     {
 
-        $data['all_data'] = DB::table('leads')
-            ->where('accept_reject', '1')
-            ->orderBy('id', 'desc') // Order by the 'id' column in descending order
-            ->get();
+       $data['all_data'] = DB::table('leads')
+                            ->where('accept_reject','1')
+                            ->orderBy('id', 'desc') // Order by the 'id' column in descending order
+                            ->get();
 
         //echo"<pre>";print_r($data);echo"</pre>";exit;       
 
-        return view('admin.list_accept_leads', $data);
+       return view('admin.list_accept_leads',$data);
+
     }
+
+    
 }

@@ -811,11 +811,7 @@
                         @if ($customerDetails && $customerDetails->mobile)
                             <li class="mb-0 mt-0">
                                 <span class="detail-label">Phone Number</span>
-                                <span class="detail-value">
-                                    @if ($customerDetails && !empty($customerDetails->country_code))
-                                        +{{ $customerDetails->country_code }}
-                                    @endif{{ $customerDetails->mobile }}
-                                </span>
+                                <span class="detail-value">{{ $customerDetails->mobile }}</span>
                             </li>
                         @endif
                     </ul>
@@ -1072,4 +1068,15 @@
         current = (current + 1) % items.length;
         items[current].classList.add('active');
     }, 2000); // change sentence every 2 seconds
+
+    try {
+        localStorage.removeItem('currentStep');
+        sessionStorage.removeItem('currentStep');
+        localStorage.removeItem('lastServiceId');
+        localStorage.removeItem('hc_hours');
+        localStorage.removeItem('hc_cleaners');
+        localStorage.removeItem('hc_freq');
+        localStorage.removeItem('hc_material');
+        sessionStorage.removeItem('cleaningSubState');
+    } catch (e) {}
 </script>

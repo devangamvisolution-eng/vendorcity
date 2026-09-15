@@ -76,4 +76,5 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/my-quotes', [MyAccountApiController::class, 'myQuotes']);
     Route::post('/my-quote-detail', [MyAccountApiController::class, 'myQuoteDetail']);
+    Route::post('/all-bookings', [MyAccountApiController::class, 'allBookings']);
 });

@@ -47,6 +47,10 @@ class VendorsController extends Controller
             $query->where('is_active', $request->status);
         }
 
+        if ($request->filled('salesperson_id')) {
+            $query->where('salesperson_id', $request->salesperson_id);
+        }
+
         $data['vendors_data'] = $query->orderBy('id', 'DESC')->get();
 
         // Fetch data for filter dropdowns
@@ -61,6 +65,7 @@ class VendorsController extends Controller
             $data['subservices'] = collect();
         }
         $data['cities'] = DB::table('cities')->orderBy('name', 'ASC')->get();
+        $data['salespersons'] = DB::table('users')->whereIn('role_id', [11, 12])->where('is_active', '0')->pluck('name', 'id')->toArray();
 
         return view('admin.list_vendors', $data);
     }
@@ -79,7 +84,7 @@ class VendorsController extends Controller
             ->where('is_active', 0)
             ->orderBy('set_order')
             ->get();
-
+        $data['salespersons'] = DB::table('users')->whereIn('role_id', [11, 12])->where('is_active', '0')->orderBy('name', 'asc')->get();
 
         return view('admin.add_vendors', $data);
     }
@@ -98,6 +103,8 @@ class VendorsController extends Controller
 
         //$data['role_id']=$_POST['hidden_role_id'];
         $data['name'] = $_POST['name'];
+        $data['company_reg_city'] = $_POST['company_reg_city'] ?? null;
+        $data['vendor_register_date'] = $_POST['vendor_register_date'] ?? null;
         $data['user_name'] = $_POST['user_name'];
         $data['companywebsite'] = $_POST['companywebsite'];
         // $data['city']=$_POST['city'];
@@ -126,6 +133,7 @@ class VendorsController extends Controller
         }
 
         $data['country_code'] = $_POST['country_code_vendor'];
+        $data['salesperson_id'] = $_POST['salesperson_id'] ?? null;
 
         if (request()->has('serviceList') && !empty(request()->input('serviceList'))) {
             $serviceList = request()->input('serviceList');
@@ -160,6 +168,9 @@ class VendorsController extends Controller
                 }
                 if ($value == '54') {
                     $roleIds[] = 23;
+                }
+                if ($value == '38') {
+                    $roleIds[] = 24;
                 }
             }
 
@@ -361,6 +372,7 @@ class VendorsController extends Controller
         $data['permission_data'] = UserPermission::orderBy('id', 'DESC')->get();
         $data['city_data'] = City::where('country', 22)->get();
         $data['service_data'] = DB::table('services')->where('is_active', 0)->orderBy('set_order')->get();
+        $data['salespersons'] = DB::table('users')->whereIn('role_id', [11, 12])->where('is_active', '0')->orderBy('name', 'asc')->get();
         return view('admin.edit_vendors', $data);
     }
 
@@ -379,6 +391,8 @@ class VendorsController extends Controller
 
         //$data['role_id']=$_POST['hidden_role_id'];
         $data['name'] = $_POST['name'];
+        $data['company_reg_city'] = $_POST['company_reg_city'] ?? null;
+        $data['vendor_register_date'] = $_POST['vendor_register_date'] ?? null;
         $data['user_name'] = $_POST['user_name'];
         $data['companywebsite'] = $_POST['companywebsite'];
         // $data['city']=$_POST['city'];
@@ -413,6 +427,7 @@ class VendorsController extends Controller
         $data['emirates_id_number'] = $_POST['emirates_id_number'] ?? null;
 
         $data['country_code'] = $_POST['country_code_vendor'];
+        $data['salesperson_id'] = $_POST['salesperson_id'] ?? null;
         if ($_POST['mobile'] != '') {
             $data['mobile'] = preg_replace('/\D/', '', $_POST['mobile']);
         } else {
@@ -452,6 +467,9 @@ class VendorsController extends Controller
                 }
                 if ($value == '54') {
                     $roleIds[] = 23;
+                }
+                if ($value == '38') {
+                    $roleIds[] = 24;
                 }
             }
 
@@ -972,6 +990,10 @@ class VendorsController extends Controller
             $query->where('is_active', $request->status);
         }
 
+        if ($request->filled('salesperson_id')) {
+            $query->where('salesperson_id', $request->salesperson_id);
+        }
+
         $vendors_data = $query->orderBy('id', 'DESC')->get()->toArray();
         // echo "<pre>";print_r($vendors_data);echo"</pre>";exit;
 
@@ -993,6 +1015,10 @@ class VendorsController extends Controller
         $sheet->setCellValue('L1', 'Establishment Date');
         $sheet->setCellValue('M1', 'TL expiry date');
         $sheet->setCellValue('N1', 'No Of Staff');
+        $sheet->setCellValue('O1', 'Salesperson');
+
+        $data['salespersons'] = DB::table('users')->whereIn('role_id', [11, 12])->where('is_active', '0')->pluck('name', 'id')->toArray();
+
 
         $row = 2;
 
@@ -1036,6 +1062,13 @@ class VendorsController extends Controller
                 $sheet->setCellValue('L' . $row, $data_new->establishment_date);
                 $sheet->setCellValue('M' . $row, $data_new->tlexpiry);
                 $sheet->setCellValue('N' . $row, $data_new->staff);
+
+                $salesperson_name = '';
+                if ($data_new->salesperson_id && isset($salespersons[$data_new->salesperson_id])) {
+                    $salesperson_name = $salespersons[$data_new->salesperson_id];
+                }
+                $sheet->setCellValue('O' . $row, $salesperson_name);
+
                 $row++;
             }
         }

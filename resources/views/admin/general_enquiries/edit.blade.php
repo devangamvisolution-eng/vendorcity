@@ -137,6 +137,27 @@
                                 </div>
 
                                 <div class="col-md-4 mb-3">
+                                    <label class="form-label">Service Date</label>
+                                    <input type="date" class="form-control" name="service_date" id="service_date"
+                                        value="{{ $enquiry->service_date }}">
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Frequency</label>
+                                    <select class="form-select select2" name="frequency" id="frequency">
+                                        <option value="">-- Select Frequency --</option>
+                                        <option value="One Time"
+                                            {{ $enquiry->frequency == 'One Time' ? 'selected' : '' }}>One Time</option>
+                                        <option value="Weekly" {{ $enquiry->frequency == 'Weekly' ? 'selected' : '' }}>
+                                            Weekly</option>
+                                        <option value="Monthly" {{ $enquiry->frequency == 'Monthly' ? 'selected' : '' }}>
+                                            Monthly</option>
+                                        <option value="Yearly" {{ $enquiry->frequency == 'Yearly' ? 'selected' : '' }}>
+                                            Yearly</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Source of Lead</label>
                                     @php
                                         $selectedSources = explode(',', $enquiry->source_lead_id);
@@ -169,18 +190,20 @@
                                         </option>
                                         <option value="Job" {{ $enquiry->status == 'Job' ? 'selected' : '' }}>Job
                                         </option>
+                                        <option value="Lead Sold" {{ $enquiry->status == 'Lead Sold' ? 'selected' : '' }}>
+                                            Lead Sold</option>
                                     </select>
                                 </div>
                             </div>
                             <!--
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Notes</label>
-                                        <textarea class="form-control" name="notes" id="notes" rows="3"
-                                            placeholder="Enter any notes or special requests here...">{{ $enquiry->notes }}</textarea>
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <label class="form-label">Notes</label>
+                                            <textarea class="form-control" name="notes" id="notes" rows="3"
+                                                placeholder="Enter any notes or special requests here...">{{ $enquiry->notes }}</textarea>
+                                        </div>
                                     </div>
-                                </div>
-                                -->
+                                    -->
 
                             <div class="mt-4 text-end">
                                 <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">Update

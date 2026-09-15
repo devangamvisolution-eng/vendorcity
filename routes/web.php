@@ -218,47 +218,6 @@ Route::get('/fix-db', function () {
     return 'Columns already exist!';
 });
 
-Route::get('/fix-db', function () {
-    if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'trn_certificate_number')) {
-        \Illuminate\Support\Facades\Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
-            $table->string('trn_certificate_number')->nullable();
-            $table->string('trade_license_number')->nullable();
-            $table->string('passport_number')->nullable();
-            $table->string('emirates_id_number')->nullable();
-        });
-        return 'Successfully added columns to users table!';
-    }
-    return 'Columns already exist!';
-});
-
-
-// Clear application cache:
-// Route::get('/clear-cache', function() {
-//     $exitCode = Artisan::call('cache:clear');
-//     return 'Application cache cleared';
-// });
-// // Clear view cache:
-// Route::get('/view-clear', function() {
-//     $exitCode = Artisan::call('view:clear');
-//     return 'View cache cleared';
-// });
-//  Route::get('/optimize-clear', function() {
-//     $exitCode = Artisan::call('optimize:clear');
-//     return 'Application cache cleared successfully';
-// });
-
-
-
-//Route::get('/edit-profile', '\App\Http\Controllers\front\MyaccountController@edit_profile');
-
-// Route::get('/checkout', '\App\Http\Controllers\front\checkoutcontroller@checkout');
-// Route::post('/order_place', '\App\Http\Controllers\front\checkoutcontroller@order_place')->name('order_place');
-// Route::get('thankyou', [checkoutcontroller::class, 'thankyou'])->name("thankyou");
-
-
-
-// Route::match(['get', 'post'], 'vendor-database', [FrontvendorController::class, 'vendor_database'])->name('vendor_database');
-
 
 // Clear application cache:
 // Route::get('/clear-cache', function() {
@@ -1574,8 +1533,6 @@ Route::prefix('{city}')
         Route::post('/update-address', '\App\Http\Controllers\front\MyaccountController@update_address')->name('update-address');
         Route::post('/cancel-order', '\App\Http\Controllers\front\MyaccountController@cancel_order')->name('cancel-order');
         Route::post('/skip-visit', '\App\Http\Controllers\front\MyaccountController@skip_visit')->name('skip-visit');
-        Route::post('/subscription/visit/reschedule', '\App\Http\Controllers\front\MyaccountController@rescheduleVisit')->name('subscription.visit.reschedule');
-        Route::post('/subscription/visit/skip', '\App\Http\Controllers\front\MyaccountController@skipVisitAdvanced')->name('subscription.visit.skip');
         Route::get('refer&earn', '\App\Http\Controllers\front\MyaccountController@refer_earn')->name('front.refer_earn');
         Route::get('refral', '\App\Http\Controllers\front\MyaccountController@refral')->name('front.refral');;
         Route::get('refer_and_earn/{userid}', '\App\Http\Controllers\front\MyaccountController@refer_earn_frend');

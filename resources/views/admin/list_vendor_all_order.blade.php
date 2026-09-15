@@ -220,36 +220,10 @@
 
                                                     <td>
                                                         @php
-                                                            $statusClasses = [
-                                                                'BC' => 'bg-success-light text-success',
-                                                                'P' => 'bg-success-light text-success',
-                                                                'PA' => 'bg-info-light text-info',
-                                                                'OTW' => 'bg-info-light text-info',
-                                                                'IP' => 'bg-primary-light text-primary',
-                                                                'CO' => 'bg-success-light text-success',
-                                                                'CL' => 'bg-danger-light text-danger',
-                                                                'BK' => 'bg-warning-light text-warning',
-                                                                'UP' => 'bg-secondary-light text-secondary',
-                                                            ];
-                                                            $statusLabels = [
-                                                                'BC' => 'Booking Confirmed',
-                                                                'P' => 'Booking Confirmed',
-                                                                'PA' => 'Vendor Assigned',
-                                                                'OTW' => 'On the way',
-                                                                'IP' => 'In progress',
-                                                                'CO' => 'Booking Completed',
-                                                                'CL' => 'Booking Cancelled',
-                                                                'BK' => 'Booking Requested',
-                                                                'UP' => 'Unpaid',
-                                                            ];
-                                                            $cls =
-                                                                $statusClasses[$vendororders->order_status] ??
-                                                                'bg-secondary-light text-secondary';
-                                                            $lbl =
-                                                                $statusLabels[$vendororders->order_status] ?? 'Pending';
+                                                            $statusDetails = \App\Helpers\Helper::getOrderStatusDetails($vendororders->order_status);
                                                         @endphp
                                                         <span
-                                                            class="badge rounded-pill {{ $cls }}">{{ $lbl }}</span>
+                                                            class="badge rounded-pill {{ $statusDetails['color'] }}">{{ $statusDetails['text'] }}</span>
                                                     </td>
                                                     <td>
 

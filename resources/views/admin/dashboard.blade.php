@@ -527,23 +527,12 @@
                                                 <td>{{ $recentordersData->bookingdate }},{{ $recentordersData->month }},{{ $recentordersData->bookingyear }}
                                                 </td>
                                                 @php
-                                                    $status = [
-                                                        'BK' => ['Booking Requested', 'warning'],
-                                                        'P' => ['Booking Confirmed', 'info'],
-                                                        'PA' => ['Vendor Assigned', 'primary'],
-                                                        'CO' => ['Booking Completed', 'success'],
-                                                        'CL' => ['Booking Cancelled', 'danger'],
-                                                    ];
-
-                                                    $current = $status[$recentordersData->order_status] ?? [
-                                                        'Unknown',
-                                                        'secondary',
-                                                    ];
+                                                    $statusDetails = \App\Helpers\Helper::getOrderStatusDetails($recentordersData->order_status);
                                                 @endphp
 
                                                 <td>
-                                                    <span class="badge bg-{{ $current[1] }}-light">
-                                                        {{ $current[0] }}
+                                                    <span class="badge {{ $statusDetails['color'] }}">
+                                                        {{ $statusDetails['text'] }}
                                                     </span>
                                                 </td>
                                                 <td class="text-right">

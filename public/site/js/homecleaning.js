@@ -11,7 +11,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (currentSubserviceId) {
         const lastServiceId = localStorage.getItem('lastServiceId');
         if (lastServiceId && lastServiceId !== currentSubserviceId) {
-            localStorage.removeItem('currentStep'); // Resets funnel to Step 1
+            localStorage.removeItem('currentStep');
+            sessionStorage.removeItem('currentStep');
+            localStorage.removeItem('hc_hours');
+            localStorage.removeItem('hc_cleaners');
+            localStorage.removeItem('hc_freq');
+            localStorage.removeItem('hc_material');
+            sessionStorage.removeItem('cleaningSubState');
         }
         localStorage.setItem('lastServiceId', currentSubserviceId);
     }
@@ -381,6 +387,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (stepNumber >= 3 && !window.isUserLoggedIn) {
+            sessionStorage.setItem('in_otp_flow', 'true');
             localStorage.setItem("currentStep", 2);
             stepNumber = 2;
             $("#otp_popup_Modal").modal("show");

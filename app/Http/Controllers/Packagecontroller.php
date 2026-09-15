@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Crypt;
 use DateTime;
 use Helper;
 use Str;
-use App\Models\Admin\City;
+use App\Models\admin\City;
 
 class Packagecontroller extends Controller
 {

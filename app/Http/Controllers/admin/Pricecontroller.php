@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\Price;
+use App\Models\Admin\Price;
 
 use DB;
 
@@ -15,10 +15,9 @@ class Pricecontroller extends Controller
 
     {
 
-        $data['all_data'] = Price::orderBy('id','DESC')->get();       
+        $data['all_data'] = Price::orderBy('id', 'DESC')->get();
 
-       return view('admin.list_price',$data);
-
+        return view('admin.list_price', $data);
     }
 
     public function create()
@@ -26,14 +25,13 @@ class Pricecontroller extends Controller
     {
 
         return view('admin.add_price');
-
     }
 
     public function store(Request $request)
 
     {
 
-       
+
 
         $price = new Price;
 
@@ -43,17 +41,15 @@ class Pricecontroller extends Controller
 
         $price->set_order = 0;
 
-        $price->save();        
+        $price->save();
 
-        return redirect()->route('price.index')->with('success','Price data added successfully');
-
+        return redirect()->route('price.index')->with('success', 'Price data added successfully');
     }
 
     public function edit(Price $price)
 
     {
-       return view('admin.edit_price',compact('price'));
-
+        return view('admin.edit_price', compact('price'));
     }
 
     public function update(Request $request, $id)
@@ -73,19 +69,17 @@ class Pricecontroller extends Controller
 
         $group->save();
 
-        return redirect()->route('price.edit',1)->with('success','Price data Updated successfully');;
-
+        return redirect()->route('price.edit', 1)->with('success', 'Price data Updated successfully');;
     }
 
     public function destroy(Request $request)
 
     {
 
-        $id=$request->selected;
+        $id = $request->selected;
 
-        Price::whereIn('id',$id)->delete();
+        Price::whereIn('id', $id)->delete();
 
-        return redirect()->route('price.index')->with('success','Price data Deleted successfully');
-
+        return redirect()->route('price.index')->with('success', 'Price data Deleted successfully');
     }
 }

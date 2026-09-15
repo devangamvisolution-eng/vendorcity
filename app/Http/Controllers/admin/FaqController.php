@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\Faq;
+use App\Models\Admin\Faq;
 use DB;
 
 class FaqController extends Controller
@@ -16,8 +16,8 @@ class FaqController extends Controller
      */
     public function index()
     {
-        $data['faq_data']=Faq::orderBy('id','DESC')->get();
-        return view('admin.list_faq',$data);
+        $data['faq_data'] = Faq::orderBy('id', 'DESC')->get();
+        return view('admin.list_faq', $data);
     }
 
     /**
@@ -26,11 +26,11 @@ class FaqController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {   
-        $data['allpackage'] = DB::table('packages')->orderBy('id','desc')->get();
-        $data['allservices'] = DB::table('services')->where('is_active',0)->orderBy('id','desc')->get();
-        $data['allsubservices'] = DB::table('subservices')->where('is_active',0)->orderBy('id','desc')->get();
-        return view('admin.add_faq',$data);
+    {
+        $data['allpackage'] = DB::table('packages')->orderBy('id', 'desc')->get();
+        $data['allservices'] = DB::table('services')->where('is_active', 0)->orderBy('id', 'desc')->get();
+        $data['allsubservices'] = DB::table('subservices')->where('is_active', 0)->orderBy('id', 'desc')->get();
+        return view('admin.add_faq', $data);
     }
 
     /**
@@ -41,18 +41,16 @@ class FaqController extends Controller
      */
     public function store(Request $request)
     {
-        $faq= new Faq;
-        $faq->question=$request->question;
+        $faq = new Faq;
+        $faq->question = $request->question;
         $faq->services = is_array($request->services) ? implode(',', $request->services) : null;
-$faq->packages = is_array($request->packages) ? implode(',', $request->packages) : null;
+        $faq->packages = is_array($request->packages) ? implode(',', $request->packages) : null;
 
-        $faq->answer=$request->answer;
+        $faq->answer = $request->answer;
 
         $faq->save();
 
-        return redirect()->route('faq.index')->with('success','FAQ Data Added Successfully');
-
-       
+        return redirect()->route('faq.index')->with('success', 'FAQ Data Added Successfully');
     }
 
     /**
@@ -74,10 +72,10 @@ $faq->packages = is_array($request->packages) ? implode(',', $request->packages)
      */
     public function edit(FAQ $faq)
     {
-        $data['allpackage'] = DB::table('packages')->orderBy('id','desc')->get();
-         $data['allservices'] = DB::table('services')->where('is_active',0)->orderBy('id','desc')->get();
-        $data['allsubservices'] = DB::table('subservices')->where('is_active',0)->orderBy('id','desc')->get();
-        return view('admin.edit_faq',compact('faq'),$data);
+        $data['allpackage'] = DB::table('packages')->orderBy('id', 'desc')->get();
+        $data['allservices'] = DB::table('services')->where('is_active', 0)->orderBy('id', 'desc')->get();
+        $data['allsubservices'] = DB::table('subservices')->where('is_active', 0)->orderBy('id', 'desc')->get();
+        return view('admin.edit_faq', compact('faq'), $data);
     }
 
     /**
@@ -89,18 +87,17 @@ $faq->packages = is_array($request->packages) ? implode(',', $request->packages)
      */
     public function update(Request $request, $id)
     {
-        $faq= FAQ::find($id);
-        
-        $faq->question=$request->question;
-         $faq->services = is_array($request->services) ? implode(',', $request->services) : null;
-$faq->packages = is_array($request->packages) ? implode(',', $request->packages) : null;
-        
-        $faq->answer=$request->answer;
+        $faq = FAQ::find($id);
+
+        $faq->question = $request->question;
+        $faq->services = is_array($request->services) ? implode(',', $request->services) : null;
+        $faq->packages = is_array($request->packages) ? implode(',', $request->packages) : null;
+
+        $faq->answer = $request->answer;
 
         $faq->update();
 
-        return redirect()->route('faq.index')->with('success','FAQ Data Updated Successfully');
-
+        return redirect()->route('faq.index')->with('success', 'FAQ Data Updated Successfully');
     }
 
     /**
@@ -111,10 +108,10 @@ $faq->packages = is_array($request->packages) ? implode(',', $request->packages)
      */
     public function destroy(Request $request)
     {
-        $id=$request->selected;
+        $id = $request->selected;
 
-        FAQ::whereIn('id',$id)->delete();
+        FAQ::whereIn('id', $id)->delete();
 
-        return redirect()->route('faq.index')->with('success','FAQ Data Deleted Successfully');
+        return redirect()->route('faq.index')->with('success', 'FAQ Data Deleted Successfully');
     }
 }

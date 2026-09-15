@@ -14,7 +14,7 @@ use Image;
 
 use DB;
 
-use App\Models\admin\Blog;
+use App\Models\Admin\Blog;
 
 
 
@@ -36,12 +36,11 @@ class Blog_categoryController extends Controller
 
     {
 
-        $data['blog_category_data']=DB::table('blog_category')->orderBy('id','DESC')->get();
+        $data['blog_category_data'] = DB::table('blog_category')->orderBy('id', 'DESC')->get();
 
-      
 
-        return view('admin.list_blog_category',$data);
 
+        return view('admin.list_blog_category', $data);
     }
 
 
@@ -60,7 +59,6 @@ class Blog_categoryController extends Controller
 
     {
         return view('admin.add_blog_category');
-
     }
 
 
@@ -89,7 +87,6 @@ class Blog_categoryController extends Controller
         DB::table('blog_category')->insert($data);
 
         return redirect()->route('blog_category.index')->with('success', 'Blog Category Added Successfully');
-
     }
 
 
@@ -134,8 +131,7 @@ class Blog_categoryController extends Controller
 
         $data['blog_category_data'] = DB::table('blog_category')->where('id', $id)->first();
 
-        return view('admin.edit_blog_category',$data);
-
+        return view('admin.edit_blog_category', $data);
     }
 
 
@@ -161,11 +157,10 @@ class Blog_categoryController extends Controller
         $data['name'] = $request->input('name');
 
         $data['page_url'] = $request->input('page_url');
-          
+
         DB::table('blog_category')->where('id', $id)->update($data);
 
-        return redirect()->route('blog_category.index')->with('success','Blog Category Updated Successfully');
-
+        return redirect()->route('blog_category.index')->with('success', 'Blog Category Updated Successfully');
     }
 
 
@@ -188,9 +183,8 @@ class Blog_categoryController extends Controller
 
         $delete_id = $request->selected;
 
-        DB::table('blog_category')->whereIn('id',$delete_id)->delete();
+        DB::table('blog_category')->whereIn('id', $delete_id)->delete();
 
-        return redirect()->route('blog_category.index')->with('success','Blog Category has been deleted successfully');
-
+        return redirect()->route('blog_category.index')->with('success', 'Blog Category has been deleted successfully');
     }
-   }
+}

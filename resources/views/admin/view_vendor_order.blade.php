@@ -292,31 +292,31 @@
                 </div>
 
                 @if (isset($order->items[0]->subservice_id) && $order->items[0]->subservice_id == 93)
-                    <div class="card shadow-sm border-0 mb-4">
-                        <div class="card-header bg-transparent border-bottom">
-                            <h5 class="card-title mb-0"><i class="fas fa-car me-2 text-primary"></i> Car Details</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-4">
-                                <div class="col-md-4">
-                                    <p class="text-muted mb-1 small text-uppercase">Plate Source</p>
-                                    <h6 class="fw-bold">{{ $order->items[0]->plate_source ?? '-' }}</h6>
-                                </div>
-                                <div class="col-md-4">
-                                    <p class="text-muted mb-1 small text-uppercase">Plate Code</p>
-                                    <h6 class="fw-bold">{{ $order->items[0]->plate_code ?? '-' }}</h6>
-                                </div>
-                                <div class="col-md-4">
-                                    <p class="text-muted mb-1 small text-uppercase">Plate Number</p>
-                                    <h6 class="fw-bold">{{ $order->items[0]->plate_number ?? '-' }}</h6>
-                                </div>
-                                <div class="col-md-12 mt-3">
-                                    <p class="text-muted mb-1 small text-uppercase">Car Description</p>
-                                    <h6 class="fw-bold">{{ $order->items[0]->describe_your_car ?? '-' }}</h6>
-                                </div>
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-transparent border-bottom">
+                        <h5 class="card-title mb-0"><i class="fas fa-car me-2 text-primary"></i> Car Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <p class="text-muted mb-1 small text-uppercase">Plate Source</p>
+                                <h6 class="fw-bold">{{ $order->items[0]->plate_source ?? '-' }}</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="text-muted mb-1 small text-uppercase">Plate Code</p>
+                                <h6 class="fw-bold">{{ $order->items[0]->plate_code ?? '-' }}</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="text-muted mb-1 small text-uppercase">Plate Number</p>
+                                <h6 class="fw-bold">{{ $order->items[0]->plate_number ?? '-' }}</h6>
+                            </div>
+                            <div class="col-md-12 mt-3">
+                                <p class="text-muted mb-1 small text-uppercase">Car Description</p>
+                                <h6 class="fw-bold">{{ $order->items[0]->describe_your_car ?? '-' }}</h6>
                             </div>
                         </div>
                     </div>
+                </div>
                 @endif
 
                 <div class="card shadow-sm border-0 mb-4">
@@ -613,49 +613,47 @@
                                     <div class="col-12 mt-3 mb-2">
                                         <h6 class="fw-bold text-primary border-bottom pb-2">Manpower Requirements</h6>
                                     </div>
-                                    @if (!empty($item->manpower_service_required))
-                                        <div class="col-md-6 col-xl-4">
-                                            <p class="text-muted mb-0 small">Service Required</p>
-                                            <span class="fw-bold text-dark">{{ $item->manpower_service_required }}</span>
-                                        </div>
+                                    @if(!empty($item->manpower_service_required))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Service Required</p>
+                                        <span class="fw-bold text-dark">{{ $item->manpower_service_required }}</span>
+                                    </div>
                                     @endif
-                                    @if (!empty($item->manpower_workers_required))
-                                        <div class="col-md-6 col-xl-4">
-                                            <p class="text-muted mb-0 small">Number of Workers</p>
-                                            <span class="fw-bold text-dark">{{ $item->manpower_workers_required }}</span>
-                                        </div>
+                                    @if(!empty($item->manpower_workers_required))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Number of Workers</p>
+                                        <span class="fw-bold text-dark">{{ $item->manpower_workers_required }}</span>
+                                    </div>
                                     @endif
-                                    @if (!empty($item->manpower_duration))
-                                        <div class="col-md-6 col-xl-4">
-                                            <p class="text-muted mb-0 small">Duration / Per Day</p>
-                                            <span class="fw-bold text-dark">{{ $item->manpower_duration }}</span>
-                                        </div>
+                                    @if(!empty($item->manpower_duration))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Duration / Per Day</p>
+                                        <span class="fw-bold text-dark">{{ $item->manpower_duration }}</span>
+                                    </div>
                                     @endif
-                                    @if (!empty($item->manpower_start_date))
-                                        <div class="col-md-6 col-xl-4">
-                                            <p class="text-muted mb-0 small">Start Date</p>
-                                            <span
-                                                class="fw-bold text-dark">{{ date('d M Y', strtotime($item->manpower_start_date)) }}</span>
-                                        </div>
+                                    @if(!empty($item->manpower_start_date))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">Start Date</p>
+                                        <span class="fw-bold text-dark">{{ date('d M Y', strtotime($item->manpower_start_date)) }}</span>
+                                    </div>
                                     @endif
-                                    @if (!empty($item->manpower_end_date))
-                                        <div class="col-md-6 col-xl-4">
-                                            <p class="text-muted mb-0 small">End Date</p>
-                                            <span
-                                                class="fw-bold text-dark">{{ date('d M Y', strtotime($item->manpower_end_date)) }}</span>
-                                        </div>
+                                    @if(!empty($item->manpower_end_date))
+                                    <div class="col-md-6 col-xl-4">
+                                        <p class="text-muted mb-0 small">End Date</p>
+                                        <span class="fw-bold text-dark">{{ date('d M Y', strtotime($item->manpower_end_date)) }}</span>
+                                    </div>
                                     @endif
-                                    @if (!empty($item->manpower_job_description))
-                                        <div class="col-12 mt-2">
-                                            <p class="text-muted mb-0 small">Job Description / Requirements</p>
-                                            <span class="fw-bold text-dark">{{ $item->manpower_job_description }}</span>
-                                        </div>
+                                    @if(!empty($item->manpower_job_description))
+                                    <div class="col-12 mt-2">
+                                        <p class="text-muted mb-0 small">Job Description / Requirements</p>
+                                        <span class="fw-bold text-dark">{{ $item->manpower_job_description }}</span>
+                                    </div>
                                     @endif
-                                    @if (!empty($item->manpower_additional_notes))
-                                        <div class="col-12 mt-2">
-                                            <p class="text-muted mb-0 small">Additional Notes</p>
-                                            <span class="fw-bold text-dark">{{ $item->manpower_additional_notes }}</span>
-                                        </div>
+                                    @if(!empty($item->manpower_additional_notes))
+                                    <div class="col-12 mt-2">
+                                        <p class="text-muted mb-0 small">Additional Notes</p>
+                                        <span class="fw-bold text-dark">{{ $item->manpower_additional_notes }}</span>
+                                    </div>
                                     @endif
                                 @endif
                                 @if ($item->subservice_id == '92')
@@ -810,53 +808,52 @@
                     $recurring_visits = \App\Helpers\Helper::getUpcomingVisits($order->order_id, 5);
                 @endphp
 
-                @if ($recurring_visits->count() > 0)
-                    <div class="card shadow-sm border-0 mt-4">
-                        <div class="card-header bg-transparent border-bottom py-3">
-                            <h5 class="card-title mb-0">
-                                <i class="far fa-calendar-alt me-2 text-primary"></i>Upcoming Visits
-                            </h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Time</th>
-                                            <th>Status</th>
-                                            <th>Assigned Cleaner</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($recurring_visits as $visit)
-                                            <tr>
-                                                <td><strong>{{ date('d M Y', strtotime($visit->visit_date)) }}</strong>
-                                                </td>
-                                                <td>{{ \App\Helpers\Helper::timeslotname($visit->visit_time) }}</td>
-                                                <td>
-                                                    @if ($visit->visit_status == 'cancelled' || $visit->visit_status == 'skipped')
-                                                        <span class="badge bg-danger">Cancelled</span>
-                                                    @elseif($visit->visit_status == 'completed')
-                                                        <span class="badge bg-success">Completed</span>
-                                                    @else
-                                                        <span class="badge bg-info">Upcoming</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if ($visit->cleaner_name)
-                                                        {{ $visit->cleaner_name }}
-                                                    @else
-                                                        <span class="text-muted">Not Assigned</span>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                @if($recurring_visits->count() > 0)
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-header bg-transparent border-bottom py-3">
+                        <h5 class="card-title mb-0">
+                            <i class="far fa-calendar-alt me-2 text-primary"></i>Upcoming Visits
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                        <th>Assigned Cleaner</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recurring_visits as $visit)
+                                    <tr>
+                                        <td><strong>{{ date('d M Y', strtotime($visit->visit_date)) }}</strong></td>
+                                        <td>{{ \App\Helpers\Helper::timeslotname($visit->visit_time) }}</td>
+                                        <td>
+                                            @if($visit->visit_status == 'cancelled' || $visit->visit_status == 'skipped')
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            @elseif($visit->visit_status == 'completed')
+                                                <span class="badge bg-success">Completed</span>
+                                            @else
+                                                <span class="badge bg-info">Upcoming</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($visit->cleaner_name)
+                                                {{ $visit->cleaner_name }}
+                                            @else
+                                                <span class="text-muted">Not Assigned</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                </div>
                 @endif
             </div>
 

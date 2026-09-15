@@ -51,8 +51,7 @@
                 </div>
             </div>
         </div>
-        <form id="category_form" action="{{ url(session('search_city_name', 'dubai') . '/vendors_data') }}" method="POST"
-            enctype="multipart/form-data">
+        <form id="category_form" action="{{ url(session('search_city_name', 'dubai').'/vendors_data') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row wow fadeInRight" data-wow-delay="300ms">
                 <div class="col-xl-10 mx-auto">
@@ -164,10 +163,7 @@
                         <!-- STEP 2 -->
                         <div id="step2" class="step-content" style="display:none;">
                             @php
-                                $service_data = DB::table('services')
-                                    ->where('is_active', 0)
-                                    ->orderBy('set_order')
-                                    ->get();
+                                $service_data = DB::table('services')->where('is_active', 0)->orderBy('set_order')->get();
                             @endphp
                             <div class="row">
                                 <div class="col-md-6 mb25" id="serviceListid">
@@ -195,14 +191,13 @@
                             <div class="row">
                                 <div class="col-md-6 mb25">
                                     <label class="form-label fw500 dark-color">Company Website</label>
-                                    <input type="text" id="companywebsite" name="companywebsite"
-                                        class="form-control" placeholder="Enter Company Website">
+                                    <input type="text" id="companywebsite" name="companywebsite" class="form-control"
+                                        placeholder="Enter Company Website">
                                 </div>
                                 <div class="col-md-6 mb25">
                                     <label class="form-label fw500 dark-color requiredStar">Cities where you offer
                                         Services</label>
-                                    <select class="form-control multiple" id="city" name="city[]"
-                                        multiple="multiple">
+                                    <select class="form-control multiple" id="city" name="city[]" multiple="multiple">
                                         @foreach ($city_data as $city)
                                             <option value="{{ $city->id }}">{{ $city->name }}</option>
                                         @endforeach
@@ -228,8 +223,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb25">
                                     <label class="form-label fw500 dark-color requiredStar">VAT Certificate</label>
-                                    <input type="file" id="vatcertificate" name="vatcertificate"
-                                        class="form-control">
+                                    <input type="file" id="vatcertificate" name="vatcertificate" class="form-control">
                                     <p class="form-error-text" id="vatcertificate_error"
                                         style="color: red; margin-top: 10px; display:none;"></p>
                                 </div>
@@ -245,14 +239,12 @@
                             <div class="row">
                                 <div class="col-md-4 mb25">
                                     <label class="form-label fw500 dark-color requiredStar">Trade License</label>
-                                    <input type="file" id="tradelicense" name="tradelicense"
-                                        class="form-control">
+                                    <input type="file" id="tradelicense" name="tradelicense" class="form-control">
                                     <p class="form-error-text" id="tradelicense_error"
                                         style="color: red; margin-top: 10px; display:none;"></p>
                                 </div>
                                 <div class="col-md-4 mb25">
-                                    <label class="form-label fw500 dark-color requiredStar">Trade License
-                                        Number</label>
+                                    <label class="form-label fw500 dark-color requiredStar">Trade License Number</label>
                                     <input type="text" id="trade_license_number" name="trade_license_number"
                                         class="form-control" placeholder="Enter Trade License Number">
                                     <p class="form-error-text" id="trade_license_number_error"
@@ -277,16 +269,15 @@
                                 <div class="col-md-4 mb25">
                                     <label class="form-label fw500 dark-color requiredStar">Passport Number (authorized
                                         person)</label>
-                                    <input type="text" id="passport_number" name="passport_number"
-                                        class="form-control" placeholder="Enter Passport Number">
+                                    <input type="text" id="passport_number" name="passport_number" class="form-control"
+                                        placeholder="Enter Passport Number">
                                     <p class="form-error-text" id="passport_number_error"
                                         style="color: red; margin-top: 10px; display:none;"></p>
                                 </div>
                                 <div class="col-md-4 mb25">
                                     <label class="form-label fw500 dark-color requiredStar">Passport Expiry Date
                                         (authorized person)</label>
-                                    <input type="date" id="passport_expiry" name="passport_expiry"
-                                        class="form-control">
+                                    <input type="date" id="passport_expiry" name="passport_expiry" class="form-control">
                                     <p class="form-error-text" id="passport_expiry_error"
                                         style="color: red; margin-top: 10px; display:none;"></p>
                                 </div>
@@ -363,8 +354,8 @@
                                 </div>
                                 <div class="col-md-6 mb15">
                                     <label class="form-label fw500 dark-color requiredStar">Confirm Password</label>
-                                    <input id="conf_password" name="conf_password" type="password"
-                                        class="form-control" placeholder="Enter Confirm Password">
+                                    <input id="conf_password" name="conf_password" type="password" class="form-control"
+                                        placeholder="Enter Confirm Password">
                                     <p class="form-error-text" id="confirm_password_error"
                                         style="color: red; margin-top: 10px; display:none;"></p>
                                 </div>
@@ -373,11 +364,9 @@
                                 <div class="col-md-8 mb15">
                                     <label class="form-label fw500 dark-color requiredStar">Company Telephone (Shared
                                         with Customers)</label>
-                                    <input type="hidden" name="country_code_vendor" id="country_code_vendor"
-                                        value="">
+                                    <input type="hidden" name="country_code_vendor" id="country_code_vendor" value="">
                                     <input id="mobile" name="mobile" type="text" class="form-control"
-                                        placeholder="Enter Company Telephone"
-                                        onkeypress="return validateNumber(event)">
+                                        placeholder="Enter Company Telephone" onkeypress="return validateNumber(event)">
                                     <p class="form-error-text" id="mobile_error"
                                         style="color: red; margin-top: 10px; display:none;"></p>
                                 </div>
@@ -391,8 +380,7 @@
                             <div class="row" id="otp_verification_section" style="display:none;">
                                 <div class="col-md-6 mb15">
                                     <label class="form-label fw500 dark-color requiredStar">Enter OTP</label>
-                                    <input type="text" id="otp_code" class="form-control"
-                                        placeholder="Enter OTP">
+                                    <input type="text" id="otp_code" class="form-control" placeholder="Enter OTP">
                                     <p class="form-error-text" id="otp_code_error"
                                         style="color: red; margin-top: 10px; display:none;"></p>
                                 </div>
@@ -423,15 +411,15 @@
                             <div class="row">
                                 <div class="col-md-6 mb15">
                                     <label class="form-label fw500 dark-color requiredStar">Company Logo</label>
-                                    <input id="company_logo" name="company_logo" type="file"
-                                        class="form-control">
+                                    <input id="company_logo" name="company_logo" type="file" class="form-control">
                                     <p class="form-error-text" id="company_logo_error"
                                         style="color: red; margin-top: 10px; display:none;"></p>
                                 </div>
                                 <div class="col-md-12 mb15">
                                     <label class="form-label fw500 dark-color">Tell us a bit about your
                                         company</label>
-                                    <textarea name="short_description" id="sort_discription" class="form-control" rows="5"></textarea>
+                                    <textarea name="short_description" id="sort_discription" class="form-control"
+                                        rows="5"></textarea>
                                     <p class="form-error-text" id="sort_discription_error"
                                         style="color: red; margin-top: 10px; display:none;"></p>
                                 </div>
@@ -445,7 +433,7 @@
                                 <div class="col-md-6">
                                     <div class="mb15">
                                         <label class="form-label fw500 dark-color requiredStar">Enter This code below:
-                                            {{ $vendor_captcha }}</label>
+                                            {{$vendor_captcha}}</label>
                                         <input id="vendor_captcha" name="vendor_captcha" type="text"
                                             class="form-control" placeholder="Enter This code"
                                             onkeypress="return validateNumber(event)">
@@ -485,7 +473,7 @@
 
 <script src="{{ asset('public/site/js/select2.min.js') }}"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $(".multiple").select2({
             placeholder: "Select a Form Fields" // Replace with your desired placeholder text
         });
@@ -608,7 +596,7 @@
                 "_token": "{{ csrf_token() }}",
                 "email": email
             },
-            success: function(msg) {
+            success: function (msg) {
                 if (msg == 1) {
                     jQuery('#email_error').html("Email Address Already Exists");
                     jQuery('#email_error').show().delay(0).fadeIn('show');
@@ -707,7 +695,7 @@
 
                     // }
 
-                    var captcha_store = '{{ session::get('vendor_captcha') }}';
+                    var captcha_store = '{{session::get('vendor_captcha')}}';
 
                     var captcha = jQuery("#vendor_captcha").val();
                     if (captcha == '') {
@@ -751,7 +739,7 @@
 </script>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         var role_id = jQuery("#role_id").val();
 
         $("#hidden_role_id").val(role_id);
@@ -759,9 +747,9 @@
 
 
 
-    $(function() {
+    $(function () {
 
-        $("#name").keyup(function() {
+        $("#name").keyup(function () {
 
             var Text = $(this).val();
 
@@ -819,7 +807,7 @@
 
     // });
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         var max_fields = 50;
         var wrapper = $(".input_fields_wrap12");
         var add_button = $("#add_field_button12");
@@ -829,7 +817,7 @@
         initializeIntlTelInputs();
 
         // Add new field logic
-        $(add_button).click(function(e) {
+        $(add_button).click(function (e) {
             e.preventDefault();
             if (b < max_fields) {
                 b++;
@@ -872,7 +860,7 @@
         });
 
         // Remove field
-        $(wrapper).on("click", ".remove_field1", function(e) {
+        $(wrapper).on("click", ".remove_field1", function (e) {
             e.preventDefault();
             $(this).closest('.poc-row').remove();
             b--;
@@ -881,7 +869,7 @@
         // ---- Function Definitions ----
 
         function initializeIntlTelInputs() {
-            $(".company-phone").each(function() {
+            $(".company-phone").each(function () {
                 initializeIntlTelInput(this);
             });
         }
@@ -933,11 +921,11 @@
 
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const Otpphoneinput = document.querySelector("#mobile");
 
         const Otpphoneinputnew = window.intlTelInput(Otpphoneinput, {
-            initialCountry: "ae", // UAE
+            initialCountry: "ae",  // UAE
             separateDialCode: true,
             autoPlaceholder: "aggressive",
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
@@ -959,12 +947,12 @@
         setCountryCode();
 
         // Listen to country change
-        Otpphoneinput.addEventListener("countrychange", function() {
+        Otpphoneinput.addEventListener("countrychange", function () {
             setCountryCode();
         });
     });
 
-    $('#serviceList').on('change', function() {
+    $('#serviceList').on('change', function () {
         var selectedServices = $(this).val(); // array of selected service IDs
         var selectedSubservices = $('#subserviceList').val() || []; // keep currently selected subservices
 
@@ -976,11 +964,11 @@
                     service_ids: selectedServices,
                     _token: "{{ csrf_token() }}"
                 },
-                success: function(response) {
+                success: function (response) {
                     $('#subserviceList').empty();
 
                     // Populate new options
-                    $.each(response, function(index, subservice) {
+                    $.each(response, function (index, subservice) {
                         var option = $('<option>', {
                             value: subservice.id,
                             text: subservice.subservicename
@@ -1025,61 +1013,18 @@
             }
         } else if (step == 4) {
             var step3_valid = true;
-            var req3 = [{
-                    id: '#vatcertificate',
-                    err: '#vatcertificate_error',
-                    msg: "Please upload VAT Certificate"
-                },
-                {
-                    id: '#trn_certificate_number',
-                    err: '#trn_certificate_number_error',
-                    msg: "Please enter TRN Certificate Number"
-                },
-                {
-                    id: '#tradelicense',
-                    err: '#tradelicense_error',
-                    msg: "Please upload Trade License"
-                },
-                {
-                    id: '#trade_license_number',
-                    err: '#trade_license_number_error',
-                    msg: "Please enter Trade License Number"
-                },
-                {
-                    id: '#tlexpiry',
-                    err: '#tlexpiry_error',
-                    msg: "Please enter Trade License Expiry Date"
-                },
-                {
-                    id: '#passport',
-                    err: '#passport_error',
-                    msg: "Please upload Passport"
-                },
-                {
-                    id: '#passport_number',
-                    err: '#passport_number_error',
-                    msg: "Please enter Passport Number"
-                },
-                {
-                    id: '#passport_expiry',
-                    err: '#passport_expiry_error',
-                    msg: "Please enter Passport Expiry Date"
-                },
-                {
-                    id: '#emirates_id',
-                    err: '#emirates_id_error',
-                    msg: "Please upload Emirates ID"
-                },
-                {
-                    id: '#emirates_id_number',
-                    err: '#emirates_id_number_error',
-                    msg: "Please enter Emirates ID Number"
-                },
-                {
-                    id: '#emirates_id_expiry',
-                    err: '#emirates_id_expiry_error',
-                    msg: "Please enter Emirates ID Expiry Date"
-                }
+            var req3 = [
+                { id: '#vatcertificate', err: '#vatcertificate_error', msg: "Please upload VAT Certificate" },
+                { id: '#trn_certificate_number', err: '#trn_certificate_number_error', msg: "Please enter TRN Certificate Number" },
+                { id: '#tradelicense', err: '#tradelicense_error', msg: "Please upload Trade License" },
+                { id: '#trade_license_number', err: '#trade_license_number_error', msg: "Please enter Trade License Number" },
+                { id: '#tlexpiry', err: '#tlexpiry_error', msg: "Please enter Trade License Expiry Date" },
+                { id: '#passport', err: '#passport_error', msg: "Please upload Passport" },
+                { id: '#passport_number', err: '#passport_number_error', msg: "Please enter Passport Number" },
+                { id: '#passport_expiry', err: '#passport_expiry_error', msg: "Please enter Passport Expiry Date" },
+                { id: '#emirates_id', err: '#emirates_id_error', msg: "Please upload Emirates ID" },
+                { id: '#emirates_id_number', err: '#emirates_id_number_error', msg: "Please enter Emirates ID Number" },
+                { id: '#emirates_id_expiry', err: '#emirates_id_expiry_error', msg: "Please enter Emirates ID Expiry Date" }
             ];
             for (var i = 0; i < req3.length; i++) {
                 if ($(req3[i].id).val() == '') {
@@ -1103,7 +1048,7 @@
                 $('#email_error').html("Please Enter Valid Email").show().delay(2000).fadeOut();
                 return false;
             }
-
+            
             var emailExists = false;
             $.ajax({
                 url: "{{ url('vendors_check_mail') }}",
@@ -1113,7 +1058,7 @@
                     "_token": "{{ csrf_token() }}",
                     "email": email
                 },
-                success: function(msg) {
+                success: function (msg) {
                     if (msg == 1) {
                         emailExists = true;
                     }
@@ -1135,8 +1080,7 @@
                 return false;
             }
             if (conf_password != password) {
-                $('#confirm_password_error').html("Confirm Password Doesn't Match Password").show().delay(2000)
-                .fadeOut();
+                $('#confirm_password_error').html("Confirm Password Doesn't Match Password").show().delay(2000).fadeOut();
                 return false;
             }
             if ($('#mobile').val() == '') {
@@ -1153,7 +1097,6 @@
         $('#step' + step).show();
         $('#step_title').text('Step ' + step + ' of 5');
     }
-
     function prevStep(step) {
         $('.step-content').hide();
         $('#step' + step).show();
@@ -1171,8 +1114,7 @@
 
         var btn = $('#btn_send_otp');
         var originalText = btn.html();
-        btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...')
-            .prop('disabled', true);
+        btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...').prop('disabled', true);
 
         $.ajax({
             url: '{{ route('vendor-otp-sent') }}',
@@ -1182,9 +1124,9 @@
                 mobile: mobile,
                 country_code: country_code
             },
-            success: function(res) {
+            success: function (res) {
                 btn.html(originalText).prop('disabled', false);
-                if (res.status == 'success') {
+                if(res.status == 'success'){
                     $('#otp_sent_msg').show();
                     $('#otp_verification_section').show();
                     $('#btn_send_otp').hide();
@@ -1192,7 +1134,7 @@
                     alert('Error sending OTP. Please try again.');
                 }
             },
-            error: function() {
+            error: function () {
                 btn.html(originalText).prop('disabled', false);
                 alert('Error sending OTP. Please try again.');
             }
@@ -1205,11 +1147,10 @@
             $('#otp_code_error').html('Please enter OTP').show();
             return false;
         }
-
+        
         var btn = $('#btn_verify_otp');
         var originalText = btn.html();
-        btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verifying...')
-            .prop('disabled', true);
+        btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verifying...').prop('disabled', true);
 
         $.ajax({
             url: '{{ route('vendor-otp-verify') }}',
@@ -1218,21 +1159,21 @@
                 _token: '{{ csrf_token() }}',
                 otp: otp_code
             },
-            success: function(res) {
+            success: function (res) {
                 btn.html(originalText).prop('disabled', false);
-                if (res.status == 'success') {
+                if(res.status == 'success'){
                     $('#otp_verified_msg').show();
                     $('#is_otp_verified').val('1');
                     $('#btn_verify_otp').hide();
                     $('#btn_resend_otp').hide();
-
+                    
                     // Go to next step after verification
                     nextStep(5);
                 } else {
                     $('#otp_code_error').html('Invalid OTP').show();
                 }
             },
-            error: function() {
+            error: function () {
                 btn.html(originalText).prop('disabled', false);
                 $('#otp_code_error').html('Invalid OTP').show();
             }
@@ -1262,4 +1203,6 @@
         // this is here to satisfy the onclick that was old, but we changed the submit button to onclick="submitForm()"
         submitForm();
     }
+
+
 </script>

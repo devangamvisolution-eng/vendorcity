@@ -195,7 +195,7 @@
 
         <!-- Filter Form -->
         <div id="filter_inputs" class="card filter-card mb-4"
-            style="display: {{ request()->has('service_id') || request()->has('subservice_id') || request()->has('city_id') || request()->has('status') ? 'block' : 'none' }};">
+            style="display: {{ request()->has('service_id') || request()->has('subservice_id') || request()->has('city_id') || request()->has('status') || request()->has('salesperson_id') ? 'block' : 'none' }};">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card premium-card">
@@ -250,6 +250,17 @@
                                             </option>
                                             <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>
                                                 Deactive</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label style="font-size: 12px; font-weight: 500; color: #555;">Salesperson</label>
+                                        <select name="salesperson_id" class="form-control form-control-sm select2">
+                                            <option value="">All</option>
+                                            @foreach ($salespersons as $id => $name)
+                                                <option value="{{ $id }}"
+                                                    {{ request('salesperson_id') == $id ? 'selected' : '' }}>
+                                                    {{ $name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="col-md-4 mb-3 text-end">
@@ -316,6 +327,12 @@
                                                         <span class="text-muted" style="font-size: 13px;"><i
                                                                 class="fas fa-phone-alt text-secondary me-1"></i>
                                                             {{ $vendors_data[$i]->mobile == 0 ? '-' : $vendors_data[$i]->mobile }}</span>
+                                                        @if ($vendors_data[$i]->salesperson_id && isset($salespersons[$vendors_data[$i]->salesperson_id]))
+                                                            <span class="text-muted" style="font-size: 13px;"><i
+                                                                    class="fas fa-user-tie text-secondary me-1"></i>
+                                                                Salesperson:
+                                                                {{ $salespersons[$vendors_data[$i]->salesperson_id] }}</span>
+                                                        @endif
                                                     </div>
                                                 </td>
                                                 @php

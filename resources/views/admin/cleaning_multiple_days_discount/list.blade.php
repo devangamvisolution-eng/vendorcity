@@ -13,11 +13,11 @@
                         <li class="breadcrumb-item active">Multiple Days Discounts</li>
                     </ul>
                 </div>
-                <div class="col-auto">
+                {{-- <div class="col-auto">
                     <a href="{{ route('cleaning_multiple_days_discounts.create') }}" class="btn btn-primary me-1">
                         <i class="fas fa-plus"></i> Add Discount
                     </a>
-                </div>
+                </div> --}}
             </div>
         </div>
         <!-- /Page Header -->
@@ -50,15 +50,19 @@
                                             <td>{{ $discount->number_of_days }} Days</td>
                                             <td>{{ $discount->discount_value }}%</td>
                                             <td class="text-right">
-                                                <a href="{{ route('cleaning_multiple_days_discounts.edit', $discount->id) }}" class="btn btn-sm bg-success-light me-2">
+                                                <a href="{{ route('cleaning_multiple_days_discounts.edit', $discount->id) }}"
+                                                    class="btn btn-sm bg-success-light me-2">
                                                     <i class="far fa-edit me-1"></i> Edit
                                                 </a>
-                                                <form action="{{ route('cleaning_multiple_days_discounts.destroy', $discount->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this discount?');">
+                                                <form
+                                                    action="{{ route('cleaning_multiple_days_discounts.destroy', $discount->id) }}"
+                                                    method="POST" style="display:inline;"
+                                                    onsubmit="return confirm('Are you sure you want to delete this discount?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm bg-danger-light">
+                                                    {{-- <button type="submit" class="btn btn-sm bg-danger-light">
                                                         <i class="far fa-trash-alt me-1"></i> Delete
-                                                    </button>
+                                                    </button> --}}
                                                 </form>
                                             </td>
                                         </tr>
