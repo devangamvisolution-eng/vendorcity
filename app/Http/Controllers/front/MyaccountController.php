@@ -2999,7 +2999,7 @@ if (empty($userdata)) {
         if ($visit) {
             $updateData = [
                 'visit_date' => Carbon::parse($new_date)->format('Y-m-d'),
-                'visit_time' => Carbon::parse($new_time)->format('H:i:s'),
+                'visit_time' => $new_time,
                 'visit_status' => 'rescheduled',
                 'rescheduled_from_date' => $visit->visit_date,
                 'updated_at' => date('Y-m-d H:i:s')
