@@ -802,45 +802,77 @@ class Helper
         $upcomingVisits = [];
         $todayStr = date('Y-m-d');
 
-        foreach ($allGeneratedVisits as $gv) {
-            $dateStr = $gv['visit_date'];
+        if (isset($storedRecords) && count($storedRecords) > 0) {
+            // Sort stored records by visit date and time
+            $storedRecords = $storedRecords->sortBy(function ($visit) {
+                return $visit->visit_date . ' ' . $visit->visit_time;
+            });
+            if ($type === 'past') {
+                $storedRecords = $storedRecords->sortByDesc(function ($visit) {
+                    return $visit->visit_date . ' ' . $visit->visit_time;
+                });
+            }
 
-            if (($type === 'upcoming' && $dateStr >= $todayStr) || ($type === 'past' && $dateStr < $todayStr) || $type === 'all') {
-                $status = 'upcoming';
-                $id = null;
-                $payment_status = $gv['payment_status'];
-                $assigned_cleaner_id = $defaultCleanerId;
-                $assigned_cleaner_name = $defaultCleanerName;
-                $extra_hours = 0;
-                $extra_charge = 0;
-
-                if (isset($storedVisits[$dateStr])) {
-                    $status = $storedVisits[$dateStr]->visit_status;
-                    $id = $storedVisits[$dateStr]->id;
-                    $payment_status = $storedVisits[$dateStr]->payment_status;
-                    if (!empty($storedVisits[$dateStr]->cleaner_id)) {
-                        $assigned_cleaner_id = $storedVisits[$dateStr]->cleaner_id;
-                        $assigned_cleaner_name = $storedVisits[$dateStr]->cleaner_name;
+            foreach ($storedRecords as $rec) {
+                if (($type === 'upcoming' && $rec->visit_date >= $todayStr) || ($type === 'past' && $rec->visit_date < $todayStr) || $type === 'all') {
+                    $upcomingVisits[] = (object) [
+                        'id' => $rec->id,
+                        'order_id' => $order_id,
+                        'visit_date' => $rec->visit_date,
+                        'visit_time' => $rec->visit_time,
+                        'payment_status' => $rec->payment_status,
+                        'visit_status' => $rec->visit_status,
+                        'cleaner_id' => $rec->cleaner_id ?: $defaultCleanerId,
+                        'cleaner_name' => $rec->cleaner_id ? $rec->cleaner_name : $defaultCleanerName,
+                        'extra_hours' => $rec->extra_hours,
+                        'extra_charge' => $rec->extra_charge
+                    ];
+                    if (count($upcomingVisits) >= $limit) {
+                        break;
                     }
-                    $extra_hours = $storedVisits[$dateStr]->extra_hours;
-                    $extra_charge = $storedVisits[$dateStr]->extra_charge;
                 }
+            }
+        } else {
+            foreach ($allGeneratedVisits as $gv) {
+                $dateStr = $gv['visit_date'];
 
-                $upcomingVisits[] = (object) [
-                    'id' => $id,
-                    'order_id' => $order_id,
-                    'visit_date' => $dateStr,
-                    'visit_time' => $gv['visit_time'],
-                    'payment_status' => $payment_status,
-                    'visit_status' => $status,
-                    'cleaner_id' => $assigned_cleaner_id,
-                    'cleaner_name' => $assigned_cleaner_name,
-                    'extra_hours' => $extra_hours,
-                    'extra_charge' => $extra_charge
-                ];
+                if (($type === 'upcoming' && $dateStr >= $todayStr) || ($type === 'past' && $dateStr < $todayStr) || $type === 'all') {
+                    $status = 'upcoming';
+                    $id = null;
+                    $payment_status = $gv['payment_status'];
+                    $assigned_cleaner_id = $defaultCleanerId;
+                    $assigned_cleaner_name = $defaultCleanerName;
+                    $extra_hours = 0;
+                    $extra_charge = 0;
 
-                if (count($upcomingVisits) >= $limit) {
-                    break;
+                    if (isset($storedVisits[$dateStr])) {
+                        $status = $storedVisits[$dateStr]->visit_status;
+                        $id = $storedVisits[$dateStr]->id;
+                        $payment_status = $storedVisits[$dateStr]->payment_status;
+                        if (!empty($storedVisits[$dateStr]->cleaner_id)) {
+                            $assigned_cleaner_id = $storedVisits[$dateStr]->cleaner_id;
+                            $assigned_cleaner_name = $storedVisits[$dateStr]->cleaner_name;
+                        }
+                        $extra_hours = $storedVisits[$dateStr]->extra_hours;
+                        $extra_charge = $storedVisits[$dateStr]->extra_charge;
+                    }
+
+                    $upcomingVisits[] = (object) [
+                        'id' => $id,
+                        'order_id' => $order_id,
+                        'visit_date' => $dateStr,
+                        'visit_time' => $gv['visit_time'],
+                        'payment_status' => $payment_status,
+                        'visit_status' => $status,
+                        'cleaner_id' => $assigned_cleaner_id,
+                        'cleaner_name' => $assigned_cleaner_name,
+                        'extra_hours' => $extra_hours,
+                        'extra_charge' => $extra_charge
+                    ];
+
+                    if (count($upcomingVisits) >= $limit) {
+                        break;
+                    }
                 }
             }
         }

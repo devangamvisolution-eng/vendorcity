@@ -11,3 +11,9 @@ ALTER TABLE `company_emp_documents` DROP FOREIGN KEY `company_emp_documents_comp
 ## 09-02-2026
 
 ALTER TABLE `subservices` ADD `subservice_code` VARCHAR(255) NULL DEFAULT NULL AFTER `page_url`;
+
+## 14-09-2026
+
+---
+
+ALTER TABLE `ci_order_item` ADD `vendor_notes` TEXT NULL DEFAULT NULL AFTER `unused_visit_handling`;

@@ -50,8 +50,6 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/edit-address/{id}', [ServiceController::class, 'edit_address']);
     Route::delete('/delete-address/{id}', [ProfileController::class, 'deleteAddress']);
 
-
-
     Route::post('/subservice', [ServiceController::class, 'subservice']);
     Route::post('/add-address', [ServiceController::class, 'add_address']);
     Route::post('/get-addons', [Homecleaningapicontroller::class, 'get_addons']);
@@ -76,4 +74,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/my-quotes', [MyAccountApiController::class, 'myQuotes']);
     Route::post('/my-quote-detail', [MyAccountApiController::class, 'myQuoteDetail']);
+
+    // Coupons
+    Route::post('/coupons/list', [MyAccountApiController::class, 'listCoupons']);
+    Route::post('/coupons/validate', [MyAccountApiController::class, 'validateCoupon']);
 });

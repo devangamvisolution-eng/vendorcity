@@ -602,253 +602,223 @@ class MyAccountApiController extends Controller
             ], 500);
         }
     }
-
-    public function listCoupons(Request $request)
+    public function allBookings(Request $request)
     {
-        try {
-            $validator = Validator::make($request->all(), [
-                'user_id' => 'required|integer',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => $validator->errors()->first()
-                ], 422);
+        // Fallback for raw JSON without proper Content-Type
+        if (empty($request->all()) && !empty($request->getContent())) {
+            $rawJson = json_decode($request->getContent(), true);
+            if (is_array($rawJson)) {
+                $request->merge($rawJson);
             }
+        }
 
-            $userId = $request->user_id;
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|integer',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
 
-            // Fetch active coupons for app
-            $coupons = DB::table('coupans')
-                ->where('is_active', 0)
-                ->orderBy('id', 'DESC')
+        $userid = $request->user_id;
+        $today = date('Y-m-d');
+
+        $orders = DB::table('ci_orders')
+            ->leftJoin('frontloginregisters', 'ci_orders.user_id', '=', 'frontloginregisters.id')
+            ->select(
+                'ci_orders.*',
+                'frontloginregisters.name as user_name',
+                'frontloginregisters.email as user_email',
+                'frontloginregisters.mobile as user_mobile'
+            )
+            ->where('ci_orders.user_id', $userid)
+            ->where('ci_orders.is_delete', '0')
+            ->orderBy('ci_orders.order_id', 'DESC')
+            ->get();
+
+        $data = [
+            'upcoming_count' => 0,
+            'upcoming' => [],
+            'completed_count' => 0,
+            'completed' => [],
+            'cancelled_count' => 0,
+            'cancelled' => [],
+            'unpaid_count' => 0,
+            'unpaid' => []
+        ];
+
+        if ($orders->count() == 0) {
+            return response()->json([
+                'status' => true,
+                'message' => 'No bookings found.',
+                'data' => $data
+            ]);
+        }
+
+        foreach ($orders as $order) {
+            $items = DB::table('ci_order_item')
+                ->where('order_id', $order->order_id)
                 ->get();
 
-            $validCoupons = [];
-            $today = \Carbon\Carbon::now()->startOfDay();
+            if ($items->count() == 0) {
+                continue;
+            }
 
-            foreach ($coupons as $coupon) {
-                // Check user eligibility
-                if (empty($coupon->user_id)) {
-                    continue;
+            $order->items = $items;
+            $item = $items->first();
+            $total = 0;
+
+            foreach ($items as $row) {
+                $price = !empty($row->product_discount_amount) ? $row->product_discount_amount : $row->package_item_price;
+                $total += ($price * $row->package_quantity);
+            }
+
+            $order->sub_total = $total;
+
+            try {
+                $startDate = \Carbon\Carbon::parse($item->bookingdate . ' ' . $item->month . ' ' . $item->bookingyear);
+            } catch (\Exception $e) {
+                $startDate = \Carbon\Carbon::today();
+            }
+
+            if (!empty($item->end_date)) {
+                $endDate = \Carbon\Carbon::parse($item->end_date);
+            } else {
+                $endDate = $startDate->copy();
+            }
+
+            $visitDates = [];
+            if ($item->how_often_do_you_need_cleaning == 'Weekly') {
+                $current = $startDate->copy();
+                while ($current <= $endDate) {
+                    $visitDates[] = $current->toDateString();
+                    $current->addWeek();
                 }
-
-                $eligibleUsers = explode(',', $coupon->user_id);
-                if (!in_array($userId, $eligibleUsers)) {
-                    continue;
-                }
-
-                // Check expiry logic
-                $endDate = \Carbon\Carbon::parse($coupon->enddate)->endOfDay();
-
-                $expiryMessage = '';
-                $isExpired = false;
-
-                if ($endDate->isPast()) {
-                    $isExpired = true;
-                    $expiryMessage = 'Expired';
-                } else {
-                    $diffInDays = $today->diffInDays($endDate, false);
-                    if ($diffInDays == 0) {
-                        $expiryMessage = 'Expires Today';
-                    } elseif ($diffInDays == 1) {
-                        $expiryMessage = 'Expires In 1 day';
-                    } else {
-                        $expiryMessage = "Expires In {$diffInDays} days";
+            } elseif (strtolower($item->how_often_do_you_need_cleaning) == 'multiple times a week') {
+                $days = explode(',', $item->which_day_of_the_week_do_you_want_the_service);
+                $days = array_map('trim', $days);
+                $current = $startDate->copy();
+                while ($current <= $endDate) {
+                    if (in_array(strtolower($current->format('l')), array_map('strtolower', $days))) {
+                        $visitDates[] = $current->toDateString();
                     }
+                    $current->addDay();
                 }
-
-                // Service & subservice format
-                $services = [];
-                if (!empty($coupon->service_id)) {
-                    $serviceIds = explode(',', $coupon->service_id);
-                    $services = DB::table('services')->whereIn('id', $serviceIds)->pluck('servicename')->toArray();
-                }
-
-                $validCoupons[] = [
-                    'id' => $coupon->id,
-                    'coupan_name' => $coupon->coupan_name,
-                    'coupan_code' => $coupon->coupan_code,
-                    'discount_type' => $coupon->coupanvalue == 1 ? 'Price' : 'Percentage',
-                    'discount_value' => $coupon->discount,
-                    'minimum_order' => $coupon->minimum_order,
-                    'start_date' => $coupon->startdate,
-                    'end_date' => $coupon->enddate,
-                    'expiry_message' => $expiryMessage,
-                    'is_expired' => $isExpired,
-                    'applicable_services' => implode(', ', $services),
-                    'description' => $coupon->description,
-                ];
+            } else {
+                $visitDates[] = $startDate->toDateString();
             }
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Coupons fetched successfully.',
-                'data' => $validCoupons
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Something went wrong.',
-                'error' => $e->getMessage()
-            ], 500);
+            $latestPastVisit = null;
+            $nextUpcomingVisit = null;
+
+            foreach ($visitDates as $visitDate) {
+                if ($visitDate < $today) {
+                    $latestPastVisit = $visitDate;
+                } elseif (!$nextUpcomingVisit) {
+                    $nextUpcomingVisit = $visitDate;
+                }
+            }
+
+            $tipAmount = 0;
+            if ($nextUpcomingVisit) {
+                $tips = DB::table('ci_tips')
+                    ->where('order_id', $order->order_id)
+                    ->where('visit_date', $nextUpcomingVisit)
+                    ->where('payment_status', 'paid')
+                    ->get();
+                $tipAmount = $tips->sum('tip_amount');
+            } elseif ($latestPastVisit) {
+                $tips = DB::table('ci_tips')
+                    ->where('order_id', $order->order_id)
+                    ->where('visit_date', $latestPastVisit)
+                    ->where('payment_status', 'paid')
+                    ->get();
+                $tipAmount = $tips->sum('tip_amount');
+            }
+
+            $serviceData = DB::table('services')->where('id', $item->service_id)->first();
+            $serviceName = "";
+            if (!empty($item->subservice_id)) {
+                $serviceName = \App\Helpers\Helper::subservicename($item->subservice_id);
+            }
+
+            $cleaner = "";
+            if (!empty($order->cleaner_id)) {
+                $cleaner = \App\Helpers\Helper::cleanername_new($order->cleaner_id);
+            }
+
+            $timeSlot = "";
+            if (!empty($item->time_slot)) {
+                $timeSlot = \App\Helpers\Helper::timeslotname($item->time_slot);
+            }
+
+            $booking = [];
+            $booking['order_id'] = $order->order_id;
+            $booking['subservice_icon'] = !empty($serviceData->app_icon) ? asset('public/upload/service/' . $serviceData->app_icon) : '';
+            $booking['subservice_name'] = $serviceName;
+            $booking['cleaner_name'] = $cleaner;
+            $booking['booking_date'] = \Carbon\Carbon::parse($item->bookingdate . ' ' . $item->month . ' ' . $item->bookingyear)->format('Y-m-d');
+            $booking['booking_time'] = $timeSlot;
+            $booking['visit_date'] = $nextUpcomingVisit;
+            $booking['latest_visit'] = $latestPastVisit;
+            $booking['subtotal'] = number_format($order->sub_total, 2, '.', '');
+            $booking['order_total'] = number_format($order->order_total, 2, '.', '');
+            $booking['tips'] = number_format($tipAmount, 2, '.', '');
+            $booking['order_status'] = $order->order_status;
+            $booking['payment_status'] = $order->payment_status;
+            $booking['items'] = $items;
+
+            // Determine status based on order_status
+            $isUnpaid = ($order->order_status == 'UP');
+            $isCancelled = ($order->order_status == 'CL');
+            $isCompleted = ($order->order_status == 'CO');
+            $isUpcoming = in_array($order->order_status, ['BK', 'BC', 'OTW', 'IP']) || (!$isUnpaid && !$isCancelled && !$isCompleted);
+
+            if ($isUnpaid) {
+                $b = $booking;
+                $b['display_status'] = 'Unpaid';
+                $b['visit_date'] = $nextUpcomingVisit ?: $latestPastVisit;
+                $b['book_again'] = false;
+                $data['unpaid'][] = $b;
+            } elseif ($isCancelled) {
+                $b = $booking;
+                $b['display_status'] = 'Cancelled';
+                $b['visit_date'] = !empty($latestPastVisit) ? $latestPastVisit : $nextUpcomingVisit;
+                $b['book_again'] = true;
+                $data['cancelled'][] = $b;
+            } elseif ($isCompleted) {
+                $b = $booking;
+                $b['display_status'] = 'Completed';
+                $b['visit_date'] = !empty($latestPastVisit) ? $latestPastVisit : $nextUpcomingVisit;
+                $b['book_again'] = true;
+                $data['completed'][] = $b;
+            } elseif ($isUpcoming) {
+                $b = $booking;
+                $b['display_status'] = 'Upcoming';
+                $b['visit_date'] = $nextUpcomingVisit ?: $latestPastVisit;
+                $b['book_again'] = false;
+                $data['upcoming'][] = $b;
+            }
         }
-    }
 
-    public function validateCoupon(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'user_id' => 'required|integer',
-                'coupon_code' => 'required|string',
-                'amount' => 'required|numeric',
-            ]);
+        $finalData = [
+            'upcoming_count' => count($data['upcoming']),
+            'upcoming' => $data['upcoming'],
+            'completed_count' => count($data['completed']),
+            'completed' => $data['completed'],
+            'cancelled_count' => count($data['cancelled']),
+            'cancelled' => $data['cancelled'],
+            'unpaid_count' => count($data['unpaid']),
+            'unpaid' => $data['unpaid']
+        ];
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => $validator->errors()->first()
-                ], 422);
-            }
-
-            // $authUser = JWTAuth::parseToken()->authenticate();
-            // $userId = $authUser->id;
-            $userId = $request->user_id;
-            $couponCode = $request->coupon_code;
-            $amount = $request->amount;
-            $serviceId = $request->service_id ?? '';
-            $subserviceId = $request->subservice_id ?? '';
-
-            // Fetch coupon
-            $coupon = DB::table('coupans')
-                ->where('coupan_code', $couponCode)
-                ->where('is_active', 0)
-                ->first();
-
-            if (!$coupon) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Invalid or inactive coupon code.'
-                ], 400);
-            }
-
-            // Check Dates
-            $startDate = \Carbon\Carbon::parse($coupon->startdate)->startOfDay();
-            $endDate = \Carbon\Carbon::parse($coupon->enddate)->endOfDay();
-            $today = \Carbon\Carbon::now();
-
-            if ($today->lt($startDate)) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Coupon is not active yet.'
-                ], 400);
-            }
-
-            if ($today->gt($endDate)) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Coupon has expired.'
-                ], 400);
-            }
-
-            // Check user eligibility
-            if (!empty($coupon->user_id)) {
-                $eligibleUsers = explode(',', $coupon->user_id);
-                if (!in_array($userId, $eligibleUsers)) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'This coupon is not applicable for your account.'
-                    ], 400);
-                }
-            }
-
-            // Check service eligibility
-            if (!empty($coupon->service_id) && !empty($serviceId)) {
-                $allowedServices = explode(',', $coupon->service_id);
-                if (!in_array($serviceId, $allowedServices)) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'This coupon is not applicable for the selected service.'
-                    ], 400);
-                }
-            }
-
-            // Check subservice eligibility
-            if (!empty($coupon->subservice_id) && !empty($subserviceId)) {
-                $allowedSubservices = explode(',', $coupon->subservice_id);
-                if (!in_array($subserviceId, $allowedSubservices)) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'This coupon is not applicable for the selected subservice.'
-                    ], 400);
-                }
-            }
-
-            // Check global usage limits
-            $totalUsage = DB::table('ci_orders')->where('coupon_code', $couponCode)->count();
-            if ($coupon->no_of_coupons > 0 && $totalUsage >= $coupon->no_of_coupons) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Coupon usage limit has been reached.'
-                ], 400);
-            }
-
-            // Check user usage limits
-            $userUsage = DB::table('ci_orders')->where('coupon_code', $couponCode)->where('user_id', $userId)->count();
-            if ($coupon->no_of_coupons_user > 0 && $userUsage >= $coupon->no_of_coupons_user) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'You have reached the maximum usage limit for this coupon.'
-                ], 400);
-            }
-
-            // Check minimum order
-            if ($amount < $coupon->minimum_order) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Minimum order amount for this coupon is ' . $coupon->minimum_order
-                ], 400);
-            }
-
-            // Calculate discount
-            $discountAmount = 0;
-            if ($coupon->coupanvalue == 0) {
-                // Percentage
-                $discountAmount = round(($amount * $coupon->discount) / 100);
-            } elseif ($coupon->coupanvalue == 1) {
-                // Fixed amount
-                $discountAmount = $coupon->discount;
-            }
-
-            // The discount shouldn't be more than the total amount
-            if ($discountAmount > $amount) {
-                $discountAmount = $amount;
-            }
-
-            $finalPrice = max($amount - $discountAmount, 0);
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Coupon applied successfully.',
-                'data' => [
-                    'id' => $coupon->id,
-                    'coupan_code' => $coupon->coupan_code,
-                    'coupan_name' => $coupon->coupan_name,
-                    'discount_type' => $coupon->coupanvalue == 1 ? 'Price' : 'Percentage',
-                    'discount_value' => $coupon->discount,
-                    'original_price' => $amount,
-                    'discount_amount' => $discountAmount,
-                    'final_price' => $finalPrice,
-                ]
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Something went wrong.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'status' => true,
+            'message' => 'Bookings retrieved successfully.',
+            'data' => $finalData
+        ]);
     }
 }

@@ -95,7 +95,7 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        padding: 16px 20px;
+        padding: 10px 15px;
         border-bottom: 1px solid #f3f4f6;
     }
     
@@ -168,7 +168,7 @@
     }
     
     .sub-card-body {
-        padding: 16px 20px;
+        padding: 10px 20px;
     }
     
     .sub-label {
@@ -177,14 +177,14 @@
         color: #9ca3af;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-bottom: 2px;
+        /* margin-bottom: 2px; */
     }
     
     .sub-value {
         font-size: 15px;
         font-weight: 700;
         color: #1f2937;
-        margin-bottom: 12px;
+        /* margin-bottom: 12px; */
     }
     
     .sub-progress-header {

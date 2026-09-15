@@ -48,7 +48,7 @@ class RenewCleaningPackages extends Command
 
         $expiredItems = DB::table('ci_order_item')
             ->join('ci_orders', 'ci_order_item.order_id', '=', 'ci_orders.order_id')
-            ->select('ci_order_item.*', 'ci_orders.user_id as order_user_id', 'ci_orders.order_total', 'ci_orders.order_currency', 'ci_orders.order_status', 'ci_orders.payment_status', 'ci_orders.subservice_code', 'ci_orders.city_code', 'ci_orders.order_year')
+            ->select('ci_order_item.*', 'ci_orders.user_id as order_user_id', 'ci_orders.order_total', 'ci_orders.order_currency', 'ci_orders.order_status', 'ci_orders.payment_status', 'ci_orders.subservice_code', 'ci_orders.city_code', 'ci_orders.order_year', 'ci_orders.pending_plan_change')
             ->where('ci_order_item.end_date', '<', $targetDate)
             ->where('ci_order_item.end_date', '>', '2000-01-01')
             ->where('ci_order_item.is_renewed', 0)
@@ -80,8 +80,18 @@ class RenewCleaningPackages extends Command
             }
 
             try {
-                // Determine price to charge (assume the item price or order total)
+                // Determine price to charge
                 $amountToCharge = $item->package_item_price ? $item->package_item_price : $item->order_total;
+
+                // If there is a pending plan change, use the new amount!
+                $pendingChange = null;
+                if (!empty($item->pending_plan_change)) {
+                    $pendingChange = json_decode($item->pending_plan_change, true);
+                    if ($pendingChange && isset($pendingChange['amount'])) {
+                        $amountToCharge = $pendingChange['amount'];
+                    }
+                }
+
                 if ($amountToCharge <= 0) {
                     $this->error('Invalid amount for Item ID: ' . $item->id);
                     continue;
@@ -159,6 +169,14 @@ class RenewCleaningPackages extends Command
 
                         $newOrderId = DB::table('ci_orders')->insertGetId($newOrderData);
 
+                        if ($pendingChange) {
+                            DB::table('ci_orders')->where('order_id', $newOrderId)->update([
+                                'order_total' => $pendingChange['amount'] ?? $amountToCharge,
+                                'renewal_amount' => $pendingChange['amount'] ?? $amountToCharge,
+                                'pending_plan_change' => null
+                            ]);
+                        }
+
                         // // Calculate new dates
                         $oldEndDate = Carbon::parse($item->end_date);
                         // $oldStartDate = Carbon::parse($item->cdate ?: ($item->bookingyear . '-' . $item->month . '-' . $item->bookingdate));
@@ -180,7 +198,7 @@ class RenewCleaningPackages extends Command
 
                         // Clone Order Item
                         $newItemData = (array) $item;
-                        unset($newItemData['id'], $newItemData['order_user_id'], $newItemData['order_total'], $newItemData['order_currency'], $newItemData['order_status'], $newItemData['payment_status'], $newItemData['subservice_code'], $newItemData['city_code'], $newItemData['order_year']); // Remove joined and primary fields
+                        unset($newItemData['id'], $newItemData['order_user_id'], $newItemData['order_total'], $newItemData['order_currency'], $newItemData['order_status'], $newItemData['payment_status'], $newItemData['subservice_code'], $newItemData['city_code'], $newItemData['order_year'], $newItemData['pending_plan_change']); // Remove joined and primary fields
 
                         $newItemData['order_id'] = $newOrderId;
                         $newItemData['is_renewed'] = 0;
@@ -189,6 +207,15 @@ class RenewCleaningPackages extends Command
                         $newItemData['bookingdate'] = $newStartDate->format('d');
                         $newItemData['month'] = $newStartDate->format('F');
                         $newItemData['bookingyear'] = $newStartDate->year;
+
+                        if ($pendingChange) {
+                            if (!empty($pendingChange['frequency'])) {
+                                $newItemData['how_often_do_you_need_cleaning'] = $pendingChange['frequency'];
+                            }
+                            if (!empty($pendingChange['visits_entitled'])) {
+                                $newItemData['visits_entitled'] = $pendingChange['visits_entitled'];
+                            }
+                        }
 
                         DB::table('ci_order_item')->insert($newItemData);
 

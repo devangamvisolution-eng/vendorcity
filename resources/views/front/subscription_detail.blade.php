@@ -193,7 +193,7 @@
     .vc-btn-primary:hover { background: #0030b3; text-decoration: none; color: #fff;}
     .vc-btn-outline { background: transparent; color: #475569; border: 1px solid #cbd5e1; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; margin-top:10px; }
 
-    .form-group { margin-bottom: 15px; text-align: left; }
+    .form-group { margin-bottom: 7px; text-align: left; }
     .form-group label { font-size:13px; font-weight:600; color:#1e293b; margin-bottom:5px; display:block; }
     .form-control { border:1px solid #cbd5e1; border-radius:6px; padding:10px 12px; width:100%; font-family: inherit;}
 
@@ -669,10 +669,9 @@
                                 <a onclick="openModal('planModal'); toggleDropdown();">Change Plan</a>
                                 <a onclick="openModal('scheduleModal'); toggleDropdown();">Edit Regular Schedule</a>
                                 <a onclick="openModal('cleanerModal'); toggleDropdown();">Cleaner Preference</a>
-                                <a onclick="alert('Checking coverage for Address Change.'); toggleDropdown();">Service Address</a>
-                                <a>Payment Method</a>
-                                <a>Billing History</a>
-                                <a>Cancellation & Rescheduling Policy</a>
+                                <a onclick="openModal('addressModal'); toggleDropdown();">Service Address</a>
+                                <a onclick="goToBillingTab('paymentMethodSection'); toggleDropdown();" style="cursor:pointer;">Payment Method</a>
+                                <a onclick="goToBillingTab('billingHistorySection'); toggleDropdown();" style="cursor:pointer;">Billing History</a>
                                 <a onclick="openModal('cancelModal'); toggleDropdown();">Cancel Subscription</a>
                             </div>
                         </div>
@@ -724,19 +723,19 @@
                             <div class="dash-card next-cleaning-block">
                                 <div class="nc-label">Next Cleaning</div>
                                 <div class="nc-date" id="highlight-next-visit">{{ $subscription->next_visit_date }}<br>{{ $subscription->next_visit_time }}</div>
-                                <div class="nc-details">{{ $subscription->preferred_cleaner }} • {{ count($subscription->upcoming_visits) > 0 ? $subscription->upcoming_visits[0]->duration : '3 Hours' }}</div>
+                                <div class="nc-details">{{ ucfirst($subscription->preferred_cleaner) }} • {{ count($subscription->upcoming_visits) > 0 ? $subscription->upcoming_visits[0]->duration : '3 Hours' }}</div>
                                 {{-- <button class="vc-btn-outline" style="width: auto; padding: 6px 16px; font-size: 12px; margin-top: auto;" onclick="openRescheduleModal(null, '{{ $subscription->next_visit_date }}', '{{ $subscription->next_visit_time }}')">Manage Visit</button> --}}
                             </div>
 
                             <!-- Progress Bar -->
                             <div class="dash-card progress-block">
                                 <div class="progress-text">{{ $subscription->visits_completed }} of {{ $subscription->visits_per_cycle }} visits completed</div>
-                                <div class="progress-dots">
+                                <div class="progress-dots" style="font-size: 16px; color: #0040E6; margin: 12px 0;">
                                     @for($i = 0; $i < $subscription->visits_per_cycle; $i++)
                                         @if($i < $subscription->visits_completed)
-                                            <span>●</span>
+                                            <i class="fas fa-circle" style="margin: 0 4px;"></i>
                                         @else
-                                            <span class="empty">○</span>
+                                            <i class="far fa-circle" style="color: #cbd5e1; margin: 0 4px;"></i>
                                         @endif
                                     @endfor
                                 </div>
@@ -863,17 +862,31 @@
                         <div id="tab-billing" class="tab-content">
                             
                             <!-- Payment Method Section -->
-                            <div class="visit-item" style="margin-bottom: 15px;">
+                            <div class="visit-item" style="margin-bottom: 15px;" id="paymentMethodSection">
                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                                     <h4 style="margin:0; font-weight:700; font-size:16px;">Payment Method</h4>
                                     <button class="vc-btn-outline" style="width:auto; padding:6px 12px; font-size:12px; margin-top:0;" onclick="openModal('paymentMethodModal')">Change Payment Method</button>
                                 </div>
                                 <div style="display:flex; align-items:center; gap:15px; border:1px solid #eaeaea; padding:15px; border-radius:8px; background:#f8fafc;">
-                                    <div style="font-size:32px; color:#1a1f36;"><i class="fab fa-cc-visa"></i></div>
-                                    <div>
-                                        <div style="font-weight:700; color:#1e293b; font-size:14px;">Visa •••• 4242</div>
-                                        <div style="font-size:13px; color:#64748b;">Expires 09/28</div>
-                                    </div>
+                                    @if(isset($subscription->paymentmode) && $subscription->paymentmode == 1)
+                                        <div style="font-size:32px; color:#1a1f36;"><i class="fas fa-money-bill-wave"></i></div>
+                                        <div>
+                                            <div style="font-weight:700; color:#1e293b; font-size:14px;">Cash on Delivery</div>
+                                            <div style="font-size:13px; color:#64748b;">Pay directly after service</div>
+                                        </div>
+                                    @elseif(isset($subscription->paymentmode) && $subscription->paymentmode == 3)
+                                        <div style="font-size:32px; color:#1a1f36;"><i class="fas fa-wallet"></i></div>
+                                        <div>
+                                            <div style="font-weight:700; color:#1e293b; font-size:14px;">Tabby</div>
+                                            <div style="font-size:13px; color:#64748b;">Pay in installments</div>
+                                        </div>
+                                    @else
+                                        <div style="font-size:32px; color:#1a1f36;"><i class="fab fa-cc-visa"></i></div>
+                                        <div>
+                                            <div style="font-weight:700; color:#1e293b; font-size:14px;">Credit / Debit Card</div>
+                                            <div style="font-size:13px; color:#64748b;">Online Payment</div>
+                                        </div>
+                                    @endif
                                     <div style="margin-left:auto; background:#ecfdf5; color:#059669; font-size:11px; font-weight:700; padding:4px 8px; border-radius:4px; border:1px solid #d1fae5;">Default</div>
                                 </div>
                             </div>
@@ -893,33 +906,37 @@
                                         <p id="renewal-text" style="color:#64748b; margin:0; font-size:13px;">Your subscription will automatically renew on {{ $subscription->next_renewal ?? '29 September 2026' }}.</p>
                                     </div>
                                     <label class="switch">
-                                      <input type="checkbox" id="autoRenewToggle" checked onchange="toggleAutoRenew(this)">
+                                      <input type="checkbox" id="autoRenewToggle" {{ $subscription->is_auto_renew ? 'checked' : '' }} onchange="toggleAutoRenew(this)">
                                       <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div id="renewal-warning" style="display:none; margin-top:15px; padding:15px; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; color:#dc2626; font-size:13px; font-weight:500;">
+                                <div id="renewal-warning" style="display:{{ $subscription->is_auto_renew ? 'none' : 'block' }}; margin-top:15px; padding:15px; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; color:#dc2626; font-size:13px; font-weight:500;">
                                     Your remaining visits will not be affected. Your subscription will end after your current cycle and will not renew.
                                 </div>
                             </div>
 
                             <!-- Billing History -->
-                            <div class="visit-item">
+                            <div class="visit-item" id="billingHistorySection">
                                 <h4 style="margin:0 0 15px 0; font-weight:700; font-size:16px;">Billing History</h4>
                                 <div style="display:flex; flex-direction:column; gap:10px;">
-                                    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid #eaeaea; border-radius:8px;">
-                                        <div>
-                                            <div style="font-weight:600; color:#1e293b; font-size:14px;">29 Aug 2026</div>
-                                            <div style="font-size:13px; color:#64748b;"><span class="currency_dhiram"></span>{{ $subscription->renewal_amount ?? ' 350' }} — <span style="color:#059669; font-weight:600;">Paid</span></div>
+                                    @if(isset($transactions) && count($transactions) > 0)
+                                        @foreach($transactions as $txn)
+                                        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid #eaeaea; border-radius:8px;">
+                                            <div>
+                                                <div style="font-weight:600; color:#1e293b; font-size:14px;">{{ $txn->date }}</div>
+                                                <div style="font-size:13px; color:#64748b;"><span class="currency_dhiram"></span>{{ number_format($txn->amount, 2) }} • <span style="color:{{ $txn->status == 'Paid' || strtolower($txn->status) == 'success' ? '#059669' : '#dc2626' }}; font-weight:600;">{{ $txn->status }}</span></div>
+                                            </div>
+                                            <div style="text-align:right;">
+                                                <div style="font-size:13px; font-weight:600; color:#0f172a;">{{ $txn->type }}</div>
+                                                <div style="font-size:12px; color:#3b82f6; margin-top:2px; cursor:pointer;"><i class="fas fa-download"></i> Receipt</div>
+                                            </div>
                                         </div>
-                                        <a href="#" style="color:#0040E6; font-size:13px; font-weight:600; text-decoration:none;"><i class="fas fa-download" style="margin-right:4px;"></i> Invoice</a>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid #eaeaea; border-radius:8px;">
-                                        <div>
-                                            <div style="font-weight:600; color:#1e293b; font-size:14px;">29 Jul 2026</div>
-                                            <div style="font-size:13px; color:#64748b;"><span class="currency_dhiram"></span>{{ $subscription->renewal_amount ?? ' 350' }} — <span style="color:#059669; font-weight:600;">Paid</span></div>
+                                        @endforeach
+                                    @else
+                                        <div class="alert alert-info" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;">
+                                            No billing history available yet.
                                         </div>
-                                        <a href="#" style="color:#0040E6; font-size:13px; font-weight:600; text-decoration:none;"><i class="fas fa-download" style="margin-right:4px;"></i> Invoice</a>
-                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -957,17 +974,16 @@
             <strong>Context Attached:</strong><br>
             Topic: <span id="support-topic" style="font-weight:600; color:#1e293b;"></span><br>
             Subscription ID: <span style="font-weight:600; color:#1e293b;">#SUB-{{ $subscription->id }}</span><br>
-            Customer ID: <span style="font-weight:600; color:#1e293b;">#CUST-{{ auth()->id() ?? '932' }}</span><br>
-            Booking ID: <span style="font-weight:600; color:#1e293b;">#VC-84931</span>
+            Customer ID: <span style="font-weight:600; color:#1e293b;">#CUST-{{ Session::get('user')['userid'] ?? 'N/A' }}</span>
         </div>
         
         <div class="form-group">
             <label>Message</label>
-            <textarea class="form-control" rows="4" placeholder="How can we help you today?"></textarea>
+            <textarea id="support-message" class="form-control" rows="4" placeholder="How can we help you today?"></textarea>
         </div>
         
-        <button class="vc-btn-primary" onclick="confirmModalAction('supportModal', 'Message Sent ✓')">Send Message</button>
-        <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
+        <button class="vc-btn-primary" id="btn-submit-support" onclick="submitSupportRequest()">Send Message</button>
+        <div id="support-success-msg" class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
 </div>
 
@@ -1062,7 +1078,7 @@
         
         <div class="form-group">
             <label>Why would you like to change?</label>
-            <select class="form-control" onchange="document.getElementById('otherReasonContainer').style.display = this.value === 'Other' ? 'block' : 'none'">
+            <select class="form-control" id="cleaner_reason" onchange="document.getElementById('otherReasonContainer').style.display = this.value === 'Other' ? 'block' : 'none'">
                 <option value="Cleaner unavailable">Cleaner unavailable</option>
                 <option value="Quality of service">Quality of service</option>
                 <option value="Communication">Communication</option>
@@ -1071,17 +1087,17 @@
                 <option value="Other">Other</option>
             </select>
             <div id="otherReasonContainer" style="display: none; margin-top: 10px;">
-                <textarea class="form-control" rows="3" placeholder="Please specify your reason"></textarea>
+                <textarea class="form-control" id="cleaner_other_reason" rows="3" placeholder="Please specify your reason"></textarea>
             </div>
         </div>
         <div class="form-group" style="margin-bottom:25px;">
             <label style="margin-bottom:10px;">Would you like the new cleaner for:</label>
-            <label style="display:block; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cleaner_scope" checked> Next visit only</label>
-            <label style="display:block; cursor:pointer;"><input type="radio" name="cleaner_scope"> All future visits</label>
+            <label style="display:block; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cleaner_scope" value="next" checked> Next visit only</label>
+            <label style="display:block; cursor:pointer;"><input type="radio" name="cleaner_scope" value="all"> All future visits</label>
         </div>
         
-        <button class="vc-btn-primary" onclick="confirmModalAction('cleanerModal', 'Cleaner Request Sent ✓')">Confirm Request</button>
-        <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
+        <button class="vc-btn-primary" onclick="submitCleanerRequest()" id="btn-request-cleaner">Confirm Request</button>
+        <div class="success-msg" id="cleaner-success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
 </div>
 
@@ -1130,21 +1146,108 @@
         <span class="vc-modal-close" onclick="closeModal('scheduleModal')">&times;</span>
         <h3>Edit Regular Schedule</h3>
         <div style="font-size:14px; color:#475569; margin-bottom:20px;">Current Schedule: <strong>{{ $subscription->recurring_schedule }}</strong></div>
-        <div class="form-group"><label>New Day of Week</label><select class="form-control"><option>Monday</option><option>Tuesday</option><option selected>Thursday</option></select></div>
-        <div class="form-group"><label>New Time</label><select class="form-control"><option>08:00 AM</option><option selected>02:00 PM</option></select></div>
+        
+        @php
+            $isMultiDay = strpos($current_day, ',') !== false;
+            $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            $currentTimeStr = explode(' • ', $subscription->recurring_schedule)[1] ?? '';
+        @endphp
+        
+        @if($isMultiDay)
+            <div style="background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; padding:15px; margin-bottom:15px;">
+                <p style="margin:0; font-size:13px; color:#d97706; font-weight:600;"><i class="fas fa-info-circle" style="margin-right:5px;"></i> You are on a custom multi-day plan. You can change your preferred time below.</p>
+            </div>
+            <input type="hidden" id="new_day_of_week" value="{{ $current_day }}">
+        @else
+            <div class="form-group">
+                <label>New Day of Week</label>
+                <select class="form-control" id="new_day_of_week">
+                    @foreach($daysOfWeek as $day)
+                        <option value="{{ $day }}" {{ trim($current_day) == $day ? 'selected' : '' }}>{{ $day }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
+        
+        <div class="form-group">
+            <label>New Time</label>
+            <select class="form-control" id="new_time_slot">
+                @foreach($time_slots as $slot)
+                    <option value="{{ $slot->id }}" {{ trim($currentTimeStr) == $slot->name ? 'selected' : '' }}>{{ $slot->name }}</option>
+                @endforeach
+            </select>
+        </div>
         
         <div class="form-group" style="margin-bottom:25px;">
             <label style="margin-bottom:10px;">Apply to:</label>
-            <label style="display:block; margin-bottom:8px; cursor:pointer;"><input type="radio" name="schedule_scope" checked> Next visit only</label>
-            <label style="display:block; cursor:pointer;"><input type="radio" name="schedule_scope"> All future visits</label>
+            <label style="display:block; margin-bottom:8px; cursor:pointer;"><input type="radio" name="schedule_scope" value="next" checked> Next visit only</label>
+            <label style="display:block; cursor:pointer;"><input type="radio" name="schedule_scope" value="all"> All future visits</label>
         </div>
 
-        <button class="vc-btn-primary" onclick="confirmModalAction('scheduleModal', 'Schedule Updated ✓')">Update Schedule</button>
-        <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
+        <button class="vc-btn-primary" onclick="submitScheduleEdit()" id="btn-edit-schedule">Update Schedule</button>
+        <div class="success-msg" id="schedule-success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
 </div>
 
-<!-- 5. Smart Cancellation Modal -->
+<!-- 5. Address Management Modal -->
+<div class="vc-modal-overlay" id="addressModal">
+    <div class="vc-modal">
+        <span class="vc-modal-close" onclick="closeModal('addressModal')">&times;</span>
+        <h3>Change Service Address</h3>
+        
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:15px; margin-bottom:20px;">
+            <div style="font-size:12px; color:#64748b; text-transform:uppercase; font-weight:600; margin-bottom:5px;">Current Address</div>
+            <div style="font-size:14px; color:#1e293b;">
+                {{ $subscription->service_address }}
+            </div>
+        </div>
+
+        <p style="font-size:13px; color:#64748b; margin-bottom:20px; line-height:1.5;">
+            Changing your address requires a quick review to ensure your current vendor and cleaner can cover the new area without pricing changes. Submit your new details below.
+        </p>
+        
+        @php
+            $currentCity = '';
+            $currentArea = '';
+            $currentBldg = '';
+            $currentApt = '';
+            
+            $addrParts = explode(', ', $subscription->service_address);
+            if (count($addrParts) >= 4) {
+                $currentCity = $addrParts[0];
+                $currentArea = $addrParts[1];
+                $currentBldg = $addrParts[2];
+                $currentApt = $addrParts[3];
+            }
+        @endphp
+
+        <div class="form-group">
+            <label>City *</label>
+            <select class="form-control" id="new_address_city">
+                @foreach($cities as $city)
+                    <option value="{{ $city->name }}" {{ trim($currentCity) == trim($city->name) ? 'selected' : '' }}>{{ $city->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Area *</label>
+            <input type="text" class="form-control" id="new_address_area" value="{{ $currentArea }}" placeholder="e.g. Dubai Hills Estate">
+        </div>
+        <div class="form-group">
+            <label>Building / Street No *</label>
+            <input type="text" class="form-control" id="new_address_street" value="{{ $currentBldg }}" placeholder="e.g. Street 10">
+        </div>
+        <div class="form-group" style="margin-bottom:25px;">
+            <label>Apartment / Villa No</label>
+            <input type="text" class="form-control" id="new_address_apt" value="{{ $currentApt }}" placeholder="e.g. Villa 24">
+        </div>
+
+        <button class="vc-btn-primary" onclick="submitAddressChangeRequest()" id="btn-request-address">Request Address Change</button>
+        <div class="success-msg" id="address-success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
+    </div>
+</div>
+
+<!-- 6. Smart Cancellation Modal -->
 <div class="vc-modal-overlay" id="cancelModal">
     <div class="vc-modal">
         <span class="vc-modal-close" onclick="closeModal('cancelModal')">&times;</span>
@@ -1185,8 +1288,8 @@
                     <li><strong>Auto-renewal:</strong> Will be turned off immediately.</li>
                 </ul>
             </div>
-            <button class="vc-btn-primary" style="background:#dc2626;" onclick="confirmModalAction('cancelModal', 'Subscription Cancelled ✓', () => { document.getElementById('main-status-badge').innerText = 'Cancelled'; document.getElementById('main-status-badge').className = 'status-badge status-cancelled'; document.getElementById('main-status-badge').style.background = ''; document.getElementById('main-status-badge').style.color = ''; })">Confirm Cancellation</button>
-            <div class="success-msg" style="display:none; color:#dc2626; font-weight:700; text-align:center; margin-top:15px;"></div>
+            <button class="vc-btn-primary" style="background:#dc2626;" id="btn-confirm-cancel" onclick="submitCancelSubscription()">Confirm Cancellation</button>
+            <div id="cancel-success-msg" class="success-msg" style="display:none; color:#dc2626; font-weight:700; text-align:center; margin-top:15px;"></div>
         </div>
     </div>
 </div>
@@ -1223,7 +1326,7 @@
                 @endphp
 
                 @if ($timeslot_service && $timeslot_service->is_active == 1)
-                    <option value="{{ $timeslot_data->name }}">
+                    <option value="{{ $timeslot_data->id }}">
                         {{ $timeslot_data->name }} @if($timeslot_service_price > 0) (+ AED {{ $timeslot_service_price }}) @endif
                     </option>
                 @endif
@@ -1233,11 +1336,11 @@
 
         <div class="form-group" style="margin-bottom:20px;">
             <label>Cleaner Preference</label>
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
                 <label style="flex: 1; display:flex; flex-direction: column; align-items: flex-start; justify-content: center; cursor:pointer; font-size:13px; border:1px solid #eaeaea; padding:12px 10px; border-radius:6px; background:#fafafa;">
                     <div style="display:flex; align-items:center; margin-bottom: 4px;">
                         <input type="radio" name="reschedule_cleaner" value="keep" checked style="margin-right:6px;"> 
-                        <span style="font-weight:600; color:#1e293b; line-height: 1.2;">Keep {{ $subscription->preferred_cleaner }}</span>
+                        <span style="font-weight:600; color:#1e293b; line-height: 1.2;">Keep {{ ucfirst($subscription->preferred_cleaner) }}</span>
                     </div>
                     <span style="color:#64748b; font-size:11px; margin-left:18px; line-height: 1.2;">(May limit available slots)</span>
                 </label>
@@ -1319,25 +1422,72 @@
 
     function switchTab(tabId) {
         document.querySelectorAll('.visit-tab').forEach(tab => tab.classList.remove('active'));
-        event.target.classList.add('active');
+        let targetTab = document.querySelector(`.visit-tab[onclick="switchTab('${tabId}')"]`);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         document.getElementById('tab-' + tabId).classList.add('active');
     }
 
+    function goToBillingTab(sectionId = null) {
+        switchTab('billing');
+        if (sectionId) {
+            setTimeout(() => {
+                document.getElementById(sectionId).scrollIntoView({behavior: 'smooth', block: 'start'});
+            }, 100);
+        }
+    }
+
     function toggleAutoRenew(el) {
-        if(el.checked) {
+        let isRenewing = el.checked;
+        if(isRenewing) {
             document.getElementById('renewal-warning').style.display = 'none';
-            document.getElementById('renewal-text').innerHTML = 'Your subscription will automatically renew for {{ $subscription->renewal_amount }} on {{ $subscription->next_renewal }}.';
-            document.getElementById('auto-renew-label').innerHTML = 'ON';
-            document.getElementById('auto-renew-label').style.color = '#059669';
-            document.getElementById('main-status-subtitle').style.display = 'none';
+            document.getElementById('renewal-text').innerHTML = 'Your subscription will automatically renew on {{ $subscription->next_renewal ?? "29 September 2026" }}.';
+            let label = document.getElementById('auto-renew-label');
+            if (label) {
+                label.innerHTML = 'ON';
+                label.style.color = '#059669';
+            }
+            let subtitle = document.getElementById('main-status-subtitle');
+            if (subtitle) subtitle.style.display = 'none';
         } else {
             document.getElementById('renewal-warning').style.display = 'block';
             document.getElementById('renewal-text').innerHTML = 'Auto-renewal is currently disabled.';
-            document.getElementById('auto-renew-label').innerHTML = 'OFF';
-            document.getElementById('auto-renew-label').style.color = '#64748b';
-            document.getElementById('main-status-subtitle').style.display = 'block';
+            let label = document.getElementById('auto-renew-label');
+            if (label) {
+                label.innerHTML = 'OFF';
+                label.style.color = '#64748b';
+            }
+            let subtitle = document.getElementById('main-status-subtitle');
+            if (subtitle) subtitle.style.display = 'block';
         }
+
+        // Backend Sync
+        fetch('{{ route('subscription.toggle_renew') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                auto_renew: isRenewing ? 1 : 0
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status !== 1) {
+                // Revert on failure
+                el.checked = !isRenewing;
+                alert(data.message || 'Error updating renewal status');
+            }
+        })
+        .catch(err => {
+            // Revert on failure
+            el.checked = !isRenewing;
+            alert('Server error, please try again later.');
+        });
     }
     
     function toggleDropdown() {
@@ -1481,7 +1631,7 @@
         if(msg) msg.style.display = 'none';
     }
     
-    function confirmModalAction(id, msgText, callback) {
+    function ss(id, msgText, callback) {
         let msg = document.getElementById(id).querySelector('.success-msg');
         if(msg) { msg.innerText = msgText; msg.style.display = 'block'; }
         if(callback) callback();
@@ -1491,6 +1641,55 @@
     function openSupportModal(topic) {
         document.getElementById('support-topic').innerText = topic;
         openModal('supportModal');
+    }
+
+    function submitSupportRequest() {
+        let topic = document.getElementById('support-topic').innerText;
+        let message = document.getElementById('support-message').value;
+
+        if (!message.trim()) {
+            alert('Please enter a message.');
+            return;
+        }
+
+        let btn = document.getElementById('btn-submit-support');
+        let originalText = btn.innerText;
+        btn.innerText = "Sending...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.support') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                topic: topic,
+                message: message
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('support-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.style.color = '#10b981';
+                msgBox.innerText = data.message;
+                document.getElementById('support-message').value = '';
+                setTimeout(() => closeModal('supportModal'), 2000);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            alert('Server error, please try again later.');
+        });
     }
     
     // Cancellation Flow
@@ -1516,9 +1715,198 @@
             showCancellationFinal();
         }
     }
+    function submitScheduleEdit() {
+        let newDay = document.getElementById('new_day_of_week').value;
+        let newTimeSlot = document.getElementById('new_time_slot').value;
+        let scope = document.querySelector('input[name="schedule_scope"]:checked').value;
+        
+        let btn = document.getElementById('btn-edit-schedule');
+        let originalText = btn.innerText;
+        btn.innerText = "Updating...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.edit_schedule') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                new_day: newDay,
+                new_time_slot: newTimeSlot,
+                scope: scope
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('schedule-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.innerText = data.message;
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    function submitCleanerRequest() {
+        let reason = document.getElementById('cleaner_reason').value;
+        let otherReason = document.getElementById('cleaner_other_reason').value;
+        let scope = document.querySelector('input[name="cleaner_scope"]:checked').value;
+        
+        let btn = document.getElementById('btn-request-cleaner');
+        let originalText = btn.innerText;
+        btn.innerText = "Sending...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.request_cleaner') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                reason: reason,
+                other_reason: otherReason,
+                scope: scope
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('cleaner-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.innerText = data.message;
+                setTimeout(() => closeModal('cleanerModal'), 2000);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    function submitAddressChangeRequest() {
+        let city = document.getElementById('new_address_city').value;
+        let area = document.getElementById('new_address_area').value;
+        let street = document.getElementById('new_address_street').value;
+        let apt = document.getElementById('new_address_apt').value;
+        
+        if (!city || !area || !street) {
+            alert('Please fill out all required fields.');
+            return;
+        }
+        
+        let btn = document.getElementById('btn-request-address');
+        let originalText = btn.innerText;
+        btn.innerText = "Sending Request...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.request_address_change') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                city: city,
+                area: area,
+                building_street_no: street,
+                apartment_villa_no: apt
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('address-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.innerText = data.message;
+                setTimeout(() => closeModal('addressModal'), 2000);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+    }
+
     function showCancellationFinal() {
         document.getElementById('cancel-step-2').style.display = 'none';
         document.getElementById('cancel-step-3').style.display = 'block';
+    }
+
+    function submitCancelSubscription() {
+        let reason = document.querySelector('input[name="cancel_reason"]:checked');
+        let otherReason = document.querySelector('#cancelOtherReasonContainer textarea').value;
+        let finalReason = reason ? reason.value : '';
+        if (finalReason === 'other') finalReason = otherReason;
+
+        let btn = document.getElementById('btn-confirm-cancel');
+        let originalText = btn.innerText;
+        btn.innerText = "Cancelling...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.cancel') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                reason: finalReason
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('cancel-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.style.color = '#10b981';
+                msgBox.innerText = data.message;
+                
+                // Update UI visually
+                document.getElementById('main-status-badge').innerText = 'Cancelled';
+                document.getElementById('main-status-badge').className = 'status-badge status-cancelled';
+                document.getElementById('main-status-badge').style.background = '';
+                document.getElementById('main-status-badge').style.color = '';
+                
+                setTimeout(() => {
+                    closeModal('cancelModal');
+                    window.location.reload();
+                }, 2000);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
     }
 </script>
 

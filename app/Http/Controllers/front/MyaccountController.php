@@ -75,6 +75,406 @@ class MyaccountController extends Controller
      */
 
 
+    public function pauseSubscription(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $pause_reason = $request->input('pause_reason');
+        $pause_duration = (int) $request->input('pause_duration'); // 2, 4, 6, 8 weeks
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $order = DB::table('ci_orders')->where('order_id', $order_id)->where('user_id', $userdata['userid'])->first();
+        if (!$order) {
+            return response()->json(['status' => 0, 'message' => 'Invalid order.']);
+        }
+
+        // Calculate dates
+        $start_date = Carbon::now();
+        $end_date = Carbon::now()->addWeeks($pause_duration);
+
+        // Update database (Assuming columns exist or using vendor_notes if they don't)
+        DB::table('ci_orders')->where('order_id', $order_id)->update([
+            'subscription_status' => 'Paused',
+            'pause_start_date' => $start_date->format('Y-m-d'),
+            'pause_end_date' => $end_date->format('Y-m-d'),
+            'total_pause_days' => $pause_duration * 7,
+            'auto_renew_status' => 0 // Disable auto renew during pause
+        ]);
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Subscription paused successfully until ' . $end_date->format('d M Y') . '.',
+            'new_status' => 'Paused'
+        ]);
+    }
+
+    public function cancelSubscription(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $reason = $request->input('reason');
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $order = DB::table('ci_orders')->where('order_id', $order_id)->where('user_id', $userdata['userid'])->first();
+        if (!$order) {
+            return response()->json(['status' => 0, 'message' => 'Invalid order.']);
+        }
+
+        DB::table('ci_orders')->where('order_id', $order_id)->update([
+            'subscription_status' => 'Cancelled',
+            'order_status' => 'CL',
+            'auto_renew_status' => 0,
+            'cancellation_reason' => $reason,
+            'cancelled_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'cancel_date_time' => Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+
+        DB::table('ci_order_item')->where('order_id', $order_id)->update([
+            'end_date' => Carbon::now()->format('Y-m-d')
+        ]);
+
+        return response()->json(['status' => 1, 'message' => 'Subscription cancelled successfully.']);
+    }
+
+    public function toggleRenew(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $auto_renew = $request->input('auto_renew');
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $order = DB::table('ci_orders')->where('order_id', $order_id)->where('user_id', $userdata['userid'])->first();
+        if (!$order) {
+            return response()->json(['status' => 0, 'message' => 'Invalid order.']);
+        }
+
+        DB::table('ci_orders')->where('order_id', $order_id)->update([
+            'auto_renew_status' => $auto_renew ? 1 : 0
+        ]);
+
+        return response()->json(['status' => 1, 'message' => 'Auto-renewal status updated.']);
+    }
+
+    public function submitSupportRequest(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $topic = $request->input('topic');
+        $msg = $request->input('message');
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $order = DB::table('ci_orders')->where('order_id', $order_id)->where('user_id', $userdata['userid'])->first();
+        if (!$order) {
+            return response()->json(['status' => 0, 'message' => 'Invalid order.']);
+        }
+
+        $order_item = DB::table('ci_order_item')->where('order_id', $order_id)->first();
+
+        // Append to vendor notes
+        $current_notes = $order_item->vendor_notes ?? '';
+        $new_note = date('Y-m-d H:i') . " - Support Request: [$topic]\n$msg\n\n" . $current_notes;
+        DB::table('ci_order_item')->where('order_id', $order_id)->update(['vendor_notes' => $new_note]);
+
+        // Send Email
+        $to = 'hello@vendorscity.com';
+        $subject = 'Customer Support Request - Order #' . $order->order_id . ' (' . $topic . ')';
+        $message_body = '<div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <h2>Support Request: ' . $topic . '</h2>
+            <p><strong>Order ID:</strong> ' . $order->order_id . '</p>
+            <p><strong>Customer Name:</strong> ' . $userdata['name'] . '</p>
+            <p><strong>Customer Email:</strong> ' . $userdata['email'] . '</p>
+            <p><strong>Customer Phone:</strong> ' . $userdata['mobile'] . '</p>
+            <hr>
+            <h3>Message</h3>
+            <p>' . nl2br(htmlspecialchars($msg)) . '</p>
+            <br>
+            <p>Please review and reply to the customer.</p>
+        </div>';
+
+        $ccRecipients = ['zafar@quickserverelo.com'];
+
+        try {
+            \Mail::send([], [], function ($email) use ($message_body, $to, $subject, $ccRecipients) {
+                $email->to($to);
+                if (!empty($ccRecipients)) {
+                    $email->cc($ccRecipients);
+                }
+                $email->subject($subject);
+                $email->html($message_body);
+            });
+        } catch (\Exception $e) {
+        }
+
+        return response()->json(['status' => 1, 'message' => 'Your message has been sent successfully. Our team will contact you shortly.']);
+    }
+
+    public function editSchedule(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $new_day = $request->input('new_day');
+        $new_time_slot = $request->input('new_time_slot');
+        $scope = $request->input('scope');
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $order = DB::table('ci_orders')->where('order_id', $order_id)->where('user_id', $userdata['userid'])->first();
+        if (!$order) {
+            return response()->json(['status' => 0, 'message' => 'Invalid order.']);
+        }
+
+        $order_item = DB::table('ci_order_item')->where('order_id', $order_id)->first();
+        if (!$order_item) {
+            return response()->json(['status' => 0, 'message' => 'Order items not found.']);
+        }
+
+        $today = date('Y-m-d');
+
+        if ($scope == 'next') {
+            // Find the VERY NEXT upcoming visit
+            $next_visit = DB::table('ci_order_visits')
+                ->where('order_id', $order_id)
+                ->where('visit_date', '>=', $today)
+                ->whereNotIn('payment_status', ['Cancelled'])
+                ->orderBy('visit_date', 'asc')
+                ->first();
+
+            if (!$next_visit) {
+                return response()->json(['status' => 0, 'message' => 'No upcoming visits found to update.']);
+            }
+
+            // Calculate the date for the new day of the week, starting from the next visit's date
+            $visit_date_obj = \Carbon\Carbon::parse($next_visit->visit_date);
+            if ($visit_date_obj->format('l') != $new_day && strpos($new_day, ',') === false) {
+                // If it's not the same day, move to the NEXT occurrence of that day
+                $visit_date_obj->modify('next ' . $new_day);
+            }
+
+            $formatted_time_slot = sprintf('00:00:%02d', $new_time_slot);
+
+            DB::table('ci_order_visits')->where('id', $next_visit->id)->update([
+                'visit_date' => $visit_date_obj->format('Y-m-d'),
+                'visit_time' => $formatted_time_slot
+            ]);
+
+            return response()->json(['status' => 1, 'message' => 'Next visit updated successfully.']);
+        } else {
+            // ALL FUTURE VISITS
+            $update_data = ['time_slot' => $new_time_slot];
+
+            // Only update the day of the week if it's not a custom multi-day selection
+            if (strpos($new_day, ',') === false) {
+                $update_data['which_day_of_the_week_do_you_want_the_service'] = $new_day;
+            }
+
+            DB::table('ci_order_item')->where('order_id', $order_id)->update($update_data);
+
+            // Fetch ALL upcoming visits to regenerate dates
+            $upcoming_visits = DB::table('ci_order_visits')
+                ->where('order_id', $order_id)
+                ->where('visit_date', '>=', $today)
+                ->whereNotIn('payment_status', ['Cancelled'])
+                ->orderBy('visit_date', 'asc')
+                ->get();
+
+            if (count($upcoming_visits) > 0) {
+                $frequency = $order_item->how_often_do_you_need_cleaning;
+
+                // Calculate the base start date for regeneration
+                $base_date = \Carbon\Carbon::today();
+                if (strpos($new_day, ',') === false) {
+                    if ($base_date->format('l') != $new_day) {
+                        $base_date->modify('next ' . $new_day);
+                    }
+                }
+
+                $i = 0;
+                foreach ($upcoming_visits as $visit) {
+                    $new_visit_date = $base_date->copy();
+
+                    if (strpos($new_day, ',') === false) {
+                        if ($frequency == 'Weekly') {
+                            $new_visit_date->addWeeks($i);
+                        } elseif ($frequency == 'Every 2 Weeks' || $frequency == 'Bi-Weekly') {
+                            $new_visit_date->addWeeks($i * 2);
+                        } elseif ($frequency == 'Monthly' || $frequency == 'Every 4 Weeks') {
+                            $new_visit_date->addWeeks($i * 4);
+                        } else {
+                            // Custom or Once, just shift it by 1 week intervals as fallback
+                            $new_visit_date->addWeeks($i);
+                        }
+                    } else {
+                        // Multi-day is complex to mathematically generate cleanly inline without the DatePeriod logic
+                        // For V1, if multi-day, we just keep their existing dates and ONLY update the time
+                        $new_visit_date = \Carbon\Carbon::parse($visit->visit_date);
+                    }
+
+                    $formatted_time_slot = sprintf('00:00:%02d', $new_time_slot);
+
+                    DB::table('ci_order_visits')->where('id', $visit->id)->update([
+                        'visit_date' => $new_visit_date->format('Y-m-d'),
+                        'visit_time' => $formatted_time_slot
+                    ]);
+
+                    $i++;
+                }
+            }
+
+            return response()->json(['status' => 1, 'message' => 'All future visits updated successfully.']);
+        }
+    }
+
+    public function requestCleaner(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $reason = $request->input('reason');
+        $other_reason = $request->input('other_reason');
+        $scope = $request->input('scope'); // 'next' or 'all'
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $order = DB::table('ci_orders')->where('order_id', $order_id)->where('user_id', $userdata['userid'])->first();
+        if (!$order) {
+            return response()->json(['status' => 0, 'message' => 'Invalid order.']);
+        }
+
+        $order_item = DB::table('ci_order_item')->where('order_id', $order_id)->first();
+
+        $actual_reason = ($reason === 'Other' && !empty($other_reason)) ? $other_reason : $reason;
+
+        // Log the request in order notes for future reference
+        $current_notes = $order_item->vendor_notes ?? '';
+        $new_note = date('Y-m-d H:i') . " - User requested different cleaner. Scope: $scope. Reason: $actual_reason.\n" . $current_notes;
+        DB::table('ci_order_item')->where('order_id', $order_id)->update(['vendor_notes' => $new_note]);
+
+        // Send email to admin
+        $to = 'hello@vendorscity.com';
+        $subject = 'Customer Requested Different Cleaner - Order #' . $order->order_id;
+
+        $message_body = '<div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <h2>Cleaner Change Request</h2>
+            <p><strong>Order ID:</strong> ' . $order->order_id . '</p>
+            <p><strong>Customer Name:</strong> ' . $userdata['name'] . '</p>
+            <p><strong>Customer Email:</strong> ' . $userdata['email'] . '</p>
+            <p><strong>Customer Phone:</strong> ' . $userdata['mobile'] . '</p>
+            <hr>
+            <p><strong>Current Cleaner:</strong> ' . ($order_item->cleaner_id ? \App\Helpers\Helper::cleanername($order_item->cleaner_id) : 'None') . '</p>
+            <p><strong>Reason for change:</strong> ' . $actual_reason . '</p>
+            <p><strong>Scope:</strong> ' . ($scope === 'next' ? 'Next visit only' : 'All future visits') . '</p>
+            <br>
+            <p>Please log in to the admin panel to assign a new cleaner.</p>
+        </div>';
+
+        $ccRecipients = ['zafar@quickserverelo.com'];
+
+        try {
+            \Mail::send([], [], function ($message) use ($message_body, $to, $subject, $ccRecipients) {
+                $message->to($to);
+                if (!empty($ccRecipients)) {
+                    $message->cc($ccRecipients);
+                }
+                $message->subject($subject);
+                $message->html($message_body);
+            });
+        } catch (\Exception $e) {
+            // Ignore email errors
+        }
+
+        return response()->json(['status' => 1, 'message' => 'Your request has been sent to our team.']);
+    }
+
+    public function requestAddressChange(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $city = $request->input('city');
+        $area = $request->input('area');
+        $building = $request->input('building_street_no');
+        $apt = $request->input('apartment_villa_no');
+
+        $userdata = Session::get('user');
+        if (!$userdata) {
+            return response()->json(['status' => 0, 'message' => 'Please login.']);
+        }
+
+        $order = DB::table('ci_orders')->where('order_id', $order_id)->where('user_id', $userdata['userid'])->first();
+        if (!$order) {
+            return response()->json(['status' => 0, 'message' => 'Invalid order.']);
+        }
+
+        $order_item = DB::table('ci_order_item')->where('order_id', $order_id)->first();
+
+        // Log the request in order notes for future reference
+        $current_notes = $order_item->vendor_notes ?? '';
+        $new_note = date('Y-m-d H:i') . " - User requested Address Change.\nNew Address: $city, $area, $building, $apt\n" . $current_notes;
+        DB::table('ci_order_item')->where('order_id', $order_id)->update(['vendor_notes' => $new_note]);
+
+        // Send email to admin
+        $to = 'hello@vendorscity.com';
+        $subject = 'Customer Requested Address Change - Order #' . $order->order_id;
+
+        $message_body = '<div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <h2>Address Change Request</h2>
+            <p><strong>Order ID:</strong> ' . $order->order_id . '</p>
+            <p><strong>Customer Name:</strong> ' . $userdata['name'] . '</p>
+            <p><strong>Customer Email:</strong> ' . $userdata['email'] . '</p>
+            <p><strong>Customer Phone:</strong> ' . $userdata['mobile'] . '</p>
+            <hr>
+            <h3>Requested New Address</h3>
+            <p><strong>City:</strong> ' . $city . '</p>
+            <p><strong>Area:</strong> ' . $area . '</p>
+            <p><strong>Building / Street:</strong> ' . $building . '</p>
+            <p><strong>Apartment / Villa:</strong> ' . $apt . '</p>
+            <br>
+            <div style="background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-top: 20px;">
+                <h4 style="margin-top: 0;">Admin Action Required</h4>
+                <p>Please validate the following before approving this change and updating the order:</p>
+                <ul>
+                    <li>Service availability at the new address</li>
+                    <li>Pricing differences for the new area (if any)</li>
+                    <li>Vendor coverage at the new address</li>
+                    <li>Cleaner availability at the new location</li>
+                </ul>
+            </div>
+            <br>
+            <p>Log in to the admin panel to review and update the order.</p>
+        </div>';
+
+        $ccRecipients = ['zafar@quickserverelo.com'];
+
+        try {
+            \Mail::send([], [], function ($message) use ($message_body, $to, $subject, $ccRecipients) {
+                $message->to($to);
+                if (!empty($ccRecipients)) {
+                    $message->cc($ccRecipients);
+                }
+                $message->subject($subject);
+                $message->html($message_body);
+            });
+        } catch (\Exception $e) {
+            // Ignore email errors
+        }
+
+        return response()->json(['status' => 1, 'message' => 'Your request has been sent to our team.']);
+    }
+
+
     public function subscriptions(Request $request)
     {
         $userdata = Session::get('user');
@@ -109,13 +509,29 @@ class MyaccountController extends Controller
                 ->where('order_id', $order->order_id)
                 ->whereIn('visit_status', ['upcoming', 'rescheduled'])
                 ->orderBy('visit_date', 'asc')
-                ->orderBy('visit_time', 'asc')
                 ->first();
+
+            $next_visit_time_formatted = 'N/A';
+            if ($nextVisit && $nextVisit->visit_time) {
+                $vTime = $nextVisit->visit_time;
+                if (strpos($vTime, ':') !== false) {
+                    $parts = explode(':', $vTime);
+                    $ts = DB::table('time_slots')->where('id', (int)end($parts))->first();
+                    if ($ts) $vTime = $ts->name;
+                }
+                $next_visit_time_formatted = $vTime;
+            }
 
             $category = $order->subcategory_name ?: $order->category_name;
             $frequency = $order->how_often_do_you_need_cleaning;
 
             $service_address = implode(', ', array_filter([$order->apartment_villa_no, $order->building_street_no, $order->area, $order->city]));
+
+            // Dynamically calculate visits completed
+            $past_visits_count = DB::table('ci_order_visits')
+                ->where('order_id', $order->order_id)
+                ->where('visit_date', '<', date('Y-m-d'))
+                ->count();
 
             $subscriptions[] = (object)[
                 'id' => $order->order_id,
@@ -123,10 +539,10 @@ class MyaccountController extends Controller
                 'plan_name' => $frequency . ' Cleaning Plan',
                 'frequency_desc' => $frequency,
                 'visits_per_cycle' => $order->visits_entitled ?: 0,
-                'visits_completed' => $order->visits_completed ?: 0,
+                'visits_completed' => $past_visits_count ?: ($order->visits_completed ?: 0),
                 'status' => $order->subscription_status ?: 'Active',
                 'next_visit_date' => $nextVisit ? Carbon::parse($nextVisit->visit_date)->format('l, d F') : 'N/A',
-                'next_visit_time' => $nextVisit ? $nextVisit->visit_time : 'N/A',
+                'next_visit_time' => $next_visit_time_formatted,
                 'next_renewal' => $order->next_renewal_date ? Carbon::parse($order->next_renewal_date)->format('d F Y') : 'N/A',
                 'renewal_amount' => $order->renewal_amount ?: $order->order_total,
                 'auto_renew' => $order->auto_renew_status == 1 ? 'ON' : 'OFF',
@@ -178,8 +594,8 @@ class MyaccountController extends Controller
         $past_visits = [];
 
         $cleaner_name = 'Any';
-        if ($order->preferred_cleaner_id) {
-            $cleaner_name = Helper::cleanername_new($order->preferred_cleaner_id) ?: 'Any';
+        if (isset($order->cleaner_id) && $order->cleaner_id) {
+            $cleaner_name = Helper::cleanername_new($order->cleaner_id) ?: 'Any';
         }
 
         $visit_num = 1;
@@ -210,9 +626,14 @@ class MyaccountController extends Controller
                 'rating' => $visit->rating,
             ];
 
-            if (in_array(strtolower($visit->visit_status), ['upcoming', 'rescheduled'])) {
+            $isPast = ($visit->visit_date < date('Y-m-d'));
+
+            if (in_array(strtolower($visit->visit_status), ['upcoming', 'rescheduled']) && !$isPast) {
                 $upcoming_visits[] = $visitObj;
             } else {
+                if ($isPast && in_array(strtolower($visit->visit_status), ['upcoming', 'rescheduled'])) {
+                    $visitObj->status = 'Completed';
+                }
                 $past_visits[] = $visitObj;
             }
             $visit_num++;
@@ -227,7 +648,7 @@ class MyaccountController extends Controller
             'plan_name' => $order->how_often_do_you_need_cleaning . ' Cleaning Plan',
             'frequency_desc' => $order->how_often_do_you_need_cleaning,
             'visits_per_cycle' => $order->visits_entitled ?: 0,
-            'visits_completed' => $order->visits_completed ?: 0,
+            'visits_completed' => count($past_visits) ?: ($order->visits_completed ?: 0),
             'status' => $order->subscription_status ?: 'Active',
             'next_visit_date' => $nextVisit ? $nextVisit->date : 'N/A',
             'next_visit_time' => $nextVisit ? $nextVisit->time : 'N/A',
@@ -239,14 +660,47 @@ class MyaccountController extends Controller
             'recurring_schedule' => $order->how_often_do_you_need_cleaning . ' • ' . $order->time_slot,
             'preferred_cleaner' => $cleaner_name,
             'cleaner_rating' => null,
+            'is_auto_renew' => $order->auto_renew_status == 1,
             'cleaner_unavailable' => false,
+            'paymentmode' => $order->paymentmode,
+            'service_address' => $order->city . ', ' . $order->area . ', ' . $order->building_street_no . ', ' . $order->apartment_villa_no,
             'upcoming_visits' => $upcoming_visits,
             'past_visits' => $past_visits,
             'service_id' => $order->service_id,
             'subservice_id' => $order->subservice_id,
+            'pending_plan_change' => $order->pending_plan_change,
+        ];
+        // Fetch transactions for billing history
+        $transactions = [];
+
+        // 1. Add the main order payment
+        $transactions[] = (object)[
+            'date' => date('d M Y', strtotime($order->created_at)),
+            'amount' => $order->order_total,
+            'status' => $order->payment_status ?: 'Pending',
+            'type' => 'Subscription Renewal'
         ];
 
-        return view('front.subscription_detail', compact('subscription'));
+        // 2. Fetch any per-visit transactions
+        $visit_txns = DB::table('ci_visit_transactions')
+            ->where('order_id', $order->order_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        foreach ($visit_txns as $tx) {
+            $transactions[] = (object)[
+                'date' => date('d M Y', strtotime($tx->created_at)),
+                'amount' => $tx->amount_deducted,
+                'status' => 'Paid',
+                'type' => 'Visit: ' . date('d M Y', strtotime($tx->visit_date))
+            ];
+        }
+
+        $time_slots = DB::table('time_slots')->orderBy('set_order', 'asc')->get();
+        $current_day = $order->which_day_of_the_week_do_you_want_the_service ?: date('l', strtotime($order->bookingdate . '-' . $order->month . '-' . $order->bookingyear));
+        $cities = DB::table('cities')->orderBy('name', 'asc')->get();
+
+        return view('front.subscription_detail', compact('subscription', 'time_slots', 'current_day', 'cities', 'transactions'));
     }
 
     public function my_order(Request $request)
@@ -2467,10 +2921,15 @@ if (empty($userdata)) {
 
     public function rescheduleVisit(Request $request)
     {
+
+        /* echo "<pre>";
+        print_r($request->all());
+        echo "</pre>";
+        exit; */
         $visit_id = $request->input('visit_id');
         $new_date = $request->input('new_date');
         $new_time = $request->input('new_time');
-        $cleaner_pref = $request->input('cleaner_pref'); // 'keep' or 'any'
+        $cleaner_pref = $request->input('cleaner_pref');
 
         $userdata = Session::get('user');
         if (!$userdata) {
@@ -2479,9 +2938,10 @@ if (empty($userdata)) {
 
         $visit = DB::table('ci_order_visits')
             ->join('ci_orders', 'ci_order_visits.order_id', '=', 'ci_orders.order_id')
+            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
             ->where('ci_order_visits.id', $visit_id)
             ->where('ci_orders.user_id', $userdata['userid'])
-            ->select('ci_order_visits.*', 'ci_orders.preferred_cleaner_id')
+            ->select('ci_order_visits.*', 'ci_order_item.cleaner_id as preferred_cleaner_id')
             ->first();
 
         if ($visit) {
