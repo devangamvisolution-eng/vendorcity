@@ -1,0 +1,1 @@
+<?php require 'vendor/autoload.php'; $app = require_once 'bootstrap/app.php'; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); $values = DB::table('ci_order_item')->distinct()->pluck('which_day_of_the_week_do_you_want_the_service'); print_r($values);

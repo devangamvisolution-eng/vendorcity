@@ -81,6 +81,19 @@
                                         <p id="subservice_id_error" style="display: none;color: red"></p>
                                     </div>
                                 </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="user_id">Customer Name</label>
+                                        <select class="form-control select2" multiple="multiple" id="user_id" name="user_id[]">
+                                            <option value="">Select Customers</option>
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}"
+                                                    @if (in_array($user->id, $selected_users)) {{ 'selected' }} @endif>
+                                                    {{ $user->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div class="col-md-4">
                                     <div class="form-group">
@@ -414,6 +427,11 @@
         $(document).ready(function() {
             $('#subservice_id').select2({
                 placeholder: 'Select SubCategory', // Add your desired placeholder text here
+            });
+        });
+        $(document).ready(function() {
+            $('#user_id').select2({
+                placeholder: 'Select Customers', // Add your desired placeholder text here
             });
         });
 

@@ -103,7 +103,7 @@
     .vc-btn-primary:hover { background: #0030b3; text-decoration: none; color: #fff;}
     .vc-btn-outline { background: transparent; color: #475569; border: 1px solid #cbd5e1; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; margin-top:10px; }
 
-    .form-group { margin-bottom: 15px; text-align: left; }
+    .form-group { margin-bottom: 7px; text-align: left; }
     .form-group label { font-size:13px; font-weight:600; color:#1e293b; margin-bottom:5px; display:block; }
     .form-control { border:1px solid #cbd5e1; border-radius:6px; padding:10px 12px; width:100%; font-family: inherit;}
 
@@ -562,10 +562,9 @@
                                 <a onclick="openModal('planModal'); toggleDropdown();">Change Plan</a>
                                 <a onclick="openModal('scheduleModal'); toggleDropdown();">Edit Regular Schedule</a>
                                 <a onclick="openModal('cleanerModal'); toggleDropdown();">Cleaner Preference</a>
-                                <a onclick="alert('Checking coverage for Address Change.'); toggleDropdown();">Service Address</a>
-                                <a>Payment Method</a>
-                                <a>Billing History</a>
-                                <a>Cancellation & Rescheduling Policy</a>
+                                <a onclick="openModal('addressModal'); toggleDropdown();">Service Address</a>
+                                <a onclick="goToBillingTab('paymentMethodSection'); toggleDropdown();" style="cursor:pointer;">Payment Method</a>
+                                <a onclick="goToBillingTab('billingHistorySection'); toggleDropdown();" style="cursor:pointer;">Billing History</a>
                                 <a onclick="openModal('cancelModal'); toggleDropdown();">Cancel Subscription</a>
                             </div>
                         </div>
@@ -605,12 +604,12 @@
                             <!-- Progress Bar -->
                             <div class="dash-card progress-block">
                                 <div class="progress-text">{{ $subscription->visits_completed }} of {{ $subscription->visits_per_cycle }} visits completed</div>
-                                <div class="progress-dots">
+                                <div class="progress-dots" style="font-size: 16px; color: #0040E6; margin: 12px 0;">
                                     @for($i = 0; $i < $subscription->visits_per_cycle; $i++)
                                         @if($i < $subscription->visits_completed)
-                                            <span>●</span>
+                                            <i class="fas fa-circle" style="margin: 0 4px;"></i>
                                         @else
-                                            <span class="empty">○</span>
+                                            <i class="far fa-circle" style="color: #cbd5e1; margin: 0 4px;"></i>
                                         @endif
                                     @endfor
                                 </div>
@@ -741,11 +740,11 @@
                                         <p id="renewal-text" style="color:#64748b; margin:0; font-size:14px;">Your subscription will automatically renew for {{ $subscription->renewal_amount }} on {{ $subscription->next_renewal }}.</p>
                                     </div>
                                     <label class="switch">
-                                      <input type="checkbox" id="autoRenewToggle" checked onchange="toggleAutoRenew(this)">
+                                      <input type="checkbox" id="autoRenewToggle" {{ $subscription->is_auto_renew ? 'checked' : '' }} onchange="toggleAutoRenew(this)">
                                       <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div id="renewal-warning" style="display:none; margin-top:15px; padding:15px; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; color:#dc2626; font-size:13px; font-weight:500;">
+                                <div id="renewal-warning" style="display:{{ $subscription->is_auto_renew ? 'none' : 'block' }}; margin-top:15px; padding:15px; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; color:#dc2626; font-size:13px; font-weight:500;">
                                     Your remaining visits will not be affected. Your subscription will end after your current cycle and will not renew.
                                 </div>
                             </div>
@@ -784,17 +783,16 @@
             <strong>Context Attached:</strong><br>
             Topic: <span id="support-topic" style="font-weight:600; color:#1e293b;"></span><br>
             Subscription ID: <span style="font-weight:600; color:#1e293b;">#SUB-{{ $subscription->id }}</span><br>
-            Customer ID: <span style="font-weight:600; color:#1e293b;">#CUST-{{ auth()->id() ?? '932' }}</span><br>
-            Booking ID: <span style="font-weight:600; color:#1e293b;">#VC-84931</span>
+            Customer ID: <span style="font-weight:600; color:#1e293b;">#CUST-{{ Session::get('user')['userid'] ?? 'N/A' }}</span>
         </div>
         
         <div class="form-group">
             <label>Message</label>
-            <textarea class="form-control" rows="4" placeholder="How can we help you today?"></textarea>
+            <textarea id="support-message" class="form-control" rows="4" placeholder="How can we help you today?"></textarea>
         </div>
         
-        <button class="vc-btn-primary" onclick="confirmModalAction('supportModal', 'Message Sent ✓')">Send Message</button>
-        <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
+        <button class="vc-btn-primary" id="btn-submit-support" onclick="submitSupportRequest()">Send Message</button>
+        <div id="support-success-msg" class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
 </div>
 
@@ -848,12 +846,12 @@
         </div>
         <div class="form-group" style="margin-bottom:25px;">
             <label style="margin-bottom:10px;">Would you like the new cleaner for:</label>
-            <label style="display:block; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cleaner_scope" checked> Next visit only</label>
-            <label style="display:block; cursor:pointer;"><input type="radio" name="cleaner_scope"> All future visits</label>
+            <label style="display:block; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cleaner_scope" value="next" checked> Next visit only</label>
+            <label style="display:block; cursor:pointer;"><input type="radio" name="cleaner_scope" value="all"> All future visits</label>
         </div>
         
-        <button class="vc-btn-primary" onclick="confirmModalAction('cleanerModal', 'Cleaner Request Sent ✓')">Confirm Request</button>
-        <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
+        <button class="vc-btn-primary" onclick="submitCleanerRequest()" id="btn-request-cleaner">Confirm Request</button>
+        <div class="success-msg" id="cleaner-success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
 </div>
 
@@ -903,7 +901,7 @@
     </div>
 </div>
 
-<!-- 5. Smart Cancellation Modal -->
+<!-- 6. Smart Cancellation Modal -->
 <div class="vc-modal-overlay" id="cancelModal">
     <div class="vc-modal">
         <span class="vc-modal-close" onclick="closeModal('cancelModal')">&times;</span>
@@ -959,25 +957,72 @@
 
     function switchTab(tabId) {
         document.querySelectorAll('.visit-tab').forEach(tab => tab.classList.remove('active'));
-        event.target.classList.add('active');
+        let targetTab = document.querySelector(`.visit-tab[onclick="switchTab('${tabId}')"]`);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         document.getElementById('tab-' + tabId).classList.add('active');
     }
 
+    function goToBillingTab(sectionId = null) {
+        switchTab('billing');
+        if (sectionId) {
+            setTimeout(() => {
+                document.getElementById(sectionId).scrollIntoView({behavior: 'smooth', block: 'start'});
+            }, 100);
+        }
+    }
+
     function toggleAutoRenew(el) {
-        if(el.checked) {
+        let isRenewing = el.checked;
+        if(isRenewing) {
             document.getElementById('renewal-warning').style.display = 'none';
-            document.getElementById('renewal-text').innerHTML = 'Your subscription will automatically renew for {{ $subscription->renewal_amount }} on {{ $subscription->next_renewal }}.';
-            document.getElementById('auto-renew-label').innerHTML = 'ON';
-            document.getElementById('auto-renew-label').style.color = '#059669';
-            document.getElementById('main-status-subtitle').style.display = 'none';
+            document.getElementById('renewal-text').innerHTML = 'Your subscription will automatically renew on {{ $subscription->next_renewal ?? "29 September 2026" }}.';
+            let label = document.getElementById('auto-renew-label');
+            if (label) {
+                label.innerHTML = 'ON';
+                label.style.color = '#059669';
+            }
+            let subtitle = document.getElementById('main-status-subtitle');
+            if (subtitle) subtitle.style.display = 'none';
         } else {
             document.getElementById('renewal-warning').style.display = 'block';
             document.getElementById('renewal-text').innerHTML = 'Auto-renewal is currently disabled.';
-            document.getElementById('auto-renew-label').innerHTML = 'OFF';
-            document.getElementById('auto-renew-label').style.color = '#64748b';
-            document.getElementById('main-status-subtitle').style.display = 'block';
+            let label = document.getElementById('auto-renew-label');
+            if (label) {
+                label.innerHTML = 'OFF';
+                label.style.color = '#64748b';
+            }
+            let subtitle = document.getElementById('main-status-subtitle');
+            if (subtitle) subtitle.style.display = 'block';
         }
+
+        // Backend Sync
+        fetch('{{ route('subscription.toggle_renew') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                auto_renew: isRenewing ? 1 : 0
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status !== 1) {
+                // Revert on failure
+                el.checked = !isRenewing;
+                alert(data.message || 'Error updating renewal status');
+            }
+        })
+        .catch(err => {
+            // Revert on failure
+            el.checked = !isRenewing;
+            alert('Server error, please try again later.');
+        });
     }
     
     function toggleDropdown() {
@@ -1012,7 +1057,7 @@
         if(msg) msg.style.display = 'none';
     }
     
-    function confirmModalAction(id, msgText, callback) {
+    function ss(id, msgText, callback) {
         let msg = document.getElementById(id).querySelector('.success-msg');
         if(msg) { msg.innerText = msgText; msg.style.display = 'block'; }
         if(callback) callback();
@@ -1022,6 +1067,55 @@
     function openSupportModal(topic) {
         document.getElementById('support-topic').innerText = topic;
         openModal('supportModal');
+    }
+
+    function submitSupportRequest() {
+        let topic = document.getElementById('support-topic').innerText;
+        let message = document.getElementById('support-message').value;
+
+        if (!message.trim()) {
+            alert('Please enter a message.');
+            return;
+        }
+
+        let btn = document.getElementById('btn-submit-support');
+        let originalText = btn.innerText;
+        btn.innerText = "Sending...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.support') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                topic: topic,
+                message: message
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('support-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.style.color = '#10b981';
+                msgBox.innerText = data.message;
+                document.getElementById('support-message').value = '';
+                setTimeout(() => closeModal('supportModal'), 2000);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            alert('Server error, please try again later.');
+        });
     }
     
     // Cancellation Flow
@@ -1044,9 +1138,198 @@
             document.getElementById('cancel-step-2').style.display = 'block';
         }
     }
+    function submitScheduleEdit() {
+        let newDay = document.getElementById('new_day_of_week').value;
+        let newTimeSlot = document.getElementById('new_time_slot').value;
+        let scope = document.querySelector('input[name="schedule_scope"]:checked').value;
+        
+        let btn = document.getElementById('btn-edit-schedule');
+        let originalText = btn.innerText;
+        btn.innerText = "Updating...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.edit_schedule') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                new_day: newDay,
+                new_time_slot: newTimeSlot,
+                scope: scope
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('schedule-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.innerText = data.message;
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    function submitCleanerRequest() {
+        let reason = document.getElementById('cleaner_reason').value;
+        let otherReason = document.getElementById('cleaner_other_reason').value;
+        let scope = document.querySelector('input[name="cleaner_scope"]:checked').value;
+        
+        let btn = document.getElementById('btn-request-cleaner');
+        let originalText = btn.innerText;
+        btn.innerText = "Sending...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.request_cleaner') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                reason: reason,
+                other_reason: otherReason,
+                scope: scope
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('cleaner-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.innerText = data.message;
+                setTimeout(() => closeModal('cleanerModal'), 2000);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    function submitAddressChangeRequest() {
+        let city = document.getElementById('new_address_city').value;
+        let area = document.getElementById('new_address_area').value;
+        let street = document.getElementById('new_address_street').value;
+        let apt = document.getElementById('new_address_apt').value;
+        
+        if (!city || !area || !street) {
+            alert('Please fill out all required fields.');
+            return;
+        }
+        
+        let btn = document.getElementById('btn-request-address');
+        let originalText = btn.innerText;
+        btn.innerText = "Sending Request...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.request_address_change') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                city: city,
+                area: area,
+                building_street_no: street,
+                apartment_villa_no: apt
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('address-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.innerText = data.message;
+                setTimeout(() => closeModal('addressModal'), 2000);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+    }
+
     function showCancellationFinal() {
         document.getElementById('cancel-step-2').style.display = 'none';
         document.getElementById('cancel-step-3').style.display = 'block';
+    }
+
+    function submitCancelSubscription() {
+        let reason = document.querySelector('input[name="cancel_reason"]:checked');
+        let otherReason = document.querySelector('#cancelOtherReasonContainer textarea').value;
+        let finalReason = reason ? reason.value : '';
+        if (finalReason === 'other') finalReason = otherReason;
+
+        let btn = document.getElementById('btn-confirm-cancel');
+        let originalText = btn.innerText;
+        btn.innerText = "Cancelling...";
+        btn.disabled = true;
+
+        fetch('{{ route('subscription.cancel') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                order_id: {{ $subscription->id }},
+                reason: finalReason
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            let msgBox = document.getElementById('cancel-success-msg');
+            msgBox.style.display = 'block';
+            if (data.status == 1) {
+                msgBox.style.color = '#10b981';
+                msgBox.innerText = data.message;
+                
+                // Update UI visually
+                document.getElementById('main-status-badge').innerText = 'Cancelled';
+                document.getElementById('main-status-badge').className = 'status-badge status-cancelled';
+                document.getElementById('main-status-badge').style.background = '';
+                document.getElementById('main-status-badge').style.color = '';
+                
+                setTimeout(() => {
+                    closeModal('cancelModal');
+                    window.location.reload();
+                }, 2000);
+            } else {
+                msgBox.style.color = '#dc2626';
+                msgBox.innerText = data.message || 'An error occurred';
+            }
+        })
+        .catch(err => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
     }
 </script>
 

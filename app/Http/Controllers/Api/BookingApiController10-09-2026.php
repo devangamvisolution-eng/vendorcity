@@ -307,35 +307,87 @@ class BookingApiController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Categorize Bookings strictly by order_status
+            | Upcoming Bookings
             |--------------------------------------------------------------------------
             */
 
-            $isUnpaid = ($order->order_status == 'UP');
-            $isCancelled = ($order->order_status == 'CL');
-            $isCompleted = ($order->order_status == 'CO');
-            $isUpcoming = in_array($order->order_status, ['BK', 'BC', 'OTW', 'IP', 'P', 'PA']) || (!$isUnpaid && !$isCancelled && !$isCompleted);
+            if ($bookingType == 'upcoming') {
 
-            if ($bookingType == 'upcoming' && $isUpcoming) {
-                $booking['display_status'] = 'Upcoming';
-                $booking['visit_date'] = !empty($nextUpcomingVisit) ? $nextUpcomingVisit : $latestPastVisit;
-                $booking['book_again'] = false;
-                $bookingCollection->push($booking);
-            } elseif ($bookingType == 'completed' && $isCompleted) {
-                $booking['display_status'] = 'Completed';
-                $booking['visit_date'] = !empty($latestPastVisit) ? $latestPastVisit : $nextUpcomingVisit;
-                $booking['book_again'] = true;
-                $bookingCollection->push($booking);
-            } elseif ($bookingType == 'cancelled' && $isCancelled) {
-                $booking['display_status'] = 'Cancelled';
-                $booking['visit_date'] = !empty($latestPastVisit) ? $latestPastVisit : $nextUpcomingVisit;
-                $booking['book_again'] = true;
-                $bookingCollection->push($booking);
-            } elseif ($bookingType == 'unpaid' && $isUnpaid) {
-                $booking['display_status'] = 'Unpaid';
-                $booking['visit_date'] = !empty($nextUpcomingVisit) ? $nextUpcomingVisit : $latestPastVisit;
-                $booking['book_again'] = false;
-                $bookingCollection->push($booking);
+                if (
+                    !empty($nextUpcomingVisit) &&
+                    $order->order_status != 'CL' &&
+                    $order->order_status != 'CO'
+                ) {
+
+                    $booking['display_status'] = 'Upcoming';
+                    $booking['visit_date'] = $nextUpcomingVisit;
+                    $booking['book_again'] = false;
+
+                    $bookingCollection->push($booking);
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Completed Bookings
+            |--------------------------------------------------------------------------
+            */ elseif ($bookingType == 'completed') {
+
+                if (
+                    !empty($latestPastVisit) ||
+                    ($order->order_status == 'CO' && !empty($nextUpcomingVisit))
+                ) {
+
+                    $booking['display_status'] = 'Completed';
+
+                    if (!empty($latestPastVisit)) {
+                        $booking['visit_date'] = $latestPastVisit;
+                    } else {
+                        $booking['visit_date'] = $nextUpcomingVisit;
+                    }
+
+                    $booking['book_again'] = true;
+
+                    $bookingCollection->push($booking);
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Cancelled Bookings
+            |--------------------------------------------------------------------------
+            */ elseif ($bookingType == 'cancelled') {
+
+                if ($order->order_status == 'CL') {
+
+                    $booking['display_status'] = 'Cancelled';
+                    $booking['visit_date'] = !empty($latestPastVisit)
+                        ? $latestPastVisit
+                        : $nextUpcomingVisit;
+
+                    $booking['book_again'] = true;
+
+                    $bookingCollection->push($booking);
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Unpaid Bookings
+            |--------------------------------------------------------------------------
+            */ elseif ($bookingType == 'unpaid') {
+
+                if (
+                    strtolower($order->payment_status) == 'pending' ||
+                    strtolower($order->payment_status) == 'unpaid'
+                ) {
+
+                    $booking['display_status'] = 'Unpaid';
+                    $booking['visit_date'] = $nextUpcomingVisit;
+                    $booking['book_again'] = false;
+
+                    $bookingCollection->push($booking);
+                }
             }
         } // End foreach orders
 
@@ -369,6 +421,7 @@ class BookingApiController extends Controller
             [
 
                 'path' => request()->url(),
+
                 'query' => request()->query()
 
             ]
@@ -432,6 +485,13 @@ class BookingApiController extends Controller
             'data' => $results->values()
 
         ]);
+
+
+
+
+        // echo "<pre>";
+        // print_r($orders);
+        // exit;
     }
 
     function bookingDetails(Request $request)

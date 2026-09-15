@@ -50,8 +50,6 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/edit-address/{id}', [ServiceController::class, 'edit_address']);
     Route::delete('/delete-address/{id}', [ProfileController::class, 'deleteAddress']);
 
-
-
     Route::post('/subservice', [ServiceController::class, 'subservice']);
     Route::post('/add-address', [ServiceController::class, 'add_address']);
     Route::post('/get-addons', [Homecleaningapicontroller::class, 'get_addons']);

@@ -175,15 +175,6 @@ class Homecleaningapicontroller extends Controller
                 ];
             });
 
-        $multipleDaysDiscountsData = DB::table('cleaning_multiple_days_discounts')->get();
-        $multipleDaysDiscounts = $multipleDaysDiscountsData->map(function ($item) {
-            return [
-                "number_of_days" => $item->number_of_days,
-                "discount_type" => $item->discount_type,
-                "discount_value" => $item->discount_value
-            ];
-        });
-
         $response = [
             "status" => true,
             "data" => [
@@ -238,8 +229,7 @@ class Homecleaningapicontroller extends Controller
                                 "Friday",
                                 "Saturday",
                                 "Sunday"
-                            ],
-                            "multiple_days_discounts" => $multipleDaysDiscounts
+                            ]
                         ]
                     ]
                 ],
