@@ -535,7 +535,6 @@ class MyaccountController extends Controller
             return redirect()->to('/');
         }
 
-        $subscriptions = $this->get_mock_subscriptions();
         $userid = $userdata['userid'];
 
         $orders = DB::table('ci_orders')
@@ -615,14 +614,28 @@ class MyaccountController extends Controller
             return redirect()->to('/');
         }
 
-        $subscriptions = collect($this->get_mock_subscriptions());
-        $subscription = $subscriptions->firstWhere('id', (int)$id);
+        $userid = $userdata['userid'];
 
-        if (!$subscription) {
+        $order = DB::table('ci_orders')
+            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+            ->leftJoin('services', 'ci_order_item.service_id', '=', 'services.id')
+            ->leftJoin('subservices', 'ci_order_item.subservice_id', '=', 'subservices.id')
+            ->where('ci_orders.order_id', $id)
+            ->where('ci_orders.user_id', $userid)
+            ->where('ci_orders.is_subscription', 1)
+            ->where('ci_orders.is_delete', 0)
+            ->select(
+                'ci_orders.*',
+                'ci_order_item.*',
+                'services.servicename as category_name',
+                'subservices.subservicename as subcategory_name'
+            )
+            ->first();
+
+        if (!$order) {
             return redirect()->route('front.subscriptions')->with('error', 'Subscription not found.');
         }
 
-        return view('front.subscription_detail', compact('subscription'));
         $all_visits = DB::table('ci_order_visits')
             ->where('order_id', $id)
             ->orderBy('visit_date', 'asc')

@@ -1534,6 +1534,22 @@ Route::prefix('{city}')
         Route::post('/update-address', '\App\Http\Controllers\front\MyaccountController@update_address')->name('update-address');
         Route::post('/cancel-order', '\App\Http\Controllers\front\MyaccountController@cancel_order')->name('cancel-order');
         Route::post('/skip-visit', '\App\Http\Controllers\front\MyaccountController@skip_visit')->name('skip-visit');
+
+        Route::post('/subscription/visit/reschedule', '\App\Http\Controllers\front\MyaccountController@rescheduleVisit')->name('subscription.visit.reschedule');
+        Route::post('/subscription/visit/skip', '\App\Http\Controllers\front\MyaccountController@skipVisitAdvanced')->name('subscription.visit.skip');
+
+        Route::post('/subscription/change-plan', '\App\Http\Controllers\front\MyaccountController@changePlan')->name('subscription.change_plan');
+        Route::post('/subscription/edit-schedule', '\App\Http\Controllers\front\MyaccountController@editSchedule')->name('subscription.edit_schedule');
+        Route::post('/subscription/request-cleaner', '\App\Http\Controllers\front\MyaccountController@requestCleaner')->name('subscription.request_cleaner');
+        Route::post('/subscription/request-address-change', '\App\Http\Controllers\front\MyaccountController@requestAddressChange')->name('subscription.request_address_change');
+
+        // Subscription Pause & Cancel flow
+        Route::post('/subscription/pause', '\App\Http\Controllers\front\MyaccountController@pauseSubscription')->name('subscription.pause');
+        Route::post('/subscription/toggle-renew', '\App\Http\Controllers\front\MyaccountController@toggleRenew')->name('subscription.toggle_renew');
+        Route::post('/subscription/support', '\App\Http\Controllers\front\MyaccountController@submitSupportRequest')->name('subscription.support');
+        Route::get('/subscription/cancel-details', '\App\Http\Controllers\front\MyaccountController@getCancelDetails')->name('subscription.cancel.details');
+        Route::post('/subscription/cancel', '\App\Http\Controllers\front\MyaccountController@cancelSubscription')->name('subscription.cancel');
+
         Route::get('refer&earn', '\App\Http\Controllers\front\MyaccountController@refer_earn')->name('front.refer_earn');
         Route::get('refral', '\App\Http\Controllers\front\MyaccountController@refral')->name('front.refral');;
         Route::get('refer_and_earn/{userid}', '\App\Http\Controllers\front\MyaccountController@refer_earn_frend');
