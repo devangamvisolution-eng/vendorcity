@@ -5,207 +5,620 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Auth;
+use DatePeriod;
+use DateTime;
+use DateInterval;
+use App\Helpers\Helper;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-class SalesReportController extends Controller
+class Salespersonreportcontroller extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index($order_id = '', $status = '')
+    public function index(Request $request)
     {
-        $data['error'] = '';
+        $data['error'] = "";
 
-        //$data['subscribe_data'] = Subscribe::orderBy('id','DESC')->get();    
+        $startdate = $request->s_date;
+        $enddate = $request->e_date;
+        $salesperson_id = $request->salesperson_id;
+        $service_id = $request->service_id;
+        $subservice_id = $request->subservice_id;
+        $order_type = $request->order_type;
+        $user_data = Auth::user();
 
-        $data['error'] = '';
+        $query = DB::table('ci_order_item')
+            ->join('ci_orders', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+            ->where('ci_orders.order_status', 'CO')
+            ->where('ci_orders.is_delete', '0')
+            ->whereNotNull('ci_order_item.salesperson_id')
+            ->where('ci_order_item.salesperson_id', '!=', '')
+            ->where('ci_order_item.salesperson_id', '!=', '0');
 
-        //$data['subscribe_data'] = Subscribe::orderBy('id','DESC')->get();    
+        // ❌ REMOVE old date filter (IMPORTANT)
+        // because now we filter on visit_date, not cdate
 
-    $query = DB::table('ci_orders')->where('ci_orders.is_delete','0')
-        ->leftJoin('frontloginregisters', 'ci_orders.user_id', '=', 'frontloginregisters.id')
-        //->leftJoin('ci_shipping_address', 'ci_orders.order_id', '=', 'ci_shipping_address.order_id')
-        ->select('frontloginregisters.email as user_email', 'frontloginregisters.name as user_name', 'frontloginregisters.mobile as user_mobile',  'ci_orders.*');
-
-    if (!empty($order_id)) {
-        $query->where('ci_orders.order_id', $order_id);
-    }
-
-    if (!empty($status)) {
-        if ($status == 'SUCCESS' || $status == 'FAILED') {
-            $query->where('ci_orders.payment_status', $status);
-        } else {
-            $query->where('ci_orders.order_status', $status);
+        if (!empty($service_id)) {
+            $query->where("ci_order_item.service_id", $service_id);
         }
-    }
+        if (!empty($subservice_id)) {
+            $query->where("ci_order_item.subservice_id", $subservice_id);
+        }
+        if (!empty($salesperson_id)) {
+            $query->where("salesperson_id", $salesperson_id);
+        }
+        if ($order_type == 'survey') {
+            $query->where('ci_orders.is_survey_order', 1);
+        } elseif ($order_type == 'manpower') {
+            $query->where('ci_orders.is_manpower_order', 1);
+        }
 
-    $query->orderBy('ci_orders.order_id', 'DESC');
+        if ($user_data->role_id == 11) {
+            $query->where('salesperson_id', $user_data->id);
+        }
 
-    $orderList = $query->where('payment_status',"Success")->get();
+        $orders = $query->orderBy('ci_order_item.id', 'DESC')->get();
 
-    foreach ($orderList as $order) {
-        $itemList = DB::table('ci_order_item')
-            ->where('order_id', $order->order_id)
-            ->get();
+        // ✅ FINAL VISIT BASED DATA
+        $final_data = [];
 
-        $total = 0;
-        $additionalCost = 0;
+        // echo "<pre>";
+        // print_r($orders);
+        // exit;
 
-        foreach ($itemList as $item) {
-            $product = DB::table('packages')
-                ->where('id', $item->package_id)
-                ->first();
+        foreach ($orders as $item) {
 
-            if($item->product_discount_amount != 0 && $item->product_discount_amount != ''){
-                $product_item_price = $item->product_discount_amount;
-            }else{
-                $product_item_price = $item->package_item_price;
+            // 👉 Create start date
+            $start_date = date('Y-m-d', strtotime(
+                $item->bookingdate . ' ' . $item->month . ' ' . $item->bookingyear
+            ));
+
+            $days = $item->which_day_of_the_week_do_you_want_the_service;
+            $end = $item->end_date;
+
+            $visit_dates = [];
+
+            // ✅ ONE TIME (villa / deep cleaning)
+            if (empty($days)) {
+
+                $visit_dates[] = $start_date;
+            } else {
+
+                $selected_days = array_map('trim', explode(',', $days));
+
+                // if end_date missing → treat as one-time
+                if (empty($end)) {
+
+                    $visit_dates[] = $start_date;
+                } else {
+
+                    $period = new DatePeriod(
+                        new DateTime($start_date),
+                        new DateInterval('P1D'),
+                        new DateTime($end . ' +1 day')
+                    );
+
+                    foreach ($period as $date) {
+                        if (in_array($date->format('l'), $selected_days)) {
+                            $visit_dates[] = $date->format('Y-m-d');
+                        }
+                    }
+                }
             }
 
-            $total += $product_item_price * $item->package_quantity;
+            // ✅ MAKE ROW PER VISIT
+            foreach ($visit_dates as $vdate) {
+
+                // ✅ APPLY FILTER HERE (IMPORTANT 🔥)
+                if (!empty($startdate) && $vdate < date('Y-m-d', strtotime($startdate)))
+                    continue;
+                if (!empty($enddate) && $vdate > date('Y-m-d', strtotime($enddate)))
+                    continue;
+
+                $row = clone $item;
+
+                $row->visit_date = $vdate;
+                $row->visit_day = date('l', strtotime($vdate));
+
+                // 🚫 EXCLUDE FUTURE VISITS
+                if ($vdate > date('Y-m-d')) {
+                    continue;
+                }
+
+                $visit_record = DB::table('ci_order_visits')
+                    ->where('order_id', $row->order_id)
+                    ->where('visit_date', $vdate)
+                    ->first();
+
+                $row->is_cancelled = false;
+                if ($visit_record) {
+                    if ($visit_record->visit_status == 'cancelled') {
+                        $row->is_cancelled = true;
+                    }
+
+                    if (!empty($visit_record->extra_charge)) {
+                        $row->order_total += $visit_record->extra_charge;
+                        if (isset($row->sub_total))
+                            $row->sub_total += $visit_record->extra_charge;
+                        if (isset($row->service_charge))
+                            $row->service_charge += $visit_record->extra_charge;
+                        $row->extra_hours = $visit_record->extra_hours;
+                        $row->extra_charge = $visit_record->extra_charge;
+                    }
+                }
+
+                $final_data[] = $row;
+            }
         }
 
-        $order->items = $itemList;
-        $order->sub_total = $total;
-    }
+        // ✅ SORT BY VISIT DATE
+        usort($final_data, function ($a, $b) {
+            return strtotime($a->visit_date) - strtotime($b->visit_date);
+        });
 
-    $orderList;  
+        $data['salesperson_order_data'] = $final_data;
 
-    $data['orders_list'] = $orderList;
-    
-        // echo"<pre>";
-        // print_r($data);
-        // echo"</pre>";exit;
-        return view('admin.list_salesreport',$data);
-    }
-    function detail($order_id){
-        //echo $id;exit;
-        $data['error'] = '';
-
-        $query = DB::table('ci_orders')->where('ci_orders.is_delete','0')
-        ->leftJoin('frontloginregisters', 'ci_orders.user_id', '=', 'frontloginregisters.id')
-       ->leftJoin('ci_shipping_address', 'ci_orders.order_id', '=', 'ci_shipping_address.order_id')
-        ->select('frontloginregisters.email as user_email', 'frontloginregisters.name as user_name', 'frontloginregisters.mobile as user_mobile',  'ci_orders.*',  'ci_shipping_address.*');
-
-    if (!empty($order_id)) {
-        $query->where('ci_orders.order_id', $order_id);
-    }
-
-    if (!empty($status)) {
-        if ($status == 'SUCCESS' || $status == 'FAILED') {
-            $query->where('ci_orders.payment_status', $status);
-        } else {
-            $query->where('ci_orders.order_status', $status);
-        }
-    }
-
-    $query->orderBy('ci_orders.order_id', 'DESC');
-
-    $orderList = $query->get();
-
-    foreach ($orderList as $order) {
-        $itemList = DB::table('ci_order_item')
-            ->where('order_id', $order->order_id)
+        // salesperson dropdown
+        $data['salesperson'] = DB::table('users')
+            ->whereIn('role_id', [11, 12])
+            ->where('is_active', '0')
             ->get();
 
-        $total = 0;
-        $additionalCost = 0;
-
-        foreach ($itemList as $item) {
-            $product = DB::table('packages')
-                ->where('id', $item->package_id)
-                ->first();
-
-            if($item->product_discount_amount != 0 && $item->product_discount_amount != ''){
-                $product_item_price = $item->product_discount_amount;
-            }else{
-                $product_item_price = $item->package_item_price;
-            }
-
-            $total += $product_item_price * $item->package_quantity;
+        $data['service_data'] = DB::table('services')->where('is_active', '0')->get();
+        if (!empty($service_id)) {
+            $data['subservice_data'] = DB::table('subservices')->where('is_active', '0')->where('serviceid', $service_id)->orderBy('id', 'DESC')->get();
+        } else {
+            $data['subservice_data'] = DB::table('subservices')->where('is_active', '0')->orderBy('id', 'DESC')->get();
         }
 
-        $order->items = $itemList;
-        $order->sub_total = $total;
+        $data['startdate'] = $startdate;
+        $data['enddate'] = $enddate;
+        $data['filter_salesperson_id'] = $salesperson_id;
+        $data['filter_service_id'] = $service_id;
+        $data['filter_subservice_id'] = $subservice_id;
+        $data['filter_order_type'] = $order_type;
+
+        // echo "<pre>";
+        // print_r($data['salesperson_order_data']);
+        // exit;
+
+        return view('admin.salesperson.list', $data);
     }
 
-    $orderList;  
-
-    $data['order'] = $orderList[0];
-
-//     $sql = $query->toSql();
-// echo $sql;
-
-    //echo "<pre>";print_r($query);echo"</pre>";
-       //echo "<pre>";print_r($data);echo"</pre>";exit;  
-
-        return view('admin.view_salesreport_deial',$data);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    function filter_data_salesperson(Request $request)
     {
-        //
-    }
+        // echo "<pre>";
+        // print_r($request->all());
+        // exit;
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $startdate = $request->startdate_fil;
+        $enddate = $request->enddate_fil;
+        $salesperson_id = $request->filter_salesperson_id;
+        $service_id = $request->service_id;
+        $subservice_id = $request->subservice_id;
+        $order_type = $request->order_type_fil;
+        $user_data = Auth::user();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+        $query = DB::table('ci_order_item')
+            ->join('ci_orders', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
+            ->where('ci_orders.order_status', 'CO')
+            ->where('ci_orders.is_delete', '0')
+            ->whereNotNull('ci_order_item.salesperson_id')
+            ->where('ci_order_item.salesperson_id', '!=', '')
+            ->where('ci_order_item.salesperson_id', '!=', '0');
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+        // ❌ REMOVE old date filter (IMPORTANT)
+        // because now we filter on visit_date, not cdate
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        if (!empty($service_id)) {
+            $query->where("ci_order_item.service_id", $service_id);
+        }
+        if (!empty($subservice_id)) {
+            $query->where("ci_order_item.subservice_id", $subservice_id);
+        }
+        if (!empty($salesperson_id)) {
+            $query->where("salesperson_id", $salesperson_id);
+        }
+        if ($order_type == 'survey') {
+            $query->where('ci_orders.is_survey_order', 1);
+        } elseif ($order_type == 'manpower') {
+            $query->where('ci_orders.is_manpower_order', 1);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        if ($user_data->role_id == 11) {
+            $query->where('salesperson_id', $user_data->id);
+        }
+
+        $orders = $query->orderBy('ci_order_item.id', 'DESC')->get();
+
+        // ✅ FINAL VISIT BASED DATA
+        $final_data = [];
+
+        foreach ($orders as $item) {
+
+            // 👉 Create start date
+            $start_date = date('Y-m-d', strtotime(
+                $item->bookingdate . ' ' . $item->month . ' ' . $item->bookingyear
+            ));
+
+            $days = $item->which_day_of_the_week_do_you_want_the_service;
+            $end = $item->end_date;
+
+            $visit_dates = [];
+
+            // ✅ ONE TIME (villa / deep cleaning)
+            if (empty($days)) {
+
+                $visit_dates[] = $start_date;
+            } else {
+
+                $selected_days = array_map('trim', explode(',', $days));
+
+                // if end_date missing → treat as one-time
+                if (empty($end)) {
+
+                    $visit_dates[] = $start_date;
+                } else {
+
+                    $period = new DatePeriod(
+                        new DateTime($start_date),
+                        new DateInterval('P1D'),
+                        new DateTime($end . ' +1 day')
+                    );
+
+                    foreach ($period as $date) {
+                        if (in_array($date->format('l'), $selected_days)) {
+                            $visit_dates[] = $date->format('Y-m-d');
+                        }
+                    }
+                }
+            }
+
+            // ✅ MAKE ROW PER VISIT
+            foreach ($visit_dates as $vdate) {
+
+                // ✅ APPLY FILTER HERE (IMPORTANT 🔥)
+                if (!empty($startdate) && $vdate < date('Y-m-d', strtotime($startdate)))
+                    continue;
+                if (!empty($enddate) && $vdate > date('Y-m-d', strtotime($enddate)))
+                    continue;
+
+                $row = clone $item;
+
+                $row->visit_date = $vdate;
+                $row->visit_day = date('l', strtotime($vdate));
+
+                // 🚫 EXCLUDE FUTURE VISITS
+                if ($vdate > date('Y-m-d')) {
+                    continue;
+                }
+
+                $visit_record = DB::table('ci_order_visits')
+                    ->where('order_id', $row->order_id)
+                    ->where('visit_date', $vdate)
+                    ->first();
+
+                $row->is_cancelled = false;
+                if ($visit_record) {
+                    if ($visit_record->visit_status == 'cancelled') {
+                        $row->is_cancelled = true;
+                    }
+
+                    if (!empty($visit_record->extra_charge)) {
+                        $row->order_total += $visit_record->extra_charge;
+                        if (isset($row->sub_total))
+                            $row->sub_total += $visit_record->extra_charge;
+                        if (isset($row->service_charge))
+                            $row->service_charge += $visit_record->extra_charge;
+                        $row->extra_hours = $visit_record->extra_hours;
+                        $row->extra_charge = $visit_record->extra_charge;
+                    }
+                }
+
+                $final_data[] = $row;
+            }
+        }
+
+        // ✅ SORT BY VISIT DATE
+        usort($final_data, function ($a, $b) {
+            return strtotime($a->visit_date) - strtotime($b->visit_date);
+        });
+
+        $service_wise_sales = [];
+        $salesperson_service_grouping = [];
+        $total_invoice_amt = 0;
+        $total_service_charge = 0;
+        $total_vendor_charges = 0;
+        $total_vat = 0;
+        $total_profit = 0;
+
+        foreach ($final_data as $row) {
+            if (isset($row->is_cancelled) && $row->is_cancelled) {
+                $invoice_amount = 0;
+                $vat_amount = 0;
+                $base_amount = 0;
+                $row->service_charge = 0;
+            } else {
+                $invoice_amount = $row->order_total ?? 0;
+                $vat_amount = $invoice_amount - ($invoice_amount / 1.05);
+                $base_amount = $invoice_amount - $vat_amount;
+            }
+
+            $total_invoice_amt += $invoice_amount;
+            $total_service_charge += $row->service_charge;
+            $total_vat += $vat_amount;
+
+            // Vendor Charge Logic
+            $vendor_payout = 0;
+            $commission = 0;
+            if ($row->vendor_id != 0 && !(isset($row->is_cancelled) && $row->is_cancelled)) {
+                if (!empty($row->subservice_booking_amount) && $row->subservice_booking_amount > 0) {
+                    $commission = $row->subservice_booking_amount;
+                    if (isset($row->extra_charge) && $row->extra_charge > 0) {
+                        $original_invoice = $invoice_amount - $row->extra_charge;
+                        if ($original_invoice > 0) {
+                            $original_vat = $original_invoice - ($original_invoice / 1.05);
+                            $original_base = $original_invoice - $original_vat;
+                            if ($original_base > 0) {
+                                $percentage = $commission / $original_base;
+                                $commission = $base_amount * $percentage;
+                            }
+                        }
+                    }
+                } else {
+                    $commission = ($base_amount * $row->subservice_booking_percentage) / 100;
+                }
+                $vendor_payout = $base_amount - $commission;
+                $total_vendor_charges += $vendor_payout;
+            }
+
+            $order_profit = $invoice_amount - $vat_amount - $vendor_payout;
+
+            // Grouping by Service
+            $sName = Helper::servicename($row->service_id);
+            if (!isset($service_wise_sales[$sName])) {
+                $service_wise_sales[$sName] = [
+                    'invoice_amount' => 0,
+                    'profit' => 0,
+                    'jobs' => 0
+                ];
+            }
+            $service_wise_sales[$sName]['invoice_amount'] += $invoice_amount;
+            $service_wise_sales[$sName]['jobs'] += 1;
+            $service_wise_sales[$sName]['profit'] += $order_profit;
+
+            // Grouping by Salesperson and Service
+            $spName = Helper::salesperson($row->salesperson_id);
+            if (!isset($salesperson_service_grouping[$spName])) {
+                $salesperson_service_grouping[$spName] = [
+                    'services' => [],
+                    'total_invoice' => 0,
+                    'total_profit' => 0,
+                    'total_jobs' => 0
+                ];
+            }
+            if (!isset($salesperson_service_grouping[$spName]['services'][$sName])) {
+                $salesperson_service_grouping[$spName]['services'][$sName] = [
+                    'invoice_amount' => 0,
+                    'profit' => 0,
+                    'jobs' => 0
+                ];
+            }
+            $salesperson_service_grouping[$spName]['services'][$sName]['invoice_amount'] += $invoice_amount;
+            $salesperson_service_grouping[$spName]['services'][$sName]['profit'] += $order_profit;
+            $salesperson_service_grouping[$spName]['services'][$sName]['jobs'] += 1;
+
+            $salesperson_service_grouping[$spName]['total_invoice'] += $invoice_amount;
+            $salesperson_service_grouping[$spName]['total_profit'] += $order_profit;
+            $salesperson_service_grouping[$spName]['total_jobs'] += 1;
+        }
+
+        // Profit calculation
+        $total_profit = $total_invoice_amt - $total_vat - $total_vendor_charges;
+
+        // ✅ 2. DRAW THE SUMMARY TABLES IN EXCEL
+        $row_num = 1;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // 1st Table: Sales Report Summary
+        $sheet->mergeCells("A{$row_num}:B{$row_num}");
+        $sheet->setCellValue("A{$row_num}", 'Sales Report Summary');
+        $sheet->getStyle("A{$row_num}")->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle("A{$row_num}:B{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312'); // Yellow
+        $sheet->getStyle("A{$row_num}")->getAlignment()->setHorizontal('center');
+
+        $row_num++;
+
+        $sheet->setCellValue("A{$row_num}", "Charges");
+        $sheet->setCellValue("B{$row_num}", "Total (AED)");
+        $sheet->getStyle("A{$row_num}:B{$row_num}")->getFont()->setBold(true);
+        $row_num++;
+
+        $sheet->setCellValue("A{$row_num}", "Invoice Amount");
+        $sheet->setCellValue("B{$row_num}", number_format($total_invoice_amt, 2));
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Service Charge");
+        $sheet->setCellValue("B{$row_num}", number_format($total_service_charge, 2));
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Agent Commission");
+        $sheet->setCellValue("B{$row_num}", "0.00");
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Vendor Charges");
+        $sheet->setCellValue("B{$row_num}", number_format($total_vendor_charges, 2));
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Other Expenses");
+        $sheet->setCellValue("B{$row_num}", "0.00");
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Vat");
+        $sheet->setCellValue("B{$row_num}", number_format($total_vat, 2));
+        $row_num++;
+        $sheet->setCellValue("A{$row_num}", "Total Profit");
+        $sheet->setCellValue("B{$row_num}", number_format($total_profit, 2));
+        $sheet->getStyle("A{$row_num}:B{$row_num}")->getFont()->getColor()->setARGB('FFFFFFFF');
+        $sheet->getStyle("A{$row_num}:B{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF0040E6'); // Blue
+
+        $row_num += 2; // Leave a blank row
+
+        // 2nd Table: Service wise Sales
+        $sheet->mergeCells("A{$row_num}:E{$row_num}");
+        $sheet->setCellValue("A{$row_num}", 'Service wise Sales');
+        $sheet->getStyle("A{$row_num}")->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312'); // Yellow
+        $sheet->getStyle("A{$row_num}")->getAlignment()->setHorizontal('center');
+
+        $row_num++;
+
+        $sheet->setCellValue("A{$row_num}", 'Services');
+        $sheet->setCellValue("B{$row_num}", 'Invoice Amount');
+        $sheet->setCellValue("C{$row_num}", 'Profit');
+        $sheet->setCellValue("D{$row_num}", 'Percentage %');
+        $sheet->setCellValue("E{$row_num}", 'No. of Jobs');
+        $sheet->getStyle("A{$row_num}:E{$row_num}")->getFont()->setBold(true);
+        $row_num++;
+
+        foreach ($service_wise_sales as $name => $data) {
+            $percentage = 0;
+            if ($data['invoice_amount'] > 0) {
+                $percentage = ($data['profit'] / $data['invoice_amount']) * 100;
+            }
+            $sheet->setCellValue("A{$row_num}", $name);
+            $sheet->setCellValue("B{$row_num}", number_format($data['invoice_amount'], 2));
+            $sheet->setCellValue("C{$row_num}", number_format($data['profit'], 2));
+            $sheet->setCellValue("D{$row_num}", number_format($percentage, 2) . '%');
+            $sheet->setCellValue("E{$row_num}", $data['jobs']);
+            $row_num++;
+        }
+
+        $total_percentage = 0;
+        if ($total_invoice_amt > 0) {
+            $total_percentage = ($total_profit / $total_invoice_amt) * 100;
+        }
+
+        $sheet->setCellValue("A{$row_num}", "Total Sales");
+        $sheet->setCellValue("B{$row_num}", number_format($total_invoice_amt, 2));
+        $sheet->setCellValue("C{$row_num}", number_format($total_profit, 2));
+        $sheet->setCellValue("D{$row_num}", number_format($total_percentage, 2) . '%');
+        $sheet->setCellValue("E{$row_num}", count($final_data));
+
+        $sheet->getStyle("A{$row_num}:E{$row_num}")->getFont()->setBold(true);
+        $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312');
+
+        $row_num += 2; // Leave a blank row
+
+        $roleIds = explode(',', $user_data->role_id);
+        if (in_array('1', $roleIds)) {
+            // 3rd Table: Salesperson Service wise Sales
+            if (count($salesperson_service_grouping) > 0) {
+                foreach ($salesperson_service_grouping as $spName => $spData) {
+                    $sheet->mergeCells("A{$row_num}:E{$row_num}");
+                    $sheet->setCellValue("A{$row_num}", strip_tags($spName) . ' - Service Wise Sales');
+                    $sheet->getStyle("A{$row_num}")->getFont()->setBold(true)->setSize(14);
+                    $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312');
+                    $sheet->getStyle("A{$row_num}")->getAlignment()->setHorizontal('center');
+                    $row_num++;
+
+                    $sheet->setCellValue("A{$row_num}", 'Services');
+                    $sheet->setCellValue("B{$row_num}", 'Invoice Amount');
+                    $sheet->setCellValue("C{$row_num}", 'Profit');
+                    $sheet->setCellValue("D{$row_num}", 'Percentage %');
+                    $sheet->setCellValue("E{$row_num}", 'No. of Jobs');
+                    $sheet->getStyle("A{$row_num}:E{$row_num}")->getFont()->setBold(true);
+                    $row_num++;
+
+                    foreach ($spData['services'] as $sName => $data) {
+                        $percentage = 0;
+                        if ($data['invoice_amount'] > 0) {
+                            $percentage = ($data['profit'] / $data['invoice_amount']) * 100;
+                        }
+                        $sheet->setCellValue("A{$row_num}", strip_tags($sName));
+                        $sheet->setCellValue("B{$row_num}", number_format($data['invoice_amount'], 2));
+                        $sheet->setCellValue("C{$row_num}", number_format($data['profit'], 2));
+                        $sheet->setCellValue("D{$row_num}", number_format($percentage, 2) . '%');
+                        $sheet->setCellValue("E{$row_num}", $data['jobs']);
+                        $row_num++;
+                    }
+
+                    $total_percentage = 0;
+                    if ($spData['total_invoice'] > 0) {
+                        $total_percentage = ($spData['total_profit'] / $spData['total_invoice']) * 100;
+                    }
+
+                    $sheet->setCellValue("A{$row_num}", "Total Sales");
+                    $sheet->setCellValue("B{$row_num}", number_format($spData['total_invoice'], 2));
+                    $sheet->setCellValue("C{$row_num}", number_format($spData['total_profit'], 2));
+                    $sheet->setCellValue("D{$row_num}", number_format($total_percentage, 2) . '%');
+                    $sheet->setCellValue("E{$row_num}", $spData['total_jobs']);
+                    $sheet->getStyle("A{$row_num}:E{$row_num}")->getFont()->setBold(true);
+                    $sheet->getStyle("A{$row_num}:E{$row_num}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFD312');
+                    $row_num += 2;
+                }
+            }
+        }
+
+        // ✅ 3. START ORDER LISTING BELOW SUMMARY
+        // Table Header for Orders
+        $order_headers = ['Booking Date', 'Service Type', 'Order Id', 'Sales Person', 'Customer', 'Vendor', 'Vendor Charge', 'Profit'];
+        $column = 'A';
+        foreach ($order_headers as $h) {
+            $sheet->setCellValue($column . $row_num, $h);
+            $column++;
+        }
+        $sheet->getStyle("A{$row_num}:H{$row_num}")->getFont()->setBold(true);
+
+        $row_num++;
+
+        // Fill Order Data
+        foreach ($final_data as $order) {
+            $invoice_amount = $order->order_total ?? 0;
+            $vat_amount = $invoice_amount - ($invoice_amount / 1.05);
+            $base_amount = $invoice_amount - $vat_amount;
+
+            $vendor_payout = 0;
+            $commission = 0;
+
+            if ($order->vendor_id != 0) {
+                if (!empty($order->subservice_booking_amount) && $order->subservice_booking_amount > 0) {
+                    $commission = $order->subservice_booking_amount;
+                } else {
+                    $commission = ($base_amount * $order->subservice_booking_percentage) / 100;
+                }
+                $vendor_payout = $base_amount - $commission;
+            }
+
+            $order_profit = $invoice_amount - $vat_amount - $vendor_payout;
+
+            $customer_order_count = \DB::table('ci_orders')
+                ->where('user_id', $order->user_info_id)
+                ->where('order_status', 'CO')
+                ->count();
+
+            $customer_status = ($customer_order_count > 1) ? ' (Repeated Customer)' : ' (New Customer)';
+            $customer_name = ($order->name ?? 'N/A') . $customer_status;
+
+            $sheet->setCellValue("A{$row_num}", $order->visit_date);
+            $sheet->setCellValue("B{$row_num}", Helper::servicename($order->service_id));
+            $sheet->setCellValue("C{$row_num}", $order->format_order_id);
+            $sheet->setCellValue("D{$row_num}", Helper::salesperson($order->salesperson_id));
+            $sheet->setCellValue("E{$row_num}", $customer_name);
+            $sheet->setCellValue("F{$row_num}", ($order->vendor_id != 0) ? Helper::vendorsname($order->vendor_id) : '-');
+            $sheet->setCellValue("G{$row_num}", number_format($vendor_payout, 2, '.', ''));
+            $sheet->setCellValue("H{$row_num}", number_format($order_profit, 2, '.', ''));
+            $row_num++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+
+        // Set headers for download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="SalespersonReport.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        // Write the file to the browser
+        $writer->save('php://output');
+        exit;
     }
 }

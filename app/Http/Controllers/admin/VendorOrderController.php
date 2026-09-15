@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\Order;
+use App\Models\Admin\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Helper;
@@ -28,7 +28,7 @@ class VendorOrderController extends Controller
         $query = DB::table('ci_orders')->where('ci_orders.is_delete', '0')
             ->leftJoin('frontloginregisters', 'ci_orders.user_id', '=', 'frontloginregisters.id')
             //->leftJoin('ci_shipping_address', 'ci_orders.order_id', '=', 'ci_shipping_address.order_id')
-            ->select('frontloginregisters.email as user_email', 'frontloginregisters.name as user_name', 'frontloginregisters.mobile as user_mobile',  'ci_orders.*')
+            ->select('frontloginregisters.email as user_email', 'frontloginregisters.name as user_name', 'frontloginregisters.mobile as user_mobile', 'ci_orders.*')
             ->where('ci_orders.order_from', '!=', 2)
             ->where('ci_orders.order_from', '=', 0)
             ->where('ci_orders.order_from', '!=', 1);;
@@ -482,6 +482,73 @@ class VendorOrderController extends Controller
         return view('admin.list_vendororder', $data);
     }
 
+    public function car_services_at_home_and_service_listing($order_id = '', $status = '')
+    {
+        $vendors_id = Auth::user()->id;
+        $data['error'] = '';
+
+        $query = DB::table('ci_orders')->where('ci_orders.is_delete', '0')
+            ->leftJoin('frontloginregisters', 'ci_orders.user_id', '=', 'frontloginregisters.id')
+            ->select(
+                'frontloginregisters.email as user_email',
+                'frontloginregisters.name as user_name',
+                'frontloginregisters.mobile as user_mobile',
+                'ci_orders.*'
+            )
+            //->where('ci_orders.order_from', 1) // This already excludes 0 and 2
+            ->where('ci_orders.vendor_id', $vendors_id);
+
+        if (!empty($order_id)) {
+            $query->where('ci_orders.order_id', $order_id);
+        }
+
+        if (!empty($status)) {
+            if ($status == 'SUCCESS' || $status == 'FAILED') {
+                $query->where('ci_orders.payment_status', $status);
+            } else {
+                $query->where('ci_orders.order_status', $status);
+            }
+        }
+
+        $query->orderBy('ci_orders.order_id', 'DESC');
+        $allOrders = $query->get();
+
+        $filteredOrders = [];
+
+        foreach ($allOrders as $order) {
+            $itemList = DB::table('ci_order_item')
+                ->where('order_id', $order->order_id)
+                ->where('service_id', 38)
+                ->get();
+
+            if ($itemList->isEmpty()) {
+                continue; // Skip orders that don't have service_id 48
+            }
+
+            $total = 0;
+            foreach ($itemList as $item) {
+                $product = DB::table('packages')
+                    ->where('id', $item->package_id)
+                    ->first();
+
+                if ($item->product_discount_amount != 0 && $item->product_discount_amount != '') {
+                    $product_item_price = $item->product_discount_amount;
+                } else {
+                    $product_item_price = $item->package_item_price;
+                }
+
+                $total += $product_item_price * $item->package_quantity;
+            }
+
+            $order->items = $itemList;
+            $filteredOrders[] = $order;
+        }
+
+        $data['vendororders_list'] = $filteredOrders;
+
+        return view('admin.list_vendororder', $data);
+    }
+
     public function car_inspection_order_listing($order_id = '', $status = '')
     {
         $vendors_id = Auth::user()->id;
@@ -741,9 +808,9 @@ class VendorOrderController extends Controller
 
         $bookingDate = $currentOrder->bookingdate;
         $bookingmonth = $currentOrder->month;
-        $bookingyear   = $currentOrder->bookingyear;
+        $bookingyear = $currentOrder->bookingyear;
         $hour = $currentOrder->how_many_hours_should_they_stay;
-        $timeSlot =  $currentOrder->time_slot;
+        $timeSlot = $currentOrder->time_slot;
 
         $requiredSlots = [];
         for ($i = 0; $i <= $hour; $i++) {
@@ -809,7 +876,7 @@ class VendorOrderController extends Controller
                 foreach ($items as $item) {
 
                     $hours = $item->how_many_hours_should_they_stay;
-                    $start_slot = (int)$item->time_slot;
+                    $start_slot = (int) $item->time_slot;
 
                     // Block current slot and next slots based on hours
                     for ($i = 0; $i <= $hours; $i++) {
@@ -915,7 +982,7 @@ class VendorOrderController extends Controller
             ->where('id', $driver_id)
             ->first();
 
-        $ci_orders_data  = DB::table('ci_orders')
+        $ci_orders_data = DB::table('ci_orders')
             ->where('order_id', $order_id)
             ->first();
 
@@ -1080,7 +1147,7 @@ class VendorOrderController extends Controller
         $vendors_id = Auth::user()->id;
         $query = Ciorder::leftJoin('frontloginregisters', 'ci_orders.user_id', '=', 'frontloginregisters.id')
             ->leftJoin('ci_shipping_address', 'ci_orders.order_id', '=', 'ci_shipping_address.order_id')
-            ->select('frontloginregisters.email as user_email', 'frontloginregisters.name as user_name', 'frontloginregisters.country_code as user_country_code', 'frontloginregisters.mobile as user_mobile',  'ci_orders.*',  'ci_shipping_address.*');
+            ->select('frontloginregisters.email as user_email', 'frontloginregisters.name as user_name', 'frontloginregisters.country_code as user_country_code', 'frontloginregisters.mobile as user_mobile', 'ci_orders.*', 'ci_shipping_address.*');
         if (!empty($order_id)) {
             $query->where('ci_orders.order_id', $order_id);
         }

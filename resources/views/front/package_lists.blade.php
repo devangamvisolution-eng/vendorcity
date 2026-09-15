@@ -608,8 +608,7 @@
                                 alt="{{ $banner_subservices->banner_image_alt_tag ?? $banner_subservices->subservicename }}">
                         @else
                             <img style="width: 100%;"
-                                src="{{ asset('public/upload/subservice/banner/no_image_subservice.png') }}"
-                                alt="">
+                                src="{{ asset('public/upload/subservice/banner/no_image_subservice.png') }}" alt="">
                         @endif
 
                         <div class="banner-content-center">
@@ -710,7 +709,7 @@
 
 
 @if (
-    $subservices_new->id != 29 &&
+        $subservices_new->id != 29 &&
         $subservices_new->id != 70 &&
         $subservices_new->id != 71 &&
         $subservices_new->id != 47 &&
@@ -726,7 +725,8 @@
         $subservices_new->id != 87 &&
         $subservices_new->id != 88 &&
         $subservices_new->id != 93 &&
-        $subservices_new->id != 41)
+        $subservices_new->id != 41
+    )
     @if ($package_count > 0)
         <!-- Listings All Lists -->
         <section class="pt30 pb90 pbm0 d-none">
@@ -741,8 +741,7 @@
                                         data-bs-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
                                         <h4>
                                             <button class="btn btn-link ps-0" type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#collapse2" aria-expanded="true"
-                                                aria-controls="collapse2">Sub
+                                                data-bs-target="#collapse2" aria-expanded="true" aria-controls="collapse2">Sub
                                                 Service</button>
                                         </h4>
                                     </div>
@@ -753,8 +752,7 @@
                                                 <div class="checkbox-style1">
                                                     <a
                                                         href="{{ route('front.package_lists', ['page_url' => $subservices->page_url]) }}">
-                                                        <label
-                                                            class="custom_checkbox">{{ $subservices->subservicename }}
+                                                        <label class="custom_checkbox">{{ $subservices->subservicename }}
                                                         </label>
                                                     </a>
                                                 </div>
@@ -814,9 +812,9 @@
                                         <div class="card-header active" id="heading1" data-bs-toggle="collapse"
                                             data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
                                             <h4>
-                                                <button class="btn btn-link ps-0" type="submit"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapse1"
-                                                    aria-expanded="true" aria-controls="collapse1">Budget</button>
+                                                <button class="btn btn-link ps-0" type="submit" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapse1" aria-expanded="true"
+                                                    aria-controls="collapse1">Budget</button>
                                             </h4>
                                         </div>
 
@@ -845,8 +843,7 @@
                                                         <div class="text-center">
                                                             <input type="text" class="amount" id="amount"
                                                                 placeholder=" {{ $startPrice }}">
-                                                            <span
-                                                                class="fa-sharp fa-solid fa-minus mx-2 dark-color"></span>
+                                                            <span class="fa-sharp fa-solid fa-minus mx-2 dark-color"></span>
                                                             <input type="text" class="amount2" id="amount2"
                                                                 placeholder=" {{ $endPrice }}">
 
@@ -854,10 +851,8 @@
                                                             <input type="hidden" name="max_price" id="max_price"
                                                                 value="{{ $max_price }}">
                                                             <input type="hidden" name="filter_price_start"
-                                                                id="filter_price_start"
-                                                                value="{{ $filter_price_start }}">
-                                                            <input type="hidden" name="filter_price_end"
-                                                                id="filter_price_end"
+                                                                id="filter_price_start" value="{{ $filter_price_start }}">
+                                                            <input type="hidden" name="filter_price_end" id="filter_price_end"
                                                                 value="{{ $filter_price_end }}">
                                                             <input type="hidden" name="sort_by" id="sort_by">
                                                         </div>
@@ -1020,10 +1015,8 @@
                                         <ul class="p-0 mb-0 text-center text-md-start">
                                             <li>
                                                 <!-- Advance Features modal trigger -->
-                                                <button type="button" class="open-btn filter-btn-left"> <img
-                                                        class="me-2"
-                                                        src="{{ asset('public/site/images/icon/all-filter-icon.svg') }}"
-                                                        alt="">
+                                                <button type="button" class="open-btn filter-btn-left"> <img class="me-2"
+                                                        src="{{ asset('public/site/images/icon/all-filter-icon.svg') }}" alt="">
                                                     All Filter</button>
                                             </li>
                                         </ul>
@@ -1087,8 +1080,7 @@
                                                             href="{{ route('front.package_detail', ['page_url' => $package_data_new->page_url]) }}">
                                                             <span
                                                                 style="font-size: 30px;font-family: 'SF Pro Rounded';font-size;">{{ $package_data_new->title }}</span><br>
-                                                            <span
-                                                                style="font-size:20px;">{{ $package_data_new->sub_title }}</span>
+                                                            <span style="font-size:20px;">{{ $package_data_new->sub_title }}</span>
 
                                                         </a>
                                                     </h5>
@@ -1121,8 +1113,7 @@
                                                             $package_data_new->price;
                                                         }
                                                     @endphp
-                                                    <div
-                                                        class="list-meta justify-content-between align-items-center mt15">
+                                                    <div class="list-meta justify-content-between align-items-center mt15">
 
                                                         @php
 
@@ -1170,37 +1161,30 @@
                                                             </div>
                                                         @endif
 
-                                                        <div class="budget pricebtn"
-                                                            style="background-color: #0040E6;text-align: center;">
+                                                        <div class="budget pricebtn" style="background-color: #0040E6;text-align: center;">
                                                             {{-- //@if (in_array('0', explode(',', $subservice->is_bookable))) --}}
                                                             <a class="ud-btn btn-thm add-joining addtocart-btn_{{ $package_data_new->id }}"
                                                                 href="{{ route('cart') }}"
                                                                 onclick="add_to_cart('{{ $package_data_new->id }}'); return false;">
                                                                 @if ($package_data_new->discount_type != '2')
-                                                                    <span class="discount_price"
-                                                                        style="display: flex;"><span
+                                                                    <span class="discount_price" style="display: flex;"><span
                                                                             class="currency_dhiram"></span>
-                                                                        {{ $disc_price }} <span
-                                                                            style="font-size: 14px">&nbsp;
+                                                                        {{ $disc_price }} <span style="font-size: 14px">&nbsp;
                                                                             &nbsp;</span>
                                                                         <del class="fz15">{{ $package_data_new->price }}
                                                                         </del> <span style="font-size: 14px">&nbsp;
                                                                             <span class="currency_dhiram"></span>
                                                                             &nbsp;</span>
                                                                         @if ($package_data_new->discount != '')
-                                                                            <span class="fz15"
-                                                                                style="display: flex;"
-                                                                                style="color:white;"><span
+                                                                            <span class="fz15" style="display: flex;" style="color:white;"><span
                                                                                     class="currency_dhiram"></span>
                                                                                 {{ $package_data_new->discount }}%
                                                                                 OFF</span>
                                                                         @endif
                                                                     </span>
                                                                 @else
-                                                                    <span class="discount_price"><span
-                                                                            class="currency_dhiram"></span>
-                                                                        {{ $package_data_new->price }} <span
-                                                                            style="font-size: 14px">&nbsp;
+                                                                    <span class="discount_price"><span class="currency_dhiram"></span>
+                                                                        {{ $package_data_new->price }} <span style="font-size: 14px">&nbsp;
                                                                         </span></span>
                                                                 @endif
                                                             </a>
@@ -1296,49 +1280,47 @@
         <div class="row">
 
             @foreach ($services as $services_data)
-                <div class="col-sm-6 col-xl-3 col-6 col-lg-3">
-                    <div class="listing-style1">
+                    <div class="col-sm-6 col-xl-3 col-6 col-lg-3">
+                        <div class="listing-style1">
 
-                        <div class="list-thumb bdrs12">
-                            @if ($services_data->image != '')
-                                @if ($services_data->id == 92)
-                                    <a
-                                        href="{{ route('automobile.listing', ['page_url' => $services_data->page_url]) }}">
+                            <div class="list-thumb bdrs12">
+                                @if ($services_data->image != '')
+                                    @if ($services_data->id == 92)
+                                        <a href="{{ route('automobile.listing', ['page_url' => $services_data->page_url]) }}">
                                     @else
-                                        <a
-                                            href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $services_data->page_url]) }}">
-                                @endif
+                                            <a
+                                                href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $services_data->page_url]) }}">
+                                        @endif
 
 
-                                <img src="{{ asset('public/upload/subservice/large/' . $services_data->image) }}"
-                                    alt="{{ $services_data->image_alt_tag ?? $services_data->subservicename }}"
-                                    class="serviceimage_desktop w-100">
-                                </a>
-                            @else
-                                @if ($services_data->id == 92)
-                                    <a
-                                        href="{{ route('automobile.listing', ['page_url' => $services_data->page_url]) }}">
-                                    @else
-                                        <a
-                                            href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $services_data->page_url]) }}">
-                                @endif
+                                            <img src="{{ asset('public/upload/subservice/large/' . $services_data->image) }}"
+                                                alt="{{ $services_data->image_alt_tag ?? $services_data->subservicename }}"
+                                                class="serviceimage_desktop w-100">
+                                        </a>
+                                @else
+                                        @if ($services_data->id == 92)
+                                            <a href="{{ route('automobile.listing', ['page_url' => $services_data->page_url]) }}">
+                                        @else
+                                                <a
+                                                    href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $services_data->page_url]) }}">
+                                            @endif
 
-                                <img class="w-100"
-                                    src="{{ asset('public/upload/service/large/Image_Available.jpg') }}"
-                                    alt="{{ $services_data->image_alt_tag ?? $services_data->subservicename }}"></a>
-                            @endif
+                                                <img class="w-100"
+                                                    src="{{ asset('public/upload/service/large/Image_Available.jpg') }}"
+                                                    alt="{{ $services_data->image_alt_tag ?? $services_data->subservicename }}"></a>
+                                    @endif
+                            </div>
+                        </div>
+                        <div class="list-content">
+                            <h5 class="list-title"><a
+                                    href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $services_data->page_url]) }}"
+                                    style="font-weight:600;">
+                                    {{ strlen($services_data->subservicename . ' in ' . $formattedCity) > 31
+                ? substr($services_data->subservicename . ' in ' . $formattedCity, 0, 31) . '...'
+                : $services_data->subservicename . ' in ' . $formattedCity }}
+                                </a></h5>
                         </div>
                     </div>
-                    <div class="list-content">
-                        <h5 class="list-title"><a
-                                href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $services_data->page_url]) }}"
-                                style="font-weight:600;">
-                                {{ strlen($services_data->subservicename . ' in ' . $formattedCity) > 31
-                                    ? substr($services_data->subservicename . ' in ' . $formattedCity, 0, 31) . '...'
-                                    : $services_data->subservicename . ' in ' . $formattedCity }}
-                            </a></h5>
-                    </div>
-                </div>
             @endforeach
         </div>
     </div>
@@ -1382,9 +1364,9 @@
                             <div class="package-mobile-section mt-4">
                                 @foreach ($package_attr as $index => $package_attribut)
                                     <div class="mb-5">
-                                        {{-- <div class="placeholder rect bg-primary rounded"
+                                        <div class="placeholder rect bg-primary rounded"
                                             style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
-                                        </div> --}}
+                                        </div>
                                         <div class="mt-3">
                                             <h3 class="mb-2 font-weight-bold">{{ $package_attribut->title_addmore }}</h3>
                                             {!! html_entity_decode($package_attribut->description_addmore) !!}
@@ -1406,22 +1388,18 @@
 
                     {{-- ✅ Desktop Full Description --}}
                     <div class="d-none d-md-block">
-
-                        <div class="row mb-1 align-items-center mrgb0">
-                            {!! html_entity_decode($top_description->description) !!}
-
-                        </div>
+                        {!! html_entity_decode($top_description->description) !!}
 
                         {{-- Desktop Package Attributes --}}
                         <div class="row mb-5 align-items-center mrgb0">
                             @foreach ($package_attr as $index => $package_attribut)
                                 @if ($index % 2 == 1)
                                     {{-- Right Image --}}
-                                    <div class="col-12 col-md-12 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right">
-                                        <div class="rounded mb-2">
+                                    <div class="col-12 col-md-7 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right">
+                                        <div class="rounded p-3">
                                             <div class="row">
                                                 <div class="col-12">
-                                                    <h3 class="font-weight-bold">
+                                                    <h3 class="mb-4 font-weight-bold">
                                                         {{ $package_attribut->title_addmore }}
                                                     </h3>
                                                 </div>
@@ -1431,24 +1409,23 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {{-- <div class="col-12 col-md-5 pl-md-0 stack-top stack-adjust--left mrgb0">
+                                    <div class="col-12 col-md-5 pl-md-0 stack-top stack-adjust--left mrgb0">
                                         <div class="placeholder rect bg-primary rounded"
                                             style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
                                         </div>
-                                    </div> --}}
+                                    </div>
                                 @else
                                     {{-- Left Image --}}
-                                    {{-- <div class="col-12 col-md-5 pl-md-0 stack-top stack-adjust--left">
+                                    <div class="col-12 col-md-5 pl-md-0 stack-top stack-adjust--left">
                                         <div class="placeholder rect bg-primary rounded"
                                             style="background: url('{{ asset('public/upload/subservice/subservice_attr/large/' . $package_attribut->image) }}'); background-size: cover; width: 100%; height: 300px;">
                                         </div>
-                                    </div> --}}
-                                    {{-- <div class="col-12 col-md-7 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right"> --}}
-                                    <div class="col-12 col-md-12 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right">
-                                        <div class="rounded mb-2">
+                                    </div>
+                                    <div class="col-12 col-md-7 px-5 px-md-0 pr-md-0 stack-bottom stack-adjust--right">
+                                        <div class="rounded p-3">
                                             <div class="row">
                                                 <div class="col-12">
-                                                    <h3 class="font-weight-bold">
+                                                    <h3 class="mb-4 font-weight-bold">
                                                         {{ $package_attribut->title_addmore }}
                                                     </h3>
                                                 </div>
@@ -1586,8 +1563,7 @@
                 <div class="item">
                     <div class="freelancer-style1  bdr1 bdrs16 hover-box-shadow review-card-fixed why-div">
 
-                        <img src="{{ asset('public/site/images/Select_your_Service.png') }}" alt=""
-                            style="width: 65%;">
+                        <img src="{{ asset('public/site/images/Select_your_Service.png') }}" alt="" style="width: 65%;">
                         <h3 style="margin-top: 15px;">Why VendorsCity?</h3>
                         <p>Positioned as a leading home and commercial services marketplace, VendorsCity takes the lead
                             in streamlining your diverse service requirements. Here's why opting for our services stands
@@ -1598,8 +1574,7 @@
                 <div class="item">
                     <div class="freelancer-style1  bdr1 bdrs16 hover-box-shadow review-card-fixed why-div">
 
-                        <img src="{{ asset('public/site/images/Sit_back_and_relax.png') }}" alt=""
-                            style="width: 65%;">
+                        <img src="{{ asset('public/site/images/Sit_back_and_relax.png') }}" alt="" style="width: 65%;">
                         <h3 style="margin-top: 15px;">Top-notch Professionals</h3>
                         <p> Connect with industry-leading professionals through VendorsCity. Prioritizing excellence, we
                             ensure our partners deliver exceptional quality for your utmost satisfaction.</p>
@@ -1845,8 +1820,7 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
                         @if (!empty($googleReview))
                             @foreach ($googleReview as $googleReview_data)
                                 <li class="splide__slide text-center">
-                                    <div
-                                        class="freelancer-style1 text-center bdr1 bdrs16 hover-box-shadow review-card-fixed">
+                                    <div class="freelancer-style1 text-center bdr1 bdrs16 hover-box-shadow review-card-fixed">
 
                                         <div class="details">
                                             @if ($googleReview_data->name != '')
@@ -1935,25 +1909,19 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
                                 @endphp
 
                                 @foreach ($faq as $faq_data)
-                                    <div
-                                        class="accordion-item @php if ($i == 0) {
+                                    <div class="accordion-item @php if ($i == 0) {
                                         echo 'active';
                                     } @endphp">
                                         <h2 class="accordion-header" id="headingOne_{{ $faq_data->id }}">
-                                            <button
-                                                class="accordion-button @php if ($i != 0) {
+                                            <button class="accordion-button @php if ($i != 0) {
                                                 echo 'collapsed';
-                                            } @endphp"
-                                                type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#collapseOne_{{ $faq_data->id }}"
-                                                aria-expanded="true"
+                                            } @endphp" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#collapseOne_{{ $faq_data->id }}" aria-expanded="true"
                                                 aria-controls="collapseOne">{{ $faq_data->question }}</button>
                                         </h2>
-                                        <div id="collapseOne_{{ $faq_data->id }}"
-                                            class="accordion-collapse collapse @php if ($i == 0) {
+                                        <div id="collapseOne_{{ $faq_data->id }}" class="accordion-collapse collapse @php if ($i == 0) {
                                             echo 'show';
-                                        } @endphp"
-                                            aria-labelledby="headingOne_{{ $faq_data->id }}"
+                                        } @endphp" aria-labelledby="headingOne_{{ $faq_data->id }}"
                                             data-parent="#accordionExample">
                                             <div class="accordion-body">{!! html_entity_decode($faq_data->answer) !!}</div>
                                         </div>
@@ -2129,7 +2097,7 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
 @include('front.includes.footer')
 <script>
     // When the user scrolls the page, execute the function
-    window.onscroll = function() {
+    window.onscroll = function () {
         scrollFunction();
     };
 
@@ -2146,7 +2114,7 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
 
 
 <script>
-    $(".slider-range").on("slide", function(event, ui) {
+    $(".slider-range").on("slide", function (event, ui) {
         var lowAmount = $("#amount").val();
         var highAmount = $("#amount2").val();
         var max_price = $("#max_price").val();
@@ -2194,8 +2162,8 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
     });
 </script>
 <script>
-    $(document).ready(function() {
-        $('#gets_button_booknow').click(function(e) {
+    $(document).ready(function () {
+        $('#gets_button_booknow').click(function (e) {
             e.preventDefault(); // Prevent default anchor click behavior
             $('html, body').animate({
                 scrollTop: $('#scroll-booknow').offset().top
@@ -2227,7 +2195,7 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
     });
 
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('.whyvendorscity-slider').owlCarousel({
             loop: false,
             margin: 30,
@@ -2260,7 +2228,7 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
 
 <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         new Splide('#review-slider', {
             type: 'slide',
             perPage: 4,
@@ -2282,7 +2250,7 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
 </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const maxChars = 190;
         const fullText = `{!! addslashes($subservices_new->top_description) !!}`;
 
@@ -2295,7 +2263,7 @@ Positioned as a leading home and commercial services marketplace, VendorsCity ta
         // Show short preview only
         shortDescDiv.innerHTML = fullText.substring(0, maxChars) + "...";
 
-        toggleBtn.addEventListener("click", function() {
+        toggleBtn.addEventListener("click", function () {
             const isExpanded = fullDescDiv.classList.contains("d-block");
 
             if (isExpanded) {

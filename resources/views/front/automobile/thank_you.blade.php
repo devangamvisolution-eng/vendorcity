@@ -707,23 +707,15 @@ status-popup {
                     <h5 class="mb-3">Booking Details</h5>
                     <ul class="list-unstyled mb-3">
                        @php
-                          if($orders->order_status == "P") {
-                              $statusText = "Awating Confirmation";
-                              $statusColor = "";
-                          } elseif($orders->order_status == "PA") {
-                              $statusText = "Vendor Assigned";
-                              $statusColor = "";
-                          } elseif($orders->order_status == "CO") {
-                              $statusText = "Completed";
-                              $statusColor = "";
-                          } elseif($orders->order_status == "CL") {
-                              $statusText = "Cancelled";
-                              $statusColor = "red";
-                          }
-                          else {
-                            $statusText = "Unknown";
-                          }
-                      @endphp
+                           $statusDetails = \App\Helpers\Helper::getOrderStatusDetails($orders->order_status);
+                           $statusText = $statusDetails['text'];
+                           $statusColor = '';
+                           if ($orders->order_status == "CL") {
+                               $statusColor = "red";
+                           } elseif ($orders->order_status == "UP") {
+                               $statusColor = "orange";
+                           }
+                       @endphp
                     <li><strong>Status:</strong> <span class="status-completed" style="color: #000 !important;">{{ $statusText }}</span></li>
                     <li><strong>Reference Code:</strong> <span class="right">{{ $orders->format_order_id}}</span></li>
                     <li><strong>Service:</strong> <span class="right">{!! Helper::subservicename($order_data->subservice_id)  !!}</span></li>

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\admin\PackageCategory;
+use App\Models\Admin\PackageCategory;
 use DB;
 
 class PackageCategoryController extends Controller
@@ -90,6 +90,17 @@ class PackageCategoryController extends Controller
             $data['app_slider_image'] = $sliderImageName;
         } else {
             $data['app_slider_image'] = "";
+        }
+
+        if ($request->hasFile('card_image')) {
+            $cardImage = $request->file('card_image');
+            $extension = $cardImage->getClientOriginalExtension();
+            $originalName = pathinfo($cardImage->getClientOriginalName(), PATHINFO_FILENAME);
+            $cardImageName = time() . '-card-' . $originalName . '.' . $extension;
+            $cardImage->move(public_path('upload/packagecategory'), $cardImageName);
+            $data['card_image'] = $cardImageName;
+        } else {
+            $data['card_image'] = "";
         }
 
         DB::table('package_categories')->insert($data);
@@ -180,6 +191,15 @@ class PackageCategoryController extends Controller
             $sliderImageName = time() . '-slider-' . $originalName . '.' . $extension;
             $sliderImage->move(public_path('upload/packagecategory'), $sliderImageName);
             $data['app_slider_image'] = $sliderImageName;
+        }
+
+        if ($request->hasFile('card_image')) {
+            $cardImage = $request->file('card_image');
+            $extension = $cardImage->getClientOriginalExtension();
+            $originalName = pathinfo($cardImage->getClientOriginalName(), PATHINFO_FILENAME);
+            $cardImageName = time() . '-card-' . $originalName . '.' . $extension;
+            $cardImage->move(public_path('upload/packagecategory'), $cardImageName);
+            $data['card_image'] = $cardImageName;
         }
 
         DB::table('package_categories')->where('id', $id)->update($data);

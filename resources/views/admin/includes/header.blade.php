@@ -1,7 +1,7 @@
 <!--Header -->
 <!-- Logo -->
 <div class="header-left">
-    @if (Auth::user()->vendor != 1)
+    @if(Auth::user()->vendor != 1)
         <a href="{{ url('/admin') }}" class="logo">
             <img src="{{ asset('public/admin/assets/img/logo.png') }}" alt="Logo" style="width: 100%;">
         </a>
@@ -145,8 +145,7 @@
         $notification = DB::table('notification')
             ->where('vendor_id', Auth::user()->id)
             ->where('view_notification', 0)
-            ->get()
-            ->toArray();
+            ->get()->toArray();
 
         $notification_count = DB::table('notification')
             ->where('vendor_id', Auth::user()->id)
@@ -158,7 +157,7 @@
         <a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
             <i data-feather="bell"></i> <span class="badge rounded-pill">{{ $notification_count }}</span>
         </a>
-        @if (!empty($notification))
+        @if(!empty($notification))
             <div class="dropdown-menu notifications">
                 <div class="topnav-dropdown-header">
                     <span class="notification-title">Notifications</span>
@@ -166,7 +165,7 @@
                 </div>
                 <div class="noti-content">
                     <ul class="notification-list">
-                        @foreach ($notification as $notification_data)
+                        @foreach($notification as $notification_data)
                             @php
                                 //    $currentDateTime = new DateTime();
                                 //     $notificationDateTime = new DateTime($notification_data->added_datetime);
@@ -205,10 +204,9 @@
             <span>{{ Auth::user()->name }}</span>
         </a>
         <div class="dropdown-menu">
-            @if (Auth::user()->role_id == 1)
-                <a class="dropdown-item" href="{{ route('profile.edit') }}"><i data-feather="user"
-                        class="me-1"></i>
-                    Profile</a>
+            @if(Auth::user()->role_id == 1)
+            <a class="dropdown-item" href="{{route('profile.edit')}}"><i data-feather="user" class="me-1"></i>
+                Profile</a>
             @endif
             <a class="dropdown-item" href="{{ route('logout') }}"
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

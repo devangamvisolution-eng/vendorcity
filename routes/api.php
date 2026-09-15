@@ -74,8 +74,5 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/my-quotes', [MyAccountApiController::class, 'myQuotes']);
     Route::post('/my-quote-detail', [MyAccountApiController::class, 'myQuoteDetail']);
-
-    // Coupons
-    Route::post('/coupons/list', [MyAccountApiController::class, 'listCoupons']);
-    Route::post('/coupons/validate', [MyAccountApiController::class, 'validateCoupon']);
+    Route::post('/all-bookings', [MyAccountApiController::class, 'allBookings']);
 });

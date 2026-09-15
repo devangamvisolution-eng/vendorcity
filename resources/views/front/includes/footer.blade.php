@@ -337,42 +337,34 @@
 
 
                                  <script src="{{ asset('public/site/js/jquery-migrate-3.0.0.min.js') }}"></script>
-                                 <script src="{{ asset('public/site/js/popper.min.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/popper.min.js') }}" defer></script>
                                  <script src="{{ asset('public/site/js/bootstrap.min.js') }}"></script>
                                  <script src="{{ asset('public/site/js/bootstrap-select.min.js') }}"></script>
                                  <script src="{{ asset('public/site/js/jquery.mmenu.all.js') }}"></script>
-                                 <script src="{{ asset('public/site/js/ace-responsive-menu.js') }}"></script>
-                                 <script src="{{ asset('public/site/js/jquery-scrolltofixed-min.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/ace-responsive-menu.js') }}" defer></script>
+                                 <script src="{{ asset('public/site/js/jquery-scrolltofixed-min.js') }}" defer></script>
                                  @if (!request()->is('*/booknow/cleaning/cleaning-subscription'))
-                                     <script src="{{ asset('public/site/js/wow.min.js') }}"></script>
-                                     <script src="{{ asset('public/site/js/owl.js') }}"></script>
-                                     <script src="{{ asset('public/site/js/jquery.counterup.js') }}"></script>
+                                     
                                  @endif
                                  <link rel="stylesheet" href="{{ asset('public/site/css/intlTelInput.css') }}">
-                                 <script src="{{ asset('public/site/js/intlTelInput.min.js') }}"></script>
-                                 {{-- <script src="{{ asset('public/site/js/isotop.js') }}"></script> --}}
-                                 <script src="{{ asset('public/site/js/scrollbalance.js') }}"></script>
-                                 <script src="{{ asset('public/site/js/scrollbalance_new.js') }}"></script>
+                                 <script src="{{ asset('public/site/js/intlTelInput.min.js') }}" defer></script>
+                                
+                                 <script src="{{ asset('public/site/js/scrollbalance.js') }}" defer></script>
                                  <!-- Custom script for all pages -->
                                  <script src="{{ asset('public/site/js/script.js') }}"></script>
                                  @if (!request()->is('*/booknow/cleaning/cleaning-subscription'))
+									 <script src="{{ asset('public/site/js/wow.min.js') }}"></script>
+                                     <script src="{{ asset('public/site/js/owl.js') }}"></script>
+                                     <script src="{{ asset('public/site/js/jquery.counterup.js') }}"></script>
                                      <script src="{{ asset('public/site/js/owl.carousel.min.js') }}"></script>
                                      <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+									 <script src="{{ asset('public/site/js/select2.min.js') }}"></script>
                                  @endif
-                                 {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script> --}}
-
                                  <script>
                                      window.Enums = {
                                          vcCharges: @json($vcChargesEnum)
                                      };
                                  </script>
-
-
-                                 <!-- Select2 JS -->
-
-                                 @if (!request()->is('*/booknow/cleaning/cleaning-subscription'))
-                                     <script src="{{ asset('public/site/js/select2.min.js') }}"></script>
-                                 @endif
 
                                  <script type="text/javascript">
                                      function remove_to_cart(rowId) {

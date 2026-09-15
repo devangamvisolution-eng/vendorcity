@@ -14,7 +14,7 @@ use Image;
 
 use DB;
 
-use App\Models\admin\Blog;
+use App\Models\Admin\Blog;
 use Illuminate\Http\JsonResponse;
 
 
@@ -37,12 +37,11 @@ class BlogController extends Controller
 
     {
 
-        $data['blog_data']=Blog::orderBy('id','DESC')->get();
+        $data['blog_data'] = Blog::orderBy('id', 'DESC')->get();
 
-      
 
-        return view('admin.list_blog',$data);
 
+        return view('admin.list_blog', $data);
     }
 
 
@@ -60,12 +59,11 @@ class BlogController extends Controller
     public function create()
 
     {
-        $data['service_data']=DB::table('services')->orderBy('id','DESC')->select('*')->get();
+        $data['service_data'] = DB::table('services')->orderBy('id', 'DESC')->select('*')->get();
 
-        $data['blog_category_data']=DB::table('blog_category')->orderBy('id','DESC')->select('*')->get();
+        $data['blog_category_data'] = DB::table('blog_category')->orderBy('id', 'DESC')->select('*')->get();
 
-        return view('admin.add_blog',$data);
-
+        return view('admin.add_blog', $data);
     }
 
 
@@ -109,40 +107,36 @@ class BlogController extends Controller
         $data['metadescription'] = $request->input('metadescription');
         $data['image_alt_tag'] = $request->input('image_alt_tag');
 
-          if($request->hasfile('image') != ''){
+        if ($request->hasfile('image') != '') {
             $image = $request->file('image');
             $remove_space = str_replace(' ', '-', $image->getClientOriginalName());
-            $data['image'] = time().$remove_space;
-           $destination_path = public_path('upload/blog/large');
-           $img = Image::make($image->path());
-           $width = 970;
-           $height = 400;
-           $img->resize($width,$height,function($contrainst){
-           })->save($destination_path."/".$data['image']);
-           $destination_path = public_path('upload/blog/detail');
-           $img = Image::make($image->path());
-           $width = 1400;
-           $height = 575;
-           $img->resize($width,$height,function($contrainst){
-           })->save($destination_path."/".$data['image']);
-           $width = 70;
-           $height = 70;
-           $destination_path = public_path('upload/blog/small');
-           $img->resize($width,$height,function($constraint){
-           })->save($destination_path."/".$data['image']);
-           $destinationPath = public_path('upload/blog');
-           $image->move($destinationPath,$data['image']);
-           $image = $data['image'];
-               $data['image']  = $image;
-           }else{
-               $data['image'] = "";
-           }
+            $data['image'] = time() . $remove_space;
+            $destination_path = public_path('upload/blog/large');
+            $img = Image::make($image->path());
+            $width = 970;
+            $height = 400;
+            $img->resize($width, $height, function ($contrainst) {})->save($destination_path . "/" . $data['image']);
+            $destination_path = public_path('upload/blog/detail');
+            $img = Image::make($image->path());
+            $width = 1400;
+            $height = 575;
+            $img->resize($width, $height, function ($contrainst) {})->save($destination_path . "/" . $data['image']);
+            $width = 70;
+            $height = 70;
+            $destination_path = public_path('upload/blog/small');
+            $img->resize($width, $height, function ($constraint) {})->save($destination_path . "/" . $data['image']);
+            $destinationPath = public_path('upload/blog');
+            $image->move($destinationPath, $data['image']);
+            $image = $data['image'];
+            $data['image']  = $image;
+        } else {
+            $data['image'] = "";
+        }
 
 
         DB::table('blogs')->insert($data);
 
         return redirect()->route('blog.index')->with('success', 'Blog Added Successfully');
-
     }
 
 
@@ -186,14 +180,13 @@ class BlogController extends Controller
     {
 
         $data['blog'] = DB::table('blogs')->where('id', $id)->first();
-        $data['service_data'] = DB::table('services')->where('is_active', '0')->orderBy('id','DESC')->get();  
-        $data['blog_category_data']=DB::table('blog_category')->orderBy('id','DESC')->select('*')->get();
-        $data['subservice_data'] = DB::table('subservices')->where('serviceid',$data['blog']->service)->orderBy('id','DESC')->get();
-        
-      
+        $data['service_data'] = DB::table('services')->where('is_active', '0')->orderBy('id', 'DESC')->get();
+        $data['blog_category_data'] = DB::table('blog_category')->orderBy('id', 'DESC')->select('*')->get();
+        $data['subservice_data'] = DB::table('subservices')->where('serviceid', $data['blog']->service)->orderBy('id', 'DESC')->get();
 
-        return view('admin.edit_blog',$data);
 
+
+        return view('admin.edit_blog', $data);
     }
 
 
@@ -215,7 +208,7 @@ class BlogController extends Controller
     public function update(Request $request, $id)
 
     {
-       // echo "<pre>";print_r($request->all());echo "</pre>";exit;
+        // echo "<pre>";print_r($request->all());echo "</pre>";exit;
 
         $data['blog_category'] = $request->input('blog_category');
 
@@ -239,39 +232,35 @@ class BlogController extends Controller
 
         $data['image_alt_tag'] = $request->input('image_alt_tag');
 
-           if($request->hasfile('image') != ''){
+        if ($request->hasfile('image') != '') {
             $image = $request->file('image');
             $remove_space = str_replace(' ', '-', $image->getClientOriginalName());
-            $data['image'] = time().$remove_space;
-           $destination_path = public_path('upload/blog/large');
-           $img = Image::make($image->path());
-           $width = 970;
-           $height = 400;
-           $img->resize($width,$height,function($contrainst){
-           })->save($destination_path."/".$data['image']);
-           $destination_path = public_path('upload/blog/detail');
-           $img = Image::make($image->path());
-           $width = 1400;
-           $height = 575;
-           $img->resize($width,$height,function($contrainst){
-           })->save($destination_path."/".$data['image']);
-           $width = 70;
-           $height = 70;
-           $destination_path = public_path('upload/blog/small');
-           $img->resize($width,$height,function($constraint){
-           })->save($destination_path."/".$data['image']);
-           $destinationPath = public_path('upload/blog');
-           $image->move($destinationPath,$data['image']);
-           $image = $data['image'];
-               $data['image']  = $image;
-           }
+            $data['image'] = time() . $remove_space;
+            $destination_path = public_path('upload/blog/large');
+            $img = Image::make($image->path());
+            $width = 970;
+            $height = 400;
+            $img->resize($width, $height, function ($contrainst) {})->save($destination_path . "/" . $data['image']);
+            $destination_path = public_path('upload/blog/detail');
+            $img = Image::make($image->path());
+            $width = 1400;
+            $height = 575;
+            $img->resize($width, $height, function ($contrainst) {})->save($destination_path . "/" . $data['image']);
+            $width = 70;
+            $height = 70;
+            $destination_path = public_path('upload/blog/small');
+            $img->resize($width, $height, function ($constraint) {})->save($destination_path . "/" . $data['image']);
+            $destinationPath = public_path('upload/blog');
+            $image->move($destinationPath, $data['image']);
+            $image = $data['image'];
+            $data['image']  = $image;
+        }
 
         // echo "<pre>";print_r($data);echo "</pre>";exit;
 
         DB::table('blogs')->where('id', $id)->update($data);
 
-        return redirect()->route('blog.index')->with('success','Blog Updated Successfully');
-
+        return redirect()->route('blog.index')->with('success', 'Blog Updated Successfully');
     }
 
 
@@ -294,47 +283,45 @@ class BlogController extends Controller
 
         $delete_id = $request->selected;
 
-        Blog::whereIn('id',$delete_id)->delete();
+        Blog::whereIn('id', $delete_id)->delete();
 
-        return redirect()->route('blog.index')->with('success','Blog has been deleted successfully');
-
+        return redirect()->route('blog.index')->with('success', 'Blog has been deleted successfully');
     }
-    function subservice_show(){
+    function subservice_show()
+    {
         $service_id = $_POST['service'];
         // echo $service_id;exit;
-        
-        $result = DB::table('subservices')->select('*')->where('serviceid','=',$service_id)->orderBy('id','DESC')->get();        
+
+        $result = DB::table('subservices')->select('*')->where('serviceid', '=', $service_id)->orderBy('id', 'DESC')->get();
 
         $result_new = $result->toArray();
 
         $html = ' <select class="form-control" id="subservice" name="subservice">';
         $html .= '<option value="">Select Sub Service</option>';
-        if($result != '' && count($result) >0)
-        {
-            for($i=0;$i<count($result);$i++)
-            {
+        if ($result != '' && count($result) > 0) {
+            for ($i = 0; $i < count($result); $i++) {
                 // echo "<pre>";print_r($result[$i]->id);echo "</pre>";exit;
-                $html .= "<option value='".$result[$i]->id ."'>".$result[$i]->subservicename."</option>";
+                $html .= "<option value='" . $result[$i]->id . "'>" . $result[$i]->subservicename . "</option>";
             }
         }
-        $html .="</select>";
+        $html .= "</select>";
         // echo "<pre>";print_r($html);echo "</pre>";exit;
         echo $html;
     }
-public function upload(Request $request): JsonResponse
+    public function upload(Request $request): JsonResponse
     {
         if ($request->hasFile('upload')) {
             $originName = $request->file('upload')->getClientOriginalName();
             $fileName = pathinfo($originName, PATHINFO_FILENAME);
             $extension = $request->file('upload')->getClientOriginalExtension();
             $fileName = $fileName . '_' . time() . '.' . $extension;
-      
+
             $request->file('upload')->move(public_path('media'), $fileName);
-            
-      
+
+
             $url = asset('public/media/' . $fileName);
-  
-            return response()->json(['fileName' => $fileName, 'uploaded'=> 1, 'url' => $url]);
+
+            return response()->json(['fileName' => $fileName, 'uploaded' => 1, 'url' => $url]);
         }
     }
 }

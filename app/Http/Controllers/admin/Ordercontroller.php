@@ -47,7 +47,64 @@ class Ordercontroller extends Controller
         // });
 
     }
-    public function index($order_id = '', $status = '')
+    private function processDataTablesAjax(\Illuminate\Http\Request $request, $query, $service_id = null)
+    {
+        $start = $request->input('start', 0);
+        $length = $request->input('length', 10);
+        $searchValue = $request->input('search.value');
+
+        if (!empty($searchValue)) {
+            $query->where(function ($q) use ($searchValue) {
+                $cleanSearchValue = ltrim($searchValue, '#');
+                $q->where('frontloginregisters.name', 'LIKE', "%{$searchValue}%")
+                    ->orWhere('frontloginregisters.email', 'LIKE', "%{$searchValue}%")
+                    ->orWhere('frontloginregisters.mobile', 'LIKE', "%{$searchValue}%")
+                    ->orWhere('ci_orders.order_id', 'LIKE', "%{$searchValue}%")
+                    ->orWhere('ci_orders.format_order_id', 'LIKE', "%{$searchValue}%")
+                    ->orWhere('ci_orders.format_order_id', 'LIKE', "%{$cleanSearchValue}%");
+            });
+        }
+
+        $recordsTotal = $query->count();
+        $recordsFiltered = $recordsTotal;
+
+        $orderList = $query->offset($start)->limit($length)->get();
+
+        foreach ($orderList as $order) {
+            $itemQuery = \Illuminate\Support\Facades\DB::table('ci_order_item')
+                ->where('order_id', $order->order_id);
+            if ($service_id !== null) {
+                $itemQuery->where('service_id', $service_id);
+            }
+            $itemList = $itemQuery->get();
+
+            $order->items = $itemList;
+        }
+
+        $data = [];
+        foreach ($orderList as $orders) {
+            $data[] = [
+                'checkbox' => (string)view('admin.partials.order_columns.checkbox', compact('orders'))->render(),
+                'order_detail' => (string)view('admin.partials.order_columns.details', compact('orders'))->render(),
+                'customer_service' => (string)view('admin.partials.order_columns.customer', compact('orders'))->render(),
+                'status' => (string)view('admin.partials.order_columns.status', compact('orders'))->render(),
+                'assign' => (string)view('admin.partials.order_columns.assign', compact('orders'))->render(),
+                'assign_salesperson' => (string)view('admin.partials.order_columns.assign_salesperson', compact('orders'))->render(),
+                'assign_crew' => (string)view('admin.partials.order_columns.assign_crew', compact('orders'))->render(),
+                'assign_vendor' => (string)view('admin.partials.order_columns.assign_vendor', compact('orders'))->render(),
+                'actions' => (string)view('admin.partials.order_columns.actions', compact('orders'))->render(),
+            ];
+        }
+
+        return response()->json([
+            'draw' => intval($request->input('draw')),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
+    public function index(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         //$data['subscribe_data'] = Subscribe::orderBy('id','DESC')->get();    
@@ -88,6 +145,10 @@ class Ordercontroller extends Controller
 
         $query->orderBy('ci_orders.order_id', 'DESC');
 
+        if ($request->ajax()) {
+            return $this->processDataTablesAjax($request, $query, 30);
+        }
+
         // Get distinct orders where service_id is 45
         $orderList = $query->get();
 
@@ -119,14 +180,14 @@ class Ordercontroller extends Controller
             //$order->sub_total = $total;
         }
 
-        $data['orders_list'] = $orderList;
+        $data['orders_list'] = [];
 
         // echo "<pre>";
         // print_r($data);
         // exit;
         return view('admin.list_order', $data);
     }
-    public function cleaning_package_order($order_id = '', $status = '')
+    public function cleaning_package_order(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         // First, fetch distinct orders
@@ -161,6 +222,9 @@ class Ordercontroller extends Controller
             }
         }
         $query->orderBy('ci_orders.order_id', 'DESC');
+        if ($request->ajax()) {
+            return $this->processDataTablesAjax($request, $query, 45);
+        }
         // Get distinct orders where service_id is 45
         $orderList = $query->get();
         // Now, for each order, fetch its items
@@ -188,12 +252,12 @@ class Ordercontroller extends Controller
             $order->items = $itemList;
             //$order->sub_total = $total;
         }
-        $data['orders_list'] = $orderList;
+        $data['orders_list'] = [];
         // echo"<pre>";print_r($data);echo"</pre>";exit;
         return view('admin.list_order', $data);
     }
 
-    public function healthcare_at_home_package_order($order_id = '', $status = '')
+    public function healthcare_at_home_package_order(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         // First, fetch distinct orders
@@ -228,6 +292,9 @@ class Ordercontroller extends Controller
             }
         }
         $query->orderBy('ci_orders.order_id', 'DESC');
+        if ($request->ajax()) {
+            return $this->processDataTablesAjax($request, $query, 54);
+        }
         // Get distinct orders where service_id is 71
         $orderList = $query->get();
         // Now, for each order, fetch its items
@@ -255,14 +322,14 @@ class Ordercontroller extends Controller
             $order->items = $itemList;
             //$order->sub_total = $total;
         }
-        $data['orders_list'] = $orderList;
+        $data['orders_list'] = [];
         // echo"<pre>";print_r($data);echo"</pre>";exit;
         return view('admin.list_order', $data);
     }
 
 
 
-    public function handyman_service_order($order_id = '', $status = '')
+    public function handyman_service_order(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         // First, fetch distinct orders
@@ -297,6 +364,9 @@ class Ordercontroller extends Controller
             }
         }
         $query->orderBy('ci_orders.order_id', 'DESC');
+        if ($request->ajax()) {
+            return $this->processDataTablesAjax($request, $query, 34);
+        }
         // Get distinct orders where service_id is 71
         $orderList = $query->get();
         // Now, for each order, fetch its items
@@ -324,12 +394,12 @@ class Ordercontroller extends Controller
             $order->items = $itemList;
             //$order->sub_total = $total;
         }
-        $data['orders_list'] = $orderList;
+        $data['orders_list'] = [];
         // echo"<pre>";print_r($data);echo"</pre>";exit;
         return view('admin.list_order', $data);
     }
 
-    public function car_services_at_home_service_order($order_id = '', $status = '')
+    public function car_services_at_home_service_order(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         // First, fetch distinct orders
@@ -364,6 +434,9 @@ class Ordercontroller extends Controller
             }
         }
         $query->orderBy('ci_orders.order_id', 'DESC');
+        if ($request->ajax()) {
+            return $this->processDataTablesAjax($request, $query, 38);
+        }
         // Get distinct orders where service_id is 71
         $orderList = $query->get();
         // Now, for each order, fetch its items
@@ -391,7 +464,7 @@ class Ordercontroller extends Controller
             $order->items = $itemList;
             //$order->sub_total = $total;
         }
-        $data['orders_list'] = $orderList;
+        $data['orders_list'] = [];
         // echo "<pre>";
         // print_r($data);
         // echo "</pre>";
@@ -536,7 +609,7 @@ class Ordercontroller extends Controller
 
 
 
-    public function painting_service_order($order_id = '', $status = '')
+    public function painting_service_order(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         // First, fetch distinct orders
@@ -593,7 +666,7 @@ class Ordercontroller extends Controller
         // echo"<pre>";print_r($data['orders_list']);echo"</pre>";exit;
         return view('admin.list_order', $data);
     }
-    public function salon_spa_order($order_id = '', $status = '')
+    public function salon_spa_order(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         // First, fetch distinct orders
@@ -629,6 +702,9 @@ class Ordercontroller extends Controller
         }
         $query->orderBy('ci_orders.order_id', 'DESC');
         // Get distinct orders where service_id is 45
+        if ($request->ajax()) {
+            return $this->processDataTablesAjax($request, $query, 48);
+        }
         $orderList = $query->get();
         // Now, for each order, fetch its items
         foreach ($orderList as $order) {
@@ -653,14 +729,14 @@ class Ordercontroller extends Controller
             }
             // Attach the items and subtotal to the order object
             $order->items = $itemList;
-            // $order->sub_total = $total;
+            //$order->sub_total = $total;
         }
-        $data['orders_list'] = $orderList;
+        $data['orders_list'] = [];
         // echo"<pre>";print_r($data);echo"</pre>";exit;
         return view('admin.list_order', $data);
     }
 
-    public function pest_control_order($order_id = '', $status = '')
+    public function pest_control_order(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         // First, fetch distinct orders
@@ -696,6 +772,9 @@ class Ordercontroller extends Controller
         }
         $query->orderBy('ci_orders.order_id', 'DESC');
         // Get distinct orders where service_id is 45
+        if ($request->ajax()) {
+            return $this->processDataTablesAjax($request, $query, 47);
+        }
         $orderList = $query->get();
         // Now, for each order, fetch its items
         foreach ($orderList as $order) {
@@ -720,9 +799,9 @@ class Ordercontroller extends Controller
             }
             // Attach the items and subtotal to the order object
             $order->items = $itemList;
-            // $order->sub_total = $total;
+            //$order->sub_total = $total;
         }
-        $data['orders_list'] = $orderList;
+        $data['orders_list'] = [];
         // echo"<pre>";print_r($data);echo"</pre>";exit;
         return view('admin.list_order', $data);
     }
@@ -7955,7 +8034,7 @@ h3 {
             ->with('success', 'Your booking has been successfully updated.');
     }
 
-    public function automobile_order($order_id = '', $status = '')
+    public function automobile_order(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         // First, fetch distinct orders
@@ -7991,6 +8070,9 @@ h3 {
             }
         }
         $query->orderBy('ci_orders.order_id', 'DESC');
+        if ($request->ajax()) {
+            return $this->processDataTablesAjax($request, $query, 50);
+        }
         // Get distinct orders where service_id is 45
         $orderList = $query->get();
         // Now, for each order, fetch its items
@@ -8018,7 +8100,7 @@ h3 {
             $order->items = $itemList;
             // $order->sub_total = $total;
         }
-        $data['orders_list'] = $orderList;
+        $data['orders_list'] = [];
         //echo"<pre>";print_r($data);echo"</pre>";exit;
         return view('admin.list_order', $data);
     }
@@ -10342,7 +10424,7 @@ h3 {
         return back()->with('success', 'Attendance Saved Successfully');
     }
 
-    public function storage_package_order($order_id = '', $status = '')
+    public function storage_package_order(\Illuminate\Http\Request $request, $order_id = '', $status = '')
     {
         $data['error'] = '';
         // First, fetch distinct orders
@@ -10386,6 +10468,9 @@ h3 {
             }
         }
         $query->orderBy('ci_orders.order_id', 'DESC');
+        if ($request->ajax()) {
+            return $this->processDataTablesAjax($request, $query, null);
+        }
         $orderList = $query->get();
         // Now, for each order, fetch its items
         foreach ($orderList as $order) {
@@ -10405,7 +10490,7 @@ h3 {
             $order->items = $itemList;
             // $order->sub_total = $total;
         }
-        $data['orders_list'] = $orderList;
+        $data['orders_list'] = [];
         return view('admin.list_order', $data);
     }
 

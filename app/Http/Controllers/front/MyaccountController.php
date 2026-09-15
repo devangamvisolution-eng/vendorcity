@@ -73,7 +73,93 @@ class MyaccountController extends Controller
      * - Scheduled -> Assigned -> On the Way -> In Progress -> Completed
      * - Exception States: Rescheduled, Skipped, Cancelled, No-show, Vendor Cancelled
      */
-
+    private function get_mock_subscriptions()
+    {
+        return [
+            (object)[
+                'id' => 1,
+                'category' => 'Home Cleaning',
+                'plan_name' => 'Weekly Cleaning Plan',
+                'frequency_desc' => '1 visit/week',
+                'visits_per_cycle' => 4,
+                'visits_completed' => 2,
+                'status' => 'ACTIVE',
+                'next_visit_date' => 'Tuesday, 15 September',
+                'next_visit_time' => '10:00 AM',
+                'next_renewal' => '29 September',
+                'renewal_amount' => 'AED 499',
+                'auto_renew' => 'ON',
+                'payment_method' => 'Visa •••• 4242',
+                'service_address' => 'Dubai Hills Estate, Villa XX',
+                'recurring_schedule' => 'Every Tuesday • 10:00 AM',
+                'preferred_cleaner' => 'Sarah',
+                'cleaner_rating' => 4.9,
+                'cleaner_unavailable' => true,
+                'upcoming_visits' => [
+                    (object)[
+                        'visit_number' => 3,
+                        'total_visits' => 4,
+                        'date' => 'Tuesday, 15 September',
+                        'time' => '10:00 AM – 1:00 PM',
+                        'cleaner' => 'Sarah',
+                        'duration' => '3 Hours'
+                    ],
+                    (object)[
+                        'visit_number' => 4,
+                        'total_visits' => 4,
+                        'date' => 'Tuesday, 22 September',
+                        'time' => '10:00 AM – 1:00 PM',
+                        'cleaner' => 'Sarah',
+                        'duration' => '3 Hours'
+                    ]
+                ],
+                'past_visits' => [
+                    (object)[
+                        'date' => 'Tuesday, 8 September',
+                        'time' => '10:00 AM – 1:00 PM',
+                        'cleaner' => 'Sarah',
+                        'duration' => '3 Hours',
+                        'booking_id' => '#VC-84920',
+                        'status' => 'Completed',
+                        'amount' => 'AED 125',
+                        'rating' => 5
+                    ],
+                    (object)[
+                        'date' => 'Tuesday, 1 September',
+                        'time' => '10:00 AM – 1:00 PM',
+                        'cleaner' => 'Sarah',
+                        'duration' => '3 Hours',
+                        'booking_id' => '#VC-84102',
+                        'status' => 'Completed',
+                        'amount' => 'AED 125',
+                        'rating' => 4
+                    ]
+                ]
+            ],
+            (object)[
+                'id' => 2,
+                'category' => 'Deep Cleaning',
+                'plan_name' => 'Bi-Monthly Plan',
+                'frequency_desc' => '2 visits/month',
+                'visits_per_cycle' => 2,
+                'visits_completed' => 0,
+                'status' => 'PENDING ACTIVATION',
+                'next_visit_date' => 'Monday, 20 September',
+                'next_visit_time' => '09:00 AM',
+                'next_renewal' => '20 October',
+                'renewal_amount' => 'AED 999',
+                'auto_renew' => 'OFF',
+                'payment_method' => 'Mastercard •••• 1234',
+                'service_address' => 'Downtown Dubai, Apt 405',
+                'recurring_schedule' => 'Every 1st and 15th • 09:00 AM',
+                'preferred_cleaner' => 'Any',
+                'cleaner_rating' => null,
+                'cleaner_unavailable' => false,
+                'upcoming_visits' => [],
+                'past_visits' => []
+            ]
+        ];
+    }
 
 
 
@@ -449,6 +535,7 @@ class MyaccountController extends Controller
             return redirect()->to('/');
         }
 
+        $subscriptions = $this->get_mock_subscriptions();
         $userid = $userdata['userid'];
 
         $orders = DB::table('ci_orders')
@@ -528,28 +615,14 @@ class MyaccountController extends Controller
             return redirect()->to('/');
         }
 
-        $userid = $userdata['userid'];
+        $subscriptions = collect($this->get_mock_subscriptions());
+        $subscription = $subscriptions->firstWhere('id', (int)$id);
 
-        $order = DB::table('ci_orders')
-            ->join('ci_order_item', 'ci_orders.order_id', '=', 'ci_order_item.order_id')
-            ->leftJoin('services', 'ci_order_item.service_id', '=', 'services.id')
-            ->leftJoin('subservices', 'ci_order_item.subservice_id', '=', 'subservices.id')
-            ->where('ci_orders.order_id', $id)
-            ->where('ci_orders.user_id', $userid)
-            ->where('ci_orders.is_subscription', 1)
-            ->where('ci_orders.is_delete', 0)
-            ->select(
-                'ci_orders.*',
-                'ci_order_item.*',
-                'services.servicename as category_name',
-                'subservices.subservicename as subcategory_name'
-            )
-            ->first();
-
-        if (!$order) {
+        if (!$subscription) {
             return redirect()->route('front.subscriptions')->with('error', 'Subscription not found.');
         }
 
+        return view('front.subscription_detail', compact('subscription'));
         $all_visits = DB::table('ci_order_visits')
             ->where('order_id', $id)
             ->orderBy('visit_date', 'asc')

@@ -1,88 +1,30 @@
 @include('front.includes.header')
 
-<link rel="stylesheet" href="{{ asset('public/site/css/select2/css/select2.min.css') }}">
-<style>
-    .select2-container--default .select2-selection--single {
-        height: 42px;
-        padding: 6px 10px;
-        font-size: 14px;
-        border: 1px solid #dbe1e8;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: #1e293b;
-        line-height: normal;
-        padding-left: 0;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 40px;
-        right: 10px;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__clear {
-        position: absolute;
-        right: 35px;
-        top: 50%;
-        transform: translateY(-50%);
-        margin-right: 0;
-        font-size: 18px;
-        color: #94a3b8;
-    }
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #0040E6;
-    }
-    .select2-dropdown {
-        border: 1px solid #dbe1e8;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        z-index: 99999;
-    }
-    .select2-search__field {
-        border-radius: 6px !important;
-        border: 1px solid #dbe1e8 !important;
-        padding: 8px 12px !important;
-    }
-</style>
 <style>
     .mar-btn { margin-bottom: 60px; }
     @media (min-width: 768px) and (max-width: 1024px) { .sidebar-left { display: none !important; } }
     
     .body_content { background-color: #f8fafc; }
     .detail-card {
-        background: #fff; border: 1px solid #dbe1e8; border-radius: 16px; box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 8px 20px rgba(15,23,42,0.06); overflow: hidden; margin-bottom: 24px;
+        background: #fff; border: 1px solid #eaeaea; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); overflow: hidden; margin-bottom: 20px;
     }
     
     /* Top Header */
     .detail-header {
-        padding: 24px 20px; text-align: center; border-bottom: 1px solid #e2e8f0; background: linear-gradient(180deg, #fbfcfd 0%, #ffffff 100%);
+        padding: 20px; text-align: center; border-bottom: 1px solid #f5f5f5;
     }
     .detail-category { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
     .detail-title { font-size: 24px; font-weight: 800; color: #1a1a1a; margin: 0 0 10px 0; }
-    .status-badge { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 9999px; text-transform: capitalize; display: inline-flex; align-items: center; gap: 6px; border: none; letter-spacing: normal; }
-    .status-active { background-color: #dcfce7; color: #166534; }
-    .status-active::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background-color: #166534; }
-    .status-pending { background-color: #fef9c3; color: #854d0e; }
-    .status-pending::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background-color: #854d0e; }
+    .status-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 30px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
+    .status-active { background-color: #ecfdf5; color: #059669; border: 1px solid #d1fae5; }
+    .status-pending { background-color: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
     .status-cancelled { background-color: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
-    .status-paused { background-color: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
-    .status-renewal-upcoming { background-color: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
-    .status-payment-failed { background-color: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
-    .status-grace-period { background-color: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; }
-    .status-ending { background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
-    .status-completed { background-color: #ecfdf5; color: #059669; border: 1px solid #d1fae5; }
-    .status-suspended { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
     /* Dashboard Grid Layout */
-    .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
-    .dash-card { background: #fff; padding: 22px 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #e2e8f0; }
-    .dash-card:last-child { border-right: none; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #f5f5f5; gap: 1px; border-top: 1px solid #f5f5f5; border-bottom: 1px solid #f5f5f5; }
+    .dash-card { background: #fff; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .dash-card.progress-block { background: #fafbfc; }
-    @media (max-width: 768px) {
-        .dashboard-grid { grid-template-columns: 1fr; }
-        .dash-card { border-right: none; border-bottom: 1px solid #e2e8f0; }
-        .dash-card:last-child { border-bottom: none; }
-    }
+    @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
     
     /* Next Cleaning Block */
     .nc-label { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
@@ -100,9 +42,8 @@
     .renewal-status { font-size: 12px; font-weight: 700; color: #059669; background: #ecfdf5; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 8px; }
     
     /* Quick Actions */
-    .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid #e2e8f0; background: #fff; }
-    .qa-btn { background: #fff; padding: 16px; text-align: center; font-size: 13px; font-weight: 700; color: #0040E6; cursor: pointer; transition: background 0.2s; border-right: 1px solid #e2e8f0; }
-    .qa-btn:last-child { border-right: none; }
+    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid #f5f5f5; background: #f5f5f5; gap: 1px; }
+    .qa-btn { background: #fff; padding: 15px; text-align: center; font-size: 13px; font-weight: 700; color: #0040E6; cursor: pointer; transition: background 0.2s; }
     .qa-btn:hover { background: #f8fafc; }
     @media (max-width: 768px) { .quick-actions { grid-template-columns: repeat(2, 1fr); } }
     
@@ -115,7 +56,7 @@
     
     .visit-list { display: flex; flex-direction: column; gap: 15px; }
     .visit-item { border: 1px solid #eaeaea; border-radius: 8px; padding: 20px; background: #fff; }
-    .visit-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #eaeaea; }
+    .visit-item-header { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #eaeaea; }
     .visit-number { font-weight: 700; color: #0040E6; font-size: 15px; }
     .visit-status { font-size: 13px; font-weight: 600; color: #10b981; }
     .visit-details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -130,13 +71,9 @@
     .support-block { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 40px; margin-top: 30px; }
     .support-title { font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 15px; }
     .support-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .support-btn { border: 1px solid #eaeaea; border-radius: 8px; padding: 12px; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; background: #fff; transition: all 0.2s; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 48px; line-height: 1.3; }
+    .support-btn { border: 1px solid #eaeaea; border-radius: 8px; padding: 12px; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; background: #fff; transition: all 0.2s; }
     .support-btn:hover { border-color: #0040E6; color: #0040E6; }
-    .support-btn.primary { background: #0040E6; color: #fff; border: none; padding: 14px 12px; font-size: 14px; margin-top: 10px; gap: 8px; }
-    .support-btn.primary i { flex-shrink: 0; }
-    @media (max-width: 480px) {
-        .support-grid { grid-template-columns: 1fr; }
-    }
+    .support-btn.primary { background: #0040E6; color: #fff; border: none; padding: 15px; font-size: 14px; margin-top: 10px; }
 
     /* Switch */
     .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
@@ -146,35 +83,9 @@
     input:checked + .slider { background-color: #059669; }
     input:checked + .slider:before { transform: translateX(26px); }
 
-    .renewal-toggle-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; border-top: 1px dashed #eaeaea; padding-top: 15px; }
-    .renewal-toggle-row .switch { flex-shrink: 0; margin-top: 2px; }
-
     .rating-stars { color: #f59e0b; font-size: 18px; }
 
-    /* Alert / Action Banners */
-    .action-banner { border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
-    .action-banner-amber { background-color: #fffbeb; border: 1px solid #fef3c7; }
-    .action-banner-red { background-color: #fef2f2; border: 1px solid #fee2e2; }
-    .action-banner-actions { display: flex; gap: 10px; flex-shrink: 0; }
-    @media (max-width: 576px) {
-        .action-banner { flex-direction: column; align-items: stretch; }
-        .action-banner-actions { width: 100%; }
-        .action-banner-actions .vc-btn-outline,
-        .action-banner-actions .vc-btn-primary { flex: 1; width: auto; }
-    }
-
     /* Manage Dropdown */
-    .sub-detail-topbar { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .sub-detail-topbar .back-link { color: #64748b; font-weight: 600; text-decoration: none; white-space: nowrap; }
-    .sub-detail-topbar .vc-dropdown { flex-shrink: 0; }
-    .manage-sub-btn { width: auto; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 0; white-space: nowrap; background-color: #ffffff !important; border: 1.5px solid #0040E6 !important; color: #0040E6 !important; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 64, 230, 0.1); transition: all 0.2s; }
-    .manage-sub-btn:hover { background-color: #f8fafc !important; box-shadow: 0 4px 6px rgba(0, 64, 230, 0.15); transform: translateY(-1px); border-color: #0040E6 !important; color: #0040E6 !important;}
-    @media (max-width: 480px) {
-        .sub-detail-topbar { flex-direction: column; align-items: stretch; gap: 12px; }
-        .sub-detail-topbar .vc-dropdown { width: 100%; }
-        .manage-sub-btn { width: 100%; }
-        .vc-dropdown-content { left: 0; right: 0; width: 100%; min-width: 0; }
-    }
     .vc-dropdown { position: relative; display: inline-block; }
     .vc-dropdown-content { display: none; position: absolute; right: 0; background-color: #fff; min-width: 280px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 8px; border: 1px solid #eaeaea; z-index: 1000; overflow:hidden; }
     .vc-dropdown-content a { color: #1e293b; padding: 12px 16px; text-decoration: none; display: block; font-size: 14px; font-weight: 500; border-bottom: 1px solid #f8fafc; cursor:pointer;}
@@ -185,8 +96,7 @@
     /* Modals */
     .vc-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; }
     .vc-modal-overlay.active { display: flex; }
-    .vc-modal { background: #fff; border-radius: 12px; width: 100%; max-width: 595px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; position: relative; scrollbar-width: none; -ms-overflow-style: none; }
-    .vc-modal::-webkit-scrollbar { display: none; }
+    .vc-modal { background: #fff; border-radius: 12px; width: 100%; max-width: 450px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; position: relative; }
     .vc-modal h3 { margin-top: 0; margin-bottom: 15px; font-weight: 700; }
     .vc-modal-close { position: absolute; right: 20px; top: 20px; cursor: pointer; font-size: 20px; color: #64748b; background: #f1f5f9; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
     .vc-btn-primary { background: #0040E6; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; display:block; text-align:center; }
@@ -196,9 +106,6 @@
     .form-group { margin-bottom: 7px; text-align: left; }
     .form-group label { font-size:13px; font-weight:600; color:#1e293b; margin-bottom:5px; display:block; }
     .form-control { border:1px solid #cbd5e1; border-radius:6px; padding:10px 12px; width:100%; font-family: inherit;}
-
-    .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
 
     /* Mobile Bottom Sheet Modal */
     @media (max-width: 768px) {
@@ -631,20 +538,6 @@
     .custom-tip-input {
         margin-top: 10px;
     }
-
-    .currency_dhiram {
-        display: inline-block;
-        width: 18px;
-        height: 14px;
-
-        background-color: currentColor;
-
-        -webkit-mask: url('{{ asset('public/site/icons/dirham.svg') }}') no-repeat center;
-        mask: url('{{ asset('public/site/icons/dirham.svg') }}') no-repeat center;
-
-        -webkit-mask-size: contain;
-        mask-size: contain;
-    }
 </style>
 
 <div class="body_content">
@@ -658,11 +551,11 @@
                 <div class="col-lg-8">
                     
                     <!-- Header with Dropdown -->
-                    <div class="sub-detail-topbar">
-                        <a href="{{ route('front.subscriptions') }}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Subscriptions</a>
+                    <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+                        <a href="{{ route('front.subscriptions') }}" style="color: #64748b; font-weight: 600; text-decoration: none;"><i class="fas fa-arrow-left"></i> Back to Subscriptions</a>
                         
                         <div class="vc-dropdown" id="manageDropdown">
-                            <button class="vc-btn-outline manage-sub-btn" onclick="toggleDropdown()">
+                            <button class="vc-btn-outline" onclick="toggleDropdown()" style="width:auto; display:flex; align-items:center; gap:8px; margin-top:0;">
                                 Manage Subscription <i class="fas fa-chevron-down" style="font-size:10px;"></i>
                             </button>
                             <div class="vc-dropdown-content">
@@ -678,42 +571,23 @@
                     </div>
 
                     @if($subscription->cleaner_unavailable && count($subscription->upcoming_visits) > 0)
-                        <div class="action-banner action-banner-amber">
+                        <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">
                             <div>
                                 <strong style="color: #d97706; display:block; margin-bottom:4px;">Action Required</strong>
                                 <span style="color: #b45309; font-size:14px;">{{ $subscription->preferred_cleaner }} isn't available for your cleaning on {{ $subscription->upcoming_visits[0]->date }}.</span>
                             </div>
-                            <div class="action-banner-actions">
+                            <div style="display:flex; gap:10px;">
                                 <button class="vc-btn-outline" style="background:#fff; border-color:#fcd34d; color:#b45309; padding:6px 12px; font-size:13px; width:auto; margin-top:0;" onclick="alert('Time kept. Another cleaner will be assigned.')">Keep my time</button>
                                 <button class="vc-btn-primary" style="background:#d97706; padding:6px 12px; font-size:13px; width:auto;" onclick="alert('Proceed to choose another time slot for Sarah.')">Keep {{ $subscription->preferred_cleaner }}</button>
                             </div>
                         </div>
                     @endif
 
-                    @if($subscription->payment_failed ?? true) <!-- Demo purpose: Set to true. In production, depends on backend flag -->
-                        {{-- <div class="action-banner action-banner-red">
-                            <div>
-                                <strong style="color: #dc2626; display:block; margin-bottom:4px; font-size: 16px;"><i class="fas fa-exclamation-circle" style="margin-right:5px;"></i> We couldn’t renew your subscription</strong>
-                                <span style="color: #991b1b; font-size:14px;">Update your payment method to keep your upcoming cleanings active.<br/> (Retry attempt 1 of 3)</span>
-                            </div>
-                            <div class="action-banner-actions">
-                                <button class="vc-btn-primary" style="background:#dc2626; padding:6px 12px; font-size:12px; width:auto; border:none; white-space: nowrap;" onclick="openModal('paymentMethodModal')">Update Payment Method</button>
-                            </div>
-                        </div> --}}
-                    @endif
-
                     <div class="detail-card">
                         <div class="detail-header">
                             <div class="detail-category">{{ $subscription->category }}</div>
-                            <h2 class="detail-title">
-                                {{ $subscription->plan_name }} 
-                            </h2>
-
-                            @php
-                                $statusClass = 'status-' . strtolower(str_replace(' ', '-', $subscription->status ?? 'pending'));
-                            @endphp
-                            <span id="main-status-badge" class="status-badge {{ $statusClass }}">{{ $subscription->status ?? 'Pending' }}</span>
-                            
+                            <h2 class="detail-title">{{ $subscription->plan_name }}</h2>
+                            <span id="main-status-badge" class="status-badge status-active">Active</span>
                             <div id="main-status-subtitle" style="font-size:11px; color:#64748b; margin-top:4px; display:none;">Ends after current cycle</div>
                         </div>
 
@@ -723,8 +597,8 @@
                             <div class="dash-card next-cleaning-block">
                                 <div class="nc-label">Next Cleaning</div>
                                 <div class="nc-date" id="highlight-next-visit">{{ $subscription->next_visit_date }}<br>{{ $subscription->next_visit_time }}</div>
-                                <div class="nc-details">{{ ucfirst($subscription->preferred_cleaner) }} • {{ count($subscription->upcoming_visits) > 0 ? $subscription->upcoming_visits[0]->duration : '3 Hours' }}</div>
-                                {{-- <button class="vc-btn-outline" style="width: auto; padding: 6px 16px; font-size: 12px; margin-top: auto;" onclick="openRescheduleModal(null, '{{ $subscription->next_visit_date }}', '{{ $subscription->next_visit_time }}')">Manage Visit</button> --}}
+                                <div class="nc-details">{{ $subscription->preferred_cleaner }} • {{ count($subscription->upcoming_visits) > 0 ? $subscription->upcoming_visits[0]->duration : '3 Hours' }}</div>
+                                <button class="vc-btn-outline" style="width: auto; padding: 6px 16px; font-size: 12px; margin-top: auto;" onclick="openModal('rescheduleModal')">Manage Visit</button>
                             </div>
 
                             <!-- Progress Bar -->
@@ -746,7 +620,7 @@
                             <div class="dash-card renewal-block">
                                 <div class="renewal-label">Next Renewal</div>
                                 <div class="renewal-value">{{ $subscription->next_renewal }}</div>
-                                <div style="font-size: 14px; font-weight: 700; color: #475569; display: flex; align-items: center; justify-content: center; gap: 4px;"><span class="currency_dhiram"></span>{{ $subscription->renewal_amount }}</div>
+                                <div style="font-size: 14px; font-weight: 700; color: #475569;">{{ $subscription->renewal_amount }}</div>
                                 <div class="renewal-status">
                                     Auto-renewal <span id="auto-renew-label">ON</span>
                                 </div>
@@ -755,8 +629,8 @@
 
                         <!-- Quick Actions Grid -->
                         <div class="quick-actions">
-                            {{-- <div class="qa-btn" onclick="openRescheduleModal(null, '{{ $subscription->next_visit_date }}', '{{ $subscription->next_visit_time }}')"><i class="far fa-calendar-alt" style="margin-right:5px;"></i> Reschedule</div>
-                            <div class="qa-btn" onclick="openSkipModal(null, '{{ $subscription->next_visit_date }}')"><i class="fas fa-forward" style="margin-right:5px;"></i> Skip Visit</div> --}}
+                            <div class="qa-btn" onclick="openModal('rescheduleModal')"><i class="far fa-calendar-alt" style="margin-right:5px;"></i> Reschedule</div>
+                            <div class="qa-btn" onclick="openModal('skipModal')"><i class="fas fa-forward" style="margin-right:5px;"></i> Skip Visit</div>
                             <div class="qa-btn" onclick="openModal('pauseModal')"><i class="far fa-pause-circle" style="margin-right:5px;"></i> Pause Plan</div>
                             <div class="qa-btn" onclick="openModal('cleanerModal')"><i class="far fa-user" style="margin-right:5px;"></i> Change Cleaner</div>
                         </div>
@@ -766,7 +640,7 @@
                     <div class="visits-section" id="upcoming">
                         <div class="visits-tabs">
                             <div class="visit-tab active" onclick="switchTab('upcoming')">Upcoming Visits</div>
-                            <div class="visit-tab" onclick="switchTab('history')">Past History</div>
+                            <div class="visit-tab" onclick="switchTab('history')">Visit History</div>
                             <div class="visit-tab" onclick="switchTab('billing')">Billing & Renewal</div>
                         </div>
                         
@@ -778,7 +652,6 @@
                                         <div class="visit-item" id="visit-row-{{ $visit->visit_number }}">
                                             <div class="visit-item-header">
                                                 <div class="visit-number">Visit {{ $visit->visit_number }} of {{ $visit->total_visits }}</div>
-                                                <div class="visit-status" style="color: #0040E6; font-weight: 700; background: #eff6ff; padding: 4px 12px; border-radius: 20px; font-size: 12px;">{{ $visit->status ?? 'Scheduled' }}</div>
                                             </div>
                                             <div class="visit-details">
                                                 <div>
@@ -791,9 +664,9 @@
                                                 </div>
                                             </div>
                                             <div class="visit-actions">
-                                                <button class="visit-btn" onclick="openRescheduleModal({{ $visit->id }}, '{{ $visit->date }}', '{{ $visit->time }}')">Reschedule</button>
+                                                <button class="visit-btn" onclick="openRescheduleModal({{ $visit->visit_number }}, '{{ $visit->date }}')">Reschedule</button>
                                                 <span style="color: #cbd5e1;">|</span>
-                                                <button class="visit-btn" onclick="openSkipModal({{ $visit->id }}, '{{ $visit->date }}')">Skip</button>
+                                                <button class="visit-btn" onclick="openSkipModal({{ $visit->visit_number }}, '{{ $visit->date }}')">Skip</button>
                                                 <span style="color: #cbd5e1;">|</span>
                                                 <button class="visit-btn">View Details</button>
                                             </div>
@@ -815,7 +688,7 @@
                                         <div class="visit-item">
                                             <div class="visit-item-header">
                                                 <div class="visit-number">{{ $visit->date }}</div>
-                                                <div class="visit-status" style="color: {{ $visit->status == 'Completed' ? '#10b981' : '#dc2626' }};">{{ $visit->status }}</div>
+                                                <div class="visit-status">{{ $visit->status }}</div>
                                             </div>
                                             <div class="visit-details">
                                                 <div>
@@ -858,52 +731,13 @@
                             @endif
                         </div>
 
-                        <!-- Billing & Renewal Tab -->
+                        <!-- Billing & Renewal Tab (Existing Style preserved) -->
                         <div id="tab-billing" class="tab-content">
-                            
-                            <!-- Payment Method Section -->
-                            <div class="visit-item" style="margin-bottom: 15px;" id="paymentMethodSection">
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                                    <h4 style="margin:0; font-weight:700; font-size:16px;">Payment Method</h4>
-                                    <button class="vc-btn-outline" style="width:auto; padding:6px 12px; font-size:12px; margin-top:0;" onclick="openModal('paymentMethodModal')">Change Payment Method</button>
-                                </div>
-                                <div style="display:flex; align-items:center; gap:15px; border:1px solid #eaeaea; padding:15px; border-radius:8px; background:#f8fafc;">
-                                    @if(isset($subscription->paymentmode) && $subscription->paymentmode == 1)
-                                        <div style="font-size:32px; color:#1a1f36;"><i class="fas fa-money-bill-wave"></i></div>
-                                        <div>
-                                            <div style="font-weight:700; color:#1e293b; font-size:14px;">Cash on Delivery</div>
-                                            <div style="font-size:13px; color:#64748b;">Pay directly after service</div>
-                                        </div>
-                                    @elseif(isset($subscription->paymentmode) && $subscription->paymentmode == 3)
-                                        <div style="font-size:32px; color:#1a1f36;"><i class="fas fa-wallet"></i></div>
-                                        <div>
-                                            <div style="font-weight:700; color:#1e293b; font-size:14px;">Tabby</div>
-                                            <div style="font-size:13px; color:#64748b;">Pay in installments</div>
-                                        </div>
-                                    @else
-                                        <div style="font-size:32px; color:#1a1f36;"><i class="fab fa-cc-visa"></i></div>
-                                        <div>
-                                            <div style="font-weight:700; color:#1e293b; font-size:14px;">Credit / Debit Card</div>
-                                            <div style="font-size:13px; color:#64748b;">Online Payment</div>
-                                        </div>
-                                    @endif
-                                    <div style="margin-left:auto; background:#ecfdf5; color:#059669; font-size:11px; font-weight:700; padding:4px 8px; border-radius:4px; border:1px solid #d1fae5;">Default</div>
-                                </div>
-                            </div>
-
-                            <!-- Next Payment & Auto-Renewal -->
-                            <div class="visit-item" style="margin-bottom: 15px;">
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                                    <h4 style="margin:0; font-weight:700; font-size:16px;">Next Payment</h4>
-                                    <div style="text-align:right;">
-                                        <div style="font-weight:700; color:#1e293b; font-size:16px; display: flex; align-items: center; justify-content: flex-end; gap: 4px;"><span class="currency_dhiram"></span> {{ $subscription->renewal_amount ?? ' 350' }}</div>
-                                        <div style="font-size:13px; color:#64748b;">{{ $subscription->next_renewal ?? '29 September 2026' }}</div>
-                                    </div>
-                                </div>
-                                <div class="renewal-toggle-row">
+                            <div class="visit-item">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div>
-                                        <h4 style="margin:0 0 5px 0; font-weight:700; font-size:14px;">Auto-Renewal</h4>
-                                        <p id="renewal-text" style="color:#64748b; margin:0; font-size:13px;">Your subscription will automatically renew on {{ $subscription->next_renewal ?? '29 September 2026' }}.</p>
+                                        <h4 style="margin:0 0 5px 0; font-weight:700;">Auto-Renewal</h4>
+                                        <p id="renewal-text" style="color:#64748b; margin:0; font-size:14px;">Your subscription will automatically renew for {{ $subscription->renewal_amount }} on {{ $subscription->next_renewal }}.</p>
                                     </div>
                                     <label class="switch">
                                       <input type="checkbox" id="autoRenewToggle" {{ $subscription->is_auto_renew ? 'checked' : '' }} onchange="toggleAutoRenew(this)">
@@ -912,31 +746,6 @@
                                 </div>
                                 <div id="renewal-warning" style="display:{{ $subscription->is_auto_renew ? 'none' : 'block' }}; margin-top:15px; padding:15px; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; color:#dc2626; font-size:13px; font-weight:500;">
                                     Your remaining visits will not be affected. Your subscription will end after your current cycle and will not renew.
-                                </div>
-                            </div>
-
-                            <!-- Billing History -->
-                            <div class="visit-item" id="billingHistorySection">
-                                <h4 style="margin:0 0 15px 0; font-weight:700; font-size:16px;">Billing History</h4>
-                                <div style="display:flex; flex-direction:column; gap:10px;">
-                                    @if(isset($transactions) && count($transactions) > 0)
-                                        @foreach($transactions as $txn)
-                                        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid #eaeaea; border-radius:8px;">
-                                            <div>
-                                                <div style="font-weight:600; color:#1e293b; font-size:14px;">{{ $txn->date }}</div>
-                                                <div style="font-size:13px; color:#64748b;"><span class="currency_dhiram"></span>{{ number_format($txn->amount, 2) }} • <span style="color:{{ $txn->status == 'Paid' || strtolower($txn->status) == 'success' ? '#059669' : '#dc2626' }}; font-weight:600;">{{ $txn->status }}</span></div>
-                                            </div>
-                                            <div style="text-align:right;">
-                                                <div style="font-size:13px; font-weight:600; color:#0f172a;">{{ $txn->type }}</div>
-                                                <div style="font-size:12px; color:#3b82f6; margin-top:2px; cursor:pointer;"><i class="fas fa-download"></i> Receipt</div>
-                                            </div>
-                                        </div>
-                                        @endforeach
-                                    @else
-                                        <div class="alert alert-info" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;">
-                                            No billing history available yet.
-                                        </div>
-                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -951,7 +760,7 @@
                             <button class="support-btn" onclick="openSupportModal('Billing issue')">Billing issue</button>
                             <button class="support-btn" onclick="openSupportModal('Subscription question')">Subscription question</button>
                             <button class="support-btn primary" onclick="openSupportModal('Chat with support')" style="grid-column: span 1;"><i class="fas fa-comments"></i> Chat with support</button>
-                            <button class="support-btn primary" onclick="window.location.href='tel:+971501234567'" style="grid-column: span 1; background: #059669;"><i class="fas fa-phone"></i>&nbsp;Call support</button>
+                            <button class="support-btn primary" onclick="window.location.href='tel:+971501234567'" style="grid-column: span 1; background: #059669;"><i class="fas fa-phone-alt"></i> Call support</button>
                         </div>
                     </div>
 
@@ -1089,17 +898,14 @@
         
         <div class="form-group">
             <label>Why would you like to change?</label>
-            <select class="form-control" id="cleaner_reason" onchange="document.getElementById('otherReasonContainer').style.display = this.value === 'Other' ? 'block' : 'none'">
-                <option value="Cleaner unavailable">Cleaner unavailable</option>
-                <option value="Quality of service">Quality of service</option>
-                <option value="Communication">Communication</option>
-                <option value="Timing/reliability">Timing/reliability</option>
-                <option value="Prefer another cleaner">Prefer another cleaner</option>
-                <option value="Other">Other</option>
+            <select class="form-control">
+                <option>Cleaner unavailable</option>
+                <option>Quality of service</option>
+                <option>Communication</option>
+                <option>Timing/reliability</option>
+                <option>Prefer another cleaner</option>
+                <option>Other</option>
             </select>
-            <div id="otherReasonContainer" style="display: none; margin-top: 10px;">
-                <textarea class="form-control" id="cleaner_other_reason" rows="3" placeholder="Please specify your reason"></textarea>
-            </div>
         </div>
         <div class="form-group" style="margin-bottom:25px;">
             <label style="margin-bottom:10px;">Would you like the new cleaner for:</label>
@@ -1117,7 +923,6 @@
     <div class="vc-modal">
         <span class="vc-modal-close" onclick="closeModal('planModal')">&times;</span>
         <h3>Change Plan</h3>
-        <p style="font-size:14px; color:#64748b; margin-bottom:20px;">Upgrade or downgrade your cleaning frequency.</p>
         <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
             <label style="border:1px solid #0040E6; background:#f8fafc; border-radius:8px; padding:15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
                 <div>
@@ -1141,11 +946,6 @@
                 <input type="radio" name="plan">
             </label>
         </div>
-        
-        <div style="background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; padding:15px; margin-bottom:20px;">
-            <p style="margin:0; font-size:13px; color:#d97706; font-weight:600;"><i class="fas fa-info-circle" style="margin-right:5px;"></i> Your new plan will begin on your next renewal date.</p>
-        </div>
-        
         <button class="vc-btn-primary" onclick="confirmModalAction('planModal', 'Plan Change Scheduled ✓')">Confirm Change</button>
         <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
@@ -1157,104 +957,10 @@
         <span class="vc-modal-close" onclick="closeModal('scheduleModal')">&times;</span>
         <h3>Edit Regular Schedule</h3>
         <div style="font-size:14px; color:#475569; margin-bottom:20px;">Current Schedule: <strong>{{ $subscription->recurring_schedule }}</strong></div>
-        
-        @php
-            $isMultiDay = strpos($current_day, ',') !== false;
-            $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            $currentTimeStr = explode(' • ', $subscription->recurring_schedule)[1] ?? '';
-        @endphp
-        
-        @if($isMultiDay)
-            <div style="background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; padding:15px; margin-bottom:15px;">
-                <p style="margin:0; font-size:13px; color:#d97706; font-weight:600;"><i class="fas fa-info-circle" style="margin-right:5px;"></i> You are on a custom multi-day plan. You can change your preferred time below.</p>
-            </div>
-            <input type="hidden" id="new_day_of_week" value="{{ $current_day }}">
-        @else
-            <div class="form-group">
-                <label>New Day of Week</label>
-                <select class="form-control" id="new_day_of_week">
-                    @foreach($daysOfWeek as $day)
-                        <option value="{{ $day }}" {{ trim($current_day) == $day ? 'selected' : '' }}>{{ $day }}</option>
-                    @endforeach
-                </select>
-            </div>
-        @endif
-        
-        <div class="form-group">
-            <label>New Time</label>
-            <select class="form-control" id="new_time_slot">
-                @foreach($time_slots as $slot)
-                    <option value="{{ $slot->id }}" {{ trim($currentTimeStr) == $slot->name ? 'selected' : '' }}>{{ $slot->name }}</option>
-                @endforeach
-            </select>
-        </div>
-        
-        <div class="form-group" style="margin-bottom:25px;">
-            <label style="margin-bottom:10px;">Apply to:</label>
-            <label style="display:block; margin-bottom:8px; cursor:pointer;"><input type="radio" name="schedule_scope" value="next" checked> Next visit only</label>
-            <label style="display:block; cursor:pointer;"><input type="radio" name="schedule_scope" value="all"> All future visits</label>
-        </div>
-
-        <button class="vc-btn-primary" onclick="submitScheduleEdit()" id="btn-edit-schedule">Update Schedule</button>
-        <div class="success-msg" id="schedule-success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
-    </div>
-</div>
-
-<!-- 5. Address Management Modal -->
-<div class="vc-modal-overlay" id="addressModal">
-    <div class="vc-modal">
-        <span class="vc-modal-close" onclick="closeModal('addressModal')">&times;</span>
-        <h3>Change Service Address</h3>
-        
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:15px; margin-bottom:20px;">
-            <div style="font-size:12px; color:#64748b; text-transform:uppercase; font-weight:600; margin-bottom:5px;">Current Address</div>
-            <div style="font-size:14px; color:#1e293b;">
-                {{ $subscription->service_address }}
-            </div>
-        </div>
-
-        <p style="font-size:13px; color:#64748b; margin-bottom:20px; line-height:1.5;">
-            Changing your address requires a quick review to ensure your current vendor and cleaner can cover the new area without pricing changes. Submit your new details below.
-        </p>
-        
-        @php
-            $currentCity = '';
-            $currentArea = '';
-            $currentBldg = '';
-            $currentApt = '';
-            
-            $addrParts = explode(', ', $subscription->service_address);
-            if (count($addrParts) >= 4) {
-                $currentCity = $addrParts[0];
-                $currentArea = $addrParts[1];
-                $currentBldg = $addrParts[2];
-                $currentApt = $addrParts[3];
-            }
-        @endphp
-
-        <div class="form-group">
-            <label>City *</label>
-            <select class="form-control" id="new_address_city">
-                @foreach($cities as $city)
-                    <option value="{{ $city->name }}" {{ trim($currentCity) == trim($city->name) ? 'selected' : '' }}>{{ $city->name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Area *</label>
-            <input type="text" class="form-control" id="new_address_area" value="{{ $currentArea }}" placeholder="e.g. Dubai Hills Estate">
-        </div>
-        <div class="form-group">
-            <label>Building / Street No *</label>
-            <input type="text" class="form-control" id="new_address_street" value="{{ $currentBldg }}" placeholder="e.g. Street 10">
-        </div>
-        <div class="form-group" style="margin-bottom:25px;">
-            <label>Apartment / Villa No</label>
-            <input type="text" class="form-control" id="new_address_apt" value="{{ $currentApt }}" placeholder="e.g. Villa 24">
-        </div>
-
-        <button class="vc-btn-primary" onclick="submitAddressChangeRequest()" id="btn-request-address">Request Address Change</button>
-        <div class="success-msg" id="address-success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
+        <div class="form-group"><label>New Day of Week</label><select class="form-control"><option>Monday</option><option>Tuesday</option><option selected>Thursday</option></select></div>
+        <div class="form-group"><label>New Time</label><select class="form-control"><option>08:00 AM</option><option selected>02:00 PM</option></select></div>
+        <button class="vc-btn-primary" onclick="confirmModalAction('scheduleModal', 'Schedule Updated ✓')">Update Schedule</button>
+        <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
 </div>
 
@@ -1265,18 +971,9 @@
         
         <div id="cancel-step-1">
             <h3>Cancel Subscription</h3>
-            <p style="font-size:14px; color:#64748b; margin-bottom:15px;">We're sorry to see you go. Why are you cancelling?</p>
-            <div class="form-group hide-scrollbar" style="margin-bottom:25px; max-height:300px; overflow-y:auto; padding-right:5px;" onchange="document.getElementById('cancelOtherReasonContainer').style.display = (event.target.value === 'other') ? 'block' : 'none'">
-                <label style="display:block; padding:10px; border:1px solid #eaeaea; border-radius:6px; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cancel_reason" value="expensive" style="margin-right:8px;"> Too expensive</label>
-                <label style="display:block; padding:10px; border:1px solid #eaeaea; border-radius:6px; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cancel_reason" value="holiday" style="margin-right:8px;"> Going away</label>
-                <label style="display:block; padding:10px; border:1px solid #eaeaea; border-radius:6px; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cancel_reason" value="dont_need" style="margin-right:8px;"> Don’t need cleaning right now</label>
-                <label style="display:block; padding:10px; border:1px solid #eaeaea; border-radius:6px; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cancel_reason" value="quality" style="margin-right:8px;"> Service quality</label>
-                <label style="display:block; padding:10px; border:1px solid #eaeaea; border-radius:6px; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cancel_reason" value="cleaner" style="margin-right:8px;"> Cleaner issue</label>
-                <label style="display:block; padding:10px; border:1px solid #eaeaea; border-radius:6px; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cancel_reason" value="schedule" style="margin-right:8px;"> Schedule doesn’t work</label>
-                <label style="display:block; padding:10px; border:1px solid #eaeaea; border-radius:6px; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cancel_reason" value="other" style="margin-right:8px;"> Other</label>
-            </div>
-            <div id="cancelOtherReasonContainer" style="display: none; margin-bottom: 25px;">
-                <textarea class="form-control" rows="3" placeholder="Please tell us more"></textarea>
+            <div class="form-group" style="margin-bottom:25px;">
+                <label style="display:block; padding:10px; border:1px solid #eaeaea; border-radius:6px; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cancel_reason" value="expensive"> Too expensive</label>
+                <label style="display:block; padding:10px; border:1px solid #eaeaea; border-radius:6px; margin-bottom:8px; cursor:pointer;"><input type="radio" name="cancel_reason" value="holiday"> Going away</label>
             </div>
             <button class="vc-btn-primary" onclick="processCancellationStep2()">Continue</button>
         </div>
@@ -1290,21 +987,16 @@
         
         <div id="cancel-step-3" style="display:none;">
             <h3>Confirm Cancellation</h3>
-            <div style="font-size:14px; color:#1e293b; background:#f8fafc; border:1px solid #eaeaea; padding:15px; border-radius:8px; margin-bottom:20px;">
-                <ul style="margin:0; padding-left:20px; line-height:1.6; color:#475569;">
-                    <li><strong>Last usable date:</strong> {{ $subscription->next_renewal ?? 'End of current cycle' }}</li>
-                    <li><strong>Remaining visits:</strong> {{ $subscription->visits_per_cycle - $subscription->visits_completed }} visits</li>
-                    <li><strong>Upcoming appointments:</strong> Will remain scheduled until your last usable date.</li>
-                    <li><strong>Refund treatment:</strong> No prorated refunds for partially used cycles.</li>
-                    <li><strong>Auto-renewal:</strong> Will be turned off immediately.</li>
-                </ul>
+            <div style="font-size:14px; color:#1e293b; background:#fef2f2; border:1px solid #fee2e2; padding:15px; border-radius:8px; margin-bottom:20px;">
+                Your last usable date will be <strong>{{ $subscription->next_renewal }}</strong>. Auto-renewal will be turned off immediately.
             </div>
-            <button class="vc-btn-primary" style="background:#dc2626;" id="btn-confirm-cancel" onclick="submitCancelSubscription()">Confirm Cancellation</button>
-            <div id="cancel-success-msg" class="success-msg" style="display:none; color:#dc2626; font-weight:700; text-align:center; margin-top:15px;"></div>
+            <button class="vc-btn-primary" style="background:#dc2626;" onclick="confirmModalAction('cancelModal', 'Subscription Cancelled', () => { document.getElementById('main-status-badge').innerText = 'Cancelled'; document.getElementById('main-status-badge').className = 'status-badge status-cancelled'; })">Confirm Cancellation</button>
+            <div class="success-msg" style="display:none; color:#dc2626; font-weight:700; text-align:center; margin-top:15px;"></div>
         </div>
     </div>
 </div>
 
+<!-- Reschedule & Skip Modals -->
 <div class="vc-modal-overlay" id="rescheduleModal">
     <div class="vc-modal" id="reschedule-step-1">
         <span class="vc-modal-close" onclick="closeModal('rescheduleModal')">&times;</span>
@@ -1378,53 +1070,17 @@
 
     <div class="vc-modal" id="reschedule-step-2" style="display:none; text-align:center; padding: 40px 20px;">
         <span class="vc-modal-close" onclick="closeModal('rescheduleModal')">&times;</span>
-        <div style="font-size:48px; color:#059669; margin-bottom:15px;"><i class="fas fa-check-circle"></i></div>
-        <h3 style="color:#059669; margin-bottom:20px;">Visit Rescheduled ✓</h3>
-        
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:20px; text-align:left; margin-bottom:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:15px; border-bottom:1px dashed #cbd5e1;">
-                <div style="width:45%;">
-                    <div style="font-size:11px; text-transform:uppercase; color:#64748b; font-weight:700; margin-bottom:4px;">Previous</div>
-                    <div style="font-size:14px; color:#94a3b8; text-decoration:line-through;" id="reschedule-old-datetime">Old Date<br>Old Time</div>
-                </div>
-                <div style="color:#cbd5e1;"><i class="fas fa-arrow-right"></i></div>
-                <div style="width:45%; text-align:right;">
-                    <div style="font-size:11px; text-transform:uppercase; color:#0040E6; font-weight:700; margin-bottom:4px;">New Appointment</div>
-                    <div style="font-size:14px; font-weight:700; color:#1e293b;" id="reschedule-new-datetime">New Date<br>New Time</div>
-                </div>
-            </div>
-            <div style="font-size:13px; color:#475569;">
-                <strong>Cleaner:</strong> <span id="reschedule-cleaner-name">Name</span>
-            </div>
-        </div>
-
-        <button class="vc-btn-outline" onclick="closeModal('rescheduleModal')">Done</button>
+        <h3>Reschedule Visit</h3>
+        <div class="form-group"><label>New Date</label><input type="date" class="form-control"></div>
+        <button class="vc-btn-primary" onclick="confirmModalAction('rescheduleModal', 'Visit Rescheduled ✓')">Confirm</button>
+        <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
 </div>
 <div class="vc-modal-overlay" id="skipModal">
     <div class="vc-modal">
         <span class="vc-modal-close" onclick="closeModal('skipModal')">&times;</span>
-        <h3 id="skip-modal-title">Skip Visit?</h3>
-        
-        <div class="form-group" style="margin-bottom:25px;">
-            <label style="margin-bottom:10px; display:block; font-weight:600; color:#1e293b;">Choose what happens to this visit:</label>
-            <label style="border:1px solid #0040E6; background:#eff6ff; border-radius:8px; padding:15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <div>
-                    <div style="font-weight:700; color:#1e293b; font-size:15px; margin-bottom:4px;">Move this visit to the end of my subscription</div>
-                    <div style="font-size:13px; color:#64748b;"><strong>Recommended:</strong> Preserves your visit. Renewal moves forward.</div>
-                </div>
-                <input type="radio" name="skip_action" value="move" checked>
-            </label>
-            <label style="border:1px solid #eaeaea; border-radius:8px; padding:15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <div style="font-weight:700; color:#1e293b; font-size:15px; margin-bottom:4px;">Skip and forfeit this visit</div>
-                    <div style="font-size:13px; color:#64748b;">You will lose this scheduled cleaning completely.</div>
-                </div>
-                <input type="radio" name="skip_action" value="forfeit">
-            </label>
-        </div>
-
-        <button class="vc-btn-primary" onclick="confirmSkipAction()">Confirm Skip</button>
+        <h3>Skip Visit</h3>
+        <button class="vc-btn-primary" onclick="confirmModalAction('skipModal', 'Visit Skipped ✓')">Confirm Skip</button>
         <div class="success-msg" style="display:none; color:#059669; font-weight:700; text-align:center; margin-top:15px;"></div>
     </div>
 </div>
@@ -1777,9 +1433,6 @@
             btn.innerText = "Change Plan";
             btn.onclick = () => { closeModal('cancelModal'); openModal('planModal'); };
             document.getElementById('cancel-step-2').style.display = 'block';
-        } else {
-            // For other reasons, bypass smart retention to avoid dark patterns and proceed directly to step 3.
-            showCancellationFinal();
         }
     }
     function submitScheduleEdit() {

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use App\Models\admin\CompanyProfile;
-use App\Models\admin\CompanyEmployee;
-use App\Models\admin\CompanyEmpDocument;
+use App\Models\Admin\CompanyProfile;
+use App\Models\Admin\CompanyEmployee;
+use App\Models\Admin\CompanyEmpDocument;
 use Illuminate\Http\Request;
 use App\Enums\EmployeeType;
 

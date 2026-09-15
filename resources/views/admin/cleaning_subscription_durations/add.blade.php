@@ -1,5 +1,6 @@
 @extends('admin.includes.Template')
 @section('content')
+
     <style>
         .premium-card {
             border: none;
@@ -99,8 +100,8 @@
                                 </div>
                                 <div class='col-md-4 mb-3'>
                                     <label>Material Price (AED)</label>
-                                    <input type='number' step='0.01' name='material_price' class='form-control'
-                                        value='0.00' required>
+                                    <input type='number' step='0.01' name='material_price' class='form-control' value='0.00'
+                                        required>
                                 </div>
                                 <div class='col-md-4 mb-3'>
                                     <label>Material Price / Hour (AED)</label>

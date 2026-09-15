@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\admin\Continent;
+use App\Models\Admin\Continent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
@@ -16,9 +16,9 @@ class ContinentController extends Controller
      */
     public function index()
     {
-        $data['continent_data']=Continent::orderBy('id','desc')->get();      
+        $data['continent_data'] = Continent::orderBy('id', 'desc')->get();
 
-        return view('admin.list_continent',$data);
+        return view('admin.list_continent', $data);
     }
 
     /**
@@ -39,10 +39,10 @@ class ContinentController extends Controller
      */
     public function store(Request $request)
     {
-        $continent= new Continent;
-        $continent->continent=$request->continent;
+        $continent = new Continent;
+        $continent->continent = $request->continent;
         $continent->save();
-        return redirect()->route('continent.index')->with('success','Continent Added Successfully');
+        return redirect()->route('continent.index')->with('success', 'Continent Added Successfully');
     }
 
     /**
@@ -64,7 +64,7 @@ class ContinentController extends Controller
      */
     public function edit(Continent $continent)
     {
-         return view('admin.edit_continent',compact('continent'));
+        return view('admin.edit_continent', compact('continent'));
     }
 
     /**
@@ -91,8 +91,8 @@ class ContinentController extends Controller
     public function destroy(Request $request)
     {
         $delete_id = $request->selected;
-        Continent::whereIn('id',$delete_id)->delete();
+        Continent::whereIn('id', $delete_id)->delete();
 
-        return redirect()->route('continent.index')->with('success','Continent Deleted Successfully');
+        return redirect()->route('continent.index')->with('success', 'Continent Deleted Successfully');
     }
 }

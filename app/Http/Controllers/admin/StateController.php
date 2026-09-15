@@ -10,9 +10,9 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-use App\Models\admin\State;
+use App\Models\Admin\State;
 
-use App\Models\admin\Country;
+use App\Models\Admin\Country;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -36,10 +36,9 @@ class StateController extends Controller
 
     {
 
-        $data['all_state'] = State::orderBy('id','DESC')->get();
+        $data['all_state'] = State::orderBy('id', 'DESC')->get();
 
-        return view('admin.list_state',$data);
-
+        return view('admin.list_state', $data);
     }
 
 
@@ -58,10 +57,9 @@ class StateController extends Controller
 
     {
 
-        $data['all_country'] = Country::orderBy('id','DESC')->get();
+        $data['all_country'] = Country::orderBy('id', 'DESC')->get();
 
-        return view('admin.add_state',$data);
-
+        return view('admin.add_state', $data);
     }
 
 
@@ -82,18 +80,17 @@ class StateController extends Controller
 
     {
 
-        $state= new State;
+        $state = new State;
 
-        $state->country_id=$request->country_id;
+        $state->country_id = $request->country_id;
 
-        $state->state=$request->state;
+        $state->state = $request->state;
 
-        
+
 
         $state->save();
 
         return redirect()->route('state.index')->with('success', 'State Added Successfully');
-
     }
 
 
@@ -136,10 +133,9 @@ class StateController extends Controller
 
     {
 
-        $data['all_country'] = Country::orderBy('id','DESC')->get();
+        $data['all_country'] = Country::orderBy('id', 'DESC')->get();
 
-        return view('admin.edit_state',compact('state'),$data);
-
+        return view('admin.edit_state', compact('state'), $data);
     }
 
 
@@ -168,14 +164,13 @@ class StateController extends Controller
 
         $state->state     = $request->state;
 
-       
+
 
         $state->save();
 
 
 
         return redirect()->route('state.index')->with('success', 'State Updated Successfully');
-
     }
 
 
@@ -196,16 +191,16 @@ class StateController extends Controller
 
     {
 
-        $delete_id = $request->selected;      
+        $delete_id = $request->selected;
 
-        State::whereIn('id',$delete_id)->delete();
+        State::whereIn('id', $delete_id)->delete();
 
-        return redirect()->route('state.index')->with('success','State  Deleted Successfully');
-
+        return redirect()->route('state.index')->with('success', 'State  Deleted Successfully');
     }
 
-    function xlsupload(Request $request){
-        
+    function xlsupload(Request $request)
+    {
+
 
         ini_set('memory_limit', '-1');
 
@@ -239,24 +234,21 @@ class StateController extends Controller
                         'country_id' => $country_id,
                     ];
 
-                    $check = DB::table('states')->where('id',$id)->first();
+                    $check = DB::table('states')->where('id', $id)->first();
 
-                    if(empty($check)){
+                    if (empty($check)) {
                         DB::table('states')->insert($data);
                     }
                     //echo "<pre>";print_r($check);echo"</pre>";exit;
-                   // DB::table('states')->insert($data);
+                    // DB::table('states')->insert($data);
                     //echo "<pre>";print_r($data);echo"</pre>";exit;
 
                 }
-
             }
 
             return redirect()->route('state.index')->with('success', 'Your Data File Uploaded Successfully.!!');
-
         }
 
         return view('admin.add_xlsstate');
     }
-
 }

@@ -10,7 +10,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 use DateTime;
-use App\Models\admin\Form_filed;
+use App\Models\Admin\Form_filed;
 
 class EnquiryController extends Controller
 {
@@ -1038,6 +1038,9 @@ class EnquiryController extends Controller
 
             if ($request->enquiry_type == 'Local') {
 
+
+                // echo "safa";
+                // exit;
                 $formFieldIds   = $request->formfield_id;
                 $formFieldVals  = $request->formfield_value;
 
@@ -1056,10 +1059,14 @@ class EnquiryController extends Controller
 
                 $CityName = $cityOption->form_option ?? '';
 
+                // echo "city name = " . $CityName . "<br>";
+
                 //$cityId = $request->formfield_value[0] ?? 0;
 
                 $cityData = DB::table('cities')->whereRaw('name LIKE ?', ['%' . strtolower($CityName) . '%'])->first();
                 $subserviceData = DB::table('subservices')->where('id', $request->sub_service_id)->first();
+
+                // echo "subserviceData name = " . $subserviceData->subservice_code . "<br>";
 
                 if (isset($subserviceData)) {
                     if (isset($subserviceData->subservice_code)) {
@@ -1080,14 +1087,21 @@ class EnquiryController extends Controller
                     }
                 }
 
+
                 $year = date('y');
 
                 $lastSequence = DB::table('packages_enquiry')
                     ->where('subservice_code', $subserviceCode)
                     ->where('city_code', $cityCode)
                     ->where('order_year', $year)
+                    ->selectRaw('MAX(CAST(sequence_no AS UNSIGNED)) as seq')
                     ->lockForUpdate()
-                    ->max('sequence_no');
+                    ->value('seq');
+
+                // echo "city_code name = " . $cityCode . "<br>";
+                // echo "subserviceCode name = " . $subserviceCode . "<br>";
+                // echo "lastSequence name = " . $lastSequence . "<br>";
+                // exit;
 
                 $nextSequence = $lastSequence ? $lastSequence + 1 : 1;
 
@@ -1098,6 +1112,8 @@ class EnquiryController extends Controller
                     $cityCode,
                     $nextSequence
                 );
+                // echo "e" . $lastSequence;
+                // exit;
 
                 $data_u['subservice_code'] = $subserviceCode;
                 $data_u['city_code'] = $cityCode;
@@ -1142,12 +1158,19 @@ class EnquiryController extends Controller
 
                 $year = date('y');
 
+                // $lastSequence = DB::table('packages_enquiry')
+                //     ->where('subservice_code', $subserviceCode)
+                //     ->where('city_code', $countryCode)
+                //     ->where('order_year', $year)
+                //     ->lockForUpdate()
+                //     ->max('sequence_no');
                 $lastSequence = DB::table('packages_enquiry')
                     ->where('subservice_code', $subserviceCode)
                     ->where('city_code', $countryCode)
                     ->where('order_year', $year)
+                    ->selectRaw('MAX(CAST(sequence_no AS UNSIGNED)) as seq')
                     ->lockForUpdate()
-                    ->max('sequence_no');
+                    ->value('seq');
 
                 $nextSequence = $lastSequence ? $lastSequence + 1 : 1;
 
@@ -1212,12 +1235,20 @@ class EnquiryController extends Controller
 
             $year = date('y');
 
+            // $lastSequence = DB::table('packages_enquiry')
+            //     ->where('subservice_code', $subserviceCode)
+            //     ->where('city_code', $countryCode)
+            //     ->where('order_year', $year)
+            //     ->lockForUpdate()
+            //     ->max('sequence_no');
+
             $lastSequence = DB::table('packages_enquiry')
-                ->where('subservice_code', $subserviceCode)
-                ->where('city_code', $countryCode)
+                ->where('subservice_code', $countryCode)
+                ->where('city_code', $cityCode)
                 ->where('order_year', $year)
+                ->selectRaw('MAX(CAST(sequence_no AS UNSIGNED)) as seq')
                 ->lockForUpdate()
-                ->max('sequence_no');
+                ->value('seq');
 
             $nextSequence = $lastSequence ? $lastSequence + 1 : 1;
 
@@ -1282,12 +1313,20 @@ class EnquiryController extends Controller
 
             $year = date('y');
 
+            // $lastSequence = DB::table('packages_enquiry')
+            //     ->where('subservice_code', $subserviceCode)
+            //     ->where('city_code', $cityCode)
+            //     ->where('order_year', $year)
+            //     ->lockForUpdate()
+            //     ->max('sequence_no');
+
             $lastSequence = DB::table('packages_enquiry')
-                ->where('subservice_code', $subserviceCode)
+                ->where('subservice_code', $countryCode)
                 ->where('city_code', $cityCode)
                 ->where('order_year', $year)
+                ->selectRaw('MAX(CAST(sequence_no AS UNSIGNED)) as seq')
                 ->lockForUpdate()
-                ->max('sequence_no');
+                ->value('seq');
 
             $nextSequence = $lastSequence ? $lastSequence + 1 : 1;
 
@@ -1307,7 +1346,9 @@ class EnquiryController extends Controller
         }
 
 
-
+        // echo "<pre>";
+        // print_r($data_u);
+        // exit;
         DB::table('packages_enquiry')->where('id', $package_inquiry)->update($data_u);
 
         if ($request->formfield_id != '' && count($request->formfield_id) > 0) {

@@ -1123,7 +1123,10 @@
                                             ->unique('form_option')
                                             ->values()
                                             ->all();
-                                        
+                                        // echo '<pre>';
+                                        // print_r($form_additionalData);
+                                        // echo '</pre>';
+                                        // exit();
 
                                         $required = $formFields[$k]->is_active;
                                      @endphp

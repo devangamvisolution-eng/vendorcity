@@ -1,14 +1,13 @@
 <div class="form-group mb-4 payment-selection-container">
-    <label class="form-label fw500 dark-color"
-        style="font-size: 1.1rem; margin-bottom: 4px;">How would you like to pay for your
+    <label class="form-label fw500 dark-color" style="font-size: 1.1rem; margin-bottom: 4px;">How would you like to pay
+        for your
         service?</label>
     <p style="font-size: 13px; color: #666; margin-bottom: 16px;">Please note cancellation
         or rescheduling fees may apply for last minute changes.</p>
 
     <div class="payment-methods-grid">
         <label class="payment-method-card" for="paymet_2">
-            <input type="radio" id="paymet_2" name="payment_type" value="ONLINE"
-                checked>
+            <input type="radio" id="paymet_2" name="payment_type" value="ONLINE" checked>
             <div class="payment-card-content">
                 <div class="payment-card-header">
                     <div class="payment-name">
@@ -63,7 +62,8 @@
         @endphp
 
         <div style="margin-top:20px; margin-bottom: 20px;">
-            <label class="form-label fw500 dark-color" style="margin-bottom:12px;">Redeem Promo Code or Pay with Wallet Balance</label>
+            <label class="form-label fw500 dark-color" style="margin-bottom:12px;">Redeem Promo Code or Pay with Wallet
+                Balance</label>
 
             <div class="row">
                 <div class="col-lg-12 col-md-12 col-12">
@@ -71,7 +71,39 @@
                     <div id="url_promo_ready_banner"
                         style="display:none; background: #e0f7fa; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; align-items: center; gap: 12px;">
                         <i class="fa-solid fa-tag" style="color: #00bcd4; font-size: 1.5rem;"></i>
-                        <span style="font-size: 14px; color: #333;"><strong><span id="ready_promo_code_name"></span></strong> voucher code is ready, please select one or more options from the list to get this voucher code applied!</span>
+                        <span style="font-size: 14px; color: #333;"><strong><span
+                                    id="ready_promo_code_name"></span></strong> voucher code is ready, please select one
+                            or more options from the list to get this voucher code applied!</span>
+                    </div>
+
+                    <!-- Add More To Apply Banner -->
+                    <div id="promo_add_more_banner"
+                        style="display:none; background: linear-gradient(135deg, #fff8e1, #fffde7); border: 1.5px dashed #f59e0b; padding: 14px 16px; border-radius: 12px; margin-bottom: 12px;">
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <div
+                                style="width:38px; height:38px; border-radius:50%; background:rgba(245,158,11,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                <i class="fa-solid fa-tag" style="color:#f59e0b; font-size:1.1rem;"></i>
+                            </div>
+                            <div style="flex:1; min-width:180px;">
+                                <div
+                                    style="font-size:0.82rem; font-weight:800; color:#b45309; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:2px;">
+                                    Promo Code Ready: <span id="promo_add_more_code" style="color:#92400e;"></span>
+                                </div>
+                                <div id="promo_add_more_msg" style="font-size:0.85rem; color:#78350f; font-weight:500;">
+                                    Add more services to unlock this promo!</div>
+                            </div>
+                            <div style="flex-shrink:0;">
+                                <div id="promo_add_more_progress"
+                                    style="font-size:0.75rem; color:#92400e; font-weight:700; white-space:nowrap;">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="promo_progress_bar_wrap"
+                            style="margin-top:10px; background:#fde68a; border-radius:99px; height:6px; overflow:hidden;">
+                            <div id="promo_progress_bar"
+                                style="height:6px; background:#f59e0b; border-radius:99px; transition:width 0.4s; width:0%;">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Promo Input State -->
@@ -83,34 +115,42 @@
                             <div class="wallet-info" style="flex:1;">
                                 <div class="wallet-label">Promo Code</div>
                                 <div class="promo-input-group">
-                                    <input type="text" name="coupon_code" id="coupon_code" class="promo-input-field" placeholder="Enter Promo Code">
-                                    <button type="button" id="promocode" class="promo-apply-btn" onclick="apply_coupon();">Apply</button>
+                                    <input type="text" name="coupon_code" id="coupon_code" class="promo-input-field"
+                                        placeholder="Enter Promo Code">
+                                    <button type="button" id="promocode" class="promo-apply-btn"
+                                        onclick="apply_coupon();">Apply</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <p class="form-error-text mt-2" id="coupon_error" style="color: red; display:none; font-size: 13px;"></p>
-                    <p class="form-success-text mt-2" id="coupon_success" style="color: green; display:none; font-size: 13px;"></p>
+                    <p class="form-error-text mt-2" id="coupon_error"
+                        style="color: red; display:none; font-size: 13px;"></p>
+                    <p class="form-success-text mt-2" id="coupon_success"
+                        style="color: green; display:none; font-size: 13px;"></p>
 
                     <!-- Promo Applied State -->
                     <div class="wallet-card-ui d-none promo_dicount_replace_div"
                         style="border-color: #16a34a; background: rgba(22, 163, 74, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 16px;">
                         <div style="display:flex; align-items:flex-start; gap:12px; flex:1; min-width: 220px;">
-                            <div class="wallet-icon-box" style="color: #16a34a; background: rgba(22, 163, 74, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                            <div class="wallet-icon-box"
+                                style="color: #16a34a; background: rgba(22, 163, 74, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
                                 <i class="fa-solid fa-check-circle" style="font-size: 1.2rem;"></i>
                             </div>
                             <div class="wallet-info" style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
-                                <div class="wallet-label" style="color: #16a34a; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0; letter-spacing: 0.5px;">
+                                <div class="wallet-label"
+                                    style="color: #16a34a; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0; letter-spacing: 0.5px;">
                                     Coupon Applied: <span class="promo_code_name" style="font-weight: 800;"></span>
                                 </div>
-                                <div class="price-wrapper" style="display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 4px; width: 100%;">
+                                <div class="price-wrapper"
+                                    style="display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 4px; width: 100%;">
                                     <!-- Dynamically updated by JS -->
                                 </div>
                             </div>
                         </div>
                         <div style="flex-shrink: 0; margin-left: auto;">
-                            <button onclick="remove_coupon();" type="button" class="wallet_cancel_new" style="display: block; background: #fff; border: 1px solid #ddd; padding: 8px 16px; border-radius: 8px; font-weight: 700; color: #333; cursor: pointer; min-width: 80px;">Remove</button>
+                            <button onclick="remove_coupon();" type="button" class="wallet_cancel_new"
+                                style="display: block; background: #fff; border: 1px solid #ddd; padding: 8px 16px; border-radius: 8px; font-weight: 700; color: #333; cursor: pointer; min-width: 80px;">Remove</button>
                         </div>
                     </div>
                 </div>
@@ -125,14 +165,17 @@
                                 <div class="wallet-info">
                                     <div class="wallet-label">Wallet Balance</div>
                                     <div id="wallet_amount" class="price-wrapper">
-                                        <span class="currency_dhiramnew" style="font-size: 0.95rem; font-weight:700; position:relative;">AED</span>
+                                        <span class="currency_dhiramnew"
+                                            style="font-size: 0.95rem; font-weight:700; position:relative;">AED</span>
                                         <span>{{ $wallet_amount }}</span>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <button onclick="apply_wallet_discount();" type="button" class="wallet_apply_new">Apply</button>
-                                <button onclick="cancelWalletDiscount();" type="button" class="wallet_cancel_new" style="display: none;">Cancel</button>
+                                <button onclick="apply_wallet_discount();" type="button"
+                                    class="wallet_apply_new">Apply</button>
+                                <button onclick="cancelWalletDiscount();" type="button" class="wallet_cancel_new"
+                                    style="display: none;">Cancel</button>
                             </div>
                         </div>
                     @endif

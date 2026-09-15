@@ -577,18 +577,8 @@
                         <div>
                             <span class="status-badge" data-bs-toggle="modal" data-bs-target="#ConfirmModal">
                                 @php
-                                    $statuses = [
-                                        'BK' => 'Booking Requested',
-                                        'BC' => 'Booking Confirmed',
-                                        'P' => 'Booking Confirmed',
-                                        'PA' => 'Vendor Assigned',
-                                        'OTW' => 'On the way',
-                                        'IP' => 'In progress',
-                                        'CO' => 'Booking Completed',
-                                        'CL' => 'Booking Cancelled',
-                                        'UP' => 'Unpaid',
-                                    ];
-                                    $currentStatusText = $statuses[$thank_order_data->order_status] ?? 'Processing';
+                                    $statusDetails = \App\Helpers\Helper::getOrderStatusDetails($thank_order_data->order_status);
+                                    $currentStatusText = $statusDetails['text'];
                                 @endphp
                                 {{ $currentStatusText }}
                             </span>
@@ -635,7 +625,8 @@
                         </li>
                         <li class="mb-0 mt-0">
                             <span class="detail-label">Service Type</span>
-                            <span class="detail-value">{!! Helper::subservicename($thank_ci_order_data->subservice_id) !!}</span>
+                            <span
+                                class="detail-value">{!! Helper::subservicename($thank_ci_order_data->subservice_id) !!}</span>
                         </li>
                         <li class="mb-0 mt-0">
                             <span class="detail-label">Date & Time</span>
@@ -688,7 +679,8 @@
                     <div class="ms-3">
                         <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Service
                             booked</small>
-                        <span class="fw-bold text-dark" style="font-size: 1.1rem;">{!! Helper::subservicename($thank_ci_order_data->subservice_id) !!}</span>
+                        <span class="fw-bold text-dark"
+                            style="font-size: 1.1rem;">{!! Helper::subservicename($thank_ci_order_data->subservice_id) !!}</span>
                     </div>
                 </div>
                 <div class="row g-4 mb-2">
@@ -715,8 +707,7 @@
                     style="background: linear-gradient(135deg, #0a58cafc 0%, #3891ca 100%); color: white;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <small class="d-block opacity-75 text-uppercase fw-bold"
-                                style="font-size: 0.65rem;">Payment
+                            <small class="d-block opacity-75 text-uppercase fw-bold" style="font-size: 0.65rem;">Payment
                                 via</small>
                             <span class="fw-bold">@php
                                 $payment_modes = ['1' => 'Cash on Delivery', '2' => 'Online Payment'];

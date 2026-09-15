@@ -5,39 +5,40 @@
 
 
 <head>
+    <meta charset="utf-8">
 
-    <!-- Google Tag Manager (Delayed) -->
-    <!-- <script>
-        var gtmLoaded = false;
+    <meta name="format-detection" content="telephone=no">
 
-        function loadGTM() {
-            if (gtmLoaded) return;
-            gtmLoaded = true;
-            (function(w, d, s, l, i) {
-                w[l] = w[l] || [];
-                w[l].push({
-                    'gtm.start': new Date().getTime(),
-                    event: 'gtm.js'
-                });
-                var f = d.getElementsByTagName(s)[0],
-                    j = d.createElement(s),
-                    dl = l != 'dataLayer' ? '&l=' + l : '';
-                j.async = true;
-                j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-                f.parentNode.insertBefore(j, f);
-            })(window, document, 'script', 'dataLayer', 'GTM-ML9CL33C');
-        }
-        ['mouseover', 'keydown', 'scroll', 'touchstart'].forEach(function(e) {
-            window.addEventListener(e, loadGTM, {
-                once: true,
-                passive: true
-            });
-        });
-        setTimeout(loadGTM, 5000);
-    </script> -->
-    <!-- End Google Tag Manager -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    @if (!empty($meta_title))
+        <title>{{ $meta_title }}</title>
+        <meta property="og:title" content="{{ $meta_title }}" />
+    @else
+        <title>VendorsCity</title>
+        <meta property="og:title" content="VendorsCity" />
+    @endif
+    @if (!empty($meta_keyword))
+        <meta name="keywords" content="{{ $meta_keyword }}">
+    @endif
+    @if (!empty($meta_description))
+        <meta name="description" content="{{ $meta_description }}">
+        <meta property="og:description" content="{{ $meta_description }}" />
+    @endif
+    <!-- Favicon -->
+
+    <meta property="og:site_name" content="VendorsCity">
+    <meta property="og:image" itemprop="image" content="{{ asset('public/site/images/Homepage/bg.png') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="{{ url()->current() }}" />
+    <meta property="og:type" content="website" />
+
 
     <!-- Google Tag Manager -->
+    <!-- <script>
     {{-- <script>
         (function(w, d, s, l, i) {
             w[l] = w[l] || [];
@@ -53,158 +54,55 @@
                 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
             f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', 'GTM-ML9CL33C');
+    </script> -->
     </script> --}}
     <!-- End Google Tag Manager -->
 
     <meta name="DC.title" content="https://www.vendorscity.com/" />
-
     <meta name="geo.region" content="AE" />
-
     <meta name="geo.position" content="24.000249;53.999483" />
-
     <meta name="ICBM" content="24.000249, 53.999483" />
-
     <link rel="canonical" href="{{ url()->current() }}" />
 
 
-
-
-
-
-
-
-    @stack('head_scripts')
-
-
-
-
-
-    <meta charset="utf-8">
-
-    <meta name="format-detection" content="telephone=no">
-
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    {{--
-    <meta name="viewport" content="width=device-width, initial-scale=1"> --}}
-
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
-    {{--
-    <meta name="keywords" content="">
-
-    <meta name="description" content=""> --}}
-
-    <!-- <meta name="CreativeLayers" content="ATFN"> -->
-
-    <!-- css file -->
-
     @if (!request()->is('/'))
-        <link rel="stylesheet" href="{{ asset('public/site/css/jquery-ui.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('public/site/css/jquery-ui.min.css') }}" media="print"
+            onload="this.media='all'">
     @endif
 
     <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap.min.css') }}">
-
-
-
-
-
     <link rel="stylesheet" href="{{ asset('public/site/css/ace-responsive-menu.css') }}">
-
     <link rel="stylesheet" href="{{ asset('public/site/css/menu.css') }}">
-
-    <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}">
-
-    <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/site/css/fontawesome.css') }}" defer>
+    <link rel="stylesheet" href="{{ asset('public/site/css/flaticon.css') }}" defer>
     <!-- Removed intlTelInput globally for Step 1 -->
-    <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/site/css/bootstrap-select.min.css') }}" defer>
 
     @if (!request()->is('/'))
         <link rel="stylesheet" href="{{ asset('public/site/css/animate.css') }}" media="print"
             onload="this.media='all'">
     @endif
-
-    <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('public/site/css/slider.css') }}" defer>
     <!-- Critical CSS Preload -->
-    <link rel="preload" href="{{ asset('public/site/css/style.css') }}" as="style">
-    <link rel="preload" href="{{ asset('public/site/css/responsive.css') }}" as="style">
-
     <link rel="stylesheet" href="{{ asset('public/site/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('public/site/css/ud-custom-spacing.css') }}">
     <link rel="stylesheet" href="{{ asset('public/site/css/responsive.css') }}">
-
-    <link rel="stylesheet" href="{{ asset('public/site/css/owl.carousel.min.css') }}" media="print"
-        onload="this.media='all'">
+    <!--<link rel="stylesheet" href="{{ asset('public/site/css/owl.carousel.min.css') }}" media="print"
+        onload="this.media='all'" defer>
     <link rel="stylesheet" href="{{ asset('public/site/css/owl.theme.default.min.css') }}" media="print"
-        onload="this.media='all'">
+        onload="this.media='all'">-->
+    <link rel="stylesheet" href="{{ asset('public/site/css/splide.min.css') }}" defer>
+    <link rel="stylesheet" href="{{ asset('public/site/css/customstyle.css') }}" defer>
 
     @stack('styles')
 
-
-    <!-- Title -->
-
-    @if (!empty($meta_title))
-        <title>{{ $meta_title }}</title>
-
-        <meta property="og:title" content="{{ $meta_title }}" />
-    @else
-        <title>VendorsCity</title>
-
-        <meta property="og:title" content="VendorsCity" />
-    @endif
-
-
-
-    @if (!empty($meta_keyword))
-        <meta name="keywords" content="{{ $meta_keyword }}">
-    @endif
-
-
-
-    @if (!empty($meta_description))
-        <meta name="description" content="{{ $meta_description }}">
-
-        <meta property="og:description" content="{{ $meta_description }}" />
-    @endif
-
-    <!-- Favicon -->
-
-
-
-    <meta property="og:site_name" content="VendorsCity">
-
-    <meta property="og:image" itemprop="image" content="{{ asset('public/site/images/Homepage/bg.png') }}">
-
-    <meta property="og:image:width" content="1200">
-
-    <meta property="og:image:height" content="630">
-
-    <meta property="og:url" content="{{ url()->current() }}" />
-
-    <meta property="og:type" content="website" />
-
-
-
-
-
-
-
+    @stack('head_scripts')
 
     <link href="{{ asset('public/site/images/v-cfavicon.png') }}" sizes="128x128" rel="shortcut icon"
         type="image/x-icon" />
 
-    <link href="{{ asset('public/site/images/v-cfavicon.png') }}" sizes="128x128" rel="shortcut icon" />
-
     <!-- Apple Touch Icon -->
-
-    <link href="{{ asset('public/site/images/v-cfavicon.png') }}" sizes="60x60" rel="apple-touch-icon">
-
     <link href="{{ asset('public/site/images/v-cfavicon.png') }}" sizes="72x72" rel="apple-touch-icon">
-
-    <link href="{{ asset('public/site/images/v-cfavicon.png') }}" sizes="114x114" rel="apple-touch-icon">
-
-    <link href="{{ asset('public/site/images/v-cfavicon.png') }}" sizes="180x180" rel="apple-touch-icon">
 
     @if (request()->is('/'))
         <!-- LCP Optimization: Preload Hero Image -->
@@ -212,30 +110,6 @@
             fetchpriority="high">
     @endif
 
-
-
-
-
-    <!-- Select2 CSS -->
-
-
-
-    <!-- Removed select2.min.css (loaded via stack) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css">
-
-
-
-
-    <link rel="stylesheet" href="{{ asset('public/site/css/customstyle.css') }}">
-
-    {{--
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
-
-    {{--
-    <link href="https://db.onlinewebfonts.com/c/060fd297f19446447a9a1325ad5b889b?family=SF+Pro+Rounded"
-        rel="stylesheet"> --}}
 
     <style>
         header.nav-homepage-style {
@@ -2761,7 +2635,7 @@
 
 
     <!-- Meta Pixel Code (Delayed) -->
-    {{-- <script>
+    <!-- <script>
         ! function(f, b, e, v, n, t, s) {
             if (f.fbq) return;
             n = f.fbq = function() {
@@ -2784,7 +2658,7 @@
         fbq('track', 'PageView');
     </script>
     <noscript><img height="1" width="1" style="display:none"
-            src="https://www.facebook.com/tr?id=483748947894350&ev=PageView&noscript=1" /></noscript> --}}
+            src="https://www.facebook.com/tr?id=483748947894350&ev=PageView&noscript=1" /></noscript> -->
     <!-- End Meta Pixel Code -->
 
 </head>
@@ -2796,6 +2670,8 @@
 
 
     <!-- Google Tag Manager (noscript) -->
+    <!-- <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-ML9CL33C" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript> -->
     {{-- <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-ML9CL33C" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript> --}}
     <!-- End Google Tag Manager (noscript) -->
@@ -2942,62 +2818,41 @@
 
 
 
-                                                                                @if ($subservice->id == 92)
-                                                                                    <a
-                                                                                        href="{{ route('automobile.listing', ['page_url' => $subservice->page_url]) }}">
-                                                                                    @else
-                                                                                        <a
-                                                                                            href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $subservice->page_url]) }}">
-                                                                                @endif
-
-
-
-
-
-
-
-                                                                                <strong>{{ $subservice->subservicename }}</strong></a>
+                                                                                @php
+                                                                                    if ($subservice->id == 92) {
+                                                                                        $menuHref = route(
+                                                                                            'automobile.listing',
+                                                                                            [
+                                                                                                'page_url' =>
+                                                                                                    $subservice->page_url,
+                                                                                            ],
+                                                                                        );
+                                                                                    } elseif (
+                                                                                        $subservice->is_bookable == 1
+                                                                                    ) {
+                                                                                        $menuHref = route('enquiry', [
+                                                                                            'service_id' =>
+                                                                                                $service_datadynamic->page_url ??
+                                                                                                $service_datadynamic->id,
+                                                                                            'subservice_id' =>
+                                                                                                $subservice->page_url ??
+                                                                                                $subservice->id,
+                                                                                        ]);
+                                                                                    } else {
+                                                                                        $menuHref = route('booknow', [
+                                                                                            'service_id' =>
+                                                                                                $service_datadynamic->page_url ??
+                                                                                                $service_datadynamic->id,
+                                                                                            'subservice_id' =>
+                                                                                                $subservice->page_url ??
+                                                                                                $subservice->id,
+                                                                                        ]);
+                                                                                    }
+                                                                                @endphp
+                                                                                <a href="{{ $menuHref }}">
+                                                                                    <strong>{{ $subservice->subservicename }}</strong></a>
 
                                                                             </li>
-
-
-
-                                                                            @php
-
-                                                                                $package_categories = DB::table(
-                                                                                    'package_categories',
-                                                                                )
-
-                                                                                    ->where(
-                                                                                        'subservice_id',
-
-                                                                                        $subservice->id,
-                                                                                    )
-
-                                                                                    ->where('set_in_menu', 0)
-
-                                                                                    ->get();
-
-                                                                            @endphp
-
-
-
-                                                                            @if ($package_categories != '' && count($package_categories) > 0)
-                                                                                @foreach ($package_categories as $package_categoriesData)
-                                                                                    <li>
-
-
-
-                                                                                        <a
-                                                                                            href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $subservice->page_url]) }}?category={{ $package_categoriesData->id }}">
-
-
-
-                                                                                            {{ $package_categoriesData->name }}</a>
-
-                                                                                    </li>
-                                                                                @endforeach
-                                                                            @endif
                                                                         @endforeach
                                                                     @endif
 
@@ -3571,15 +3426,16 @@
                                                 <input class="form-control bordermob" type="text" name="search"
                                                     value="{{ session('search_content') }}"
                                                     placeholder="What service are you looking for?" id="search_auto_header"
-                                                    autocomplete="off" style="
+                                                    autocomplete="off"
+                                                    style="
 
-                                                                                                    padding: 4px;
+                                                                                                                                                                                padding: 4px;
 
-                                                                                                    height: 30px;
+                                                                                                                                                                                height: 30px;
 
-                                                                                                    font-size: 13px;
+                                                                                                                                                                                font-size: 13px;
 
-                                                                                                ">
+                                                                                                                                                                            ">
 
 
 
@@ -3599,11 +3455,11 @@
                                                 <ul class="dropdown-list-mobile list_mobile"
                                                     style="
 
-                                                                                                padding: 0;
+                                                                                                                                                                            padding: 0;
 
-                                                                                                margin: 0;
+                                                                                                                                                                            margin: 0;
 
-                                                                                            ">
+                                                                                                                                                                        ">
 
 
 
@@ -3716,11 +3572,12 @@
                                     <div class="text-center text-xl-start">
 
                                         <button class="ud-btn btn-thm w-100 bdrs60 mgtop20" type="button"
-                                            onclick="search_banner_header()" style="
+                                            onclick="search_banner_header()"
+                                            style="
 
-                                                                                            padding: 0;
+                                                                                                                                                                        padding: 0;
 
-                                                                                        ">Search</button>
+                                                                                                                                                                    ">Search</button>
 
                                     </div>
 
@@ -3759,60 +3616,57 @@
 
 
                     @php
-
-                        $staticServiceIds = [45, 30, 44, 34, 48, 47];
-
+                        $mobile_services = DB::table('services')
+                            ->where('is_active', 0)
+                            ->whereRaw('FIND_IN_SET(?, city)', [session('search_city_id')])
+                            ->orderBy('set_order')
+                            ->get();
                     @endphp
 
-
-
-                    @foreach ($staticServiceIds as $staticServiceId)
-
+                    @foreach ($mobile_services as $service)
                         @php
-
-                            $service = DB::table('services')->where('id', $staticServiceId)->first();
-
                             $subservices = DB::table('subservices')
-
-                                ->where('serviceid', $staticServiceId)
-
+                                ->where('serviceid', $service->id)
                                 ->where('is_active', 0)
-
+                                ->whereRaw('FIND_IN_SET(?, city)', [session('search_city_id')])
                                 ->orderBy('set_order')
-
                                 ->get();
-
                         @endphp
-
-
 
                         @if ($service)
                             <li>
-
                                 <span>{{ $service->servicename }}</span>
 
                                 @if ($subservices->isNotEmpty())
                                     <ul>
-
                                         @foreach ($subservices as $sub)
                                             <li>
-
-                                                <a class="dropdown-item"
-                                                    href="{{ route('front.package_lists', ['city' => session('search_city_name'), 'page_url' => $sub->page_url]) }}">
-
+                                                @php
+                                                    if ($sub->id == 92) {
+                                                        $mobileHref = route('automobile.listing', [
+                                                            'page_url' => $sub->page_url,
+                                                        ]);
+                                                    } elseif ($sub->is_bookable == 1) {
+                                                        $mobileHref = route('enquiry', [
+                                                            'service_id' => $service->page_url ?? $service->id,
+                                                            'subservice_id' => $sub->page_url ?? $sub->id,
+                                                        ]);
+                                                    } else {
+                                                        $mobileHref = route('booknow', [
+                                                            'service_id' => $service->page_url ?? $service->id,
+                                                            'subservice_id' => $sub->page_url ?? $sub->id,
+                                                        ]);
+                                                    }
+                                                @endphp
+                                                <a class="dropdown-item" href="{{ $mobileHref }}">
                                                     {{ $sub->subservicename }}
-
                                                 </a>
-
                                             </li>
                                         @endforeach
-
                                     </ul>
                                 @endif
-
                             </li>
                         @endif
-
                     @endforeach
 
 
@@ -3825,136 +3679,73 @@
 
                     {{-- <li><a class="list-item" href="{{ url('/cart') }}"><span>Cart</span></a></li> --}}
 
-                    <li>
-
-                        <span>My Account</span>
-
-                        <ul>
-
-                            <li>
-
-                                <a href="{{ route('front.myaccount') }}"
-                                    class="{{ Route::is('front.myaccount') ? 'active' : '' }}"> <i
-                                        class="far fa-home"></i> &nbsp;&nbsp;Dashboard
-
-                                </a>
-
-                            </li>
-
-                            <li>
-
-                                <a href="{{ route('front.myleads') }}"
-                                    class="{{ Route::is('front.myleads') || Route::is('front.mylead_detail') ? 'active' : '' }}">
-
-                                    <i class="far fa-file-alt"></i> &nbsp;&nbsp;My Quotes
-
-                                </a>
-
-                            </li>
-
-                            <li>
-
-                                <a href="{{ route('front.myorder') }}"
-                                    class="{{ Route::is('front.myorder') ? 'active' : '' }}">
-
-                                    <i class="far fa-file-alt"></i> &nbsp;&nbsp;My Orders
-
-                                </a>
-
-                            </li>
-
-                            <li>
-
-                                <a href="{{ route('front.myprofile') }}"
-                                    class="{{ Route::is('front.myprofile') ? 'active' : '' }}">
-
-                                    <i class="far fa-user"></i> &nbsp;&nbsp;My Profile
-
-                                </a>
-
-                            </li>
-
-                            <li>
-
-                                <a href="{{ route('front.mywallet') }}"
-                                    class="{{ Route::is('front.mywallet') ? 'active' : '' }}">
-
-                                    <i class="far fa-wallet"></i> &nbsp;&nbsp;Wallet
-
-                                </a>
-
-                            </li>
-
-                            <li>
-
-                                <a href="{{ route('front.refer_earn') }}"
-                                    class="{{ Route::is('front.refer_earn') ? 'active' : '' }}">
-
-                                    <i class="fa-regular fa-gift"></i> &nbsp;&nbsp;Refer And Earn
-
-                                </a>
-
-                            </li>
-
-                            <li>
-
-                                <a href="{{ route('front.refral') }}"
-                                    class="{{ Route::is('front.refral') ? 'active' : '' }}">
-
-                                    <i class="fa-regular fa-gift"></i> &nbsp;&nbsp;Referral List
-
-                                </a>
-
-                            </li>
-
-                            <li>
-
-                                <a href="{{ route('user_signout') }}"
-                                    class="{{ Route::is('front.user_signout') ? 'active' : '' }}">
-
-                                    <i class="far fa-sign-out-alt"></i> &nbsp;&nbsp;Logout
-
-                                </a>
-
-                            </li>
-
-                        </ul>
-
-
-
-                    </li>
-
                     @php
-
                         $userData = Session::get('user');
-
-                        // $userData = Session::get('user');
-
                     @endphp
 
-
-
-                    @if ($userData == '')
-                        {{-- <li><a class="list-item" href="{{ route('Sign-Up.create') }}"><span>Log in</span></a></li> --}}
-
-                        <li><span>Login</span>
-
+                    @if ($userData != '')
+                        <li>
+                            <span>My Account</span>
                             <ul>
-
-                                <!-- <li><a href="{{ route('Sign-in') }}">Customer Login</a></li> -->
-
+                                <li>
+                                    <a href="{{ route('front.myaccount') }}"
+                                        class="{{ Route::is('front.myaccount') ? 'active' : '' }}"> <i
+                                            class="far fa-home"></i> &nbsp;&nbsp;Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('front.myleads') }}"
+                                        class="{{ Route::is('front.myleads') || Route::is('front.mylead_detail') ? 'active' : '' }}">
+                                        <i class="far fa-file-alt"></i> &nbsp;&nbsp;My Quotes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('front.myorder') }}"
+                                        class="{{ Route::is('front.myorder') ? 'active' : '' }}">
+                                        <i class="far fa-file-alt"></i> &nbsp;&nbsp;My Orders
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('front.myprofile') }}"
+                                        class="{{ Route::is('front.myprofile') ? 'active' : '' }}">
+                                        <i class="far fa-user"></i> &nbsp;&nbsp;My Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('front.mywallet') }}"
+                                        class="{{ Route::is('front.mywallet') ? 'active' : '' }}">
+                                        <i class="far fa-wallet"></i> &nbsp;&nbsp;Wallet
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('front.refer_earn') }}"
+                                        class="{{ Route::is('front.refer_earn') ? 'active' : '' }}">
+                                        <i class="fa-regular fa-gift"></i> &nbsp;&nbsp;Refer And Earn
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('front.refral') }}"
+                                        class="{{ Route::is('front.refral') ? 'active' : '' }}">
+                                        <i class="fa-regular fa-gift"></i> &nbsp;&nbsp;Referral List
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('user_signout') }}"
+                                        class="{{ Route::is('front.user_signout') ? 'active' : '' }}">
+                                        <i class="far fa-sign-out-alt"></i> &nbsp;&nbsp;Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a class="list-item" href="{{ route('user_signout') }}"><span>Log out</span></a></li>
+                    @else
+                        <li><span>Login</span>
+                            <ul>
                                 <li> <a href="javascript:void(0)" data-bs-toggle="modal"
                                         data-bs-target="#otp_popup_Modal">Customer Login</a></li>
-
-
-
                                 <li><a href="{{ url('/vendor/login') }}">Vendor Login</a></li>
-
                             </ul>
-
                         </li>
-                    @else
-                        <li><a class="list-item" href="{{ url('user_signout') }}"><span>Log out</span></a></li>
                     @endif
 
                 </ul>

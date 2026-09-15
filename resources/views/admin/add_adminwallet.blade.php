@@ -81,15 +81,14 @@
                                         <option value=""> Select Vendor</option>
 
                                         @foreach ($all_vendor as $all_vendor_data)
-
                                             <option value="{{ $all_vendor_data->id }}">{{ $all_vendor_data->name }}
 
                                             </option>
-
                                         @endforeach
 
                                     </select>
-                                    <p class="form-error-text" id="vendor_id_error" style="color: red; margin-top: 10px;"></p>
+                                    <p class="form-error-text" id="vendor_id_error" style="color: red; margin-top: 10px;">
+                                    </p>
 
                                 </div>
 
@@ -105,7 +104,8 @@
                                         <option value="3"> Refund</option>
                                         <option value="4"> Deduct</option>
                                     </select>
-                                    <p class="form-error-text" id="payment_type_error" style="color: red; margin-top: 10px;"></p>
+                                    <p class="form-error-text" id="payment_type_error"
+                                        style="color: red; margin-top: 10px;"></p>
                                 </div>
 
                                 <div class="form-group" id="deduct_reason_container" style="display: none;">
@@ -113,9 +113,20 @@
                                     <label for="reason">Reason For Deduction</label>
 
                                     <input class="form-control" id="deduct_reason" name="deduct_reason" type="text"
-                                    placeholder="Enter Deduct Reason" value="" /> 
+                                        placeholder="Enter Deduct Reason" value="" />
 
-                                    <p class="form-error-text" id="deduct_reason_error" style="color: red; margin-top:10px;"></p>
+                                    <p class="form-error-text" id="deduct_reason_error"
+                                        style="color: red; margin-top:10px;"></p>
+                                </div>
+
+                                <div class="form-group" id="notes_container" style="display: none;">
+
+                                    <label for="notes">Notes</label>
+
+                                    <input class="form-control" id="notes" name="notes" type="text"
+                                        placeholder="Enter Notes" value="" />
+
+                                    <p class="form-error-text" id="notes_error" style="color: red; margin-top:10px;"></p>
                                 </div>
 
 
@@ -125,9 +136,8 @@
                                     <label for="name">Price</label>
 
                                     <input id="price" name="price" type="number" class="form-control"
-
                                         placeholder="Enter Price" value="" />
-                                <p class="form-error-text" id="price_error" style="color: red; margin-top: 10px;"></p>
+                                    <p class="form-error-text" id="price_error" style="color: red; margin-top: 10px;"></p>
                                 </div>
 
                                 {{-- <div class="form-group">
@@ -221,10 +231,10 @@
 
 
                                 <button class="btn btn-primary mb-1" type="button" disabled id="spinner_button"
-
                                     style="display: none;">
 
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span class="spinner-border spinner-border-sm" role="status"
+                                        aria-hidden="true"></span>
 
                                     Loading...
 
@@ -233,7 +243,6 @@
 
 
                                 <button type="button" class="btn btn-primary" id="submit_button"
-
                                     onclick="javascript:category_validation()">Submit</button>
 
                                 <!-- <input type="submit" name="submit" value="Submit" class="btn btn-primary"> -->
@@ -279,7 +288,6 @@
 
 
     <script>
-
         function category_validation() {
 
 
@@ -308,18 +316,32 @@
                 return false;
             }
 
-            if(payment_type == 4){
-            var deduct_reason = jQuery("#deduct_reason").val();
+            if (payment_type == 4) {
+                var deduct_reason = jQuery("#deduct_reason").val();
 
-            if (deduct_reason == '') {
-                jQuery('#deduct_reason_error').html("Please Enter Deduction Reason");
-                jQuery('#deduct_reason_error').show().delay(0).fadeIn('show');
-                jQuery('#deduct_reason_error').show().delay(2000).fadeOut('show');
-                $('html, body').animate({
-                    scrollTop: $('#deduct_reason').offset().top - 150
-                }, 1000);
-                return false;
+                if (deduct_reason == '') {
+                    jQuery('#deduct_reason_error').html("Please Enter Deduction Reason");
+                    jQuery('#deduct_reason_error').show().delay(0).fadeIn('show');
+                    jQuery('#deduct_reason_error').show().delay(2000).fadeOut('show');
+                    $('html, body').animate({
+                        scrollTop: $('#deduct_reason').offset().top - 150
+                    }, 1000);
+                    return false;
+                }
             }
+
+            if (payment_type == 3) {
+                var notes = jQuery("#notes").val();
+
+                if (notes == '') {
+                    jQuery('#notes_error').html("Please Enter Notes");
+                    jQuery('#notes_error').show().delay(0).fadeIn('show');
+                    jQuery('#notes_error').show().delay(2000).fadeOut('show');
+                    $('html, body').animate({
+                        scrollTop: $('#notes').offset().top - 150
+                    }, 1000);
+                    return false;
+                }
             }
 
 
@@ -331,7 +353,7 @@
                 jQuery('#price_error').html("Please Enter price");
                 jQuery('#price_error').show().delay(0).fadeIn('show');
                 jQuery('#price_error').show().delay(2000).fadeOut('show');
-                
+
                 return false;
             }
             var vendor_id = $('#vendor_id').val();
@@ -339,7 +361,7 @@
 
             // alert(vendor_id);
             // alert(payment_type);
-            if(payment_type == 4){
+            if (payment_type == 4) {
 
                 $.ajax({
                     type: "post",
@@ -348,11 +370,12 @@
                         "_token": "{{ csrf_token() }}",
                         "vendor_id": vendor_id,
                         "payment_type": payment_type,
-                        "price":price
+                        "price": price
                     },
                     success: function(returndata) {
-                        if(returndata == 2){
-                            $('#failed_message').text('The Deducted amount is greater than the vendor wallet balance.');
+                        if (returndata == 2) {
+                            $('#failed_message').text(
+                                'The Deducted amount is greater than the vendor wallet balance.');
                             $('.failed_show').show().delay(0).fadeIn('show');
                             $('.failed_show').show().delay(5000).fadeOut('show');
                             $('html, body').animate({
@@ -361,7 +384,7 @@
                             return false;
                             // $('#is_active_toggle').prop('checked', false);
                         }
-                        if(returndata == 1){
+                        if (returndata == 1) {
                             $('#success_message').text('The Amount Deducted successfully');
                             $('.success_show').show().delay(0).fadeIn('show');
                             $('.success_show').show().delay(5000).fadeOut('show');
@@ -375,32 +398,38 @@
                     }
                 });
 
-            }else{
+            } else {
                 $('#spinner_button').show();
                 $('#submit_button').hide();
                 $('#category_form').submit();
             }
-            
 
 
 
 
-            
+
+
 
         }
 
         $("#vendor_id").select2();
-
     </script>
     <script>
         document.getElementById('payment_type').addEventListener('change', function() {
             var selectedValue = this.value;
             var deductReasonField = document.getElementById('deduct_reason_container');
-            
+            var notesField = document.getElementById('notes_container');
+
             if (selectedValue == '4') {
                 deductReasonField.style.display = 'block'; // Show the deduct reason field
             } else {
                 deductReasonField.style.display = 'none'; // Hide the deduct reason field
+            }
+
+            if (selectedValue == '3') {
+                notesField.style.display = 'block'; // Show the notes field
+            } else {
+                notesField.style.display = 'none'; // Hide the notes field
             }
         });
     </script>
@@ -445,4 +474,3 @@
 
 
 @stop
-

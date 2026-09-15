@@ -66,8 +66,11 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/home-subservice', [ServiceController::class, 'homesubservice']);
     Route::post('/wallet-amount-check', [MyAccountApiController::class, 'walletAmountCheck']);
     Route::post('/rating-order', [MyAccountApiController::class, 'ratingOrder']);
+    Route::post('/wallet-transactions', [MyAccountApiController::class, 'walletTransactions']);
     Route::post('/moving-service', [HomeControllerApi::class, 'movingService']);
     Route::post('/search-service', [HomeControllerApi::class, 'searchSubservice']);
     Route::post('/store-moving-service', [HomeControllerApi::class, 'storeMovingServiceInquiry']);
-    Route::post('/store-garden-pest-control', [HomeControllerApi::class, 'storeGardenPestControlInquiry']);
+
+    Route::post('/my-quotes', [MyAccountApiController::class, 'myQuotes']);
+    Route::post('/my-quote-detail', [MyAccountApiController::class, 'myQuoteDetail']);
 });

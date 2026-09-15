@@ -433,7 +433,36 @@ class checkoutcontroller extends Controller
             // See your keys here: https://dashboard.stripe.com/apikeys
             $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
 
-            $response = $stripe->checkout->sessions->create([
+            $userEmail = '';
+            $userDataDb = null;
+            if (isset($userid) && $userid != '') {
+                $userDataDb = DB::table('frontloginregisters')->where('id', $userid)->first();
+                if ($userDataDb && isset($userDataDb->email)) {
+                    $userEmail = $userDataDb->email;
+                }
+            } else if (isset($userdata['email']) && !empty($userdata['email'])) {
+                $userEmail = $userdata['email'];
+            }
+
+            $stripeCustomerId = null;
+            if (!empty($userEmail)) {
+                try {
+                    $customers = $stripe->customers->search(['query' => "email:'$userEmail'", 'limit' => 1]);
+                    if (count($customers->data) > 0) {
+                        $stripeCustomerId = $customers->data[0]->id;
+                    } else {
+                        $newCustomer = $stripe->customers->create([
+                            'email' => $userEmail,
+                            'name' => $userDataDb->name ?? ($userdata['name'] ?? '')
+                        ]);
+                        $stripeCustomerId = $newCustomer->id;
+                    }
+                } catch (\Exception $e) {
+                    // Fallback
+                }
+            }
+
+            $checkoutData = [
                 'line_items' => [
                     [
                         'price_data' => [
@@ -447,9 +476,18 @@ class checkoutcontroller extends Controller
                     ],
                 ],
                 'mode' => 'payment',
-                'success_url' => route('payment_success'),
+                'success_url' => route('payment_success') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('payment_fail'),
-            ]);
+                'client_reference_id' => $CIData->order_number ?? '',
+            ];
+
+            if ($stripeCustomerId) {
+                $checkoutData['customer'] = $stripeCustomerId;
+            } else if (!empty($userEmail)) {
+                $checkoutData['customer_email'] = $userEmail;
+            }
+
+            $response = $stripe->checkout->sessions->create($checkoutData);
 
             if (isset($response->id) && $response->id != '') {
 
@@ -1183,7 +1221,30 @@ class checkoutcontroller extends Controller
 
                 $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
 
-                $response = $stripe->checkout->sessions->create([
+                $userEmail = '';
+                if (isset($userdata['email']) && !empty($userdata['email'])) {
+                    $userEmail = $userdata['email'];
+                }
+
+                $stripeCustomerId = null;
+                if (!empty($userEmail)) {
+                    try {
+                        $customers = $stripe->customers->search(['query' => "email:'$userEmail'", 'limit' => 1]);
+                        if (count($customers->data) > 0) {
+                            $stripeCustomerId = $customers->data[0]->id;
+                        } else {
+                            $newCustomer = $stripe->customers->create([
+                                'email' => $userEmail,
+                                'name' => $userdata['name'] ?? ''
+                            ]);
+                            $stripeCustomerId = $newCustomer->id;
+                        }
+                    } catch (\Exception $e) {
+                        // Fallback
+                    }
+                }
+
+                $checkoutData = [
                     'line_items' => [
                         [
                             'price_data' => [
@@ -1197,9 +1258,18 @@ class checkoutcontroller extends Controller
                         ],
                     ],
                     'mode' => 'payment',
-                    'success_url' => route('payment_success'),
+                    'success_url' => route('payment_success') . '?session_id={CHECKOUT_SESSION_ID}',
                     'cancel_url' => route('payment_fail'),
-                ]);
+                    'client_reference_id' => $CIData->order_number,
+                ];
+
+                if ($stripeCustomerId) {
+                    $checkoutData['customer'] = $stripeCustomerId;
+                } else if (!empty($userEmail)) {
+                    $checkoutData['customer_email'] = $userEmail;
+                }
+
+                $response = $stripe->checkout->sessions->create($checkoutData);
 
                 // dd($response);
                 // echo "dev".$response->id;
@@ -1884,14 +1954,22 @@ class checkoutcontroller extends Controller
     {
 
         $stripe_session_id = Session::get('stripe_session_id');
+        if (empty($stripe_session_id) && $request->has('session_id')) {
+            $stripe_session_id = $request->input('session_id');
+        }
 
         $order_number = Session::get('order_number');
 
-        if (isset($stripe_session_id)) {
+        if (isset($stripe_session_id) && $stripe_session_id != '') {
 
             $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
 
             $response = $stripe->checkout->sessions->retrieve($stripe_session_id);
+
+            if (empty($order_number) && isset($response->client_reference_id)) {
+                $order_number = $response->client_reference_id;
+                Session::put('order_number', $order_number);
+            }
 
             if ($response->status == 'complete') {
 
@@ -4602,7 +4680,36 @@ class checkoutcontroller extends Controller
         } else {
             $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
 
-            $response = $stripe->checkout->sessions->create([
+            $userEmail = '';
+            $userDataDb = null;
+            if (isset($userid) && $userid != '') {
+                $userDataDb = DB::table('frontloginregisters')->where('id', $userid)->first();
+                if ($userDataDb && isset($userDataDb->email)) {
+                    $userEmail = $userDataDb->email;
+                }
+            } else if (isset($userdata['email']) && !empty($userdata['email'])) {
+                $userEmail = $userdata['email'];
+            }
+
+            $stripeCustomerId = null;
+            if (!empty($userEmail)) {
+                try {
+                    $customers = $stripe->customers->search(['query' => "email:'$userEmail'", 'limit' => 1]);
+                    if (count($customers->data) > 0) {
+                        $stripeCustomerId = $customers->data[0]->id;
+                    } else {
+                        $newCustomer = $stripe->customers->create([
+                            'email' => $userEmail,
+                            'name' => $userDataDb->name ?? ($userdata['name'] ?? '')
+                        ]);
+                        $stripeCustomerId = $newCustomer->id;
+                    }
+                } catch (\Exception $e) {
+                    // Fallback
+                }
+            }
+
+            $checkoutData = [
                 'line_items' => [
                     [
                         'price_data' => [
@@ -4616,9 +4723,18 @@ class checkoutcontroller extends Controller
                     ],
                 ],
                 'mode' => 'payment',
-                'success_url' => route('payment_success'),
+                'success_url' => route('payment_success') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('payment_fail'),
-            ]);
+                'client_reference_id' => $CIData->order_number ?? '',
+            ];
+
+            if ($stripeCustomerId) {
+                $checkoutData['customer'] = $stripeCustomerId;
+            } else if (!empty($userEmail)) {
+                $checkoutData['customer_email'] = $userEmail;
+            }
+
+            $response = $stripe->checkout->sessions->create($checkoutData);
 
             if (isset($response->id) && $response->id != '') {
                 Session::put('stripe_session_id', $response->id);
@@ -4631,6 +4747,10 @@ class checkoutcontroller extends Controller
 
     function book_now_homecleaning(Request $request)
     {
+
+        if ($request->how_often_do_you_need_cleaning == 'Multiple times a week' && is_array($request->which_day_of_the_week_do_you_want_the_service) && count($request->which_day_of_the_week_do_you_want_the_service) > 6) {
+            return redirect()->back()->with('error', 'You can select a maximum of 6 days for home cleaning.');
+        }
 
         /* echo "<pre>";
         print_r($request->all());
@@ -4675,7 +4795,7 @@ class checkoutcontroller extends Controller
         $front_wallet_amount_new = 0;
         $vat_total = $request->vat_total;
 
-        $cleaning_discount_additional = "";
+        $cleaning_discount_additional = $request->input('applied_discount_percentage', 0);
 
         $timing_charger = $request->timing_charge;
 
@@ -4969,7 +5089,33 @@ class checkoutcontroller extends Controller
 
             $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
 
-            $response = $stripe->checkout->sessions->create([
+            $userEmail = '';
+            if (isset($userid) && $userid != '') {
+                $userDataDb = DB::table('frontloginregisters')->where('id', $userid)->first();
+                if ($userDataDb && isset($userDataDb->email)) {
+                    $userEmail = $userDataDb->email;
+                }
+            }
+
+            $stripeCustomerId = null;
+            if (!empty($userEmail)) {
+                try {
+                    $customers = $stripe->customers->search(['query' => "email:'$userEmail'", 'limit' => 1]);
+                    if (count($customers->data) > 0) {
+                        $stripeCustomerId = $customers->data[0]->id;
+                    } else {
+                        $newCustomer = $stripe->customers->create([
+                            'email' => $userEmail,
+                            'name' => $userDataDb->name ?? ''
+                        ]);
+                        $stripeCustomerId = $newCustomer->id;
+                    }
+                } catch (\Exception $e) {
+                    // Fallback to let Stripe handle it if search fails
+                }
+            }
+
+            $checkoutData = [
                 'line_items' => [
                     [
                         'price_data' => [
@@ -4983,9 +5129,18 @@ class checkoutcontroller extends Controller
                     ],
                 ],
                 'mode' => 'payment',
-                'success_url' => route('payment_success'),
+                'success_url' => route('payment_success') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('payment_fail'),
-            ]);
+                'client_reference_id' => $order_number,
+            ];
+
+            if ($stripeCustomerId) {
+                $checkoutData['customer'] = $stripeCustomerId;
+            } else if (!empty($userEmail)) {
+                $checkoutData['customer_email'] = $userEmail;
+            }
+
+            $response = $stripe->checkout->sessions->create($checkoutData);
 
             // dd($response);
             // echo "dev".$response->id;
@@ -5391,7 +5546,36 @@ class checkoutcontroller extends Controller
 
             $stripe = new \Stripe\StripeClient(config('stripe.stripe_sk'));
 
-            $response = $stripe->checkout->sessions->create([
+            $userEmail = '';
+            $userDataDb = null;
+            if (isset($userid) && $userid != '') {
+                $userDataDb = DB::table('frontloginregisters')->where('id', $userid)->first();
+                if ($userDataDb && isset($userDataDb->email)) {
+                    $userEmail = $userDataDb->email;
+                }
+            } else if (isset($userdata['email']) && !empty($userdata['email'])) {
+                $userEmail = $userdata['email'];
+            }
+
+            $stripeCustomerId = null;
+            if (!empty($userEmail)) {
+                try {
+                    $customers = $stripe->customers->search(['query' => "email:'$userEmail'", 'limit' => 1]);
+                    if (count($customers->data) > 0) {
+                        $stripeCustomerId = $customers->data[0]->id;
+                    } else {
+                        $newCustomer = $stripe->customers->create([
+                            'email' => $userEmail,
+                            'name' => $userDataDb->name ?? ($userdata['name'] ?? '')
+                        ]);
+                        $stripeCustomerId = $newCustomer->id;
+                    }
+                } catch (\Exception $e) {
+                    // Fallback
+                }
+            }
+
+            $checkoutData = [
                 'line_items' => [
                     [
                         'price_data' => [
@@ -5405,9 +5589,18 @@ class checkoutcontroller extends Controller
                     ],
                 ],
                 'mode' => 'payment',
-                'success_url' => route('payment_success'),
+                'success_url' => route('payment_success') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('payment_fail'),
-            ]);
+                'client_reference_id' => $CIData->order_number ?? '',
+            ];
+
+            if ($stripeCustomerId) {
+                $checkoutData['customer'] = $stripeCustomerId;
+            } else if (!empty($userEmail)) {
+                $checkoutData['customer_email'] = $userEmail;
+            }
+
+            $response = $stripe->checkout->sessions->create($checkoutData);
 
             // dd($response);
             // echo "dev".$response->id;

@@ -125,8 +125,8 @@
                 </svg>
             </div>
 
-            <h1>{{ session('title', 'Updated Successful!') }}</h1>
-
+            <h1>{{ session('title', 'Update Successful!') }}</h1>
+            
             <p>
                 {{ session('message', 'Thank you! Your documents have been successfully updated.') }}
             </p>
@@ -138,5 +138,4 @@
     </div>
 
 </body>
-
 </html>
